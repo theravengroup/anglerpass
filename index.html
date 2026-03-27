@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnglerPass — Private Water Access, Modernized</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--forest:#1a3a2a;--forest-deep:#0f2219;--river:#3a6b7c;--river-light:#5a9aad;--river-pale:#c5dde5;
+--stone:#6b6b60;--stone-light:#9a9a8e;--sand:#c8b89a;--parchment:#f0ead6;--parchment-light:#f7f4ec;
+--offwhite:#faf9f5;--bronze:#9a7340;--bronze-light:#b8944e;--charcoal:#2a2a25;
+--text-primary:#1e1e1a;--text-secondary:#5a5a52;--text-light:#8a8a80;
+--border:rgba(0,0,0,0.08);--shadow-sm:0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 20px rgba(0,0,0,0.08);
+--shadow-lg:0 8px 40px rgba(0,0,0,0.12);--shadow-xl:0 20px 60px rgba(0,0,0,0.15);
+--radius:8px;--radius-lg:14px;
+--heading:'Cormorant Garamond',Georgia,serif;--body:'DM Sans',-apple-system,sans-serif;--mono:'DM Mono',monospace;
+--max-width:1200px;--section-pad:140px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+.container{max-width:var(--max-width);margin:0 auto;padding:0 32px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--bronze);font-weight:500;display:inline-block}
+.section-heading{font-family:var(--heading);font-size:clamp(38px,5vw,56px);font-weight:500;line-height:1.1;color:var(--text-primary);letter-spacing:-0.5px}
+.section-subhead{font-size:17px;color:var(--text-secondary);max-width:600px;line-height:1.7}
+
+/* ═══ REVEAL SYSTEM ═══ */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-50px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(50px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(.92);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}.d5{transition-delay:.5s}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:16px 34px;border-radius:6px;font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.3px;text-decoration:none;cursor:pointer;border:none;transition:all .4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .6s}
+.btn:hover::after{transform:translateX(100%)}
+.btn-primary{background:var(--forest);color:#fff}
+.btn-primary:hover{background:var(--forest-deep);transform:translateY(-2px);box-shadow:0 8px 30px rgba(26,58,42,.3)}
+.btn-secondary{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35)}
+.btn-secondary:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.6);transform:translateY(-2px)}
+.btn-white{background:#fff;color:var(--forest)}
+.btn-white:hover{background:var(--parchment);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.btn-ghost{background:transparent;color:rgba(255,255,255,.9);border:1.5px solid rgba(255,255,255,.3)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
+.btn-dark-outline{background:transparent;color:var(--forest);border:1.5px solid var(--forest)}
+.btn-dark-outline:hover{background:var(--forest);color:#fff;transform:translateY(-2px)}
+.btn-bronze{background:var(--bronze);color:#fff}
+.btn-bronze:hover{background:var(--bronze-light);transform:translateY(-2px);box-shadow:0 8px 30px rgba(154,115,64,.3)}
+
+/* ═══ NAV ═══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 32px;transition:all .5s cubic-bezier(.22,1,.36,1);background:transparent}
+nav.scrolled{background:rgba(250,249,245,.92);backdrop-filter:blur(20px) saturate(1.2);border-bottom:1px solid var(--border);box-shadow:0 1px 12px rgba(0,0,0,.04)}
+nav.scrolled .nav-logo span,nav.scrolled .nav-links a{color:var(--text-primary)}
+.nav-inner{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;transition:color .4s}
+.nav-logo svg{width:28px;height:28px}
+.nav-logo span{font-family:var(--heading);font-size:22px;font-weight:600;letter-spacing:-.3px}
+.nav-links{display:flex;align-items:center;gap:22px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:rgba(255,255,255,.75);text-decoration:none;letter-spacing:.3px;transition:color .3s}
+.nav-links a:hover{color:#fff}
+nav.scrolled .nav-links a:hover{color:var(--forest)}
+.nav-cta .btn{padding:10px 22px;font-size:13px}
+.mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
+.mobile-toggle span{display:block;width:22px;height:2px;background:#fff;margin:5px 0;transition:all .3s}
+nav.scrolled .mobile-toggle span{background:var(--text-primary)}
+
+/* ═══ HERO ═══ */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 100px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-bg img{width:100%;height:120%;object-fit:cover;object-position:center 40%;will-change:transform;transform:scale(1.05)}
+.hero-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,34,25,.45) 0%,rgba(15,34,25,.30) 30%,rgba(15,34,25,.35) 60%,rgba(15,34,25,.65) 100%);z-index:1}
+.hero-bg-grain{display:none}
+.hero .container{position:relative;z-index:3;display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
+.hero-content{max-width:580px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:7px 18px;margin-bottom:30px;backdrop-filter:blur(8px);animation:fadeIn .8s ease .3s both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--bronze-light);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.hero-badge span{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.85);font-weight:500}
+.hero h1{font-family:var(--heading);font-size:clamp(44px,5.5vw,68px);font-weight:500;line-height:1.05;color:#fff;letter-spacing:-1px;margin-bottom:24px}
+.hero h1 em{font-style:italic;color:var(--river-pale)}
+.hero-word{display:inline-block;opacity:0;transform:translateY(30px);animation:wordReveal .7s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes wordReveal{to{opacity:1;transform:translateY(0)}}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:40px;max-width:480px;opacity:0;animation:fadeUp .9s ease 1s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .9s ease 1.15s both}
+.hero-note{margin-top:28px;font-size:13px;color:rgba(255,255,255,.45);opacity:0;animation:fadeUp .9s ease 1.3s both}
+.hero-note svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px;stroke:rgba(255,255,255,.35)}
+
+/* Hero Mockup */
+.hero-visual{position:relative;opacity:0;animation:heroMockupIn 1.2s cubic-bezier(.22,1,.36,1) .6s both}
+@keyframes heroMockupIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.hero-mockup{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.1);overflow:hidden;position:relative}
+.mockup-topbar{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--forest-deep)}
+.mockup-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12)}
+.mockup-dot:first-child{background:#e85d4a}.mockup-dot:nth-child(2){background:#e8b84a}.mockup-dot:nth-child(3){background:#4ae86b}
+.mockup-url{flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.5px}
+.mockup-body{padding:24px;min-height:320px;background:linear-gradient(135deg,var(--parchment-light) 0%,#fff 100%)}
+.mockup-sidebar{position:absolute;left:0;top:42px;bottom:0;width:52px;background:var(--forest);display:flex;flex-direction:column;align-items:center;padding-top:16px;gap:18px}
+.mockup-sidebar-icon{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.1)}
+.mockup-sidebar-icon.active{background:rgba(255,255,255,.22)}
+.mockup-content{margin-left:52px}
+.mockup-greeting{font-family:var(--heading);font-size:19px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.mockup-sub{font-size:12px;color:var(--text-light);margin-bottom:18px}
+.mockup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mockup-stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.mockup-stat-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:5px}
+.mockup-stat-value{font-family:var(--heading);font-size:24px;font-weight:600;color:var(--forest)}
+.mockup-stat-change{font-size:10px;color:#4a9a62;margin-top:2px}
+.mockup-table{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.mockup-table-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:9px 14px;background:var(--parchment-light);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-light)}
+.mockup-table-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:9px 14px;font-size:12px;color:var(--text-secondary);border-top:1px solid var(--border)}
+.mockup-table-row span:first-child{color:var(--text-primary);font-weight:500}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:500}
+.status-active{background:rgba(74,154,98,.12);color:#3a8a52}
+.status-pending{background:rgba(200,160,60,.12);color:#9a7a20}
+
+.float-card{position:absolute;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:12px 16px;z-index:2;opacity:0;animation:floatCardIn .8s cubic-bezier(.22,1,.36,1) forwards}
+.float-card-1{top:-10px;right:-20px;animation-delay:1.4s}
+.float-card-2{bottom:40px;right:-30px;animation-delay:1.7s}
+@keyframes floatCardIn{from{opacity:0;transform:translateY(20px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+.float-card-1.floating{animation:floatCardIn .8s cubic-bezier(.22,1,.36,1) forwards,floatA 6s ease-in-out 2.2s infinite}
+.float-card-2.floating{animation:floatCardIn .8s cubic-bezier(.22,1,.36,1) forwards,floatB 6s ease-in-out 2.5s infinite}
+@keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.float-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.float-icon.green{background:rgba(26,58,42,.1)}.float-icon.blue{background:rgba(58,107,124,.1)}
+.float-card-inner{display:flex;align-items:center;gap:10px}
+.float-card-label{font-size:11px;font-weight:500;color:var(--text-primary)}
+.float-card-sub{font-size:10px;color:var(--text-light)}
+
+/* ═══ SCROLL INDICATOR ═══ */
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;z-index:10;opacity:0;animation:fadeIn 1s ease 1.8s both;transition:opacity .5s}
+.scroll-indicator:hover .scroll-mouse{border-color:rgba(255,255,255,.9)}
+.scroll-label{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.8)}
+.scroll-mouse{width:26px;height:40px;border:2px solid rgba(255,255,255,.6);border-radius:13px;display:flex;justify-content:center;transition:border-color .3s}
+.scroll-wheel{width:3px;height:8px;background:#fff;border-radius:2px;margin-top:8px;animation:scrollWheel 2.2s ease-in-out infinite}
+@keyframes scrollWheel{0%{opacity:1;transform:translateY(0)}35%{opacity:1;transform:translateY(8px)}55%{opacity:0;transform:translateY(8px)}100%{opacity:0;transform:translateY(0)}}
+.scroll-chevrons{color:rgba(255,255,255,.7)}
+.chevron-1{animation:chevBounce 2.2s ease-in-out infinite}
+.chevron-2{animation:chevBounce 2.2s ease-in-out .15s infinite}
+@keyframes chevBounce{0%,100%{opacity:.4;transform:translateY(0)}50%{opacity:1;transform:translateY(3px)}}
+.scroll-indicator.hidden{opacity:0;pointer-events:none}
+
+/* ═══ PROBLEM ═══ */
+.problem{padding:var(--section-pad) 0;background:var(--offwhite);position:relative}
+.problem::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.problem-header{text-align:center;max-width:700px;margin:0 auto 72px}
+.problem-header .section-heading{margin:16px 0 20px}
+.problem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.problem-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 28px;transition:all .5s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.problem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--forest),var(--river));opacity:0;transition:opacity .4s}
+.problem-card:hover::before{opacity:1}
+.problem-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.problem-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;background:rgba(26,58,42,.06);transition:all .4s}
+.problem-card:hover .problem-icon{background:var(--forest)}
+.problem-card:hover .problem-icon svg{stroke:#fff}
+.problem-icon svg{width:22px;height:22px;stroke:var(--forest);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .4s}
+.problem-card h3{font-family:var(--heading);font-size:23px;font-weight:600;margin-bottom:10px}
+.problem-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
+
+/* ═══ CINEMATIC DIVIDER ═══ */
+.cinematic-divider{height:50vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cinematic-divider-bg{position:absolute;inset:-30% 0;background-size:cover;background-position:center;will-change:transform}
+.cinematic-divider-content{position:relative;z-index:2;text-align:center;color:#fff;max-width:700px;padding:0 32px}
+.cinematic-divider-content .eyebrow{color:var(--sand)}
+.cinematic-divider-content h2{font-family:var(--heading);font-size:clamp(30px,4vw,44px);font-weight:400;font-style:italic;line-height:1.25;margin-top:12px;color:rgba(255,255,255,.9);letter-spacing:-.3px}
+.divider-line{width:50px;height:2px;background:var(--bronze);margin:0 auto 16px}
+.cinematic-divider-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--offwhite) 0%,transparent 18%,transparent 82%,var(--offwhite) 100%);pointer-events:none}
+
+/* ═══ HOW IT WORKS ═══ */
+.how-it-works{padding:var(--section-pad) 0;background:var(--offwhite)}
+.how-header{text-align:center;max-width:780px;margin:0 auto 72px}
+.how-header .section-heading{margin:16px 0 20px}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.how-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .5s cubic-bezier(.22,1,.36,1)}
+.how-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-xl)}
+.how-card-accent{height:4px}
+.how-card:nth-child(1) .how-card-accent{background:linear-gradient(90deg,var(--forest),#2a5a3a)}
+.how-card:nth-child(2) .how-card-accent{background:linear-gradient(90deg,var(--river),#4a8a9c)}
+.how-card:nth-child(3) .how-card-accent{background:linear-gradient(90deg,var(--bronze),#c0984e)}
+.how-card-body{padding:36px 32px}
+.how-card-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
+.how-card:nth-child(1) .how-card-icon{background:rgba(26,58,42,.08)}
+.how-card:nth-child(2) .how-card-icon{background:rgba(58,107,124,.08)}
+.how-card:nth-child(3) .how-card-icon{background:rgba(154,115,64,.08)}
+.how-card-icon svg{width:24px;height:24px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.how-card:nth-child(1) .how-card-icon svg{stroke:var(--forest)}
+.how-card:nth-child(2) .how-card-icon svg{stroke:var(--river)}
+.how-card:nth-child(3) .how-card-icon svg{stroke:var(--bronze)}
+.how-card h3{font-family:var(--heading);font-size:28px;font-weight:600;margin-bottom:6px}
+.how-card-for{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.how-card:nth-child(1) .how-card-for{color:var(--forest)}
+.how-card:nth-child(2) .how-card-for{color:var(--river)}
+.how-card:nth-child(3) .how-card-for{color:var(--bronze)}
+.how-card ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.how-card li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:var(--text-secondary);line-height:1.5}
+.how-card li::before{content:'';width:5px;height:5px;border-radius:50%;margin-top:8px;flex-shrink:0}
+.how-card:nth-child(1) li::before{background:var(--forest)}
+.how-card:nth-child(2) li::before{background:var(--river)}
+.how-card:nth-child(3) li::before{background:var(--bronze)}
+
+/* ═══ FEATURES ═══ */
+.features{padding:var(--section-pad) 0;background:#fff;position:relative}
+.features::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.features-header{text-align:center;max-width:620px;margin:0 auto 72px}
+.features-header .section-heading{margin:16px 0 20px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feature-item{padding:34px 28px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--parchment-light);transition:all .5s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.feature-item::after{content:'';position:absolute;bottom:0;left:0;right:0;height:0;background:linear-gradient(180deg,transparent,rgba(26,58,42,.03));transition:height .5s}
+.feature-item:hover::after{height:100%}
+.feature-item:hover{border-color:rgba(26,58,42,.15);box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.feature-icon{width:44px;height:44px;border-radius:12px;background:rgba(26,58,42,.07);display:flex;align-items:center;justify-content:center;margin-bottom:18px;position:relative;z-index:1}
+.feature-icon svg{width:20px;height:20px;stroke:var(--forest);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.feature-item h4{font-family:var(--heading);font-size:21px;font-weight:600;margin-bottom:8px;position:relative;z-index:1}
+.feature-item p{font-size:13.5px;color:var(--text-secondary);line-height:1.65;position:relative;z-index:1}
+
+/* ═══ WHY IT MATTERS ═══ */
+.why{padding:var(--section-pad) 0;position:relative;overflow:hidden;background:var(--forest-deep);color:#fff}
+.why-bg{position:absolute;inset:-30% 0;background-size:cover;background-position:center;filter:brightness(.18) saturate(.8);will-change:transform}
+.why-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(58,107,124,.2) 0%,transparent 50%),radial-gradient(ellipse at 10% 90%,rgba(154,115,64,.12) 0%,transparent 40%);z-index:1}
+.why-grain{position:absolute;inset:0;z-index:2;opacity:.08;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+.why .container{position:relative;z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.why-content .eyebrow{color:var(--sand)}
+.why h2{font-family:var(--heading);font-size:clamp(36px,5vw,50px);font-weight:500;line-height:1.12;margin:16px 0 28px;color:#fff;letter-spacing:-.5px}
+.why-text{font-size:16px;color:rgba(255,255,255,.68);line-height:1.75;margin-bottom:20px}
+.why-list{display:flex;flex-direction:column;gap:22px;margin-top:40px}
+.why-list-item{display:flex;align-items:flex-start;gap:16px}
+.why-list-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.why-list-icon svg{width:20px;height:20px;stroke:var(--sand);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.why-list-text h4{font-family:var(--heading);font-size:20px;font-weight:600;color:#fff;margin-bottom:4px}
+.why-list-text p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.6}
+.why-visual-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:48px 44px;backdrop-filter:blur(12px)}
+.why-quote-line{width:50px;height:2px;background:linear-gradient(90deg,var(--bronze),var(--sand));margin-bottom:20px}
+.why-quote{font-family:var(--heading);font-size:30px;font-weight:400;font-style:italic;line-height:1.35;color:rgba(255,255,255,.85);margin-bottom:24px}
+.why-quote-attr{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+
+/* ═══ BUILT FOR ═══ */
+.built-for{padding:var(--section-pad) 0;background:var(--parchment-light)}
+.built-for-header{text-align:center;max-width:640px;margin:0 auto 72px}
+.built-for-header .section-heading{margin:16px 0 20px}
+.built-for-rows{display:flex;flex-direction:column;gap:48px}
+.built-for-row{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.built-for-row:nth-child(even){direction:rtl}
+.built-for-row:nth-child(even) > *{direction:ltr}
+.built-for-img{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:3/2;position:relative}
+.built-for-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.built-for-row:hover .built-for-img img{transform:scale(1.04)}
+.built-for-img::after{content:'';position:absolute;inset:0;border-radius:var(--radius-lg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.built-for-text{padding:12px 0}
+.built-for-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:inline-block}
+.built-for-row:nth-child(1) .built-for-label{color:var(--forest)}
+.built-for-row:nth-child(2) .built-for-label{color:var(--river)}
+.built-for-row:nth-child(3) .built-for-label{color:var(--bronze)}
+.built-for-text h3{font-family:var(--heading);font-size:clamp(28px,3.5vw,36px);font-weight:600;margin-bottom:16px;line-height:1.15;letter-spacing:-.3px}
+.built-for-text p{font-size:16px;color:var(--text-secondary);line-height:1.75;margin-bottom:20px}
+.built-for-text .btn{margin-top:8px;padding:12px 24px;font-size:13px}
+
+/* ═══ WAITLIST ═══ */
+.waitlist{padding:var(--section-pad) 0;background:#fff;position:relative}
+.waitlist::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.waitlist .container{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.waitlist-content .section-heading{margin:16px 0 20px}
+.waitlist-text{font-size:16px;color:var(--text-secondary);line-height:1.75;margin-bottom:24px}
+.waitlist-features{display:flex;flex-direction:column;gap:14px;margin-top:36px}
+.waitlist-feature{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text-secondary)}
+.waitlist-feature-check{width:24px;height:24px;border-radius:7px;background:rgba(26,58,42,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.waitlist-feature-check svg{width:13px;height:13px;stroke:var(--forest);fill:none;stroke-width:2.5}
+.waitlist-form-wrapper{background:var(--parchment-light);border:1px solid var(--border);border-radius:var(--radius-lg);padding:44px;box-shadow:var(--shadow-md)}
+.waitlist-form-title{font-family:var(--heading);font-size:26px;font-weight:600;margin-bottom:6px}
+.waitlist-form-sub{font-size:13px;color:var(--text-light);margin-bottom:28px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:6px;letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:13px 16px;border:1px solid rgba(0,0,0,.12);border-radius:6px;font-family:var(--body);font-size:14px;color:var(--text-primary);background:#fff;transition:all .3s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--river);box-shadow:0 0 0 4px rgba(58,107,124,.08)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%235a5a52' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-submit{margin-top:8px}
+.form-submit .btn{width:100%;justify-content:center;padding:15px;font-size:14.5px}
+.form-partner{margin-top:20px;text-align:center;font-size:13px;color:var(--text-light)}
+.form-partner a{color:var(--river);text-decoration:none;font-weight:500}
+.form-partner a:hover{text-decoration:underline}
+
+/* ═══ FAQ ═══ */
+.faq{padding:var(--section-pad) 0;background:var(--offwhite)}
+.faq-header{text-align:center;max-width:500px;margin:0 auto 60px}
+.faq-header .section-heading{margin:16px 0}
+.faq-list{max-width:760px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:first-child{border-top:1px solid var(--border)}
+.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 0;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--heading);font-size:20px;font-weight:600;color:var(--text-primary);transition:color .3s}
+.faq-question:hover{color:var(--river)}
+.faq-chevron{width:20px;height:20px;stroke:var(--text-light);fill:none;stroke-width:2;transition:transform .4s cubic-bezier(.22,1,.36,1);flex-shrink:0;margin-left:16px}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.22,1,.36,1)}
+.faq-answer-inner{padding:0 0 24px;font-size:15px;color:var(--text-secondary);line-height:1.7;max-width:640px}
+
+/* ═══ NAV DROPDOWN ═══ */
+.nav-dropdown{position:relative}
+.nav-dropdown > a{display:flex;align-items:center;gap:4px}
+.nav-dropdown > a svg{width:10px;height:10px;transition:transform .3s}
+.nav-dropdown:hover > a svg{transform:rotate(180deg)}
+.nav-dropdown-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(4px);background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:8px 0;min-width:200px;opacity:0;visibility:hidden;transition:all .3s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.nav-dropdown-menu a{display:block;padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-secondary) !important;letter-spacing:.2px;transition:all .2s;white-space:nowrap}
+.nav-dropdown-menu a:hover{color:var(--forest) !important;background:var(--parchment-light)}
+.nav-dropdown-menu .dd-divider{height:1px;background:var(--border);margin:6px 0}
+
+/* ═══ INVESTORS ═══ */
+.investors{padding:var(--section-pad) 0;background:var(--forest-deep);color:#fff;position:relative;overflow:hidden}
+.investors::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(58,107,124,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(154,115,64,.08) 0%,transparent 40%);pointer-events:none}
+.investors .container{position:relative;z-index:1}
+.investors-header{max-width:700px;margin-bottom:72px}
+.investors-header .eyebrow{color:var(--sand)}
+.investors-header h2{font-family:var(--heading);font-size:clamp(36px,5vw,50px);font-weight:500;line-height:1.12;margin:16px 0 20px;color:#fff;letter-spacing:-.5px}
+.investors-header p{font-size:16px;color:rgba(255,255,255,.6);line-height:1.75;max-width:560px}
+.investors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:64px}
+.investor-metric{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:36px 32px;transition:all .4s}
+.investor-metric:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.investor-metric-value{font-family:var(--heading);font-size:clamp(32px,4vw,44px);font-weight:600;color:#fff;margin-bottom:6px;line-height:1}
+.investor-metric-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sand);margin-bottom:12px}
+.investor-metric p{font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.6}
+.investors-columns{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.investors-col h3{font-family:var(--heading);font-size:26px;font-weight:600;color:#fff;margin-bottom:20px}
+.investors-detail{margin-bottom:28px}
+.investors-detail h4{font-size:14px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.investors-detail h4::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bronze);flex-shrink:0}
+.investors-detail p{font-size:14px;color:rgba(255,255,255,.5);line-height:1.65;padding-left:14px}
+.investor-form-wrap{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:40px}
+.investor-form-wrap h3{font-family:var(--heading);font-size:24px;font-weight:600;color:#fff;margin-bottom:6px}
+.investor-form-wrap .form-sub{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:24px}
+.investor-form-wrap .form-group label{color:rgba(255,255,255,.7)}
+.investor-form-wrap .form-group input,
+.investor-form-wrap .form-group select,
+.investor-form-wrap .form-group textarea{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#fff}
+.investor-form-wrap .form-group input::placeholder,
+.investor-form-wrap .form-group textarea::placeholder{color:rgba(255,255,255,.3)}
+.investor-form-wrap .form-group input:focus,
+.investor-form-wrap .form-group select:focus,
+.investor-form-wrap .form-group textarea:focus{border-color:var(--bronze);box-shadow:0 0 0 4px rgba(154,115,64,.15)}
+.investor-form-wrap .form-group select{background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.investor-form-wrap .form-group select option{background:var(--forest-deep);color:#fff}
+.investor-form-wrap .btn-bronze{width:100%;justify-content:center;padding:15px}
+.investors-note{margin-top:40px;padding-top:28px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:rgba(255,255,255,.3);text-align:center}
+
+/* ═══ FINAL CTA ═══ */
+.final-cta{padding:120px 0;position:relative;overflow:hidden;text-align:center}
+.final-cta-bg{position:absolute;inset:-30% 0;background-size:cover;background-position:center 60%;filter:brightness(.25) saturate(.9);will-change:transform}
+.final-cta-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(58,107,124,.2) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(15,34,25,.5) 0%,transparent 60%);z-index:1}
+.final-cta .container{position:relative;z-index:2}
+.final-cta .eyebrow{color:var(--sand);margin-bottom:16px}
+.final-cta h2{font-family:var(--heading);font-size:clamp(36px,4.5vw,52px);font-weight:500;line-height:1.12;color:#fff;max-width:660px;margin:0 auto 22px;letter-spacing:-.5px}
+.final-cta p{font-size:16.5px;color:rgba(255,255,255,.6);max-width:520px;margin:0 auto 40px;line-height:1.7}
+.final-cta-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ═══ FOOTER ═══ */
+footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,.5)}
+.footer-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.footer-brand .nav-logo{margin-bottom:14px}
+.footer-brand .nav-logo span{color:#fff}
+.footer-tagline{font-size:13px;color:rgba(255,255,255,.38);max-width:280px;line-height:1.6}
+.footer-links{display:flex;gap:32px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .3s}
+.footer-links a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{margin-top:44px;padding-top:28px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,.25)}
+.footer-bottom a{color:rgba(255,255,255,.35);text-decoration:none;transition:color .3s}
+.footer-bottom a:hover{color:rgba(255,255,255,.7)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1024px){
+:root{--section-pad:100px}
+.hero .container{grid-template-columns:1fr;gap:50px}
+.hero-visual{max-width:600px}
+.problem-grid{grid-template-columns:repeat(2,1fr)}
+.why .container{grid-template-columns:1fr;gap:50px}
+.waitlist .container{grid-template-columns:1fr;gap:50px}
+.investors-columns{grid-template-columns:1fr;gap:50px}
+}
+@media(max-width:768px){
+:root{--section-pad:80px}
+.container{padding:0 20px}
+.nav-links{display:none}
+.mobile-toggle{display:block}
+.hero{padding:120px 0 80px;min-height:auto}
+.hero h1{font-size:38px}
+.problem-grid{grid-template-columns:1fr}
+.how-grid{grid-template-columns:1fr}
+.features-grid{grid-template-columns:1fr}
+.built-for-row{grid-template-columns:1fr;gap:24px}
+.built-for-row:nth-child(even){direction:ltr}
+.form-row{grid-template-columns:1fr}
+.float-card{display:none}
+.scroll-indicator{display:none}
+.cinematic-divider{height:35vh}
+.investors-grid{grid-template-columns:1fr}
+.nav-dropdown-menu{display:none}
+.footer-inner{flex-direction:column;gap:24px}
+.footer-links{flex-wrap:wrap;gap:18px}
+.footer-bottom{flex-direction:column;gap:10px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <svg viewBox="0 0 28 28" fill="none"><path d="M14 2C7.37 2 2 7.37 2 14s5.37 12 12 12 12-5.37 12-12S20.63 2 14 2z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M6 18c2-3 4-8 8-8s6 5 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M10 13c0-2 1.5-5 4-5s4 3 4 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity=".4"/><circle cx="14" cy="8" r="1.5" fill="currentColor" opacity=".6"/></svg>
+      <span>AnglerPass</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problem">The Opportunity</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#why">Why It Matters</a></li>
+      <li><a href="#built-for">Who It's For</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li class="nav-dropdown">
+        <a href="#investors">Investors <svg viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav-dropdown-menu">
+          <a href="#investors">Investment Overview</a>
+          <a href="#investor-form">Request the Deck</a>
+          <div class="dd-divider"></div>
+          <a href="mailto:investors@anglerpass.com">Contact Directly</a>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-cta"><a href="#waitlist" class="btn btn-primary">Join the Waitlist</a></div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <img src="hero.webp" alt="Fly fishing at sunrise on a private Rocky Mountain river" id="heroBgImg">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-bg-grain"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge"><div class="hero-badge-dot"></div><span>Now Building AnglerPass</span></div>
+      <h1 id="heroHeadline">Private Water Access, <em>Modernized.</em></h1>
+      <p class="hero-sub">The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — all in one place built for landowners, clubs, and serious anglers.</p>
+      <div class="hero-ctas">
+        <a href="#waitlist" class="btn btn-primary">Join the Waitlist <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="#waitlist" class="btn btn-secondary">Request Early Access</a>
+      </div>
+      <p class="hero-note"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Platform under active development. Early supporters get priority access.</p>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-mockup">
+        <div class="mockup-topbar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-url">app.anglerpass.com</div></div>
+        <div class="mockup-body">
+          <div class="mockup-sidebar"><div class="mockup-sidebar-icon active"></div><div class="mockup-sidebar-icon"></div><div class="mockup-sidebar-icon"></div><div class="mockup-sidebar-icon"></div><div class="mockup-sidebar-icon"></div></div>
+          <div class="mockup-content">
+            <div class="mockup-greeting">Welcome back, James</div>
+            <div class="mockup-sub">Silver Creek Ranch · Property Dashboard</div>
+            <div class="mockup-stats">
+              <div class="mockup-stat"><div class="mockup-stat-label">Active Bookings</div><div class="mockup-stat-value" data-count="14">0</div><div class="mockup-stat-change">+3 this week</div></div>
+              <div class="mockup-stat"><div class="mockup-stat-label">Members</div><div class="mockup-stat-value" data-count="86">0</div><div class="mockup-stat-change">+12 this month</div></div>
+              <div class="mockup-stat"><div class="mockup-stat-label">Properties</div><div class="mockup-stat-value" data-count="3">0</div><div class="mockup-stat-change">All active</div></div>
+            </div>
+            <div class="mockup-table">
+              <div class="mockup-table-header"><span>Property</span><span>Type</span><span>Availability</span><span>Status</span></div>
+              <div class="mockup-table-row"><span>Silver Creek — East Fork</span><span>River</span><span>Mar 26–28</span><span><span class="status-badge status-active">Active</span></span></div>
+              <div class="mockup-table-row"><span>Elk Meadow Spring</span><span>Spring Creek</span><span>Apr 1–5</span><span><span class="status-badge status-active">Active</span></span></div>
+              <div class="mockup-table-row"><span>Columbine Reservoir</span><span>Stillwater</span><span>Pending</span><span><span class="status-badge status-pending">Review</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card float-card-1" id="floatCard1"><div class="float-card-inner"><div class="float-icon green"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L7 12.5L3 8.5" stroke="#1a3a2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="float-card-label">Reservation Confirmed</div><div class="float-card-sub">Silver Creek · Mar 26</div></div></div></div>
+      <div class="float-card float-card-2" id="floatCard2"><div class="float-card-inner"><div class="float-icon blue"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="#3a6b7c" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="float-card-label">New Member Request</div><div class="float-card-sub">Trout Valley Anglers Club</div></div></div></div>
+    </div>
+  </div>
+  <div class="scroll-indicator" id="scrollIndicator">
+    <span class="scroll-label">Explore</span>
+    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+    <svg class="scroll-chevrons" width="16" height="18" viewBox="0 0 16 18" fill="none"><path class="chevron-1" d="M1 1L8 8L15 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path class="chevron-2" d="M1 6L8 13L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="problem-header reveal">
+      <span class="eyebrow">The Opportunity</span>
+      <h2 class="section-heading">A Premier Ecosystem, Running on Manual Systems</h2>
+      <p class="section-subhead" style="margin:0 auto">Private fly fishing has an access problem. Not a lack of interest — a lack of infrastructure.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card reveal d1"><div class="problem-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg></div><h3>Scattered Management</h3><p>Landowners manage private water access through phone calls, emails, and handshake agreements. There's no centralized system to organize properties, schedules, or inquiries.</p></div>
+      <div class="problem-card reveal d2"><div class="problem-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Club Friction</h3><p>Fly fishing clubs handle memberships, scheduling, and communications through spreadsheets and group texts. Administrative overhead eats into the time members should spend on the water.</p></div>
+      <div class="problem-card reveal d3"><div class="problem-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><h3>Discovery Gaps</h3><p>Individual anglers have limited ways to find and book legitimate private water experiences. Most access still depends on who you know, not what's available.</p></div>
+      <div class="problem-card reveal d4"><div class="problem-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Trust Deficit</h3><p>Without a structured platform, trust between landowners, clubs, and anglers relies on informal networks. That limits growth and keeps the market fragmented.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="cinematic-divider">
+  <div class="cinematic-divider-bg" id="dividerBg" style="background-image:url('virginia.webp');filter:brightness(.35) saturate(1.1)"></div>
+  <div class="cinematic-divider-overlay"></div>
+  <div class="cinematic-divider-content reveal">
+    <div class="divider-line"></div>
+    <span class="eyebrow">The AnglerPass Philosophy</span>
+    <h2>The best fishing isn't about finding any water. It's about finding the right water — and earning access to it.</h2>
+  </div>
+</div>
+
+<section class="how-it-works" id="how">
+  <div class="container">
+    <div class="how-header reveal"><span class="eyebrow">How It Works</span><h2 class="section-heading">One Platform. Three Distinct Roles.</h2><p class="section-subhead" style="margin:0 auto">AnglerPass connects the private water ecosystem through a shared platform designed for every stakeholder.</p></div>
+    <div class="how-grid">
+      <div class="how-card reveal d1"><div class="how-card-accent"></div><div class="how-card-body"><div class="how-card-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><h3>Landowners</h3><div class="how-card-for">Property Management</div><ul><li>Register and showcase private waters</li><li>Control access, visibility, and availability</li><li>Manage inquiries and booking requests</li><li>Participate in a vetted, trusted network</li><li>Present properties with a professional profile</li></ul></div></div>
+      <div class="how-card reveal d2"><div class="how-card-accent"></div><div class="how-card-body"><div class="how-card-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Fly Fishing Clubs</h3><div class="how-card-for">Membership &amp; Operations</div><ul><li>Offer and manage memberships digitally</li><li>Organize member access and schedules</li><li>Simplify reservation workflows</li><li>Track participation and availability</li><li>Reduce administrative overhead</li></ul></div></div>
+      <div class="how-card reveal d3"><div class="how-card-accent"></div><div class="how-card-body"><div class="how-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Individual Anglers</h3><div class="how-card-for">Access &amp; Booking</div><ul><li>Discover private fishing opportunities</li><li>Book private fly fishing days directly</li><li>Access trusted, vetted properties</li><li>View real-time availability and details</li><li>Enjoy a streamlined booking experience</li></ul></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header reveal"><span class="eyebrow">Platform Capabilities</span><h2 class="section-heading">Core Platform Features</h2><p class="section-subhead" style="margin:0 auto">Every tool designed to make private water management, membership operations, and angler access work together.</p></div>
+    <div class="features-grid">
+      <div class="feature-item reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h4>Property Registration</h4><p>List and manage private waters with detailed profiles, maps, and access parameters. Define what's available, when, and to whom.</p></div>
+      <div class="feature-item reveal d1"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h4>Membership Tools</h4><p>Run club memberships with structured tiers, renewals, and digital roster management. Keep your member base organized without the spreadsheets.</p></div>
+      <div class="feature-item reveal d2"><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h4>Reservations &amp; Booking</h4><p>A clean workflow for scheduling fishing days. Handle requests, confirmations, and calendar management from a single dashboard.</p></div>
+      <div class="feature-item reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><h4>Availability Calendars</h4><p>Visual, real-time calendars that sync across properties and members. No more double bookings or outdated schedules.</p></div>
+      <div class="feature-item reveal d1"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>Access Controls</h4><p>Fine-grained permissions for who can see, request, and book specific waters. Maintain privacy while opening controlled access.</p></div>
+      <div class="feature-item reveal d2"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h4>Guest Management</h4><p>Handle member guests, day-pass visitors, and inquiry forms. Track who's on the water and when, with clear records for every visit.</p></div>
+      <div class="feature-item reveal"><div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h4>Admin Dashboard</h4><p>A centralized operations view for landowners and club managers. See activity, manage requests, and monitor access from one screen.</p></div>
+      <div class="feature-item reveal d1"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>Inquiry Handling</h4><p>Receive and respond to access requests from qualified anglers. Pre-screen, approve, or decline with structured communication tools.</p></div>
+      <div class="feature-item reveal d2"><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h4>Private Water Listings</h4><p>Curated, searchable listings for private waters. Each property gets a professional profile with photos, rules, species info, and access terms.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="why-bg" id="whyBg" style="background-image:url('patagonia.webp')"></div>
+  <div class="why-overlay"></div>
+  <div class="why-grain"></div>
+  <div class="container">
+    <div class="why-content reveal-left">
+      <span class="eyebrow">Why This Matters</span>
+      <h2>Bringing Structure to the Waters That Matter Most</h2>
+      <p class="why-text">Private waters represent some of the best fly fishing on the planet. But the systems around them — scheduling, memberships, access management — haven't kept up with the quality of the experience.</p>
+      <p class="why-text">AnglerPass exists to close that gap. By giving landowners, clubs, and anglers the tools they've been missing, we make private water access more organized, more sustainable, and more accessible to the right people.</p>
+      <div class="why-list">
+        <div class="why-list-item"><div class="why-list-icon"><svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg></div><div class="why-list-text"><h4>Preserve Quality Access</h4><p>Help landowners maintain the integrity of their waters while opening controlled access.</p></div></div>
+        <div class="why-list-item"><div class="why-list-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="why-list-text"><h4>Modernize Operations</h4><p>Give clubs real software to replace the patchwork of spreadsheets, texts, and emails.</p></div></div>
+        <div class="why-list-item"><div class="why-list-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="why-list-text"><h4>Elevate the Angler Experience</h4><p>Make discovering and booking private waters as professional as the experience itself.</p></div></div>
+      </div>
+    </div>
+    <div class="why-visual reveal-right d2">
+      <div class="why-visual-card"><div class="why-quote-line"></div><div class="why-quote">The best fishing isn't about finding any water. It's about finding the right water — and earning access to it.</div><div class="why-quote-attr">The AnglerPass Philosophy</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="built-for" id="built-for">
+  <div class="container">
+    <div class="built-for-header reveal"><span class="eyebrow">Who It's For</span><h2 class="section-heading">Built for the Private Water Ecosystem</h2><p class="section-subhead" style="margin:0 auto">Every feature was designed with the specific needs of three core audiences in mind.</p></div>
+    <div class="built-for-rows">
+      <div class="built-for-row reveal">
+        <div class="built-for-img"><img src="virginia.webp" alt="Angler fly fishing on a private Virginia river at golden hour"></div>
+        <div class="built-for-text">
+          <span class="built-for-label">For Landowners</span>
+          <h3>Private Landowners</h3>
+          <p>You own the water. AnglerPass gives you a professional way to register your properties, manage who has access, control availability, and present your waters in a way that attracts the right anglers — not just anyone with a rod.</p>
+          <a href="#waitlist" class="btn btn-primary">Register Your Property</a>
+        </div>
+      </div>
+      <div class="built-for-row reveal">
+        <div class="built-for-img"><img src="minnesota.webp" alt="Two anglers fly fishing on a private Minnesota lake in autumn"></div>
+        <div class="built-for-text">
+          <span class="built-for-label">For Clubs</span>
+          <h3>Clubs &amp; Associations</h3>
+          <p>Managing memberships, scheduling water access, and keeping track of participation shouldn't require a full-time administrator. AnglerPass gives your club the operational backbone to run smoothly so members can focus on fishing.</p>
+          <a href="#waitlist" class="btn btn-dark-outline">Streamline Your Club</a>
+        </div>
+      </div>
+      <div class="built-for-row reveal">
+        <div class="built-for-img"><img src="patagonia.webp" alt="Angler fly fishing in turquoise water with Patagonian mountains"></div>
+        <div class="built-for-text">
+          <span class="built-for-label">For Anglers</span>
+          <h3>Independent Anglers</h3>
+          <p>You know the quality of private water is unmatched. AnglerPass gives you a way to discover, evaluate, and book legitimate private fishing days — without needing an inside connection or a club membership to find what's available.</p>
+          <a href="#waitlist" class="btn btn-bronze">Find Private Water</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="waitlist" id="waitlist">
+  <div class="container">
+    <div class="waitlist-content reveal-left">
+      <span class="eyebrow">Early Access</span>
+      <h2 class="section-heading">Launching Soon</h2>
+      <p class="waitlist-text">AnglerPass is currently under development. We're building the platform with input from landowners, club operators, and anglers — the people who understand this space best.</p>
+      <p class="waitlist-text">Join the waitlist to stay informed about launch updates, pilot opportunities, and early access invitations.</p>
+      <div class="waitlist-features">
+        <div class="waitlist-feature"><div class="waitlist-feature-check"><svg viewBox="0 0 16 16"><path d="M13 4L6.5 10.5 3.5 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Priority access when the platform goes live</div>
+        <div class="waitlist-feature"><div class="waitlist-feature-check"><svg viewBox="0 0 16 16"><path d="M13 4L6.5 10.5 3.5 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Behind-the-scenes development updates</div>
+        <div class="waitlist-feature"><div class="waitlist-feature-check"><svg viewBox="0 0 16 16"><path d="M13 4L6.5 10.5 3.5 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Opportunity to join the pilot program</div>
+        <div class="waitlist-feature"><div class="waitlist-feature-check"><svg viewBox="0 0 16 16"><path d="M13 4L6.5 10.5 3.5 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Direct input on features and direction</div>
+      </div>
+    </div>
+    <div class="waitlist-form-wrapper reveal-right d1">
+      <h3 class="waitlist-form-title">Join the Waitlist</h3>
+      <p class="waitlist-form-sub">Be among the first to access AnglerPass when we launch.</p>
+      <form id="waitlistForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group"><label for="firstName">First Name</label><input type="text" id="firstName" name="firstName" placeholder="James" required></div>
+          <div class="form-group"><label for="lastName">Last Name</label><input type="text" id="lastName" name="lastName" placeholder="Merritt"></div>
+        </div>
+        <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="james@example.com" required></div>
+        <div class="form-group"><label for="role">I am a...</label><select id="role" name="role" required><option value="" disabled selected>Select your role</option><option value="landowner">Landowner</option><option value="club">Club or Association</option><option value="angler">Individual Angler</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label for="message">Message <span style="font-weight:400;color:var(--text-light)">(optional)</span></label><textarea id="message" name="message" placeholder="Tell us about your interest in AnglerPass..."></textarea></div>
+        <div class="form-submit"><button type="submit" class="btn btn-primary">Join the Waitlist <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      </form>
+      <p class="form-partner">Interested in becoming an early partner? <a href="mailto:hello@anglerpass.com">Request early access</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="faq-header reveal"><span class="eyebrow">Questions</span><h2 class="section-heading">Frequently Asked</h2></div>
+    <div class="faq-list reveal d1">
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What is AnglerPass?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">AnglerPass is a software platform built for the private fly fishing ecosystem. It connects landowners, fly fishing clubs, and individual anglers through tools for property management, membership operations, reservations, and access coordination — all in one place.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Who is AnglerPass for?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">AnglerPass serves three core audiences: private landowners who want to manage water access professionally, fly fishing clubs that need membership and scheduling tools, and individual anglers looking to discover and book private fly fishing experiences.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is the platform available yet?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">Not yet. AnglerPass is currently under active development. We're building the platform with direct input from landowners, clubs, and experienced anglers. You can join the waitlist to get priority access and development updates as we approach launch.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can landowners list private waters?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">Yes. AnglerPass will include full property registration and listing tools. Landowners will be able to create professional profiles for their waters, define access rules, manage availability calendars, and control who can see and request access to their properties.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can clubs manage memberships through AnglerPass?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">Absolutely. The platform is being designed with clubs as a core user group. Membership management, digital rosters, access scheduling, reservation coordination, and member communication tools are all part of the product roadmap.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Will individual anglers be able to book directly?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">That's the plan. AnglerPass will give anglers the ability to browse available private waters, view property details, and submit booking or access requests. The specifics of the booking flow will depend on each landowner or club's preferences and access rules.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How do I join the waitlist?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">You can sign up using the form on this page. Enter your name, email, and role (landowner, club, or angler), and we'll add you to our priority list. You'll receive updates on our development progress and an early invitation when we're ready to launch.</div></div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I request early access or become a pilot user?<svg class="faq-chevron" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-answer"><div class="faq-answer-inner">Yes. If you're a landowner with private water to manage, a club looking for better operations tools, or an angler interested in helping shape the platform, we'd welcome the conversation. Reach out through the early access link on the waitlist form or contact us directly.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ INVESTORS ═══════════════════════════ -->
+<section class="investors" id="investors">
+  <div class="container">
+    <div class="investors-header reveal">
+      <span class="eyebrow">For Investors</span>
+      <h2>The Infrastructure Layer for Private Water Access</h2>
+      <p>AnglerPass is building the first purpose-built software platform for the private fly fishing ecosystem — a fragmented, high-value market with no incumbent technology and strong willingness to pay.</p>
+    </div>
+
+    <div class="investors-grid">
+      <div class="investor-metric reveal d1">
+        <div class="investor-metric-value">$2.8B</div>
+        <div class="investor-metric-label">Addressable Market</div>
+        <p>The U.S. fly fishing market generates billions annually, with private water access, club memberships, and guided experiences representing the highest-value segments.</p>
+      </div>
+      <div class="investor-metric reveal d2">
+        <div class="investor-metric-value">3-Sided</div>
+        <div class="investor-metric-label">Platform Model</div>
+        <p>Landowners, clubs, and anglers each have distinct needs that converge on one platform — creating network effects and natural retention as adoption grows.</p>
+      </div>
+      <div class="investor-metric reveal d3">
+        <div class="investor-metric-value">Zero</div>
+        <div class="investor-metric-label">Direct Competitors</div>
+        <p>No existing SaaS platform serves this vertical. Current solutions are spreadsheets, phone calls, and informal networks — leaving a wide-open lane for purpose-built software.</p>
+      </div>
+    </div>
+
+    <div class="investors-columns">
+      <div class="reveal-left">
+        <h3>The Business Model</h3>
+        <div class="investors-detail">
+          <h4>SaaS Subscriptions</h4>
+          <p>Tiered monthly plans for landowners and clubs based on properties managed, members served, and feature access. Predictable, recurring revenue from day one.</p>
+        </div>
+        <div class="investors-detail">
+          <h4>Booking Transaction Fees</h4>
+          <p>A percentage on private water bookings processed through the platform. As the marketplace grows, transaction revenue scales alongside subscription revenue.</p>
+        </div>
+        <div class="investors-detail">
+          <h4>Premium Access Tiers</h4>
+          <p>Individual anglers pay for enhanced discovery, priority booking, and access to exclusive or high-demand properties — a consumer revenue layer on top of B2B SaaS.</p>
+        </div>
+        <div class="investors-detail">
+          <h4>Early Traction</h4>
+          <p>Waitlist open. Conversations underway with landowners in Colorado, Montana, and Virginia. Club partnerships in active discussion. Platform MVP in development.</p>
+        </div>
+      </div>
+
+      <div class="reveal-right d2" id="investor-form">
+        <div class="investor-form-wrap">
+          <h3>Request the Pitch Deck</h3>
+          <p class="form-sub">Share your details and we'll send the full investor deck within 24 hours.</p>
+          <form id="investorForm" onsubmit="handleInvestorSubmit(event)">
+            <div class="form-row">
+              <div class="form-group"><label for="invFirstName">First Name</label><input type="text" id="invFirstName" name="firstName" placeholder="Jane" required></div>
+              <div class="form-group"><label for="invLastName">Last Name</label><input type="text" id="invLastName" name="lastName" placeholder="Chen"></div>
+            </div>
+            <div class="form-group"><label for="invEmail">Email</label><input type="email" id="invEmail" name="email" placeholder="jane@fund.com" required></div>
+            <div class="form-group"><label for="invType">Investor Type</label>
+              <select id="invType" name="type" required>
+                <option value="" disabled selected>Select type</option>
+                <option value="angel">Angel Investor</option>
+                <option value="vc">Venture Capital</option>
+                <option value="family-office">Family Office</option>
+                <option value="strategic">Strategic / Industry</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label for="invMessage">Message <span style="font-weight:400;color:rgba(255,255,255,.3)">(optional)</span></label><textarea id="invMessage" name="message" placeholder="What drew your interest in AnglerPass?"></textarea></div>
+            <div class="form-submit"><button type="submit" class="btn btn-bronze">Request the Deck <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <p class="investors-note">This section is for informational purposes only and does not constitute an offer to sell or a solicitation of an offer to buy any securities.</p>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="final-cta-bg" id="finalCtaBg" style="background-image:url('minnesota.webp')"></div>
+  <div class="final-cta-overlay"></div>
+  <div class="container">
+    <span class="eyebrow reveal">Be First</span>
+    <h2 class="reveal d1">Help Shape the Future of Private Fly Fishing Access</h2>
+    <p class="reveal d2">We're building AnglerPass for the people who understand this space best. Join the waitlist, get early access, and help us get it right from the start.</p>
+    <div class="final-cta-buttons reveal d3">
+      <a href="#waitlist" class="btn btn-white">Join the Waitlist <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="mailto:hello@anglerpass.com" class="btn btn-ghost">Request Early Access</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#hero" class="nav-logo"><svg viewBox="0 0 28 28" fill="none"><path d="M14 2C7.37 2 2 7.37 2 14s5.37 12 12 12 12-5.37 12-12S20.63 2 14 2z" stroke="rgba(255,255,255,.5)" stroke-width="1.6" fill="none"/><path d="M6 18c2-3 4-8 8-8s6 5 8 8" stroke="rgba(255,255,255,.5)" stroke-width="1.6" stroke-linecap="round" fill="none"/><circle cx="14" cy="8" r="1.5" fill="rgba(255,255,255,.4)"/></svg><span>AnglerPass</span></a>
+        <p class="footer-tagline">The operating platform for private fly fishing access. Connecting landowners, clubs, and anglers.</p>
+      </div>
+      <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="mailto:hello@anglerpass.com">Contact</a><a href="#investors">Investors</a><a href="#waitlist">Join Waitlist</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 AnglerPass. All rights reserved.</span><a href="#hero">Back to top &uarr;</a></div>
+  </div>
+</footer>
+
+<script>
+(()=>{
+'use strict';
+
+// ─── SCROLL REVEAL ───
+const ro=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting)n.target.classList.add('visible')})},{threshold:.08,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').forEach(e=>ro.observe(e));
+
+// ─── PARALLAX ───
+const heroBg=document.getElementById('heroBgImg');
+const whyBg=document.getElementById('whyBg');
+const divBg=document.getElementById('dividerBg');
+const ctaBg=document.getElementById('finalCtaBg');
+const wh=()=>window.innerHeight;
+
+function parallax(){
+  const sy=window.scrollY;
+  const h=wh();
+  if(heroBg){heroBg.style.transform=`translate3d(0,${sy*.35}px,0) scale(1.05)`}
+  [whyBg,divBg,ctaBg].forEach(bg=>{
+    if(!bg)return;
+    const sec=bg.closest('section,.cinematic-divider,.final-cta');
+    if(!sec)return;
+    const r=sec.getBoundingClientRect();
+    const p=(h-r.top)/(h+r.height);
+    if(p>-.2&&p<1.2)bg.style.transform=`translate3d(0,${(p-.5)*-100}px,0)`;
+  });
+}
+
+// ─── NAV ───
+const nav=document.getElementById('mainNav');
+const si=document.getElementById('scrollIndicator');
+function onScroll(){
+  nav.classList.toggle('scrolled',window.scrollY>60);
+  if(si)si.classList.toggle('hidden',window.scrollY>120);
+  parallax();
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+parallax();
+
+// ─── SCROLL INDICATOR CLICK ───
+if(si){si.addEventListener('click',()=>{
+  const t=document.getElementById('problem');
+  if(t){window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-72,behavior:'smooth'})}
+})}
+
+// ─── FLOATING CARDS ───
+setTimeout(()=>{
+  const f1=document.getElementById('floatCard1'),f2=document.getElementById('floatCard2');
+  if(f1)f1.classList.add('floating');if(f2)f2.classList.add('floating');
+},2500);
+
+// ─── HERO WORD-BY-WORD ───
+const hl=document.getElementById('heroHeadline');
+if(hl){
+  const h=hl.innerHTML;const pts=h.split(/(<em>.*?<\/em>)/);let wi=0;
+  hl.innerHTML=pts.map(p=>{
+    if(p.startsWith('<em>')){const inner=p.replace(/<\/?em>/g,'');const ws=inner.split(/\s+/);const wr=ws.map(w=>{const d=.3+wi*.08;wi++;return`<span class="hero-word" style="animation-delay:${d}s">${w}</span>`}).join(' ');return`<em>${wr}</em>`}
+    else{return p.split(/\s+/).filter(w=>w).map(w=>{const d=.3+wi*.08;wi++;return`<span class="hero-word" style="animation-delay:${d}s">${w}</span>`}).join(' ')}
+  }).join(' ');
+}
+
+// ─── COUNTER ANIMATION ───
+let cd=false;const cs=document.querySelectorAll('[data-count]');
+const co=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting&&!cd){cd=true;cs.forEach(el=>{const t=+el.dataset.count;const s=performance.now();(function tick(now){const p=Math.min((now-s)/1200,1);el.textContent=Math.round((1-Math.pow(1-p,3))*t);if(p<1)requestAnimationFrame(tick)})(s)})}})},{threshold:.5});
+cs.forEach(e=>co.observe(e));
+
+// ─── FAQ ───
+window.toggleFaq=function(b){const i=b.parentElement;const a=i.querySelector('.faq-answer');const o=i.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(x=>{x.classList.remove('open');x.querySelector('.faq-answer').style.maxHeight='0'});if(!o){i.classList.add('open');a.style.maxHeight=a.scrollHeight+'px'}};
+
+// ─── FORM ───
+window.handleSubmit=function(e){e.preventDefault();const b=e.target.querySelector('button[type="submit"]');const oh=b.innerHTML;b.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="animation:spin .6s linear infinite"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="8"/></svg> Joining...';b.disabled=true;setTimeout(()=>{b.innerHTML='\u2713 You\'re on the list!';b.style.background='#2a6b3a';setTimeout(()=>{b.innerHTML=oh;b.style.background='';b.disabled=false;e.target.reset()},3000)},1500)};
+
+window.handleInvestorSubmit=function(e){e.preventDefault();const b=e.target.querySelector('button[type="submit"]');const oh=b.innerHTML;b.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="animation:spin .6s linear infinite"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-dashoffset="8"/></svg> Sending...';b.disabled=true;setTimeout(()=>{b.innerHTML='\u2713 Deck request received!';b.style.background='#2a6b3a';setTimeout(()=>{b.innerHTML=oh;b.style.background='';b.disabled=false;e.target.reset()},3000)},1500)};
+const ss=document.createElement('style');ss.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(ss);
+
+// ─── SMOOTH SCROLL ───
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t)window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-72,behavior:'smooth'})})});
+
+})();
+</script>
+</body>
+</html>
