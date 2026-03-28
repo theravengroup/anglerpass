@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import MarketingLayout from '@/components/shared/MarketingLayout';
 
 export const metadata: Metadata = {
   title: 'For Clubs — AnglerPass',
@@ -73,7 +72,7 @@ const features = [
 
 export default function ClubsPage() {
   return (
-    <MarketingLayout>
+    <>
       {/* Hero */}
       <section
         style={{
@@ -151,7 +150,7 @@ export default function ClubsPage() {
               Join the Waitlist &rarr;
             </Link>
             <Link
-              href="/contact"
+              href="/#waitlist"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -199,6 +198,7 @@ export default function ClubsPage() {
                 color: 'var(--color-forest)',
                 margin: '0 0 16px',
                 letterSpacing: '-.3px',
+                textWrap: 'balance',
               }}
             >
               Modern tools for serious clubs
@@ -303,6 +303,7 @@ export default function ClubsPage() {
               color: 'var(--color-forest)',
               margin: '0 0 20px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Your members deserve a better experience
@@ -340,6 +341,7 @@ export default function ClubsPage() {
               color: 'var(--color-parchment)',
               margin: '0 0 16px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Bring your club into the modern era
@@ -377,6 +379,6 @@ export default function ClubsPage() {
           </Link>
         </div>
       </section>
-    </MarketingLayout>
+    </>
   );
 }

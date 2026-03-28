@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import MarketingLayout from '@/components/shared/MarketingLayout';
 
 export const metadata: Metadata = {
   title: 'For Anglers — AnglerPass',
@@ -73,7 +72,7 @@ const features = [
 
 export default function AnglersPage() {
   return (
-    <MarketingLayout>
+    <>
       {/* Hero */}
       <section
         style={{
@@ -151,7 +150,7 @@ export default function AnglersPage() {
               Join the Waitlist &rarr;
             </Link>
             <Link
-              href="/contact"
+              href="/#waitlist"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -199,6 +198,7 @@ export default function AnglersPage() {
                 color: 'var(--color-forest)',
                 margin: '0 0 16px',
                 letterSpacing: '-.3px',
+                textWrap: 'balance',
               }}
             >
               Access water worth the trip
@@ -303,6 +303,7 @@ export default function AnglersPage() {
               color: 'var(--color-forest)',
               margin: '0 0 20px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Not another booking site
@@ -341,6 +342,7 @@ export default function AnglersPage() {
               color: 'var(--color-parchment)',
               margin: '0 0 16px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Your next best day on the water starts here
@@ -378,6 +380,6 @@ export default function AnglersPage() {
           </Link>
         </div>
       </section>
-    </MarketingLayout>
+    </>
   );
 }

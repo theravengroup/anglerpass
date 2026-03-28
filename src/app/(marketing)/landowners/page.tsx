@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import MarketingLayout from '@/components/shared/MarketingLayout';
 
 export const metadata: Metadata = {
   title: 'For Landowners — AnglerPass',
@@ -74,7 +73,7 @@ const features = [
 
 export default function LandownersPage() {
   return (
-    <MarketingLayout>
+    <>
       {/* Hero */}
       <section
         style={{
@@ -152,7 +151,7 @@ export default function LandownersPage() {
               Join the Waitlist &rarr;
             </Link>
             <Link
-              href="/contact"
+              href="/#waitlist"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -200,6 +199,7 @@ export default function LandownersPage() {
                 color: 'var(--color-forest)',
                 margin: '0 0 16px',
                 letterSpacing: '-.3px',
+                textWrap: 'balance',
               }}
             >
               Everything a landowner needs
@@ -304,6 +304,7 @@ export default function LandownersPage() {
               color: 'var(--color-forest)',
               margin: '0 0 20px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Your property deserves better than a spreadsheet
@@ -342,6 +343,7 @@ export default function LandownersPage() {
               color: 'var(--color-parchment)',
               margin: '0 0 16px',
               letterSpacing: '-.3px',
+              textWrap: 'balance',
             }}
           >
             Ready to modernize access to your water?
@@ -379,6 +381,6 @@ export default function LandownersPage() {
           </Link>
         </div>
       </section>
-    </MarketingLayout>
+    </>
   );
 }
