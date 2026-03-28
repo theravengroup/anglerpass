@@ -66,6 +66,25 @@ export default function MarketingFooter() {
                 The operating platform for private fly fishing access. Connecting
                 landowners, clubs, and anglers.
               </p>
+              <Link
+                href="/dashboard"
+                target="_blank"
+                style={{
+                  display: 'inline-block',
+                  marginTop: 18,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  letterSpacing: '.3px',
+                  color: 'var(--color-bronze-light)',
+                  textDecoration: 'none',
+                  padding: '6px 14px',
+                  borderRadius: 100,
+                  border: '1px solid rgba(184,148,78,.25)',
+                  transition: 'all .3s',
+                }}
+              >
+                Preview Dashboard
+              </Link>
             </div>
 
             {/* Platform */}
@@ -102,26 +121,6 @@ export default function MarketingFooter() {
                     </Link>
                   </li>
                 ))}
-                <li style={{ marginTop: 16 }}>
-                  <Link
-                    href="/dashboard"
-                    target="_blank"
-                    style={{
-                      display: 'inline-block',
-                      fontSize: 11,
-                      fontWeight: 500,
-                      letterSpacing: '.3px',
-                      color: 'var(--color-bronze-light)',
-                      textDecoration: 'none',
-                      padding: '6px 14px',
-                      borderRadius: 100,
-                      border: '1px solid rgba(184,148,78,.25)',
-                      transition: 'all .3s',
-                    }}
-                  >
-                    Preview Dashboard
-                  </Link>
-                </li>
               </ul>
             </div>
 
