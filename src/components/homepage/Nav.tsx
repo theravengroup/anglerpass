@@ -123,6 +123,7 @@ export default function Nav() {
           </li>
         </ul>
         <div className="nav-cta">
+          <Link href="/login" className="nav-login-link">Log In</Link>
           {isHomepage ? (
             <a
               href="#waitlist"
@@ -158,12 +159,15 @@ export default function Nav() {
             gap: '4px',
           }}
         >
-          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '#waitlist', label: 'Join the Waitlist' }].map((item) =>
+          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '#waitlist', label: 'Join the Waitlist' }, { anchor: '/login', label: 'Log In' }].map((item) =>
             isHomepage ? (
               <a
                 key={item.anchor}
                 href={item.anchor}
-                onClick={(e) => handleAnchorClick(e, item.anchor)}
+                onClick={(e) => {
+                  handleAnchorClick(e, item.anchor);
+                  if (!item.anchor.startsWith('#')) setMobileOpen(false);
+                }}
                 style={{
                   display: 'block',
                   padding: '12px 0',
@@ -179,7 +183,7 @@ export default function Nav() {
             ) : (
               <Link
                 key={item.anchor}
-                href={`/${item.anchor}`}
+                href={item.anchor.startsWith('#') ? `/${item.anchor}` : item.anchor}
                 onClick={() => setMobileOpen(false)}
                 style={{
                   display: 'block',
