@@ -39,6 +39,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   const {
     register,
@@ -76,7 +77,23 @@ export default function SignupPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // If email confirmation is required, the user won't have a session yet
+      // Check by trying to get the current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        // Email confirmation required - show message instead of redirecting
+        setError(null);
+        setIsLoading(false);
+        setConfirmationSent(true);
+        return;
+      }
+
+      // Redirect based on the role they just selected
+      const { getRoleHomePath } = await import("@/types/roles");
+      router.push(getRoleHomePath(data.role));
       router.refresh();
     } catch {
       setError(
@@ -85,6 +102,33 @@ export default function SignupPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  if (confirmationSent) {
+    return (
+      <div>
+        <h1
+          className="mb-1 text-center text-2xl font-semibold text-[var(--color-forest)]"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Check Your Email
+        </h1>
+        <p className="mb-6 text-center text-sm text-[var(--color-text-secondary)]">
+          We sent a confirmation link to your email address. Please click the
+          link to verify your account and get started.
+        </p>
+        <p className="text-center text-sm text-[var(--color-text-secondary)]">
+          Didn&apos;t receive it?{" "}
+          <button
+            type="button"
+            onClick={() => setConfirmationSent(false)}
+            className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+          >
+            Try again
+          </button>
+        </p>
+      </div>
+    );
   }
 
   return (

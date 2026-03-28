@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,16 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,7 +57,26 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Determine redirect: honor `next` param, or redirect based on role
+      const next = searchParams.get("next");
+      if (next) {
+        router.push(next);
+        router.refresh();
+        return;
+      }
+
+      // Fetch profile to get role for redirect
+      const { getRoleHomePath } = await import("@/types/roles");
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .returns<{ role: string }[]>()
+        .single();
+
+      const destination = profile?.role
+        ? getRoleHomePath(profile.role)
+        : "/dashboard";
+      router.push(destination);
       router.refresh();
     } catch {
       setError(

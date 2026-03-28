@@ -11,6 +11,14 @@ import {
 } from "lucide-react";
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
+import type { UserProfile } from "@/lib/auth/get-profile";
+
+const ROLE_LABELS: Record<string, string> = {
+  landowner: "Landowner",
+  club_admin: "Club Admin",
+  angler: "Angler",
+  admin: "Admin",
+};
 
 export interface SidebarItem {
   label: string;
@@ -24,6 +32,7 @@ interface DashboardSidebarProps {
   open: boolean;
   onToggle: () => void;
   adminBadge?: boolean;
+  user: UserProfile | null;
 }
 
 export default function DashboardSidebar({
@@ -31,6 +40,7 @@ export default function DashboardSidebar({
   open,
   onToggle,
   adminBadge = false,
+  user,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -136,10 +146,10 @@ export default function DashboardSidebar({
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-white/90">
-                  Account
+                  {user?.display_name || user?.email || "Account"}
                 </p>
                 <p className="truncate text-xs text-white/50">
-                  Manage settings
+                  {user?.role ? ROLE_LABELS[user.role] || user.role : "Manage settings"}
                 </p>
               </div>
             )}
