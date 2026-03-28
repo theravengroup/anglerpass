@@ -102,6 +102,26 @@ export default function MarketingFooter() {
                     </Link>
                   </li>
                 ))}
+                <li style={{ marginTop: 16 }}>
+                  <Link
+                    href="/dashboard"
+                    target="_blank"
+                    style={{
+                      display: 'inline-block',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      letterSpacing: '.3px',
+                      color: 'var(--color-bronze-light)',
+                      textDecoration: 'none',
+                      padding: '6px 14px',
+                      borderRadius: 100,
+                      border: '1px solid rgba(184,148,78,.25)',
+                      transition: 'all .3s',
+                    }}
+                  >
+                    Preview Dashboard
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -159,20 +179,6 @@ export default function MarketingFooter() {
                     }}
                   >
                     Investors
-                  </Link>
-                </li>
-                <li style={{ marginBottom: 10 }}>
-                  <Link
-                    href="/dashboard"
-                    target="_blank"
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                    }}
-                  >
-                    Preview Dashboard
                   </Link>
                 </li>
               </ul>
