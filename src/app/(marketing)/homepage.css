@@ -181,13 +181,13 @@ nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 .how-header{text-align:center;max-width:780px;margin:0 auto 72px}
 .how-header .section-heading{margin:16px 0 20px}
 .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-.how-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .5s cubic-bezier(.22,1,.36,1)}
+.how-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .5s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
 .how-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-xl)}
 .how-card-accent{height:4px}
 .how-card:nth-child(1) .how-card-accent{background:linear-gradient(90deg,var(--forest),#2a5a3a)}
 .how-card:nth-child(2) .how-card-accent{background:linear-gradient(90deg,var(--river),#4a8a9c)}
 .how-card:nth-child(3) .how-card-accent{background:linear-gradient(90deg,var(--bronze),#c0984e)}
-.how-card-body{padding:36px 32px}
+.how-card-body{padding:36px 32px;flex:1}
 .how-card-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
 .how-card:nth-child(1) .how-card-icon{background:rgba(26,58,42,.08)}
 .how-card:nth-child(2) .how-card-icon{background:rgba(58,107,124,.08)}

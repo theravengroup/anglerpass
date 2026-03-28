@@ -10,13 +10,13 @@ export default function HowItWorksSection() {
         <div className="how-grid">
           <div className="how-card reveal d1">
             <div className="how-card-accent"></div>
-            <div className="how-card-body">
+            <div className="how-card-body" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="how-card-icon">
                 <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
               </div>
               <h3>Landowners</h3>
               <div className="how-card-for">Property Management</div>
-              <ul>
+              <ul style={{ flex: 1 }}>
                 <li>Register and showcase private waters</li>
                 <li>Control access, visibility, and availability</li>
                 <li>Manage inquiries and booking requests</li>
@@ -28,29 +28,34 @@ export default function HowItWorksSection() {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 6,
-                  marginTop: 20,
+                  marginTop: 24,
+                  padding: '10px 24px',
+                  borderRadius: 100,
                   fontSize: 13,
-                  fontWeight: 500,
+                  fontWeight: 600,
                   letterSpacing: '.3px',
-                  color: 'var(--color-forest)',
+                  color: '#fff',
+                  background: 'var(--color-forest)',
                   textDecoration: 'none',
-                  transition: 'opacity .3s',
+                  transition: 'all .3s',
+                  alignSelf: 'flex-start',
                 }}
               >
-                Learn more &rarr;
+                For Landowners &rarr;
               </a>
             </div>
           </div>
           <div className="how-card reveal d2">
             <div className="how-card-accent"></div>
-            <div className="how-card-body">
+            <div className="how-card-body" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="how-card-icon">
                 <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
               </div>
               <h3>Fly Fishing Clubs</h3>
               <div className="how-card-for">Trust &amp; Vetting</div>
-              <ul>
+              <ul style={{ flex: 1 }}>
                 <li>Vet members and vouch for their access</li>
                 <li>Serve as the trust layer for landowners</li>
                 <li>Manage memberships and schedules digitally</li>
@@ -62,29 +67,34 @@ export default function HowItWorksSection() {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 6,
-                  marginTop: 20,
+                  marginTop: 24,
+                  padding: '10px 24px',
+                  borderRadius: 100,
                   fontSize: 13,
-                  fontWeight: 500,
+                  fontWeight: 600,
                   letterSpacing: '.3px',
-                  color: 'var(--color-river)',
+                  color: '#fff',
+                  background: 'var(--color-river)',
                   textDecoration: 'none',
-                  transition: 'opacity .3s',
+                  transition: 'all .3s',
+                  alignSelf: 'flex-start',
                 }}
               >
-                Learn more &rarr;
+                For Clubs &rarr;
               </a>
             </div>
           </div>
           <div className="how-card reveal d3">
             <div className="how-card-accent"></div>
-            <div className="how-card-body">
+            <div className="how-card-body" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="how-card-icon">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
               </div>
               <h3>Individual Anglers</h3>
               <div className="how-card-for">Club-Based Access</div>
-              <ul>
+              <ul style={{ flex: 1 }}>
                 <li>Join a club and get vetted as a member</li>
                 <li>Book private fly fishing days through your club</li>
                 <li>Access trusted, vetted properties</li>
@@ -96,17 +106,22 @@ export default function HowItWorksSection() {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 6,
-                  marginTop: 20,
+                  marginTop: 24,
+                  padding: '10px 24px',
+                  borderRadius: 100,
                   fontSize: 13,
-                  fontWeight: 500,
+                  fontWeight: 600,
                   letterSpacing: '.3px',
-                  color: 'var(--color-bronze)',
+                  color: '#fff',
+                  background: 'var(--color-bronze)',
                   textDecoration: 'none',
-                  transition: 'opacity .3s',
+                  transition: 'all .3s',
+                  alignSelf: 'flex-start',
                 }}
               >
-                Learn more &rarr;
+                For Anglers &rarr;
               </a>
             </div>
           </div>
