@@ -5,8 +5,8 @@ export default function BuiltForSection() {
       <div className="container">
         <div className="built-for-header reveal">
           <span className="eyebrow">Who It&apos;s For</span>
-          <h2 className="section-heading">Built for the Private Water Ecosystem</h2>
-          <p className="section-subhead" style={{ margin: '0 auto' }}>Every feature was designed with the specific needs of three core audiences in mind.</p>
+          <h2 className="section-heading">Built for the{' '}<br />Private Water Ecosystem</h2>
+          <p className="section-subhead" style={{ margin: '0 auto' }}>Every feature was designed with the specific needs{' '}<br />of three core audiences in mind.</p>
         </div>
         <div className="built-for-rows">
           <div className="built-for-row reveal">
