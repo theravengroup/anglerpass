@@ -45,7 +45,7 @@ export default function InvestorsSection() {
             </div>
             <div className="investors-detail">
               <h4>Early Traction</h4>
-              <p>Waitlist open. Conversations underway with landowners in Colorado, Montana, and Virginia. Club partnerships in active discussion. Platform MVP in development.</p>
+              <p>Waitlist open. Conversations underway with landowners in Colorado, Montana, Wyoming, and New Mexico. First club partnership with the Rocky Mountain Angling Club.</p>
             </div>
           </div>
 
