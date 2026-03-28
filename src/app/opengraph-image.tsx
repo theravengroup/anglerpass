@@ -1,10 +1,13 @@
 import { ImageResponse } from 'next/og';
+import { getLogoDataUri } from '@/lib/og-logo';
 
 export const alt = 'AnglerPass — Private Water Access, Modernized';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function Image() {
+  const logoSrc = getLogoDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -56,6 +59,14 @@ export default async function Image() {
             zIndex: 1,
           }}
         >
+          {/* Logo */}
+          <img
+            src={logoSrc}
+            width={100}
+            height={82}
+            style={{ marginBottom: 20, opacity: 0.85 }}
+          />
+
           {/* Eyebrow */}
           <div
             style={{
@@ -65,7 +76,7 @@ export default async function Image() {
               textTransform: 'uppercase',
               letterSpacing: '0.25em',
               color: '#b8944e',
-              marginBottom: 24,
+              marginBottom: 20,
               display: 'flex',
             }}
           >
@@ -80,7 +91,7 @@ export default async function Image() {
               color: '#f0ead6',
               letterSpacing: '-1.5px',
               lineHeight: 1,
-              marginBottom: 28,
+              marginBottom: 24,
               display: 'flex',
             }}
           >
@@ -93,7 +104,7 @@ export default async function Image() {
               width: 60,
               height: 1,
               background: 'rgba(184,148,78,0.4)',
-              marginBottom: 28,
+              marginBottom: 24,
               display: 'flex',
             }}
           />
@@ -119,7 +130,7 @@ export default async function Image() {
             style={{
               display: 'flex',
               gap: 16,
-              marginTop: 40,
+              marginTop: 36,
               fontFamily: 'sans-serif',
             }}
           >

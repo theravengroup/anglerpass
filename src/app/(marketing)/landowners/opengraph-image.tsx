@@ -1,10 +1,13 @@
 import { ImageResponse } from 'next/og';
+import { getLogoDataUri } from '@/lib/og-logo';
 
 export const alt = 'For Landowners — AnglerPass';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function Image() {
+  const logoSrc = getLogoDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -45,6 +48,13 @@ export default async function Image() {
         />
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1 }}>
+          <img
+            src={logoSrc}
+            width={80}
+            height={66}
+            style={{ marginBottom: 20, opacity: 0.7 }}
+          />
+
           <div
             style={{
               fontFamily: 'sans-serif',

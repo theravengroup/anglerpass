@@ -31,12 +31,12 @@ export const metadata: Metadata = {
     template: "%s | AnglerPass",
   },
   description:
-    "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — all in one place built for landowners, clubs, and serious anglers.",
+    "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — built for landowners, clubs, and serious anglers.",
   metadataBase: new URL("https://anglerpass.com"),
   openGraph: {
-    title: "AnglerPass — Private Water Access, Modernized",
+    title: "AnglerPass — Private Fly Fishing Access, Modernized",
     description:
-      "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days.",
+      "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — built for landowners, clubs, and serious anglers.",
     siteName: "AnglerPass",
     type: "website",
     locale: "en_US",
@@ -44,9 +44,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AnglerPass — Private Water Access, Modernized",
+    title: "AnglerPass — Private Fly Fishing Access, Modernized",
     description:
-      "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days.",
+      "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — built for landowners, clubs, and serious anglers.",
   },
 };
 
