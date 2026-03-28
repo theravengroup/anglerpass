@@ -350,21 +350,21 @@ export default function ClubsPage() {
                 name: 'Starter',
                 price: '$49',
                 description: 'For new or small clubs getting organized.',
-                features: ['Up to 500 members', 'Property management', 'Basic scheduling', 'Member roster', 'Email support'],
+                features: ['Up to 500 members', 'Up to 25 properties', 'Basic scheduling', 'Member roster', 'Email support'],
                 highlight: false,
               },
               {
                 name: 'Standard',
                 price: '$99',
                 description: 'For established clubs managing active rosters.',
-                features: ['Up to 2,000 members', 'Property management', 'Advanced scheduling & rotation', 'Cross-club access eligible', 'Member communication tools', 'Priority support'],
+                features: ['Up to 2,000 members', 'Up to 100 properties', 'Advanced scheduling & rotation', 'Cross-club access eligible', 'Member communication tools', 'Priority support'],
                 highlight: true,
               },
               {
                 name: 'Pro',
                 price: '$199',
                 description: 'For large clubs with complex operations.',
-                features: ['Unlimited members', 'Property management', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
+                features: ['Unlimited members', 'Unlimited properties', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
                 highlight: false,
               },
             ].map((tier, i) => (
@@ -445,6 +445,8 @@ export default function ClubsPage() {
           </div>
           <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--color-text-light)', marginTop: 20, fontStyle: 'italic' }}>
             All plans include a 30-day free trial. No credit card required to start.
+            <br />
+            Need more properties? Additional properties available at tiered pricing.
           </p>
         </div>
       </section>
