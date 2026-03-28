@@ -14,6 +14,7 @@ interface PhotoUploadProps {
   photos: string[];
   onChange: (photos: string[]) => void;
   propertyId?: string;
+  onEnsureSaved?: () => Promise<string | null>;
   disabled?: boolean;
 }
 
@@ -85,6 +86,7 @@ export default function PhotoUpload({
   photos,
   onChange,
   propertyId,
+  onEnsureSaved,
   disabled = false,
 }: PhotoUploadProps) {
   const [uploading, setUploading] = useState(false);
@@ -96,8 +98,21 @@ export default function PhotoUpload({
 
   const handleFiles = useCallback(
     async (files: FileList) => {
-      if (!propertyId) {
-        setError("Save the property as a draft first, then add photos.");
+      let resolvedId = propertyId;
+
+      // Auto-save draft if property hasn't been saved yet
+      if (!resolvedId && onEnsureSaved) {
+        setUploading(true);
+        resolvedId = (await onEnsureSaved()) ?? undefined;
+        if (!resolvedId) {
+          setError("Please enter a property name before uploading photos.");
+          setUploading(false);
+          return;
+        }
+      }
+
+      if (!resolvedId) {
+        setError("Please enter a property name before uploading photos.");
         return;
       }
 
@@ -133,7 +148,7 @@ export default function PhotoUpload({
           // Upload to API
           const formData = new FormData();
           formData.append("file", webpBlob, `photo-${Date.now()}.webp`);
-          formData.append("propertyId", propertyId);
+          formData.append("propertyId", resolvedId);
 
           const res = await fetch("/api/properties/photos", {
             method: "POST",
@@ -160,7 +175,7 @@ export default function PhotoUpload({
       }
       setUploading(false);
     },
-    [photos, onChange, propertyId, remaining]
+    [photos, onChange, propertyId, onEnsureSaved, remaining]
   );
 
   function removePhoto(index: number) {

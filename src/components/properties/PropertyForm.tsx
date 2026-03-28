@@ -87,6 +87,31 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
   const halfDayAllowed = watch("half_day_allowed");
   const gateCodeRequired = watch("gate_code_required");
   const photos = watch("photos");
+  const currentName = watch("name");
+
+  // Auto-save draft when photos are added before first save
+  async function ensureSaved(): Promise<string | null> {
+    if (savedPropertyId) return savedPropertyId;
+
+    const name = currentName?.trim();
+    if (!name) return null;
+
+    try {
+      const res = await fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) return null;
+
+      setSavedPropertyId(result.property.id);
+      return result.property.id;
+    } catch {
+      return null;
+    }
+  }
 
   async function saveProperty(data: PropertyFormData) {
     setSaving(true);
@@ -302,6 +327,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
             photos={photos ?? []}
             onChange={(newPhotos) => setValue("photos", newPhotos)}
             propertyId={savedPropertyId}
+            onEnsureSaved={ensureSaved}
             disabled={isDisabled}
           />
         </CardContent>
