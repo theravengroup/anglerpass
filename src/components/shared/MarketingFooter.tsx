@@ -161,6 +161,20 @@ export default function MarketingFooter() {
                     Investors
                   </Link>
                 </li>
+                <li style={{ marginBottom: 10 }}>
+                  <Link
+                    href="/dashboard"
+                    target="_blank"
+                    style={{
+                      fontSize: 13,
+                      color: 'rgba(255,255,255,.4)',
+                      textDecoration: 'none',
+                      transition: 'color .3s',
+                    }}
+                  >
+                    Preview Dashboard
+                  </Link>
+                </li>
               </ul>
             </div>
 
