@@ -428,7 +428,7 @@ export default function AnglersPage() {
             }}
           >
             When you book a fishing day through AnglerPass, a small platform fee of
-            5&ndash;8% is added to the property&rsquo;s base rate. This fee covers the
+            5% is added to the property&rsquo;s base rate. This fee covers the
             booking platform, payment processing, and the trust infrastructure that
             makes private water access possible.
           </p>
@@ -444,16 +444,16 @@ export default function AnglersPage() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
-              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Property day rate (set by landowner)</span>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Rod fee (set by landowner)</span>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$250</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
-              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (5&ndash;8%)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$15</span>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (5%)</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$12.50</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>You pay</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$265</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$262.50</span>
             </div>
           </div>
           <p
