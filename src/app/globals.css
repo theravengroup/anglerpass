@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  /* AnglerPass Design Tokens */
+  --color-forest: #1a3a2a;
+  --color-forest-deep: #0f2219;
+  --color-river: #3a6b7c;
+  --color-river-light: #5a9aad;
+  --color-river-pale: #c5dde5;
+  --color-stone: #6b6b60;
+  --color-stone-light: #9a9a8e;
+  --color-sand: #c8b89a;
+  --color-parchment: #f0ead6;
+  --color-parchment-light: #f7f4ec;
+  --color-offwhite: #faf9f5;
+  --color-bronze: #9a7340;
+  --color-bronze-light: #b8944e;
+  --color-charcoal: #2a2a25;
+
+  --color-text-primary: #1e1e1a;
+  --color-text-secondary: #5a5a52;
+  --color-text-light: #8a8a80;
+
+  --font-heading: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", -apple-system, sans-serif;
+  --font-mono: "DM Mono", monospace;
+}
+
+/* Base body styles for non-homepage pages */
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}

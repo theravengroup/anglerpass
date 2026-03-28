@@ -1,0 +1,33 @@
+import Nav from '@/components/homepage/Nav';
+import HeroSection from '@/components/homepage/HeroSection';
+import ProblemSection from '@/components/homepage/ProblemSection';
+import CinematicDivider from '@/components/homepage/CinematicDivider';
+import HowItWorksSection from '@/components/homepage/HowItWorksSection';
+import FeaturesSection from '@/components/homepage/FeaturesSection';
+import WhySection from '@/components/homepage/WhySection';
+import BuiltForSection from '@/components/homepage/BuiltForSection';
+import WaitlistSection from '@/components/homepage/WaitlistSection';
+import FaqSection from '@/components/homepage/FaqSection';
+import InvestorsSection from '@/components/homepage/InvestorsSection';
+import FinalCtaSection from '@/components/homepage/FinalCtaSection';
+import Footer from '@/components/homepage/Footer';
+
+export default function HomePage() {
+  return (
+    <>
+      <Nav />
+      <HeroSection />
+      <ProblemSection />
+      <CinematicDivider />
+      <HowItWorksSection />
+      <FeaturesSection />
+      <WhySection />
+      <BuiltForSection />
+      <WaitlistSection />
+      <FaqSection />
+      <InvestorsSection />
+      <FinalCtaSection />
+      <Footer />
+    </>
+  );
+}

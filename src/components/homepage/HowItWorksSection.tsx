@@ -1,0 +1,66 @@
+export default function HowItWorksSection() {
+  return (
+    <section className="how-it-works" id="how">
+      <div className="container">
+        <div className="how-header reveal">
+          <span className="eyebrow">How It Works</span>
+          <h2 className="section-heading">One Platform. Three Distinct Roles.</h2>
+          <p className="section-subhead" style={{ margin: '0 auto' }}>AnglerPass connects the private water ecosystem through a shared platform designed for every stakeholder.</p>
+        </div>
+        <div className="how-grid">
+          <div className="how-card reveal d1">
+            <div className="how-card-accent"></div>
+            <div className="how-card-body">
+              <div className="how-card-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+              </div>
+              <h3>Landowners</h3>
+              <div className="how-card-for">Property Management</div>
+              <ul>
+                <li>Register and showcase private waters</li>
+                <li>Control access, visibility, and availability</li>
+                <li>Manage inquiries and booking requests</li>
+                <li>Participate in a vetted, trusted network</li>
+                <li>Present properties with a professional profile</li>
+              </ul>
+            </div>
+          </div>
+          <div className="how-card reveal d2">
+            <div className="how-card-accent"></div>
+            <div className="how-card-body">
+              <div className="how-card-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+              </div>
+              <h3>Fly Fishing Clubs</h3>
+              <div className="how-card-for">Membership &amp; Operations</div>
+              <ul>
+                <li>Offer and manage memberships digitally</li>
+                <li>Organize member access and schedules</li>
+                <li>Simplify reservation workflows</li>
+                <li>Track participation and availability</li>
+                <li>Reduce administrative overhead</li>
+              </ul>
+            </div>
+          </div>
+          <div className="how-card reveal d3">
+            <div className="how-card-accent"></div>
+            <div className="how-card-body">
+              <div className="how-card-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
+              </div>
+              <h3>Individual Anglers</h3>
+              <div className="how-card-for">Access &amp; Booking</div>
+              <ul>
+                <li>Discover private fishing opportunities</li>
+                <li>Book private fly fishing days directly</li>
+                <li>Access trusted, vetted properties</li>
+                <li>View real-time availability and details</li>
+                <li>Enjoy a streamlined booking experience</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
