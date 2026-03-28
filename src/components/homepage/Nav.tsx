@@ -123,7 +123,7 @@ export default function Nav() {
           </li>
         </ul>
         <div className="nav-cta">
-          <Link href="/login" className="nav-login-link">Log In</Link>
+          <a href="/login" className="nav-login-link">Log In</a>
           {isHomepage ? (
             <a
               href="#waitlist"
