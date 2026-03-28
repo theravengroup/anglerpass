@@ -9,6 +9,9 @@ const PROTECTED_PREFIXES = [
   "/angler",
   "/admin",
 ];
+
+// Public marketing pages that start with protected prefixes (plural forms)
+const PUBLIC_OVERRIDES = ["/landowners", "/clubs", "/anglers"];
 const AUTH_ROUTES = [
   "/login",
   "/signup",
@@ -20,7 +23,10 @@ export async function middleware(request: NextRequest) {
   const { supabase, response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+  const isPublicOverride = PUBLIC_OVERRIDES.some((p) => pathname.startsWith(p));
+  const isProtected =
+    !isPublicOverride &&
+    PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
   const isAuthRoute = AUTH_ROUTES.some(
     (r) => pathname === r || pathname.startsWith(r + "/")
   );
