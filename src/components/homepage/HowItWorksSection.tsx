@@ -23,6 +23,23 @@ export default function HowItWorksSection() {
                 <li>Participate in a vetted, trusted network</li>
                 <li>Present properties with a professional profile</li>
               </ul>
+              <a
+                href="/landowners"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: '.3px',
+                  color: 'var(--color-forest)',
+                  textDecoration: 'none',
+                  transition: 'opacity .3s',
+                }}
+              >
+                Learn more &rarr;
+              </a>
             </div>
           </div>
           <div className="how-card reveal d2">
@@ -40,6 +57,23 @@ export default function HowItWorksSection() {
                 <li>Opt in to cross-club access agreements</li>
                 <li>Reduce administrative overhead</li>
               </ul>
+              <a
+                href="/clubs"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: '.3px',
+                  color: 'var(--color-river)',
+                  textDecoration: 'none',
+                  transition: 'opacity .3s',
+                }}
+              >
+                Learn more &rarr;
+              </a>
             </div>
           </div>
           <div className="how-card reveal d3">
@@ -57,6 +91,23 @@ export default function HowItWorksSection() {
                 <li>View real-time availability and details</li>
                 <li>Unlock cross-club water through the network</li>
               </ul>
+              <a
+                href="/anglers"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: '.3px',
+                  color: 'var(--color-bronze)',
+                  textDecoration: 'none',
+                  transition: 'opacity .3s',
+                }}
+              >
+                Learn more &rarr;
+              </a>
             </div>
           </div>
         </div>
