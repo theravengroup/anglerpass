@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import FooterModal from '@/components/homepage/FooterModal';
+import DashboardPreviewModal from '@/components/homepage/DashboardPreviewModal';
 
 export default function MarketingFooter() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -68,9 +69,9 @@ export default function MarketingFooter() {
                 The operating platform for private fly fishing access. Connecting
                 landowners, clubs, and anglers.
               </p>
-              <Link
-                href="/dashboard"
-                target="_blank"
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); setActiveModal('dashboard-preview'); }}
                 style={{
                   display: 'inline-block',
                   marginTop: 18,
@@ -83,10 +84,11 @@ export default function MarketingFooter() {
                   borderRadius: 100,
                   border: '1px solid rgba(184,148,78,.25)',
                   transition: 'all .3s',
+                  cursor: 'pointer',
                 }}
               >
                 Preview Dashboard
-              </Link>
+              </a>
             </div>
 
             {/* Platform */}
@@ -372,6 +374,12 @@ export default function MarketingFooter() {
           We may update these terms as the platform evolves. Significant changes will be communicated to registered users. Continued use of the platform constitutes acceptance of updated terms.
         </p>
       </FooterModal>
+
+      {/* Dashboard Preview Modal */}
+      <DashboardPreviewModal
+        isOpen={activeModal === 'dashboard-preview'}
+        onClose={() => setActiveModal(null)}
+      />
 
       {/* Contact Modal */}
       <FooterModal

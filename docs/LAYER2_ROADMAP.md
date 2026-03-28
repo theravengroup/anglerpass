@@ -154,6 +154,33 @@
 
 ---
 
+## Phase 5b: Calendar Feeds (iCal)
+
+**Goal:** Landowners can subscribe to a private iCal feed for each property so bookings appear on their phone (Google Calendar, Apple Calendar, Outlook, etc.).
+
+**Key Features:**
+- Private iCal (.ics) feed URL per property with a secret token for auth
+- Feed returns standard iCalendar VEVENT entries for each booking (angler name, date, full/half day, party size)
+- "Subscribe to Calendar" button on the landowner property dashboard with copy-to-clipboard URL
+- Token regeneration (invalidates old subscriptions if compromised)
+- Feed is read-only — one-way sync from AnglerPass to the landowner's calendar app
+
+**Major Files/Systems:**
+- `supabase/migrations/00009_calendar_tokens.sql` (calendar_tokens table: property_id, token, created_at)
+- `src/app/api/properties/[id]/calendar.ics/route.ts` (GET — generates iCal feed, auth via token query param)
+- `src/app/(dashboard)/landowner/properties/[id]/page.tsx` (add calendar subscription UI)
+- `src/lib/ical.ts` (iCalendar format helper — generates VCALENDAR/VEVENT strings)
+
+**Dependencies:** Phase 5 (bookings must exist to populate the feed)
+
+**Risks/Complexity:**
+- Google Calendar can't send auth headers, so the feed URL must include a secret token as a query parameter. Use a cryptographically random token (e.g., `crypto.randomUUID()`). Store hashed or treat as a secret.
+- Google Calendar polls iCal feeds every 12–24 hours, so bookings won't appear instantly. This is a known limitation — document it for landowners.
+- The iCal format is simple but strict. Test with Google Calendar, Apple Calendar, and Outlook to ensure compatibility. Use `VTIMEZONE` components for correct timezone handling.
+- Keep the feed lightweight — only include future bookings (not historical) to avoid large payloads.
+
+---
+
 ## Phase 6: Notifications
 
 **Goal:** Users receive email notifications for key events and can manage notification preferences.
@@ -347,6 +374,7 @@ Phase 1: Auth & Roles
   ├── Phase 2: Property Management
   │     ├── Phase 3: Moderation
   │     ├── Phase 5: Discovery & Booking
+  │     │     ├── Phase 5b: Calendar Feeds (iCal)
   │     │     ├── Phase 6: Notifications
   │     │     ├── Phase 7: Payments
   │     │     ├── Phase 8: Map & Search

@@ -9,6 +9,7 @@ import WaitlistSection from '@/components/homepage/WaitlistSection';
 import FaqSection from '@/components/homepage/FaqSection';
 import InvestorsSection from '@/components/homepage/InvestorsSection';
 import FinalCtaSection from '@/components/homepage/FinalCtaSection';
+import FloatingCta from '@/components/homepage/FloatingCta';
 
 export default function HomePage() {
   return (
@@ -24,6 +25,7 @@ export default function HomePage() {
       <FaqSection />
       <InvestorsSection />
       <FinalCtaSection />
+      <FloatingCta />
     </>
   );
 }

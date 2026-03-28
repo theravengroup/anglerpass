@@ -124,19 +124,7 @@ export default function Nav() {
         </ul>
         <div className="nav-cta">
           <a href="/login" className="nav-login-link">Log In</a>
-          {isHomepage ? (
-            <a
-              href="#waitlist"
-              className="btn btn-primary"
-              onClick={(e) => handleAnchorClick(e, '#waitlist')}
-            >
-              Join the Waitlist
-            </a>
-          ) : (
-            <Link href="/#waitlist" className="btn btn-primary">
-              Join the Waitlist
-            </Link>
-          )}
+          <a href="/signup" className="btn btn-primary">Sign Up</a>
         </div>
         <button
           className="mobile-toggle"
@@ -159,7 +147,7 @@ export default function Nav() {
             gap: '4px',
           }}
         >
-          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '#waitlist', label: 'Join the Waitlist' }, { anchor: '/login', label: 'Log In' }].map((item) =>
+          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/login', label: 'Log In' }, { anchor: '/signup', label: 'Sign Up' }].map((item) =>
             isHomepage ? (
               <a
                 key={item.anchor}
