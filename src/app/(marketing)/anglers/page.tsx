@@ -445,15 +445,15 @@ export default function AnglersPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
               <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Rod fee (set by landowner)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$250</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$125</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
               <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (5%)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$12.50</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$6.25</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>You pay</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$262.50</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$131.25</span>
             </div>
           </div>
           <p
