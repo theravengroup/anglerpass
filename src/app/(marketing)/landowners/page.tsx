@@ -138,8 +138,8 @@ export default function LandownersPage() {
             }}
           >
             Manage private water access with the professionalism your property
-            deserves. AnglerPass gives landowners the tools to control, organize,
-            and monetize access on their own terms.
+            deserves. Every angler who reaches your listing has been vetted by a
+            fly fishing club &mdash; so you control access with confidence.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -291,7 +291,7 @@ export default function LandownersPage() {
         </div>
       </section>
 
-      {/* Value prop */}
+      {/* Trust / vetting section */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
@@ -302,10 +302,10 @@ export default function LandownersPage() {
               fontSize: 11,
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
+              color: 'var(--color-forest)',
             }}
           >
-            Why AnglerPass
+            Built-In Trust
           </span>
           <h2
             style={{
@@ -318,7 +318,7 @@ export default function LandownersPage() {
               textWrap: 'balance',
             }}
           >
-            Your property deserves better than a spreadsheet
+            No strangers at your gate
           </h2>
           <p
             style={{
@@ -329,10 +329,56 @@ export default function LandownersPage() {
               margin: '0 auto',
             }}
           >
-            Most private water access is still managed through phone calls,
-            handshakes, and scattered notes. AnglerPass replaces that with a
-            platform built specifically for landowners who take their water
-            seriously.
+            AnglerPass is not an open marketplace. Every angler who can view or book
+            your property is a member of a fly fishing club that has vetted them.
+            Clubs serve as the trust layer between you and the people on your water
+            &mdash; so you never have to wonder who&rsquo;s showing up.
+          </p>
+        </div>
+      </section>
+
+      {/* Cross-club access */}
+      <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: 12,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: 'var(--color-forest)',
+            }}
+          >
+            The Network
+          </span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 500,
+              color: 'var(--color-forest)',
+              margin: '0 0 20px',
+              letterSpacing: '-.3px',
+              textWrap: 'balance',
+            }}
+          >
+            More clubs, more demand, more bookings
+          </h2>
+          <p
+            style={{
+              fontSize: 16.5,
+              lineHeight: 1.7,
+              color: 'var(--color-text-secondary)',
+              maxWidth: 560,
+              margin: '0 auto',
+            }}
+          >
+            As more clubs join AnglerPass and opt in to cross-club access, your
+            property reaches a growing network of vetted anglers &mdash; without any
+            extra work on your part. Every new club in the network is a new source
+            of qualified bookings for your water.
           </p>
         </div>
       </section>

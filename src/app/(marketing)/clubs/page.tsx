@@ -136,9 +136,9 @@ export default function ClubsPage() {
               margin: '0 auto 40px',
             }}
           >
-            Membership rosters, scheduling, reservations, and communication
-            tools designed for fly fishing clubs that take their operations
-            seriously.
+            Clubs are the trust layer of AnglerPass. You vet your members,
+            landowners trust your judgment, and everyone gets access to better water.
+            Modern tools for clubs that take their operations seriously.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -290,8 +290,162 @@ export default function ClubsPage() {
         </div>
       </section>
 
-      {/* Value prop */}
+      {/* Pricing tiers */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 32px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <span
+              style={{
+                display: 'inline-block',
+                marginBottom: 12,
+                fontFamily: 'var(--font-mono)',
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                color: 'var(--color-river)',
+              }}
+            >
+              Club Pricing
+            </span>
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 3.5vw, 40px)',
+                fontWeight: 500,
+                color: 'var(--color-forest)',
+                margin: '0 0 16px',
+                letterSpacing: '-.3px',
+                textWrap: 'balance',
+              }}
+            >
+              Simple plans that grow with your club
+            </h2>
+            <p
+              style={{
+                fontSize: 16,
+                color: 'var(--color-text-secondary)',
+                maxWidth: 520,
+                margin: '0 auto',
+                lineHeight: 1.65,
+              }}
+            >
+              No per-member fees. No surprise charges. Pick the plan that fits your club
+              and upgrade anytime.
+            </p>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 24,
+            }}
+            className="marketing-features-grid"
+          >
+            {[
+              {
+                name: 'Starter',
+                price: '$49',
+                description: 'For new or small clubs getting organized.',
+                features: ['Up to 25 members', 'Basic scheduling', 'Member roster', 'Email support'],
+                highlight: false,
+              },
+              {
+                name: 'Standard',
+                price: '$99',
+                description: 'For established clubs managing active rosters.',
+                features: ['Up to 75 members', 'Advanced scheduling & rotation', 'Cross-club access eligible', 'Member communication tools', 'Priority support'],
+                highlight: true,
+              },
+              {
+                name: 'Pro',
+                price: '$199',
+                description: 'For large clubs and multi-property operations.',
+                features: ['Unlimited members', 'Multi-property management', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
+                highlight: false,
+              },
+            ].map((tier) => (
+              <div
+                key={tier.name}
+                style={{
+                  background: '#fff',
+                  border: tier.highlight ? '2px solid var(--color-river)' : '1px solid var(--color-parchment)',
+                  borderRadius: 14,
+                  padding: '36px 28px',
+                  position: 'relative',
+                }}
+              >
+                {tier.highlight && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -12,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: 'var(--color-river)',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      padding: '4px 16px',
+                      borderRadius: 100,
+                    }}
+                  >
+                    Most Popular
+                  </span>
+                )}
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: 'var(--color-forest)',
+                    marginBottom: 4,
+                    letterSpacing: '-.2px',
+                  }}
+                >
+                  {tier.name}
+                </h3>
+                <div style={{ marginBottom: 12 }}>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 600, color: 'var(--color-forest)' }}>
+                    {tier.price}
+                  </span>
+                  <span style={{ fontSize: 14, color: 'var(--color-text-light)' }}>/month</span>
+                </div>
+                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-text-secondary)', marginBottom: 20 }}>
+                  {tier.description}
+                </p>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {tier.features.map((feature) => (
+                    <li
+                      key={feature}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '6px 0',
+                        fontSize: 13.5,
+                        color: 'var(--color-text-secondary)',
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-river)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--color-text-light)', marginTop: 20, fontStyle: 'italic' }}>
+            All plans include a 30-day free trial. No credit card required to start.
+          </p>
+        </div>
+      </section>
+
+      {/* Cross-club access */}
+      <section style={{ padding: '100px 0', background: 'var(--color-offwhite)' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
@@ -301,10 +455,10 @@ export default function ClubsPage() {
               fontSize: 11,
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
+              color: 'var(--color-river)',
             }}
           >
-            Built for Clubs
+            Cross-Club Network
           </span>
           <h2
             style={{
@@ -317,7 +471,7 @@ export default function ClubsPage() {
               textWrap: 'balance',
             }}
           >
-            Your members deserve a better experience
+            Expand your members&rsquo; access without expanding your lease
           </h2>
           <p
             style={{
@@ -328,9 +482,56 @@ export default function ClubsPage() {
               margin: '0 auto',
             }}
           >
-            The best clubs run on clear communication, fair scheduling, and
-            organized operations. AnglerPass gives your board and members the
-            tools to make that effortless.
+            Standard and Pro clubs can opt in to cross-club access &mdash; letting
+            your members book fishing days on water managed by other clubs in the
+            AnglerPass network, and vice versa. More value for your members, more
+            reach for your club, and new revenue from reciprocal bookings.
+          </p>
+        </div>
+      </section>
+
+      {/* Value prop */}
+      <section style={{ padding: '80px 0', background: 'var(--color-parchment-light)' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: 12,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: 'var(--color-bronze)',
+            }}
+          >
+            The Trust Layer
+          </span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 500,
+              color: 'var(--color-forest)',
+              margin: '0 0 20px',
+              letterSpacing: '-.3px',
+              textWrap: 'balance',
+            }}
+          >
+            Clubs make private water access work
+          </h2>
+          <p
+            style={{
+              fontSize: 16.5,
+              lineHeight: 1.7,
+              color: 'var(--color-text-secondary)',
+              maxWidth: 560,
+              margin: '0 auto',
+            }}
+          >
+            Landowners don&rsquo;t want strangers on their property. They want vetted,
+            responsible anglers &mdash; and your club is the one doing the vetting.
+            AnglerPass makes your club the gateway to private water, giving your
+            membership real, tangible value.
           </p>
         </div>
       </section>

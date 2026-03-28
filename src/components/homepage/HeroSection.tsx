@@ -64,9 +64,9 @@ export default function HeroSection() {
             })}
           </h1>
           <p className="hero-sub">
-            The operating platform for private fly fishing access. Manage
-            properties, memberships, and fishing days — all in one place built
-            for landowners, clubs, and serious anglers.
+            The operating platform for private fly fishing access. Clubs vet
+            anglers, landowners trust the network, and everyone gets access to
+            better water — all in one place.
           </p>
           <div className="hero-ctas">
             <a href="#waitlist" className="btn btn-primary">

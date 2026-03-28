@@ -22,7 +22,7 @@ const features = [
   {
     title: 'Discover Private Waters',
     description:
-      'Browse a curated directory of private fly fishing properties. Filter by location, species, season, and access type to find water worth traveling for.',
+      'Browse private fly fishing properties available through your club. Filter by location, species, season, and access type to find water worth traveling for.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -30,9 +30,9 @@ const features = [
     ),
   },
   {
-    title: 'Book Experiences',
+    title: 'Book Through Your Club',
     description:
-      'Request access and book fishing days directly through the platform. Clear pricing, availability, and terms before you commit.',
+      'Request access and book fishing days through your club membership. Clear pricing, availability, and terms before you commit.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
@@ -40,9 +40,9 @@ const features = [
     ),
   },
   {
-    title: 'Trusted Properties',
+    title: 'Vetted Access',
     description:
-      'Every listing on AnglerPass is managed by a verified landowner or club. Quality standards, clear expectations, and real accountability.',
+      'Every angler on AnglerPass is vouched for by their club. Landowners trust the platform because clubs vet their members — creating access opportunities that wouldn\u2019t exist otherwise.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -136,9 +136,9 @@ export default function AnglersPage() {
               margin: '0 auto 40px',
             }}
           >
-            Access private waters you never knew existed. AnglerPass connects
-            serious anglers with exceptional properties through a platform built
-            on trust, transparency, and respect for the resource.
+            Access private waters through trusted fly fishing clubs. AnglerPass
+            connects serious anglers with exceptional properties through a
+            club-based platform built on vetting, trust, and respect for the resource.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -223,8 +223,8 @@ export default function AnglersPage() {
                 lineHeight: 1.65,
               }}
             >
-              AnglerPass opens doors to private waters that were previously
-              accessible only through personal connections or years of networking.
+              Join a club, get vetted, and unlock access to private waters that
+              were previously available only through personal connections.
             </p>
           </div>
 
@@ -290,7 +290,186 @@ export default function AnglersPage() {
         </div>
       </section>
 
-      {/* Value prop */}
+      {/* Club membership trust section */}
+      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: 12,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: 'var(--color-bronze)',
+            }}
+          >
+            How It Works
+          </span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 500,
+              color: 'var(--color-forest)',
+              margin: '0 0 20px',
+              letterSpacing: '-.3px',
+              textWrap: 'balance',
+            }}
+          >
+            Access starts with your club
+          </h2>
+          <p
+            style={{
+              fontSize: 16.5,
+              lineHeight: 1.7,
+              color: 'var(--color-text-secondary)',
+              maxWidth: 620,
+              margin: '0 auto 48px',
+            }}
+          >
+            AnglerPass is not a free-for-all booking site. Every angler accesses private
+            water through a fly fishing club that vouches for its members. Clubs are the
+            trust layer that makes landowners comfortable opening their gates.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 24,
+              textAlign: 'left',
+            }}
+            className="marketing-features-grid"
+          >
+            {[
+              { step: '01', title: 'Join a Club', text: 'Find a fly fishing club on AnglerPass and apply for membership. Clubs set their own standards and vet every applicant.' },
+              { step: '02', title: 'Get Vetted', text: 'Your club reviews your application and vouches for you as a responsible angler. This vetting is what earns landowner trust.' },
+              { step: '03', title: 'Book Water', text: 'Once you\u2019re a club member, browse properties your club has access to and book fishing days through the platform.' },
+            ].map((item) => (
+              <div
+                key={item.step}
+                style={{
+                  background: '#fff',
+                  border: '1px solid var(--color-parchment)',
+                  borderRadius: 14,
+                  padding: '32px 24px',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'inline-block',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: 'var(--color-bronze)',
+                    letterSpacing: '0.15em',
+                    marginBottom: 12,
+                  }}
+                >
+                  STEP {item.step}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 20,
+                    fontWeight: 600,
+                    color: 'var(--color-forest)',
+                    marginBottom: 10,
+                    letterSpacing: '-.2px',
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: 14.5, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Booking fees section */}
+      <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: 12,
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: 'var(--color-bronze)',
+            }}
+          >
+            Transparent Pricing
+          </span>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 500,
+              color: 'var(--color-forest)',
+              margin: '0 0 20px',
+              letterSpacing: '-.3px',
+              textWrap: 'balance',
+            }}
+          >
+            Simple, fair booking fees
+          </h2>
+          <p
+            style={{
+              fontSize: 16.5,
+              lineHeight: 1.7,
+              color: 'var(--color-text-secondary)',
+              maxWidth: 560,
+              margin: '0 auto 32px',
+            }}
+          >
+            When you book a fishing day through AnglerPass, a small platform fee of
+            5&ndash;8% is added to the property&rsquo;s base rate. This fee covers the
+            booking platform, payment processing, and the trust infrastructure that
+            makes private water access possible.
+          </p>
+          <div
+            style={{
+              background: '#fff',
+              border: '1px solid var(--color-parchment)',
+              borderRadius: 14,
+              padding: '28px 32px',
+              maxWidth: 480,
+              margin: '0 auto',
+              textAlign: 'left',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Property day rate (set by landowner)</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$250</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (5&ndash;8%)</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$15</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>You pay</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$265</span>
+            </div>
+          </div>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--color-text-light)',
+              marginTop: 16,
+              fontStyle: 'italic',
+            }}
+          >
+            No hidden fees. No subscription required for anglers. You only pay when you book.
+          </p>
+        </div>
+      </section>
+
+      {/* Cross-club access section */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
@@ -304,7 +483,7 @@ export default function AnglersPage() {
               color: 'var(--color-bronze)',
             }}
           >
-            The AnglerPass Difference
+            The Network Effect
           </span>
           <h2
             style={{
@@ -317,7 +496,7 @@ export default function AnglersPage() {
               textWrap: 'balance',
             }}
           >
-            Not another booking site
+            One membership, expanding access
           </h2>
           <p
             style={{
@@ -328,10 +507,10 @@ export default function AnglersPage() {
               margin: '0 auto',
             }}
           >
-            AnglerPass is built around respect for private water and the people
-            who steward it. Every interaction is designed to build trust between
-            anglers and landowners, creating access opportunities that benefit
-            everyone involved.
+            Clubs on AnglerPass can opt in to cross-club access agreements, meaning
+            your membership in one club can unlock fishing days on water managed by
+            other clubs in the network. The more clubs that join, the more water
+            becomes available to you &mdash; without needing multiple memberships.
           </p>
         </div>
       </section>
@@ -367,8 +546,8 @@ export default function AnglersPage() {
               lineHeight: 1.7,
             }}
           >
-            Join the waitlist and be among the first anglers to discover
-            exceptional private waters through AnglerPass.
+            Join the waitlist and be among the first anglers to access
+            exceptional private waters through club-vetted booking on AnglerPass.
           </p>
           <Link
             href="/#waitlist"

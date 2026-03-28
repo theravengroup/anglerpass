@@ -32,12 +32,12 @@ export default function HowItWorksSection() {
                 <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
               </div>
               <h3>Fly Fishing Clubs</h3>
-              <div className="how-card-for">Membership &amp; Operations</div>
+              <div className="how-card-for">Trust &amp; Vetting</div>
               <ul>
-                <li>Offer and manage memberships digitally</li>
-                <li>Organize member access and schedules</li>
-                <li>Simplify reservation workflows</li>
-                <li>Track participation and availability</li>
+                <li>Vet members and vouch for their access</li>
+                <li>Serve as the trust layer for landowners</li>
+                <li>Manage memberships and schedules digitally</li>
+                <li>Opt in to cross-club access agreements</li>
                 <li>Reduce administrative overhead</li>
               </ul>
             </div>
@@ -49,16 +49,54 @@ export default function HowItWorksSection() {
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
               </div>
               <h3>Individual Anglers</h3>
-              <div className="how-card-for">Access &amp; Booking</div>
+              <div className="how-card-for">Club-Based Access</div>
               <ul>
-                <li>Discover private fishing opportunities</li>
-                <li>Book private fly fishing days directly</li>
+                <li>Join a club and get vetted as a member</li>
+                <li>Book private fly fishing days through your club</li>
                 <li>Access trusted, vetted properties</li>
                 <li>View real-time availability and details</li>
-                <li>Enjoy a streamlined booking experience</li>
+                <li>Unlock cross-club water through the network</li>
               </ul>
             </div>
           </div>
+        </div>
+        {/* Cross-club network banner */}
+        <div
+          className="reveal"
+          style={{
+            marginTop: 48,
+            padding: '36px 40px',
+            background: 'rgba(58,107,124,.06)',
+            border: '1px solid rgba(58,107,124,.12)',
+            borderRadius: 14,
+            textAlign: 'center',
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 22,
+              fontWeight: 600,
+              color: 'var(--color-forest)',
+              marginBottom: 10,
+              letterSpacing: '-.2px',
+            }}
+          >
+            The Cross-Club Network
+          </h3>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.7,
+              color: 'var(--color-text-secondary)',
+              maxWidth: 600,
+              margin: '0 auto',
+            }}
+          >
+            Clubs on AnglerPass can opt in to reciprocal access agreements. Your members
+            fish water managed by other clubs. Their members fish yours. One membership,
+            an expanding network of private water.
+          </p>
         </div>
       </div>
     </section>

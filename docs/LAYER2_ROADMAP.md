@@ -6,6 +6,28 @@
 
 ---
 
+## V1 Business Model
+
+> These principles shape how every phase is built. They can be revisited if the model evolves.
+
+**Core model:** Clubs are the trust and vetting layer. All anglers access private water through club membership — there is no direct angler-to-landowner booking without a club intermediary.
+
+**Club pricing tiers:**
+- **Starter** — $49/month (up to 25 members, basic scheduling)
+- **Standard** — $99/month (up to 75 members, cross-club eligible)
+- **Pro** — $199/month (unlimited members, multi-property, cross-club eligible)
+
+**Angler booking fees:** 5–8% platform fee on each booking (paid by the angler on top of the property's base rate). No subscription required for anglers.
+
+**Cross-club access:** Standard and Pro clubs can opt in to reciprocal access agreements, allowing members of one club to book water managed by another club in the network. This is the network effect that grows the platform.
+
+**Revenue streams:**
+1. Club subscription fees (monthly SaaS)
+2. Angler booking fees (per-transaction)
+3. Future: premium placement, analytics upgrades
+
+---
+
 ## Phase 1: Auth Protection & Role System
 
 **Goal:** Lock down routes, enforce roles, and make the existing auth pages functional end-to-end.
@@ -94,21 +116,27 @@
 
 ---
 
-## Phase 4: Club Management
+## Phase 4: Club Management & Trust Layer
 
-**Goal:** Club admins can set up their club, manage members, and coordinate access to properties.
+**Goal:** Club admins can set up their club, manage members, vet applicants, and coordinate access to properties. Clubs serve as the trust/vetting intermediary between anglers and landowners — all angler access flows through club membership.
+
+> **V1 model note:** The club-as-intermediary design is a core V1 assumption. If this model evolves (e.g., to allow direct angler booking), the club requirement can be relaxed without major architectural changes — the club_membership foreign key on bookings would become optional rather than required.
 
 **Key Features:**
 - Club profile creation (name, description, location, rules, membership tiers)
 - Member roster with invite system (invite by email)
+- Member vetting workflow (application → review → approve/reject)
 - Member status management (active, inactive, pending)
 - Club-property association (which properties the club has access to)
 - Basic scheduling: assign members to properties on specific dates
+- Club subscription billing (Starter $49/mo, Standard $99/mo, Pro $199/mo)
+- Cross-club access opt-in (Standard and Pro tiers only)
 
 **Major Files/Systems:**
-- `supabase/migrations/00007_clubs.sql` (clubs, club_memberships, club_property_access tables)
+- `supabase/migrations/00007_clubs.sql` (clubs, club_memberships, club_property_access tables, subscription_tier column)
 - `src/app/(dashboard)/club/page.tsx` (club dashboard — replace placeholder)
 - `src/app/(dashboard)/club/members/page.tsx` (roster — replace placeholder)
+- `src/app/(dashboard)/club/applications/page.tsx` (new — vetting queue)
 - `src/app/(dashboard)/club/settings/page.tsx` (club profile edit)
 - `src/app/api/clubs/route.ts`
 - `src/app/api/clubs/[id]/members/route.ts`
@@ -119,23 +147,29 @@
 **Risks/Complexity:**
 - The invite system needs careful thought. Options: (a) invite by email → creates a pending membership → user signs up and is auto-linked, or (b) user signs up first, then requests to join. Start with (a) — it's what club admins expect.
 - Club-property access is a many-to-many relationship. Keep it simple: a club either has access to a property or it doesn't. Don't build per-member permissions on properties yet.
+- Club subscription billing can use Stripe Subscriptions. Wire this up alongside Phase 7 (Payments) or as a parallel effort.
+- Cross-club access needs a `cross_club_agreements` table and eligibility checks on the booking flow. Keep it simple: two clubs either have a reciprocal agreement or they don't.
 
 ---
 
-## Phase 5: Angler Discovery & Booking
+## Phase 5: Angler Discovery & Booking (Club-Based)
 
-**Goal:** Anglers can browse published properties, view details, and request bookings.
+**Goal:** Anglers can browse properties available through their club, view details, and request bookings. All bookings flow through club membership — anglers cannot book without belonging to a club that has access to the property.
+
+> **V1 model note:** The booking flow requires `club_membership_id` as a foreign key. If the model evolves to allow direct booking, this field becomes optional. The discovery page filters properties to those accessible via the angler's club(s).
 
 **Key Features:**
-- Property discovery page (grid of published properties with filters)
-- Property detail page (public-facing — photos, description, species, regulations, availability)
-- Booking request form (select date, party size, message to landowner)
+- Property discovery page filtered by angler's club access (grid with filters)
+- Cross-club property discovery (if angler's club has cross-club agreements)
+- Property detail page (photos, description, species, regulations, availability)
+- Booking request form (select date, party size, message to landowner — must select which club membership to book through)
+- Platform fee calculation (5–8% added to base rate, paid by angler)
 - Booking status tracking for anglers (pending, confirmed, declined)
 - Booking management for landowners (approve/decline requests, view calendar)
 - Angler's "My Bookings" page
 
 **Major Files/Systems:**
-- `supabase/migrations/00008_bookings.sql` (bookings table with status enum)
+- `supabase/migrations/00008_bookings.sql` (bookings table with status enum, club_membership_id FK, platform_fee column)
 - `src/app/(marketing)/properties/page.tsx` (public discovery — new route in marketing group)
 - `src/app/(marketing)/properties/[id]/page.tsx` (public property detail)
 - `src/app/(dashboard)/angler/page.tsx` (replace placeholder)
@@ -145,12 +179,13 @@
 - `src/app/api/bookings/[id]/route.ts`
 - `src/lib/validations/bookings.ts`
 
-**Dependencies:** Phase 2 (published properties must exist), Phase 1 (auth for booking)
+**Dependencies:** Phase 2 (published properties must exist), Phase 1 (auth for booking), Phase 4 (club membership required for booking)
 
 **Risks/Complexity:**
 - Availability conflicts: two anglers booking the same date. Use a database constraint or check-then-insert pattern. Start simple — first-come-first-served with landowner approval.
 - The public property pages live in the `(marketing)` route group so they get the marketing nav/footer. They'll need to import homepage.css styles or use inline styles consistent with the marketing pages.
 - Don't build real-time availability updates yet. A simple "request and wait" flow is fine.
+- Cross-club discovery needs to check the angler's club's cross-club agreements. Keep the query simple: join through `club_memberships → cross_club_agreements → club_property_access`.
 
 ---
 
@@ -217,11 +252,13 @@
 **Goal:** Anglers can pay for bookings; landowners receive payouts. Platform takes a fee.
 
 **Key Features:**
-- Stripe Checkout for booking payments
+- Stripe Checkout for booking payments (base rate + 5–8% platform fee)
 - Stripe Connect for landowner payouts (Express accounts)
+- Stripe Subscriptions for club billing (Starter/Standard/Pro tiers)
 - Platform fee calculation (percentage per booking)
 - Payment status tracking (pending, paid, refunded)
 - Landowner payout dashboard (earnings, pending payouts, payout history)
+- Club billing management (plan upgrades/downgrades, invoices)
 - Cancellation and refund policy enforcement
 - Stripe webhook handler for payment events
 
