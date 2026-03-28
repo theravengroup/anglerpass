@@ -385,21 +385,21 @@ export default function MarketingFooter() {
 
         <div className="modal-contact-info">
           <div className="modal-contact-row">
-            <h3 className="modal-heading">General inquiries</h3>
+            <h3 className="modal-heading">General Inquiries</h3>
             <p className="modal-text">
               <a href="mailto:hello@anglerpass.com">hello@anglerpass.com</a>
             </p>
           </div>
 
           <div className="modal-contact-row">
-            <h3 className="modal-heading">Investor relations</h3>
+            <h3 className="modal-heading">Investor Relations</h3>
             <p className="modal-text">
               <a href="mailto:investors@anglerpass.com">investors@anglerpass.com</a>
             </p>
           </div>
 
           <div className="modal-contact-row">
-            <h3 className="modal-heading">Landowners &amp; clubs</h3>
+            <h3 className="modal-heading">Landowners &amp; Clubs</h3>
             <p className="modal-text">
               Interested in listing your property or club on AnglerPass?{' '}
               <a href="mailto:partners@anglerpass.com">partners@anglerpass.com</a>
@@ -407,7 +407,7 @@ export default function MarketingFooter() {
           </div>
 
           <div className="modal-contact-row">
-            <h3 className="modal-heading">Press &amp; media</h3>
+            <h3 className="modal-heading">Press &amp; Media</h3>
             <p className="modal-text">
               <a href="mailto:press@anglerpass.com">press@anglerpass.com</a>
             </p>
