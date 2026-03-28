@@ -9,7 +9,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
-import AnglerPassLogo from "@/components/icons/AnglerPassLogo";
+/* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
 
 export interface SidebarItem {
@@ -55,7 +55,7 @@ export default function DashboardSidebar({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-4 border-b border-white/10">
-          <AnglerPassLogo className="size-7 shrink-0 text-bronze-light" />
+          <img src="/images/anglerpass-noword-logo.svg" alt="" style={{ height: 28, width: 'auto', opacity: 0.8 }} />
           {!collapsed && (
             <div className="flex items-center gap-2 overflow-hidden">
               <span className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">

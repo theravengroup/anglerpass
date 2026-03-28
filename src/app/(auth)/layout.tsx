@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import AnglerPassLogo from "@/components/icons/AnglerPassLogo";
 
 export default function AuthLayout({
   children,
@@ -11,12 +11,13 @@ export default function AuthLayout({
       <div className="w-full max-w-md">
         <Link
           href="/"
-          className="mb-8 flex items-center justify-center gap-2 text-[var(--color-forest)]"
+          className="mb-8 flex items-center justify-center gap-2.5"
+          style={{ textDecoration: 'none' }}
         >
-          <AnglerPassLogo className="size-8" />
+          <img src="/images/anglerpass-noword-logo.svg" alt="" style={{ height: 36, width: 'auto' }} />
           <span
             className="text-2xl font-semibold tracking-tight"
-            style={{ fontFamily: "var(--font-heading)" }}
+            style={{ fontFamily: "var(--font-heading)", color: "var(--color-forest)" }}
           >
             AnglerPass
           </span>

@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
-import AnglerPassLogo from '@/components/icons/AnglerPassLogo';
 
 const footerLinks = {
   Platform: [
@@ -20,18 +20,59 @@ const footerLinks = {
 
 export default function MarketingFooter() {
   return (
-    <footer className="border-t border-parchment bg-forest-deep text-parchment-light">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
-          {/* Brand column */}
+    <footer
+      style={{
+        padding: '60px 0 44px',
+        background: 'var(--color-forest-deep)',
+        color: 'rgba(255,255,255,.5)',
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr 1fr 1fr',
+            gap: 40,
+          }}
+          className="marketing-footer-grid"
+        >
+          {/* Brand */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2.5 no-underline">
-              <AnglerPassLogo className="h-7 w-7 text-parchment/60" />
-              <span className="font-heading text-xl font-semibold text-parchment">
+            <Link
+              href="/"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                textDecoration: 'none',
+                marginBottom: 14,
+              }}
+            >
+              <img
+                src="/images/anglerpass-noword-logo.svg"
+                alt=""
+                style={{ height: 32, width: 'auto', opacity: 0.7 }}
+              />
+              <span
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: '#fff',
+                  letterSpacing: '-.3px',
+                }}
+              >
                 AnglerPass
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-parchment/60">
+            <p
+              style={{
+                fontSize: 13,
+                color: 'rgba(255,255,255,.38)',
+                maxWidth: 280,
+                lineHeight: 1.6,
+              }}
+            >
               The operating platform for private fly fishing access. Connecting
               landowners, clubs, and anglers.
             </p>
@@ -40,15 +81,29 @@ export default function MarketingFooter() {
           {/* Link columns */}
           {Object.entries(footerLinks).map(([heading, links]) => (
             <div key={heading}>
-              <h4 className="mb-4 text-xs font-medium uppercase tracking-widest text-bronze-light">
+              <h4
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  color: 'var(--color-bronze-light)',
+                  marginBottom: 16,
+                }}
+              >
                 {heading}
               </h4>
-              <ul className="space-y-2.5">
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} style={{ marginBottom: 10 }}>
                     <Link
                       href={link.href}
-                      className="text-sm text-parchment/50 transition-colors hover:text-parchment"
+                      style={{
+                        fontSize: 13,
+                        color: 'rgba(255,255,255,.4)',
+                        textDecoration: 'none',
+                        transition: 'color .3s',
+                      }}
                     >
                       {link.label}
                     </Link>
@@ -60,13 +115,27 @@ export default function MarketingFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-parchment/10 pt-8 sm:flex-row">
-          <span className="text-xs text-parchment/40">
-            &copy; {new Date().getFullYear()} AnglerPass. All rights reserved.
-          </span>
+        <div
+          style={{
+            marginTop: 44,
+            paddingTop: 28,
+            borderTop: '1px solid rgba(255,255,255,.06)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: 12,
+            color: 'rgba(255,255,255,.25)',
+          }}
+          className="marketing-footer-bottom"
+        >
+          <span>&copy; {new Date().getFullYear()} AnglerPass. All rights reserved.</span>
           <Link
             href="/"
-            className="text-xs text-parchment/40 transition-colors hover:text-parchment/70"
+            style={{
+              color: 'rgba(255,255,255,.35)',
+              textDecoration: 'none',
+              transition: 'color .3s',
+            }}
           >
             Back to home
           </Link>

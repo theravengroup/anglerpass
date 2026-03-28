@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion';
+import { useState } from 'react';
 
 const faqItems = [
   {
@@ -66,22 +61,79 @@ const faqItems = [
 ];
 
 export default function FaqAccordion() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
-    <Accordion type="single" collapsible className="w-full">
-      {faqItems.map((item, i) => (
-        <AccordionItem
-          key={i}
-          value={`faq-${i}`}
-          className="border-parchment"
-        >
-          <AccordionTrigger className="py-5 text-left font-heading text-lg font-semibold text-forest hover:no-underline sm:text-xl">
-            {item.question}
-          </AccordionTrigger>
-          <AccordionContent className="text-base leading-relaxed text-text-secondary">
-            {item.answer}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {faqItems.map((item, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div
+            key={i}
+            style={{
+              borderBottom: '1px solid var(--color-parchment)',
+            }}
+          >
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 16,
+                padding: '22px 0',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'var(--font-heading)',
+                fontSize: 19,
+                fontWeight: 600,
+                color: 'var(--color-forest)',
+                letterSpacing: '-.2px',
+                lineHeight: 1.35,
+              }}
+            >
+              <span>{item.question}</span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="var(--color-forest)"
+                strokeWidth={1.5}
+                style={{
+                  flexShrink: 0,
+                  transition: 'transform .3s ease',
+                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 7.5L10 12.5L15 7.5" />
+              </svg>
+            </button>
+            <div
+              style={{
+                overflow: 'hidden',
+                maxHeight: isOpen ? 500 : 0,
+                transition: 'max-height .35s ease',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 15.5,
+                  lineHeight: 1.75,
+                  color: 'var(--color-text-secondary)',
+                  margin: 0,
+                  paddingBottom: 22,
+                }}
+              >
+                {item.answer}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

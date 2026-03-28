@@ -32,3 +32,17 @@ body {
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Marketing nav responsive */
+@media (max-width: 768px) {
+  .marketing-nav-links { display: none !important; }
+  .marketing-nav-cta { display: none !important; }
+  .marketing-mobile-toggle { display: block !important; }
+  .marketing-footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .marketing-footer-bottom { flex-direction: column !important; gap: 10px !important; text-align: center; }
+  .marketing-features-grid { grid-template-columns: 1fr !important; }
+  .marketing-contact-grid { grid-template-columns: 1fr !important; }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .marketing-features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}

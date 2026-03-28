@@ -1,18 +1,9 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'lucide-react';
-import AnglerPassLogo from '@/components/icons/AnglerPassLogo';
-import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
 
 const navLinks = [
   { href: '/landowners', label: 'For Landowners' },
@@ -24,7 +15,7 @@ const navLinks = [
 
 export default function MarketingNav() {
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -36,46 +27,91 @@ export default function MarketingNav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-offwhite/95 backdrop-blur-md shadow-sm border-b border-parchment'
-          : 'bg-transparent'
-      }`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        padding: '0 32px',
+        transition: 'all .5s cubic-bezier(.22,1,.36,1)',
+        background: scrolled ? 'rgba(250,249,245,.92)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px) saturate(1.2)' : 'none',
+        borderBottom: scrolled ? '1px solid var(--color-parchment)' : '1px solid transparent',
+        boxShadow: scrolled ? '0 1px 12px rgba(0,0,0,.04)' : 'none',
+      }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 72,
+        }}
+      >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 no-underline">
-          <AnglerPassLogo
-            className={`h-7 w-7 transition-colors duration-300 ${
-              scrolled ? 'text-forest' : 'text-offwhite'
-            }`}
+        <Link
+          href="/"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            textDecoration: 'none',
+            color: scrolled ? 'var(--color-text-primary)' : '#fff',
+            transition: 'color .4s',
+          }}
+        >
+          <img
+            src="/images/anglerpass-noword-logo.svg"
+            alt=""
+            style={{ height: 36, width: 'auto' }}
           />
           <span
-            className={`font-heading text-xl font-semibold tracking-tight transition-colors duration-300 ${
-              scrolled ? 'text-forest' : 'text-offwhite'
-            }`}
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 22,
+              fontWeight: 600,
+              letterSpacing: '-.3px',
+            }}
           >
             AnglerPass
           </span>
         </Link>
 
         {/* Desktop links */}
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 22,
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+          }}
+          className="marketing-nav-links"
+        >
           {navLinks.map((link) => {
             const active = pathname === link.href;
             return (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                    scrolled
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: active ? 600 : 400,
+                    textDecoration: 'none',
+                    color: scrolled
                       ? active
-                        ? 'text-forest'
-                        : 'text-text-secondary hover:text-forest'
+                        ? 'var(--color-forest)'
+                        : 'var(--color-text-secondary)'
                       : active
-                        ? 'text-white'
-                        : 'text-white/75 hover:text-white'
-                  }`}
+                        ? '#fff'
+                        : 'rgba(255,255,255,.7)',
+                    transition: 'color .3s',
+                    letterSpacing: '.2px',
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -85,73 +121,95 @@ export default function MarketingNav() {
         </ul>
 
         {/* Desktop CTA */}
-        <div className="hidden md:block">
-          <Link href="/#waitlist">
-            <Button
-              className={`rounded-full px-5 text-sm font-medium transition-all duration-300 ${
-                scrolled
-                  ? 'bg-forest text-offwhite hover:bg-forest-deep'
-                  : 'bg-white/15 text-white backdrop-blur-sm hover:bg-white/25 border border-white/20'
-              }`}
-            >
-              Join Waitlist
-            </Button>
+        <div className="marketing-nav-cta">
+          <Link
+            href="/#waitlist"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 22px',
+              borderRadius: 6,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: '.3px',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              border: 'none',
+              transition: 'all .4s cubic-bezier(.22,1,.36,1)',
+              background: 'var(--color-forest-deep)',
+              color: '#fff',
+            }}
+          >
+            Join Waitlist
           </Link>
         </div>
 
-        {/* Mobile menu */}
-        <div className="md:hidden">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Open menu"
-                className={`rounded-md p-2 transition-colors ${
-                  scrolled ? 'text-forest' : 'text-white'
-                }`}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-72 border-l-parchment bg-offwhite"
-            >
-              <SheetHeader>
-                <SheetTitle className="flex items-center gap-2 font-heading text-lg text-forest">
-                  <AnglerPassLogo className="h-6 w-6 text-forest" />
-                  AnglerPass
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="mt-4 flex flex-col gap-1 px-4">
-                {navLinks.map((link) => {
-                  const active = pathname === link.href;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                        active
-                          ? 'bg-parchment text-forest'
-                          : 'text-text-secondary hover:bg-parchment-light hover:text-forest'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-                <div className="mt-4 border-t border-parchment pt-4">
-                  <Link href="/#waitlist" onClick={() => setOpen(false)}>
-                    <Button className="w-full rounded-full bg-forest text-offwhite hover:bg-forest-deep">
-                      Join Waitlist
-                    </Button>
-                  </Link>
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+        {/* Mobile toggle */}
+        <button
+          className="marketing-mobile-toggle"
+          aria-label="Menu"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          style={{
+            display: 'none',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 8,
+          }}
+        >
+          <span style={{ display: 'block', width: 22, height: 2, background: scrolled ? 'var(--color-text-primary)' : '#fff', margin: '5px 0', transition: 'all .3s' }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: scrolled ? 'var(--color-text-primary)' : '#fff', margin: '5px 0', transition: 'all .3s' }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: scrolled ? 'var(--color-text-primary)' : '#fff', margin: '5px 0', transition: 'all .3s' }} />
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div
+          style={{
+            background: scrolled ? 'rgba(250,249,245,.98)' : 'rgba(15,34,25,.95)',
+            backdropFilter: 'blur(20px)',
+            padding: '20px 32px 28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
+        >
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: 'block',
+                padding: '12px 0',
+                fontSize: 15,
+                fontWeight: pathname === link.href ? 600 : 500,
+                color: scrolled ? 'var(--color-text-primary)' : 'rgba(255,255,255,.85)',
+                textDecoration: 'none',
+                borderBottom: `1px solid ${scrolled ? 'var(--color-parchment)' : 'rgba(255,255,255,.08)'}`,
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <Link
+            href="/#waitlist"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: 'block',
+              padding: '12px 0',
+              fontSize: 15,
+              fontWeight: 500,
+              color: scrolled ? 'var(--color-bronze)' : 'var(--color-bronze-light)',
+              textDecoration: 'none',
+            }}
+          >
+            Join Waitlist
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }
