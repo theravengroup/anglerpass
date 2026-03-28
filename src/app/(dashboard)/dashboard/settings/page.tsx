@@ -34,13 +34,13 @@ export default function SettingsPage() {
             }}
           >
             <div
-              className="mb-3 flex size-10 items-center justify-center rounded-lg"
+              className="mb-4 flex size-12 items-center justify-center rounded-lg"
               style={{ background: `${item.color}10` }}
             >
-              <item.icon className="size-5" style={{ color: item.color }} />
+              <item.icon className="size-6" style={{ color: item.color }} />
             </div>
             <h3
-              className="mb-1 text-sm font-semibold"
+              className="mb-1 text-lg font-semibold"
               style={{
                 fontFamily: "var(--font-heading)",
                 color: "var(--color-forest-deep)",
@@ -49,7 +49,7 @@ export default function SettingsPage() {
               {item.title}
             </h3>
             <p
-              className="text-xs leading-relaxed"
+              className="text-sm leading-relaxed"
               style={{ color: "var(--color-text-secondary)" }}
             >
               {item.description}
@@ -72,13 +72,13 @@ export default function SettingsPage() {
           />
           <div>
             <p
-              className="text-sm font-medium"
+              className="text-base font-medium"
               style={{ color: "var(--color-forest-deep)" }}
             >
               Settings will be fully available at launch
             </p>
             <p
-              className="mt-1 text-xs"
+              className="mt-1 text-sm"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Account management, notification preferences, and security

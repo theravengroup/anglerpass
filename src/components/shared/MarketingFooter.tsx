@@ -3,10 +3,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import FooterModal from '@/components/homepage/FooterModal';
 
 export default function MarketingFooter() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const pathname = usePathname();
 
   return (
     <>
@@ -247,8 +249,12 @@ export default function MarketingFooter() {
             className="marketing-footer-bottom"
           >
             <span>&copy; {new Date().getFullYear()} AnglerPass. All rights reserved.</span>
-            <Link
-              href="/"
+            <a
+              href={pathname === '/' ? '#hero' : '/'}
+              onClick={pathname === '/' ? (e: React.MouseEvent) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } : undefined}
               style={{
                 color: 'rgba(255,255,255,.35)',
                 textDecoration: 'none',
@@ -256,7 +262,7 @@ export default function MarketingFooter() {
               }}
             >
               Back to home
-            </Link>
+            </a>
           </div>
         </div>
       </footer>
