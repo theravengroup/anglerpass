@@ -12,6 +12,14 @@
  * This placeholder allows the project to compile before types are generated.
  */
 
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export type Database = {
   public: {
     Tables: {
@@ -80,6 +88,25 @@ export type Database = {
           id: string;
           owner_id: string;
           name: string;
+          description: string | null;
+          location_description: string | null;
+          coordinates: string | null;
+          water_type: string | null;
+          species: string[];
+          regulations: string | null;
+          photos: string[];
+          capacity: number | null;
+          rate_adult_full_day: number | null;
+          rate_youth_full_day: number | null;
+          rate_child_full_day: number | null;
+          half_day_allowed: boolean;
+          rate_adult_half_day: number | null;
+          rate_youth_half_day: number | null;
+          rate_child_half_day: number | null;
+          water_miles: number | null;
+          access_notes: string | null;
+          gate_code_required: boolean;
+          gate_code: string | null;
           status: string;
           created_at: string;
           updated_at: string;
@@ -88,6 +115,25 @@ export type Database = {
           id?: string;
           owner_id: string;
           name: string;
+          description?: string | null;
+          location_description?: string | null;
+          coordinates?: string | null;
+          water_type?: string | null;
+          species?: string[];
+          regulations?: string | null;
+          photos?: string[];
+          capacity?: number | null;
+          rate_adult_full_day?: number | null;
+          rate_youth_full_day?: number | null;
+          rate_child_full_day?: number | null;
+          half_day_allowed?: boolean;
+          rate_adult_half_day?: number | null;
+          rate_youth_half_day?: number | null;
+          rate_child_half_day?: number | null;
+          water_miles?: number | null;
+          access_notes?: string | null;
+          gate_code_required?: boolean;
+          gate_code?: string | null;
           status?: string;
           created_at?: string;
           updated_at?: string;
@@ -96,6 +142,25 @@ export type Database = {
           id?: string;
           owner_id?: string;
           name?: string;
+          description?: string | null;
+          location_description?: string | null;
+          coordinates?: string | null;
+          water_type?: string | null;
+          species?: string[];
+          regulations?: string | null;
+          photos?: string[];
+          capacity?: number | null;
+          rate_adult_full_day?: number | null;
+          rate_youth_full_day?: number | null;
+          rate_child_full_day?: number | null;
+          half_day_allowed?: boolean;
+          rate_adult_half_day?: number | null;
+          rate_youth_half_day?: number | null;
+          rate_child_half_day?: number | null;
+          water_miles?: number | null;
+          access_notes?: string | null;
+          gate_code_required?: boolean;
+          gate_code?: string | null;
           status?: string;
           created_at?: string;
           updated_at?: string;

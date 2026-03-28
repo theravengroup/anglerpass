@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -93,10 +94,12 @@ export default function LandownerPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="bg-forest text-white hover:bg-forest/90">
-            Add Property
-            <ArrowRight className="ml-1 size-4" />
-          </Button>
+          <Link href="/landowner/properties/new">
+            <Button className="bg-forest text-white hover:bg-forest/90">
+              Add Property
+              <ArrowRight className="ml-1 size-4" />
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

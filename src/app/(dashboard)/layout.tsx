@@ -73,6 +73,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/landowner": "Property Management",
   "/landowner/properties": "Properties",
+  "/landowner/properties/new": "Add Property",
   "/landowner/bookings": "Bookings",
   "/club": "Club Management",
   "/club/members": "Members",
