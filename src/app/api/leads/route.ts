@@ -86,11 +86,24 @@ async function sendInvestorEmails(data: {
   const typeLabel =
     INVESTOR_TYPE_LABELS[data.investorType ?? ""] ?? data.investorType ?? "—";
 
+  // Fetch the Investor Snapshot image for attachment
+  let attachments: { filename: string; content: Buffer }[] = [];
+  try {
+    const snapshotRes = await fetch("https://anglerpass.com/images/anglerpass-investor-snapshot.png");
+    if (snapshotRes.ok) {
+      const arrayBuffer = await snapshotRes.arrayBuffer();
+      attachments = [{ filename: "AnglerPass-Investor-Snapshot.png", content: Buffer.from(arrayBuffer) }];
+    }
+  } catch {
+    console.error("[leads] Failed to fetch investor snapshot for attachment");
+  }
+
   // Confirmation to investor
   await resend.emails.send({
     from: "AnglerPass Investors <investors@anglerpass.com>",
     to: data.email,
     subject: "AnglerPass | Investor Snapshot",
+    attachments,
     html: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; color: #1a2e1a;">
   <p style="font-size: 15px; line-height: 1.7; color: #333;">Hi ${name},</p>
