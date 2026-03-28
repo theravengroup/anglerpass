@@ -5,6 +5,17 @@ export const metadata: Metadata = {
   title: 'For Anglers — AnglerPass',
   description:
     'Discover private waters, book experiences, and access trusted properties. AnglerPass connects serious anglers with exceptional water.',
+  openGraph: {
+    title: 'For Anglers — AnglerPass',
+    description:
+      'Discover private waters, book experiences, and access trusted properties across the country.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'For Anglers — AnglerPass',
+    description:
+      'Discover private waters, book experiences, and access trusted properties across the country.',
+  },
 };
 
 const features = [

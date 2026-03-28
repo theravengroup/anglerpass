@@ -5,6 +5,17 @@ export const metadata: Metadata = {
   title: 'For Landowners — AnglerPass',
   description:
     'Manage private water access professionally. Property registration, access controls, booking management, and more with AnglerPass.',
+  openGraph: {
+    title: 'For Landowners — AnglerPass',
+    description:
+      'Manage private water access professionally. Property registration, access controls, and booking management.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'For Landowners — AnglerPass',
+    description:
+      'Manage private water access professionally. Property registration, access controls, and booking management.',
+  },
 };
 
 const features = [

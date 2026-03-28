@@ -5,6 +5,17 @@ export const metadata: Metadata = {
   title: 'For Clubs — AnglerPass',
   description:
     'Run your fishing club with modern tools. Membership management, scheduling, roster tools, and reservation coordination with AnglerPass.',
+  openGraph: {
+    title: 'For Clubs — AnglerPass',
+    description:
+      'Run your fishing club with modern tools. Membership management, scheduling, and reservation coordination.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'For Clubs — AnglerPass',
+    description:
+      'Run your fishing club with modern tools. Membership management, scheduling, and reservation coordination.',
+  },
 };
 
 const features = [

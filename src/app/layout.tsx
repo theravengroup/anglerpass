@@ -32,12 +32,21 @@ export const metadata: Metadata = {
   },
   description:
     "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days — all in one place built for landowners, clubs, and serious anglers.",
+  metadataBase: new URL("https://anglerpass.com"),
   openGraph: {
     title: "AnglerPass — Private Water Access, Modernized",
     description:
       "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days.",
     siteName: "AnglerPass",
     type: "website",
+    locale: "en_US",
+    url: "https://anglerpass.com",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AnglerPass — Private Water Access, Modernized",
+    description:
+      "The operating platform for private fly fishing access. Manage properties, memberships, and fishing days.",
   },
 };
 
