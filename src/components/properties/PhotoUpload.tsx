@@ -124,14 +124,12 @@ export default function PhotoUpload({
         "image/jpeg",
         "image/png",
         "image/webp",
-        "image/heic",
-        "image/heif",
       ];
       const invalidFiles = fileArray.filter(
         (f) => !validTypes.includes(f.type)
       );
       if (invalidFiles.length > 0) {
-        setError("Only JPEG, PNG, WebP, and HEIC images are accepted.");
+        setError("Only JPEG, PNG, and WebP images are accepted.");
         return;
       }
 
@@ -262,14 +260,14 @@ export default function PhotoUpload({
                 Click or drag photos here
               </p>
               <p className="mt-1 text-xs text-text-light">
-                JPEG, PNG, WebP, or HEIC — up to {remaining} more
+                JPEG, PNG, or WebP — up to {remaining} more
               </p>
             </>
           )}
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            accept="image/jpeg,image/png,image/webp"
             multiple
             className="hidden"
             onChange={(e) => {

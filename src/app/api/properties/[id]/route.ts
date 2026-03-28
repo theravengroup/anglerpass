@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { propertySchema, propertyStatusTransition } from "@/lib/validations/properties";
+import { propertySchema, propertyStatusTransition, MIN_PHOTOS } from "@/lib/validations/properties";
 
 export async function GET(
   _request: Request,
@@ -56,11 +56,11 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify ownership
+    // Verify ownership — fetch full property for validation
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existing } = await (supabase as any)
       .from("properties")
-      .select("id, owner_id, status")
+      .select("*")
       .eq("id", id)
       .single();
 
@@ -96,6 +96,35 @@ export async function PATCH(
           { error: "Only draft properties can be submitted for review" },
           { status: 400 }
         );
+      }
+
+      // Server-side validation for submit-for-review
+      if (statusResult.data.status === "pending_review") {
+        const photoCount = (existing.photos as string[])?.length ?? 0;
+        if (photoCount < MIN_PHOTOS) {
+          return NextResponse.json(
+            { error: `At least ${MIN_PHOTOS} photos are required to submit for review` },
+            { status: 400 }
+          );
+        }
+
+        if (
+          existing.rate_adult_full_day == null ||
+          existing.rate_youth_full_day == null ||
+          existing.rate_child_full_day == null
+        ) {
+          return NextResponse.json(
+            { error: "Full-day rates for Adult, Youth, and Child are required to submit for review" },
+            { status: 400 }
+          );
+        }
+
+        if (existing.capacity == null) {
+          return NextResponse.json(
+            { error: "Capacity is required to submit for review" },
+            { status: 400 }
+          );
+        }
       }
 
       // Only pending_review can be withdrawn back to draft
@@ -181,6 +210,31 @@ export async function DELETE(
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Fetch property to get photo URLs for cleanup
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: property } = await (supabase as any)
+      .from("properties")
+      .select("photos")
+      .eq("id", id)
+      .single();
+
+    // Delete photos from storage
+    if (property?.photos?.length > 0) {
+      const paths = (property.photos as string[]).map((url: string) => {
+        try {
+          const urlObj = new URL(url);
+          const pathParts = urlObj.pathname.split("/storage/v1/object/public/property-photos/");
+          return pathParts[1] ?? "";
+        } catch {
+          return "";
+        }
+      }).filter(Boolean);
+
+      if (paths.length > 0) {
+        await supabase.storage.from("property-photos").remove(paths);
+      }
     }
 
     // RLS policy only allows deleting drafts owned by the user

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { MAX_PHOTOS } from "@/lib/validations/properties";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB server-side limit
 
 export async function POST(request: Request) {
   try {
@@ -23,11 +26,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify property ownership
+    // Server-side file size check
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "File is too large. Maximum size is 5MB." },
+        { status: 413 }
+      );
+    }
+
+    // Verify property ownership and check current photo count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: property } = await (supabase as any)
       .from("properties")
-      .select("id, owner_id")
+      .select("id, owner_id, photos")
       .eq("id", propertyId)
       .single();
 
@@ -35,9 +46,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const currentCount = (property.photos as string[])?.length ?? 0;
+    if (currentCount >= MAX_PHOTOS) {
+      return NextResponse.json(
+        { error: `Maximum of ${MAX_PHOTOS} photos allowed` },
+        { status: 400 }
+      );
+    }
+
     // Upload to Supabase Storage
-    // Path: {user_id}/{property_id}/{timestamp}.webp
-    const fileName = `${user.id}/${propertyId}/${Date.now()}.webp`;
+    // Path: {user_id}/{property_id}/{timestamp}-{random}.webp
+    const fileName = `${user.id}/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
 
     const { error: uploadError } = await supabase.storage
       .from("property-photos")
