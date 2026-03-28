@@ -102,6 +102,7 @@ export default function ClubsPage() {
         />
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
+            className="audience-hero-badge"
             style={{
               display: 'inline-block',
               marginBottom: 20,
@@ -115,6 +116,7 @@ export default function ClubsPage() {
             For Clubs
           </span>
           <h1
+            className="audience-hero-heading"
             style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(38px, 5vw, 58px)',
@@ -128,6 +130,7 @@ export default function ClubsPage() {
             Run Your Club<br />Like It Deserves.
           </h1>
           <p
+            className="audience-hero-sub"
             style={{
               fontSize: 17,
               lineHeight: 1.7,
@@ -140,7 +143,7 @@ export default function ClubsPage() {
             landowners trust your judgment, and everyone gets access to better water.
             Modern tools for clubs that take their operations seriously.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
               href="/#waitlist"
               style={{
@@ -187,7 +190,7 @@ export default function ClubsPage() {
       {/* Features grid */}
       <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <span
               style={{
                 display: 'inline-block',
@@ -236,9 +239,10 @@ export default function ClubsPage() {
             }}
             className="marketing-features-grid"
           >
-            {features.map((feature) => (
+            {features.map((feature, i) => (
               <div
                 key={feature.title}
+                className={`reveal d${(i % 3) + 1}`}
                 style={{
                   background: '#fff',
                   border: '1px solid var(--color-parchment)',
@@ -293,7 +297,7 @@ export default function ClubsPage() {
       {/* Pricing tiers */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
             <span
               style={{
                 display: 'inline-block',
@@ -363,9 +367,10 @@ export default function ClubsPage() {
                 features: ['Unlimited members', 'Multi-property management', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
                 highlight: false,
               },
-            ].map((tier) => (
+            ].map((tier, i) => (
               <div
                 key={tier.name}
+                className={`reveal d${i + 1}`}
                 style={{
                   background: '#fff',
                   border: tier.highlight ? '2px solid var(--color-river)' : '1px solid var(--color-parchment)',
@@ -446,7 +451,7 @@ export default function ClubsPage() {
 
       {/* Cross-club access */}
       <section style={{ padding: '100px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -492,7 +497,7 @@ export default function ClubsPage() {
 
       {/* Value prop */}
       <section style={{ padding: '80px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -544,7 +549,7 @@ export default function ClubsPage() {
           textAlign: 'center',
         }}
       >
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
+        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
           <h2
             style={{
               fontFamily: 'var(--font-heading)',

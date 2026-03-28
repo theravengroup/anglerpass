@@ -103,6 +103,7 @@ export default function LandownersPage() {
         />
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
+            className="audience-hero-badge"
             style={{
               display: 'inline-block',
               marginBottom: 20,
@@ -116,6 +117,7 @@ export default function LandownersPage() {
             For Landowners
           </span>
           <h1
+            className="audience-hero-heading"
             style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(38px, 5vw, 58px)',
@@ -129,6 +131,7 @@ export default function LandownersPage() {
             Your Water. Your Rules.<br />Your Platform.
           </h1>
           <p
+            className="audience-hero-sub"
             style={{
               fontSize: 17,
               lineHeight: 1.7,
@@ -141,7 +144,7 @@ export default function LandownersPage() {
             deserves. Every angler who reaches your listing has been vetted by a
             fly fishing club &mdash; so you control access with confidence.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
               href="/#waitlist"
               style={{
@@ -188,7 +191,7 @@ export default function LandownersPage() {
       {/* Features grid */}
       <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <span
               style={{
                 display: 'inline-block',
@@ -237,9 +240,10 @@ export default function LandownersPage() {
             }}
             className="marketing-features-grid"
           >
-            {features.map((feature) => (
+            {features.map((feature, i) => (
               <div
                 key={feature.title}
+                className={`reveal d${(i % 3) + 1}`}
                 style={{
                   background: '#fff',
                   border: '1px solid var(--color-parchment)',
@@ -293,7 +297,7 @@ export default function LandownersPage() {
 
       {/* Trust / vetting section */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -339,7 +343,7 @@ export default function LandownersPage() {
 
       {/* Cross-club access */}
       <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -391,7 +395,7 @@ export default function LandownersPage() {
           textAlign: 'center',
         }}
       >
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
+        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
           <h2
             style={{
               fontFamily: 'var(--font-heading)',

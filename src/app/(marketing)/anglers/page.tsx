@@ -102,6 +102,7 @@ export default function AnglersPage() {
         />
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
+            className="audience-hero-badge"
             style={{
               display: 'inline-block',
               marginBottom: 20,
@@ -115,6 +116,7 @@ export default function AnglersPage() {
             For Anglers
           </span>
           <h1
+            className="audience-hero-heading"
             style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(38px, 5vw, 58px)',
@@ -128,6 +130,7 @@ export default function AnglersPage() {
             Find the Water<br />Worth Finding.
           </h1>
           <p
+            className="audience-hero-sub"
             style={{
               fontSize: 17,
               lineHeight: 1.7,
@@ -140,7 +143,7 @@ export default function AnglersPage() {
             connects serious anglers with exceptional properties through a
             club-based platform built on vetting, trust, and respect for the resource.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
               href="/#waitlist"
               style={{
@@ -187,7 +190,7 @@ export default function AnglersPage() {
       {/* Features grid */}
       <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <span
               style={{
                 display: 'inline-block',
@@ -236,9 +239,10 @@ export default function AnglersPage() {
             }}
             className="marketing-features-grid"
           >
-            {features.map((feature) => (
+            {features.map((feature, i) => (
               <div
                 key={feature.title}
+                className={`reveal d${(i % 3) + 1}`}
                 style={{
                   background: '#fff',
                   border: '1px solid var(--color-parchment)',
@@ -292,7 +296,7 @@ export default function AnglersPage() {
 
       {/* Club membership trust section */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -345,9 +349,10 @@ export default function AnglersPage() {
               { step: '01', title: 'Join a Club', text: 'Find a fly fishing club on AnglerPass and apply for membership. Clubs set their own standards and vet every applicant.' },
               { step: '02', title: 'Get Vetted', text: 'Your club reviews your application and vouches for you as a responsible angler. This vetting is what earns landowner trust.' },
               { step: '03', title: 'Book Water', text: 'Once you\u2019re a club member, browse properties your club has access to and book fishing days through the platform.' },
-            ].map((item) => (
+            ].map((item, i) => (
               <div
                 key={item.step}
+                className={`reveal d${i + 1}`}
                 style={{
                   background: '#fff',
                   border: '1px solid var(--color-parchment)',
@@ -391,7 +396,7 @@ export default function AnglersPage() {
 
       {/* Booking fees section */}
       <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -471,7 +476,7 @@ export default function AnglersPage() {
 
       {/* Cross-club access section */}
       <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
+        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
               display: 'inline-block',
@@ -523,7 +528,7 @@ export default function AnglersPage() {
           textAlign: 'center',
         }}
       >
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
+        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
           <h2
             style={{
               fontFamily: 'var(--font-heading)',
