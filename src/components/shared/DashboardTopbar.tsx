@@ -1,17 +1,22 @@
 "use client";
 
-import { Bell, Menu, User } from "lucide-react";
+import { Bell, LogOut, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { UserProfile } from "@/lib/auth/get-profile";
 
 interface DashboardTopbarProps {
   pageTitle: string;
   onMenuToggle: () => void;
+  user: UserProfile | null;
 }
 
 export default function DashboardTopbar({
   pageTitle,
   onMenuToggle,
+  user,
 }: DashboardTopbarProps) {
+  const displayName = user?.display_name || user?.email || "Account";
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-stone-light/20 bg-offwhite px-4 lg:px-6">
       {/* Mobile menu button */}
@@ -31,7 +36,7 @@ export default function DashboardTopbar({
       </h1>
 
       {/* Right side actions */}
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -43,9 +48,26 @@ export default function DashboardTopbar({
           <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-bronze" />
         </Button>
 
-        <div className="ml-1 flex size-8 items-center justify-center rounded-full bg-forest/10 text-forest">
-          <User className="size-4" />
+        <div className="flex items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-full bg-forest/10 text-forest">
+            <User className="size-4" />
+          </div>
+          <span className="hidden text-sm font-medium text-text-primary lg:block">
+            {displayName}
+          </span>
         </div>
+
+        <form action="/auth/signout" method="post">
+          <Button
+            type="submit"
+            variant="ghost"
+            size="icon-sm"
+            className="text-text-secondary hover:text-red-600"
+          >
+            <LogOut className="size-[18px]" />
+            <span className="sr-only">Sign out</span>
+          </Button>
+        </form>
       </div>
     </header>
   );
