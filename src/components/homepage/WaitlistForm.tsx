@@ -28,7 +28,7 @@ export default function WaitlistForm() {
       await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, type: 'waitlist' }),
+        body: JSON.stringify({ ...data, interestType: data.role, type: 'waitlist' }),
       });
     } catch {
       // silently handle

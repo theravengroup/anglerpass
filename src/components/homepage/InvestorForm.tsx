@@ -28,7 +28,7 @@ export default function InvestorForm() {
       await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, type: 'investor' }),
+        body: JSON.stringify({ ...data, interestType: 'investor', type: 'investor' }),
       });
     } catch {
       // silently handle
