@@ -67,6 +67,10 @@ nav.scrolled .nav-links a:hover{color:var(--bronze)}
 .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
 .mobile-toggle span{display:block;width:22px;height:2px;background:#fff;margin:5px 0;transition:all .3s}
 nav.scrolled .mobile-toggle span{background:var(--text-primary)}
+.nav-login-link{font-size:13px;font-weight:500;color:rgba(255,255,255,.75);text-decoration:none;letter-spacing:.3px;transition:color .3s;margin-right:8px}
+.nav-login-link:hover{color:#fff}
+nav.scrolled .nav-login-link{color:var(--text-primary)}
+nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 
 /* ═══ HERO ═══ */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 100px;overflow:hidden}
