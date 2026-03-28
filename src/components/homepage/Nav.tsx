@@ -108,13 +108,13 @@ export default function Nav() {
                     Investment Overview
                   </a>
                   <a href="#investor-form" onClick={(e) => handleAnchorClick(e, '#investor-form')}>
-                    Request the Deck
+                    Request the Snapshot
                   </a>
                 </>
               ) : (
                 <>
                   <Link href="/#investors">Investment Overview</Link>
-                  <Link href="/#investor-form">Request the Deck</Link>
+                  <Link href="/#investor-form">Request the Snapshot</Link>
                 </>
               )}
               <div className="dd-divider"></div>
