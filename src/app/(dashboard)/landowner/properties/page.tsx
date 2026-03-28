@@ -21,6 +21,10 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
     label: "Pending Review",
     className: "bg-river/10 text-river border-river/20",
   },
+  changes_requested: {
+    label: "Changes Requested",
+    className: "bg-river/10 text-river border-river/20",
+  },
   published: {
     label: "Published",
     className: "bg-forest/10 text-forest border-forest/20",

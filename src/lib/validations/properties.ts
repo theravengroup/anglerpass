@@ -31,6 +31,7 @@ export const COMMON_SPECIES = [
 export const PROPERTY_STATUSES = [
   "draft",
   "pending_review",
+  "changes_requested",
   "published",
   "archived",
 ] as const;

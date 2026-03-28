@@ -87,13 +87,14 @@ export async function PATCH(
         );
       }
 
-      // Only drafts can be submitted for review
+      // Only drafts and changes_requested can be submitted for review
       if (
         statusResult.data.status === "pending_review" &&
-        existing.status !== "draft"
+        existing.status !== "draft" &&
+        existing.status !== "changes_requested"
       ) {
         return NextResponse.json(
-          { error: "Only draft properties can be submitted for review" },
+          { error: "Only draft or changes-requested properties can be submitted for review" },
           { status: 400 }
         );
       }
@@ -127,13 +128,14 @@ export async function PATCH(
         }
       }
 
-      // Only pending_review can be withdrawn back to draft
+      // Only pending_review or changes_requested can be withdrawn back to draft
       if (
         statusResult.data.status === "draft" &&
-        existing.status !== "pending_review"
+        existing.status !== "pending_review" &&
+        existing.status !== "changes_requested"
       ) {
         return NextResponse.json(
-          { error: "Only pending properties can be withdrawn" },
+          { error: "Only pending or changes-requested properties can be withdrawn" },
           { status: 400 }
         );
       }

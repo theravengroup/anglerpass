@@ -208,6 +208,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      moderation_notes: {
+        Row: {
+          id: number;
+          property_id: string;
+          admin_id: string;
+          action: string;
+          notes: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          property_id: string;
+          admin_id: string;
+          action: string;
+          notes: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          property_id?: string;
+          admin_id?: string;
+          action?: string;
+          notes?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "moderation_notes_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "moderation_notes_admin_id_fkey";
+            columns: ["admin_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

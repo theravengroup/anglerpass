@@ -1,41 +1,71 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck, ArrowRight } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Moderation Queue",
 };
 
-export default function ModerationPage() {
+export default async function ModerationPage() {
+  const supabase = await createClient();
+
+  // Fetch all pending_review properties with owner info
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: properties } = await (supabase as any)
+    .from("properties")
+    .select("id, name, status, location_description, photos, capacity, created_at, updated_at, owner_id")
+    .eq("status", "pending_review")
+    .order("updated_at", { ascending: true });
+
+  // Fetch owner display names
+  const ownerIds = [...new Set((properties ?? []).map((p: { owner_id: string }) => p.owner_id))];
+  let owners: Record<string, string> = {};
+
+  if (ownerIds.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: profiles } = await (supabase as any)
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", ownerIds);
+
+    owners = (profiles ?? []).reduce(
+      (acc: Record<string, string>, p: { id: string; display_name: string | null }) => {
+        acc[p.id] = p.display_name ?? "Unknown";
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+  }
+
+  const queue = properties ?? [];
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <div>
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Moderation Queue
-        </h2>
-        <p className="mt-1 text-sm text-text-secondary">
-          Review property changes, new listings, and flagged content.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+            Moderation Queue
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            Review and approve property listings before they go live.
+          </p>
+        </div>
+        {queue.length > 0 && (
+          <Badge variant="outline" className="bg-river/10 text-river border-river/20">
+            {queue.length} pending
+          </Badge>
+        )}
       </div>
 
-      <Card className="border-stone-light/20">
-        <CardContent className="p-0">
-          {/* Table header */}
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-4 border-b border-stone-light/15 px-6 py-3 text-xs font-medium uppercase tracking-wider text-text-light">
-            <span>Property</span>
-            <span>Submitted By</span>
-            <span>Change Type</span>
-            <span>Submitted</span>
-            <span>Action</span>
-          </div>
-
-          {/* Empty state */}
-          <div className="flex flex-col items-center justify-center py-16">
+      {queue.length === 0 ? (
+        <Card className="border-stone-light/20">
+          <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="flex size-14 items-center justify-center rounded-full bg-forest/10">
               <ShieldCheck className="size-6 text-forest" />
             </div>
@@ -43,12 +73,76 @@ export default function ModerationPage() {
               No items pending review
             </h3>
             <p className="mt-1 max-w-sm text-center text-sm text-text-secondary">
-              New property submissions and flagged content will appear here for
-              your review.
+              New property submissions will appear here for your review.
             </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {queue.map((property: {
+            id: string;
+            name: string;
+            location_description: string | null;
+            photos: string[];
+            capacity: number | null;
+            owner_id: string;
+            updated_at: string;
+          }) => (
+            <Link
+              key={property.id}
+              href={`/admin/moderation/${property.id}`}
+            >
+              <Card className="border-stone-light/20 transition-colors hover:border-river/30">
+                <CardContent className="flex items-center justify-between py-4">
+                  <div className="flex items-center gap-4">
+                    {/* Thumbnail */}
+                    {property.photos?.length > 0 ? (
+                      <img
+                        src={property.photos[0]}
+                        alt=""
+                        className="size-14 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-14 items-center justify-center rounded-lg bg-stone/10 text-xs text-text-light">
+                        No photo
+                      </div>
+                    )}
+
+                    <div className="space-y-1">
+                      <h3 className="font-medium text-text-primary">
+                        {property.name}
+                      </h3>
+                      <div className="flex items-center gap-3 text-sm text-text-light">
+                        <span>by {owners[property.owner_id] ?? "Unknown"}</span>
+                        {property.location_description && (
+                          <span>
+                            {property.location_description.length > 40
+                              ? property.location_description.slice(0, 40) + "..."
+                              : property.location_description}
+                          </span>
+                        )}
+                        {property.capacity && (
+                          <span>{property.capacity} anglers</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-text-light">
+                      Submitted {new Date(property.updated_at).toLocaleDateString()}
+                    </span>
+                    <Button variant="outline" size="sm">
+                      Review
+                      <ArrowRight className="ml-1 size-3" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

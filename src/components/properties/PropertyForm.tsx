@@ -226,7 +226,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
 
   const isDisabled = saving || submitting;
   const canSubmitForReview =
-    mode === "create" || initialData?.status === "draft";
+    mode === "create" || initialData?.status === "draft" || initialData?.status === "changes_requested";
 
   return (
     <form className="mx-auto max-w-3xl space-y-8">
@@ -630,7 +630,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
               ) : (
                 <Send className="size-4" />
               )}
-              Submit for Review
+              {initialData?.status === "changes_requested" ? "Resubmit for Review" : "Submit for Review"}
             </Button>
           )}
         </div>
