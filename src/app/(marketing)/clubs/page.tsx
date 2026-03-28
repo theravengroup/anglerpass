@@ -348,21 +348,21 @@ export default function ClubsPage() {
             {[
               {
                 name: 'Starter',
-                price: '$49',
+                price: '$149',
                 description: 'For new or small clubs getting organized.',
                 features: ['Up to 500 members', 'Up to 25 properties', 'Basic scheduling', 'Member roster', 'Email support'],
                 highlight: false,
               },
               {
                 name: 'Standard',
-                price: '$99',
+                price: '$349',
                 description: 'For established clubs managing active rosters.',
                 features: ['Up to 2,000 members', 'Up to 100 properties', 'Advanced scheduling & rotation', 'Cross-club access eligible', 'Member communication tools', 'Priority support'],
                 highlight: true,
               },
               {
                 name: 'Pro',
-                price: '$199',
+                price: '$699',
                 description: 'For large clubs with complex operations.',
                 features: ['Unlimited members', 'Unlimited properties', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
                 highlight: false,

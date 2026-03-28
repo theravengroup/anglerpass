@@ -13,9 +13,9 @@
 **Core model:** Clubs are the trust and vetting layer. All anglers access private water through club membership — there is no direct angler-to-landowner booking without a club intermediary.
 
 **Club pricing tiers:**
-- **Starter** — $49/month (up to 25 members, basic scheduling)
-- **Standard** — $99/month (up to 75 members, cross-club eligible)
-- **Pro** — $199/month (unlimited members, multi-property, cross-club eligible)
+- **Starter** — $149/month (up to 500 members, 25 properties, basic scheduling)
+- **Standard** — $349/month (up to 2,000 members, 100 properties, cross-club eligible)
+- **Pro** — $699/month (unlimited members, unlimited properties, cross-club eligible)
 
 **Angler booking fees:** 5% platform fee on each booking (paid by the angler on top of the property's base rate). No subscription required for anglers.
 
@@ -129,7 +129,7 @@
 - Member status management (active, inactive, pending)
 - Club-property association (which properties the club has access to)
 - Basic scheduling: assign members to properties on specific dates
-- Club subscription billing (Starter $49/mo, Standard $99/mo, Pro $199/mo)
+- Club subscription billing (Starter $149/mo, Standard $349/mo, Pro $699/mo)
 - Cross-club access opt-in (Standard and Pro tiers only)
 
 **Major Files/Systems:**
