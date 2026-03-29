@@ -1,24 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState, useCallback, useMemo, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Loader2,
-  MapPin,
-  Droplets,
-  Users,
-  DollarSign,
-  Compass,
-  Fish,
-} from "lucide-react";
+import { Loader2, Users, Compass } from "lucide-react";
+import SearchFilters, {
+  type SearchFiltersState,
+} from "@/components/map/SearchFilters";
+import PropertyCard from "@/components/map/PropertyCard";
+
+// Lazy-load map to keep bundle small
+const PropertyMap = lazy(() => import("@/components/map/PropertyMap"));
 
 interface DiscoverProperty {
   id: string;
@@ -33,6 +24,8 @@ interface DiscoverProperty {
   rate_adult_half_day: number | null;
   half_day_allowed: boolean;
   water_miles: number | null;
+  latitude: number | null;
+  longitude: number | null;
   accessible_through: {
     membership_id: string;
     club_id: string;
@@ -40,44 +33,57 @@ interface DiscoverProperty {
   }[];
 }
 
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
-
 export default function DiscoverPage() {
   const [properties, setProperties] = useState<DiscoverProperty[]>([]);
   const [loading, setLoading] = useState(true);
-  const [waterTypeFilter, setWaterTypeFilter] = useState<string>("all");
   const [noClubs, setNoClubs] = useState(false);
+  const [viewMode, setViewMode] = useState<"map" | "list">("list");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filters, setFilters] = useState<SearchFiltersState>({
+    q: "",
+    water_type: "",
+    species: "",
+    min_price: "",
+    max_price: "",
+  });
+
+  const fetchProperties = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filters.water_type) params.set("water_type", filters.water_type);
+      if (filters.species) params.set("species", filters.species);
+      if (filters.min_price) params.set("min_price", filters.min_price);
+      if (filters.max_price) params.set("max_price", filters.max_price);
+
+      const res = await fetch(`/api/properties/discover?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProperties(data.properties ?? []);
+        setNoClubs(!data.memberships?.length);
+      }
+    } catch {
+      // Silent fail
+    } finally {
+      setLoading(false);
+    }
+  }, [filters.water_type, filters.species, filters.min_price, filters.max_price]);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const params = new URLSearchParams();
-        if (waterTypeFilter && waterTypeFilter !== "all") {
-          params.set("water_type", waterTypeFilter);
-        }
+    fetchProperties();
+  }, [fetchProperties]);
 
-        const res = await fetch(`/api/properties/discover?${params}`);
-        if (res.ok) {
-          const data = await res.json();
-          setProperties(data.properties ?? []);
-          setNoClubs(!data.memberships?.length);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [waterTypeFilter]);
+  // Client-side text search filter (q filter)
+  const filteredProperties = useMemo(() => {
+    if (!filters.q) return properties;
+    const q = filters.q.toLowerCase();
+    return properties.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.location_description?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.species?.some((s) => s.toLowerCase().includes(q))
+    );
+  }, [properties, filters.q]);
 
   if (loading) {
     return (
@@ -88,40 +94,18 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-            Discover Private Waters
-          </h2>
-          <p className="mt-1 text-sm text-text-secondary">
-            Browse properties available through your club memberships.
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="flex gap-3">
-          <Select
-            value={waterTypeFilter}
-            onValueChange={setWaterTypeFilter}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Water type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Water Types</SelectItem>
-              {Object.entries(WATER_TYPE_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="mx-auto max-w-6xl space-y-4">
+      <div>
+        <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+          Discover Private Waters
+        </h2>
+        <p className="mt-1 text-sm text-text-secondary">
+          Browse properties available through your club memberships.
+        </p>
       </div>
 
       {/* No clubs state */}
-      {noClubs && (
+      {noClubs ? (
         <Card className="border-bronze/20 bg-bronze/5">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <div className="flex size-14 items-center justify-center rounded-full bg-bronze/10">
@@ -137,112 +121,81 @@ export default function DiscoverPage() {
             </p>
           </CardContent>
         </Card>
-      )}
+      ) : (
+        <>
+          {/* Filters + view toggle */}
+          <SearchFilters
+            filters={filters}
+            onChange={setFilters}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            resultCount={filteredProperties.length}
+          />
 
-      {/* Empty state (has clubs but no properties) */}
-      {!noClubs && properties.length === 0 && (
-        <Card className="border-stone-light/20">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="flex size-14 items-center justify-center rounded-full bg-bronze/10">
-              <Compass className="size-6 text-bronze" />
-            </div>
-            <h3 className="mt-4 text-base font-medium text-text-primary">
-              No properties available yet
-            </h3>
-            <p className="mt-1 max-w-sm text-center text-sm text-text-secondary">
-              Your clubs don&apos;t have access to any published properties yet.
-              Check back soon — new waters are added regularly.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Property grid */}
-      {properties.length > 0 && (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {properties.map((property) => (
-            <Link
-              key={property.id}
-              href={`/angler/properties/${property.id}`}
-            >
-              <Card className="group overflow-hidden border-stone-light/20 transition-all hover:border-stone-light/40 hover:shadow-md">
-                {/* Photo */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-offwhite">
-                  {property.photos?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={property.photos[0]}
-                      alt={property.name}
-                      className="size-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center">
-                      <MapPin className="size-8 text-text-light" />
-                    </div>
-                  )}
-                  {/* Club badge */}
-                  <div className="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-river backdrop-blur-sm">
-                    {property.accessible_through[0]?.club_name}
-                    {property.accessible_through.length > 1 &&
-                      ` +${property.accessible_through.length - 1}`}
-                  </div>
+          {/* Empty state */}
+          {filteredProperties.length === 0 && (
+            <Card className="border-stone-light/20">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="flex size-14 items-center justify-center rounded-full bg-bronze/10">
+                  <Compass className="size-6 text-bronze" />
                 </div>
+                <h3 className="mt-4 text-base font-medium text-text-primary">
+                  No properties found
+                </h3>
+                <p className="mt-1 max-w-sm text-center text-sm text-text-secondary">
+                  {properties.length === 0
+                    ? "Your clubs don't have access to any published properties yet. Check back soon."
+                    : "Try adjusting your filters to see more results."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-                <CardContent className="space-y-3 p-4">
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-primary">
-                      {property.name}
-                    </h3>
-                    {property.location_description && (
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-text-light">
-                        <MapPin className="size-3" />
-                        {property.location_description}
-                      </p>
-                    )}
+          {/* Map view */}
+          {viewMode === "map" && filteredProperties.length > 0 && (
+            <div className="grid gap-4 lg:grid-cols-[1fr_350px]">
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[400px] items-center justify-center rounded-lg bg-stone-light/10">
+                    <Loader2 className="size-6 animate-spin text-forest" />
                   </div>
+                }
+              >
+                <PropertyMap
+                  properties={filteredProperties}
+                  onPropertyClick={setSelectedId}
+                  selectedId={selectedId}
+                  className="h-[500px] lg:h-[600px]"
+                />
+              </Suspense>
 
-                  {/* Details row */}
-                  <div className="flex flex-wrap gap-3 text-xs text-text-secondary">
-                    {property.water_type && (
-                      <span className="flex items-center gap-1">
-                        <Droplets className="size-3" />
-                        {WATER_TYPE_LABELS[property.water_type] ??
-                          property.water_type}
-                      </span>
-                    )}
-                    {property.species?.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        <Fish className="size-3" />
-                        {property.species.slice(0, 2).join(", ")}
-                        {property.species.length > 2 &&
-                          ` +${property.species.length - 2}`}
-                      </span>
-                    )}
-                    {property.water_miles && (
-                      <span>
-                        {property.water_miles} mi
-                      </span>
-                    )}
-                  </div>
+              {/* Side panel with scrollable list */}
+              <div className="max-h-[600px] space-y-3 overflow-y-auto pr-1">
+                {filteredProperties.map((p) => (
+                  <PropertyCard
+                    key={p.id}
+                    property={p}
+                    href={`/angler/properties/${p.id}`}
+                    selected={p.id === selectedId}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-                  {/* Price */}
-                  {property.rate_adult_full_day != null && (
-                    <div className="flex items-center gap-1 text-sm font-medium text-text-primary">
-                      <DollarSign className="size-3.5" />
-                      {property.rate_adult_full_day}/day
-                      {property.half_day_allowed &&
-                        property.rate_adult_half_day != null && (
-                          <span className="text-xs font-normal text-text-light">
-                            · ${property.rate_adult_half_day}/half
-                          </span>
-                        )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+          {/* List view */}
+          {viewMode === "list" && filteredProperties.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredProperties.map((p) => (
+                <PropertyCard
+                  key={p.id}
+                  property={p}
+                  href={`/angler/properties/${p.id}`}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

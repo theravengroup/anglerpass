@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema, propertyStatusTransition, MIN_PHOTOS } from "@/lib/validations/properties";
+import { parseCoordinates } from "@/lib/geo";
 
 export async function GET(
   _request: Request,
@@ -168,14 +169,18 @@ export async function PATCH(
       );
     }
 
-    const { water_type, ...rest } = result.data;
+    const { water_type, coordinates, ...rest } = result.data;
+    const { latitude, longitude } = parseCoordinates(coordinates);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase as any)
       .from("properties")
       .update({
         ...rest,
+        coordinates,
         water_type: water_type || null,
+        latitude,
+        longitude,
       })
       .eq("id", id)
       .select()

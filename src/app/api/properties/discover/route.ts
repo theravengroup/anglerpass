@@ -18,6 +18,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const waterType = searchParams.get("water_type");
     const species = searchParams.get("species");
+    const minPrice = searchParams.get("min_price");
+    const maxPrice = searchParams.get("max_price");
+    const bounds = searchParams.get("bounds"); // "south,west,north,east"
 
     // Get the user's active club memberships
     const { data: memberships } = await admin
@@ -74,7 +77,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, capacity, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles"
+        "id, name, description, location_description, water_type, species, photos, capacity, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
       .in("id", propertyIds)
       .eq("status", "published")
@@ -86,6 +89,27 @@ export async function GET(request: Request) {
 
     if (species) {
       query = query.contains("species", [species]);
+    }
+
+    if (minPrice) {
+      query = query.gte("rate_adult_full_day", parseFloat(minPrice));
+    }
+
+    if (maxPrice) {
+      query = query.lte("rate_adult_full_day", parseFloat(maxPrice));
+    }
+
+    // Bounding box filter for map viewport
+    if (bounds) {
+      const parts = bounds.split(",").map(Number);
+      if (parts.length === 4 && parts.every((n) => !isNaN(n))) {
+        const [south, west, north, east] = parts;
+        query = query
+          .gte("latitude", south)
+          .lte("latitude", north)
+          .gte("longitude", west)
+          .lte("longitude", east);
+      }
     }
 
     const { data: properties, error } = await query;

@@ -16,6 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
+    "mapbox-gl": "^3.20.0",
     "next": "^16.2.1",
     "radix-ui": "^1.4.3",
     "react": "^19.1.0",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",
+    "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",

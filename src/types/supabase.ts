@@ -91,6 +91,8 @@ export type Database = {
           description: string | null;
           location_description: string | null;
           coordinates: string | null;
+          latitude: number | null;
+          longitude: number | null;
           water_type: string | null;
           species: string[];
           regulations: string | null;
@@ -118,6 +120,8 @@ export type Database = {
           description?: string | null;
           location_description?: string | null;
           coordinates?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           water_type?: string | null;
           species?: string[];
           regulations?: string | null;
@@ -145,6 +149,8 @@ export type Database = {
           description?: string | null;
           location_description?: string | null;
           coordinates?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           water_type?: string | null;
           species?: string[];
           regulations?: string | null;
