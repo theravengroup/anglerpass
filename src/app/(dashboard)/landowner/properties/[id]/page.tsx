@@ -66,6 +66,7 @@ export default function PropertyDetailPage() {
           rate_adult_half_day: data.rate_adult_half_day ?? null,
           rate_youth_half_day: data.rate_youth_half_day ?? null,
           rate_child_half_day: data.rate_child_half_day ?? null,
+          staff_rate_discount: data.staff_rate_discount ?? 0,
           access_notes: data.access_notes ?? "",
           gate_code_required: data.gate_code_required ?? false,
           gate_code: data.gate_code ?? "",

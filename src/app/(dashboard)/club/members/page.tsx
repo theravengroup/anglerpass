@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Mail,
   Send,
+  Shield,
 } from "lucide-react";
 import { MEMBERSHIP_STATUS } from "@/lib/constants/status";
 import { FetchError } from "@/components/shared/FetchError";
@@ -33,11 +34,12 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "active" | "pending">("all");
+  const [filter, setFilter] = useState<"all" | "active" | "staff" | "pending">("all");
 
   // Invite form state
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"member" | "staff">("member");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
@@ -95,7 +97,7 @@ export default function MembersPage() {
       const res = await fetch(`/api/clubs/${clubId}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: inviteEmail.trim() }),
+        body: JSON.stringify({ email: inviteEmail.trim(), role: inviteRole }),
       });
 
       const data = await res.json();
@@ -105,8 +107,10 @@ export default function MembersPage() {
         return;
       }
 
-      setInviteSuccess(`Invitation sent to ${inviteEmail}`);
+      const roleLabel = inviteRole === "staff" ? "Staff invitation" : "Invitation";
+      setInviteSuccess(`${roleLabel} sent to ${inviteEmail}`);
       setInviteEmail("");
+      setInviteRole("member");
       await fetchMembers(clubId);
     } catch {
       setInviteError("An unexpected error occurred");
@@ -156,7 +160,8 @@ export default function MembersPage() {
   }
 
   const filteredMembers = members.filter((m) => {
-    if (m.role === "admin") return filter === "all" || filter === "active";
+    if (m.role === "admin") return filter === "all" || filter === "active" || filter === "staff";
+    if (filter === "staff") return m.role === "staff" && m.status !== "declined";
     if (filter === "active") return m.status === "active";
     if (filter === "pending") return m.status === "pending";
     return true;
@@ -224,6 +229,21 @@ export default function MembersPage() {
                   }}
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="invite_role">Role</Label>
+                <select
+                  id="invite_role"
+                  value={inviteRole}
+                  onChange={(e) =>
+                    setInviteRole(e.target.value as "member" | "staff")
+                  }
+                  disabled={inviting}
+                  className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="member">Member</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
               <Button
                 onClick={handleInvite}
                 disabled={inviting || !inviteEmail.trim()}
@@ -237,6 +257,13 @@ export default function MembersPage() {
                 Send
               </Button>
             </div>
+            {inviteRole === "staff" && (
+              <p className="flex items-center gap-1.5 text-xs text-text-secondary">
+                <Shield className="size-3.5 text-river" />
+                Staff can help manage the club and get discounted rod fees at
+                your properties.
+              </p>
+            )}
             {inviteError && (
               <p className="text-sm text-red-600">{inviteError}</p>
             )}
@@ -253,7 +280,7 @@ export default function MembersPage() {
       {/* Filter tabs */}
       {members.length > 0 && (
         <div className="flex gap-1 rounded-lg border border-stone-light/20 bg-offwhite/50 p-1">
-          {(["all", "active", "pending"] as const).map((f) => (
+          {(["all", "active", "staff", "pending"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -327,7 +354,13 @@ export default function MembersPage() {
                         {member.display_name ?? member.email ?? "Unknown"}
                         {member.role === "admin" && (
                           <span className="ml-2 rounded-full bg-river/10 px-2 py-0.5 text-xs font-medium text-river">
-                            Admin
+                            Owner
+                          </span>
+                        )}
+                        {member.role === "staff" && (
+                          <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-forest/10 px-2 py-0.5 text-xs font-medium text-forest">
+                            <Shield className="size-2.5" />
+                            Staff
                           </span>
                         )}
                       </p>

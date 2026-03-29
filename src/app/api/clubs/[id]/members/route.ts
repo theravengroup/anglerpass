@@ -175,7 +175,7 @@ export async function POST(
         );
       }
 
-      await sendMemberInviteEmail(email, club.name, false);
+      await sendMemberInviteEmail(email, club.name, false, role);
 
       return NextResponse.json({ membership }, { status: 201 });
     }
@@ -217,7 +217,7 @@ export async function POST(
       );
     }
 
-    await sendMemberInviteEmail(email, club.name, true);
+    await sendMemberInviteEmail(email, club.name, true, role);
 
     return NextResponse.json({ membership }, { status: 201 });
   } catch (err) {
@@ -232,7 +232,8 @@ export async function POST(
 async function sendMemberInviteEmail(
   email: string,
   clubName: string,
-  needsSignup: boolean
+  needsSignup: boolean,
+  role: string
 ) {
   if (!resend) return;
 
@@ -246,21 +247,35 @@ async function sendMemberInviteEmail(
       ? "Create Your Account →"
       : "View Your Membership →";
 
+    const isStaff = role === "staff";
+    const roleDescription = isStaff
+      ? "as a <strong>staff member</strong>"
+      : "as a member";
+    const perksLine = isStaff
+      ? `<p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
+          As a staff member, you'll help manage the club and enjoy discounted rod fees at club properties.
+        </p>`
+      : `<p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
+          As a member, you'll be able to view available private waters, book access, and manage your
+          reservations — all in one place.
+        </p>`;
+
+    const subject = isStaff
+      ? `You've been invited to staff ${clubName} on AnglerPass`
+      : `You've been invited to join ${clubName} on AnglerPass`;
+
     await resend.emails.send({
       from: "AnglerPass <hello@anglerpass.com>",
       to: email,
-      subject: `You've been invited to join ${clubName} on AnglerPass`,
+      subject,
       html: `
 <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
   <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">You're invited to ${clubName}</h2>
   <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
-    <strong>${clubName}</strong> has invited you to join their club on AnglerPass — a platform for
+    <strong>${clubName}</strong> has invited you to join their club ${roleDescription} on AnglerPass — a platform for
     managing private fly fishing access.
   </p>
-  <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
-    As a member, you'll be able to view available private waters, book access, and manage your
-    reservations — all in one place.
-  </p>
+  ${perksLine}
   <div style="margin: 32px 0;">
     <a href="${ctaUrl}"
        style="display: inline-block; padding: 14px 32px; background: #8b6914; color: #fff; text-decoration: none; border-radius: 6px; font-family: sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.3px;">

@@ -129,6 +129,7 @@ export type Database = {
           rate_adult_half_day: number | null;
           rate_youth_half_day: number | null;
           rate_child_half_day: number | null;
+          staff_rate_discount: number;
           water_miles: number | null;
           access_notes: string | null;
           gate_code_required: boolean;

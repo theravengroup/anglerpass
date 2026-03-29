@@ -9,7 +9,7 @@ export const MEMBERSHIP_STATUSES = [
   "declined",
 ] as const;
 
-export const MEMBERSHIP_ROLES = ["admin", "member"] as const;
+export const MEMBERSHIP_ROLES = ["admin", "staff", "member"] as const;
 
 export const ACCESS_STATUSES = ["pending", "approved", "declined"] as const;
 
