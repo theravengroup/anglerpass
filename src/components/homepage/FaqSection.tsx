@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     question: 'Can clubs manage memberships through AnglerPass?',
-    answer: 'Absolutely. The platform is being designed with clubs as a core user group. Membership management, digital rosters, access scheduling, reservation coordination, and member communication tools are all part of the product roadmap.',
+    answer: 'Yes \u2014 and it\u2019s not an afterthought. AnglerPass gives clubs best-in-class member management software in the cloud, purpose-built for fly fishing. Digital rosters, member vetting and applications, access scheduling, reservation coordination, property management, and member communications \u2014 all available at launch. Most clubs run on spreadsheets, group texts, and handshake agreements. AnglerPass replaces all of that with a single platform designed around how clubs actually operate.',
   },
   {
     question: 'How do anglers book private water?',
