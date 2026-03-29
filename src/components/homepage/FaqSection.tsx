@@ -17,15 +17,15 @@ const faqItems = [
   },
   {
     question: 'Can landowners list private waters?',
-    answer: 'Yes. AnglerPass will include full property registration and listing tools. Landowners will be able to create professional profiles for their waters, define access rules, manage availability calendars, and control who can see and request access to their properties.',
+    answer: 'Yes. Landowners can register properties, create professional profiles, define access rules, and manage availability calendars. Every property must be associated with at least one fly fishing club before it can be published \u2014 clubs serve as the trust and vetting layer for anglers who book access. If your club isn\u2019t on AnglerPass yet, you can invite them directly from the property registration flow.',
   },
   {
     question: 'Can clubs manage memberships through AnglerPass?',
     answer: 'Absolutely. The platform is being designed with clubs as a core user group. Membership management, digital rosters, access scheduling, reservation coordination, and member communication tools are all part of the product roadmap.',
   },
   {
-    question: 'Will individual anglers be able to book directly?',
-    answer: 'That\u2019s the plan. AnglerPass will give anglers the ability to browse available private waters, view property details, and submit booking or access requests. The specifics of the booking flow will depend on each landowner or club\u2019s preferences and access rules.',
+    question: 'How do anglers book private water?',
+    answer: 'All bookings on AnglerPass go through club membership. Anglers join a fly fishing club, get vetted as a member, and then book private water through their club\u2019s access agreements with landowners. A flat 5% platform fee is added to each booking. If your club participates in cross-club access, you can also book water managed by other clubs in the network.',
   },
   {
     question: 'How do I join the waitlist?',

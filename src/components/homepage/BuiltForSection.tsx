@@ -38,7 +38,7 @@ export default function BuiltForSection() {
             <div className="built-for-text">
               <span className="built-for-label">For Anglers</span>
               <h3>Independent Anglers</h3>
-              <p>You know the quality of private water is unmatched. AnglerPass gives you a way to discover, evaluate, and book legitimate private fishing days — without needing an inside connection or a club membership to find what&apos;s available.</p>
+              <p>You know the quality of private water is unmatched. Join a club on AnglerPass and get access to vetted private waters you won&apos;t find anywhere else — with real availability, transparent rod fees, and a booking system that respects the resource.</p>
               <a href="#waitlist" className="btn btn-bronze">Find Private Water</a>
             </div>
           </div>

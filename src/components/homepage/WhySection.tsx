@@ -65,8 +65,8 @@ export default function WhySection() {
         <div className="why-visual reveal-right d2">
           <div className="why-visual-card">
             <div className="why-quote-line"></div>
-            <div className="why-quote">The best fishing isn't about finding any water. It's about finding the right water — and earning access to it.</div>
-            <div className="why-quote-attr">The AnglerPass Philosophy</div>
+            <div className="why-quote">Private water access has always run on relationships. We're building the platform that makes those relationships scale.</div>
+            <div className="why-quote-attr">The AnglerPass Mission</div>
           </div>
         </div>
       </div>

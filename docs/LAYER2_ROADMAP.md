@@ -66,8 +66,9 @@
 - Property list view with status badges (draft, pending_review, published, archived)
 - Property detail/edit page
 - Photo upload to Supabase Storage
-- Property status transitions (draft → pending_review → published)
+- Property status transitions (draft → pending_club → pending_review → published)
 - Basic availability calendar (which dates are open)
+- **Note:** Properties require at least one club association before they can be submitted for review. The club association UI and invite flow are built in Phase 4 — until then, properties can be created as drafts.
 
 **Major Files/Systems:**
 - `supabase/migrations/00005_expand_properties.sql` (add columns: description, location, water_type, species, regulations, pricing, photos, coordinates)
@@ -128,24 +129,37 @@
 - Member vetting workflow (application → review → approve/reject)
 - Member status management (active, inactive, pending)
 - Club-property association (which properties the club has access to)
+- **Property → club association flow on the landowner side:**
+  - Properties cannot be published without at least one associated club
+  - Property status flow: draft → pending_club (no club yet) → pending_review → published
+  - Landowner can search existing clubs on the platform and send an access request
+  - Landowner can invite a club not yet on the platform (club name + admin email → invitation email sent → pending association created → auto-linked when club admin signs up and approves)
+  - Landowner can also create a club themselves if they wear both hats (links to club registration)
+  - Club admin approves or declines property association requests
+  - Dashboard indicator on landowner properties: "Associate a club to make this property bookable"
 - Basic scheduling: assign members to properties on specific dates
-- Club subscription billing (Starter $149/mo, Standard $349/mo, Pro $699/mo)
+- Club subscription billing (Starter $149/mo, Standard $349/mo, Pro $699/mo) — can defer to Phase 7
 - Cross-club access opt-in (Standard and Pro tiers only)
 
 **Major Files/Systems:**
-- `supabase/migrations/00007_clubs.sql` (clubs, club_memberships, club_property_access tables, subscription_tier column)
+- `supabase/migrations/00007_clubs.sql` (clubs, club_memberships, club_property_access, club_invitations tables, subscription_tier column)
 - `src/app/(dashboard)/club/page.tsx` (club dashboard — replace placeholder)
 - `src/app/(dashboard)/club/members/page.tsx` (roster — replace placeholder)
 - `src/app/(dashboard)/club/applications/page.tsx` (new — vetting queue)
+- `src/app/(dashboard)/club/properties/page.tsx` (new — manage property association requests)
 - `src/app/(dashboard)/club/settings/page.tsx` (club profile edit)
+- `src/app/(dashboard)/landowner/properties/[id]/clubs/page.tsx` (new — manage club associations for a property)
 - `src/app/api/clubs/route.ts`
 - `src/app/api/clubs/[id]/members/route.ts`
+- `src/app/api/clubs/[id]/properties/route.ts` (approve/decline property associations)
+- `src/app/api/clubs/invite/route.ts` (send club invitation email from landowner)
 - `src/lib/validations/clubs.ts`
 
 **Dependencies:** Phase 1 (auth), Phase 2 (properties exist to associate with)
 
 **Risks/Complexity:**
-- The invite system needs careful thought. Options: (a) invite by email → creates a pending membership → user signs up and is auto-linked, or (b) user signs up first, then requests to join. Start with (a) — it's what club admins expect.
+- The member invite system needs careful thought. Options: (a) invite by email → creates a pending membership → user signs up and is auto-linked, or (b) user signs up first, then requests to join. Start with (a) — it's what club admins expect.
+- The club invitation flow (landowner inviting a club) is a growth mechanism — every landowner who invites their club is a warm lead. Store invitations in a `club_invitations` table with status tracking (sent, accepted, expired). When a club admin signs up via an invitation link, auto-create the club and queue the property association for their approval.
 - Club-property access is a many-to-many relationship. Keep it simple: a club either has access to a property or it doesn't. Don't build per-member permissions on properties yet.
 - Club subscription billing can use Stripe Subscriptions. Wire this up alongside Phase 7 (Payments) or as a parallel effort.
 - Cross-club access needs a `cross_club_agreements` table and eligibility checks on the booking flow. Keep it simple: two clubs either have a reciprocal agreement or they don't.
@@ -417,7 +431,7 @@ Phase 1: Auth & Roles
   │     │     ├── Phase 8: Map & Search
   │     │     └── Phase 9: Documents
   │     └── Phase 10: Analytics (needs real data)
-  ├── Phase 4: Clubs (needs Phase 2 for property association)
+  ├── Phase 4: Clubs (needs Phase 2; unlocks property publishing via club association)
   └── Phase 11: Admin Permissions (can start after Phase 1, grows with each phase)
 ```
 
