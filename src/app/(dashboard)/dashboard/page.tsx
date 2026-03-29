@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -50,21 +51,25 @@ const gettingStartedSteps = [
   {
     label: "Complete your profile",
     description: "Add your name, location, and fishing preferences",
+    href: "/dashboard/settings",
     done: false,
   },
   {
     label: "Choose your role",
     description: "Set up as a landowner, club manager, or angler",
+    href: "/dashboard/settings",
     done: false,
   },
   {
     label: "Explore private waters",
     description: "Browse available properties and membership opportunities",
+    href: "/angler/discover",
     done: false,
   },
   {
     label: "Make your first booking",
     description: "Reserve a fishing day at a private property",
+    href: "/angler/bookings",
     done: false,
   },
 ];
@@ -122,9 +127,10 @@ export default function DashboardPage() {
         <CardContent>
           <div className="space-y-4">
             {gettingStartedSteps.map((step, i) => (
-              <div
+              <Link
                 key={i}
-                className="flex items-start gap-3 rounded-lg border border-stone-light/15 p-4"
+                href={step.href}
+                className="flex items-start gap-3 rounded-lg border border-stone-light/15 p-4 transition-colors hover:border-stone-light/30 hover:bg-offwhite/50"
               >
                 {step.done ? (
                   <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-forest" />
@@ -139,10 +145,12 @@ export default function DashboardPage() {
                     {step.description}
                   </p>
                 </div>
-                <Button variant="ghost" size="icon-sm" className="shrink-0">
-                  <ArrowRight className="size-4 text-text-light" />
+                <Button variant="ghost" size="icon-sm" className="shrink-0" asChild>
+                  <span>
+                    <ArrowRight className="size-4 text-text-light" />
+                  </span>
                 </Button>
-              </div>
+              </Link>
             ))}
           </div>
         </CardContent>
