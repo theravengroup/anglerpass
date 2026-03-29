@@ -28,6 +28,7 @@ import {
   STATUS_BADGE_COLORS,
 } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
+import { FetchError } from "@/components/shared/FetchError";
 
 /** Plural labels for the admin role breakdown chart */
 const ROLE_LABELS_PLURAL: Record<string, string> = {
@@ -68,16 +69,20 @@ interface RecentBooking {
 export default function AdminPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [days, setDays] = useState(30);
 
   const load = useCallback(async () => {
+    setError(false);
     try {
       const res = await fetch(`/api/analytics?view=admin&days=${days}`);
       if (res.ok) {
         setData(await res.json());
+      } else {
+        setError(true);
       }
     } catch {
-      // Silent fail
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -119,6 +124,14 @@ export default function AdminPage() {
     return (
       <div className="mx-auto flex max-w-5xl items-center justify-center py-24">
         <Loader2 className="size-6 animate-spin text-river" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <FetchError message="Failed to load analytics." onRetry={load} />
       </div>
     );
   }

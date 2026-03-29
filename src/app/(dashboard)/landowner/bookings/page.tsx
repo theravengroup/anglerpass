@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,10 +8,10 @@ import {
   Loader2,
   CheckCircle2,
   Clock,
-  XCircle,
-  Ban,
   MapPin,
 } from "lucide-react";
+import { BOOKING_STATUS } from "@/lib/constants/status";
+import { FetchError } from "@/components/shared/FetchError";
 
 interface LandownerBooking {
   id: string;
@@ -37,64 +37,34 @@ interface LandownerBooking {
   } | null;
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; icon: typeof CheckCircle2; color: string; bg: string }
-> = {
-  pending: {
-    label: "Pending Review",
-    icon: Clock,
-    color: "text-bronze",
-    bg: "bg-bronze/10",
-  },
-  confirmed: {
-    label: "Confirmed",
-    icon: CheckCircle2,
-    color: "text-forest",
-    bg: "bg-forest/10",
-  },
-  declined: {
-    label: "Declined",
-    icon: XCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-  },
-  cancelled: {
-    label: "Cancelled",
-    icon: Ban,
-    color: "text-text-light",
-    bg: "bg-stone-light/10",
-  },
-  completed: {
-    label: "Completed",
-    icon: CheckCircle2,
-    color: "text-river",
-    bg: "bg-river/10",
-  },
-};
-
 export default function LandownerBookingsPage() {
   const [bookings, setBookings] = useState<LandownerBooking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notesInput, setNotesInput] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/bookings?role=landowner");
-        if (res.ok) {
-          const data = await res.json();
-          setBookings(data.bookings ?? []);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
+  const load = useCallback(async () => {
+    setError(false);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/bookings?role=landowner");
+      if (res.ok) {
+        const data = await res.json();
+        setBookings(data.bookings ?? []);
+      } else {
+        setError(true);
       }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function handleAction(
     bookingId: string,
@@ -116,9 +86,12 @@ export default function LandownerBookingsPage() {
         setBookings((prev) =>
           prev.map((b) => (b.id === bookingId ? { ...b, ...data.booking } : b))
         );
+      } else {
+        const err = await res.json().catch(() => null);
+        alert(err?.error ?? "Action failed");
       }
     } catch {
-      // Silent fail
+      alert("An error occurred. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -139,6 +112,14 @@ export default function LandownerBookingsPage() {
     return (
       <div className="mx-auto flex max-w-5xl items-center justify-center py-24">
         <Loader2 className="size-6 animate-spin text-forest" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <FetchError message="Failed to load bookings." onRetry={load} />
       </div>
     );
   }
@@ -305,7 +286,7 @@ export default function LandownerBookingsPage() {
 }
 
 function BookingRow({ booking }: { booking: LandownerBooking }) {
-  const config = STATUS_CONFIG[booking.status] ?? STATUS_CONFIG.pending;
+  const config = BOOKING_STATUS[booking.status] ?? BOOKING_STATUS.pending;
   const Icon = config.icon;
 
   return (

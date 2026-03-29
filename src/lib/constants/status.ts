@@ -4,6 +4,7 @@ import {
   Clock,
   XCircle,
   Ban,
+  UserMinus,
 } from "lucide-react";
 
 // ─── Booking / Property Status ──────────────────────────────────────
@@ -71,6 +72,12 @@ export const MEMBERSHIP_STATUS: Record<string, StatusConfig> = {
     icon: Clock,
     color: "text-bronze",
     bg: "bg-bronze/10",
+  },
+  inactive: {
+    label: "Inactive",
+    icon: UserMinus,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
   },
   declined: {
     label: "Declined",

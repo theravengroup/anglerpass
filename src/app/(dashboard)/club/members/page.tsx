@@ -10,12 +10,11 @@ import {
   UserPlus,
   Loader2,
   CheckCircle2,
-  Clock,
-  XCircle,
-  UserMinus,
   Mail,
   Send,
 } from "lucide-react";
+import { MEMBERSHIP_STATUS } from "@/lib/constants/status";
+import { FetchError } from "@/components/shared/FetchError";
 
 interface Member {
   id: string;
@@ -29,39 +28,10 @@ interface Member {
   created_at: string;
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; icon: typeof CheckCircle2; color: string; bg: string }
-> = {
-  active: {
-    label: "Active",
-    icon: CheckCircle2,
-    color: "text-forest",
-    bg: "bg-forest/10",
-  },
-  pending: {
-    label: "Pending",
-    icon: Clock,
-    color: "text-bronze",
-    bg: "bg-bronze/10",
-  },
-  inactive: {
-    label: "Inactive",
-    icon: UserMinus,
-    color: "text-text-light",
-    bg: "bg-stone-light/10",
-  },
-  declined: {
-    label: "Declined",
-    icon: XCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-  },
-};
-
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "pending">("all");
 
@@ -87,26 +57,32 @@ export default function MembersPage() {
     }
   }, []);
 
-  useEffect(() => {
-    async function init() {
-      try {
-        const res = await fetch("/api/clubs");
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (data.owned?.length) {
-          const cid = data.owned[0].id;
-          setClubId(cid);
-          await fetchMembers(cid);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
+  const init = useCallback(async () => {
+    setError(false);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/clubs");
+      if (!res.ok) {
+        setError(true);
+        return;
       }
+
+      const data = await res.json();
+      if (data.owned?.length) {
+        const cid = data.owned[0].id;
+        setClubId(cid);
+        await fetchMembers(cid);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    init();
   }, [fetchMembers]);
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   async function handleInvite() {
     if (!clubId || !inviteEmail.trim()) return;
@@ -190,6 +166,14 @@ export default function MembersPage() {
     return (
       <div className="mx-auto flex max-w-5xl items-center justify-center py-24">
         <Loader2 className="size-6 animate-spin text-river" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <FetchError message="Failed to load members." onRetry={init} />
       </div>
     );
   }
@@ -320,7 +304,7 @@ export default function MembersPage() {
         <div className="space-y-2">
           {filteredMembers.map((member) => {
             const config =
-              STATUS_CONFIG[member.status] ?? STATUS_CONFIG.pending;
+              MEMBERSHIP_STATUS[member.status] ?? MEMBERSHIP_STATUS.pending;
             const Icon = config.icon;
             const isLoading = actionLoading === member.id;
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { markReadSchema } from "@/lib/validations/notifications";
 
 // GET: List notifications for the current user
 export async function GET(request: Request) {
@@ -75,10 +76,19 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
+    const parsed = markReadSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+        { status: 400 }
+      );
+    }
+
     const admin = createAdminClient();
 
     // Mark all as read
-    if (body.mark_all_read) {
+    if (parsed.data.mark_all_read) {
       const { error } = await admin
         .from("notifications")
         .update({ read: true })
@@ -97,13 +107,7 @@ export async function PATCH(request: Request) {
     }
 
     // Mark specific notification(s) as read
-    const ids: string[] = body.ids ?? (body.id ? [body.id] : []);
-    if (ids.length === 0) {
-      return NextResponse.json(
-        { error: "No notification IDs provided" },
-        { status: 400 }
-      );
-    }
+    const ids: string[] = parsed.data.ids ?? (parsed.data.id ? [parsed.data.id] : []);
 
     const { error } = await admin
       .from("notifications")

@@ -11,6 +11,8 @@ import {
   XCircle,
   Droplets,
 } from "lucide-react";
+import { WATER_TYPE_LABELS } from "@/lib/constants/status";
+import { FetchError } from "@/components/shared/FetchError";
 
 interface PropertyAccess {
   id: string;
@@ -51,19 +53,10 @@ const STATUS_CONFIG: Record<
   },
 };
 
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
-
 export default function ClubPropertiesPage() {
   const [properties, setProperties] = useState<PropertyAccess[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -79,26 +72,32 @@ export default function ClubPropertiesPage() {
     }
   }, []);
 
-  useEffect(() => {
-    async function init() {
-      try {
-        const res = await fetch("/api/clubs");
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (data.owned?.length) {
-          const cid = data.owned[0].id;
-          setClubId(cid);
-          await fetchProperties(cid);
-        }
-      } catch {
-        // Silent fail
-      } finally {
-        setLoading(false);
+  const init = useCallback(async () => {
+    setError(false);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/clubs");
+      if (!res.ok) {
+        setError(true);
+        return;
       }
+
+      const data = await res.json();
+      if (data.owned?.length) {
+        const cid = data.owned[0].id;
+        setClubId(cid);
+        await fetchProperties(cid);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    init();
   }, [fetchProperties]);
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   async function handleAction(accessId: string, status: "approved" | "declined") {
     if (!clubId) return;
@@ -128,6 +127,14 @@ export default function ClubPropertiesPage() {
     return (
       <div className="mx-auto flex max-w-5xl items-center justify-center py-24">
         <Loader2 className="size-6 animate-spin text-river" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <FetchError message="Failed to load properties." onRetry={init} />
       </div>
     );
   }

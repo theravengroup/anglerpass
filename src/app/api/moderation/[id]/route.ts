@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
 import { moderationActionSchema } from "@/lib/validations/moderation";
 
 const ACTION_TO_STATUS: Record<string, string> = {
@@ -14,59 +13,36 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verify admin role
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: profile } = await (supabase as any)
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const { user, admin } = auth;
 
     // Validate request body
     const body = await request.json();
     const result = moderationActionSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { action, notes } = result.data;
 
     // Get current property
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: property } = await (supabase as any)
+    const { data: property } = await admin
       .from("properties")
       .select("id, status, name, owner_id")
       .eq("id", id)
       .single();
 
     if (!property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     if (property.status !== "pending_review") {
-      return NextResponse.json(
-        { error: "Only properties with pending_review status can be moderated" },
-        { status: 400 }
+      return jsonError(
+        "Only properties with pending_review status can be moderated",
+        400
       );
     }
 
@@ -74,23 +50,18 @@ export async function POST(
     const oldStatus = property.status;
 
     // Update property status
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await admin
       .from("properties")
       .update({ status: newStatus })
       .eq("id", id);
 
     if (updateError) {
       console.error("[moderation] Status update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update property status" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update property status", 500);
     }
 
     // Insert moderation note
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: noteError } = await (supabase as any)
+    const { error: noteError } = await admin
       .from("moderation_notes")
       .insert({
         property_id: id,
@@ -105,8 +76,7 @@ export async function POST(
     }
 
     // Write to audit log
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: auditError } = await (supabase as any)
+    const { error: auditError } = await admin
       .from("audit_log")
       .insert({
         actor_id: user.id,
@@ -121,16 +91,10 @@ export async function POST(
       console.error("[moderation] Audit log error:", auditError);
     }
 
-    return NextResponse.json({
-      success: true,
-      property: { id, status: newStatus },
-    });
+    return jsonSuccess({ property: { id, status: newStatus } });
   } catch (err) {
     console.error("[moderation] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -141,17 +105,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await auth.admin
       .from("moderation_notes")
       .select("id, action, notes, created_at, admin_id")
       .eq("property_id", id)
@@ -159,18 +116,12 @@ export async function GET(
 
     if (error) {
       console.error("[moderation] Fetch notes error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch moderation history" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch moderation history", 500);
     }
 
-    return NextResponse.json({ notes: data ?? [] });
+    return jsonSuccess({ notes: data ?? [] });
   } catch (err) {
     console.error("[moderation] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
