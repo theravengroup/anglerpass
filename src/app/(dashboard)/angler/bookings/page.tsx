@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import {
   Compass,
   Droplets,
   FileText,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import { BOOKING_STATUS, WATER_TYPE_LABELS } from "@/lib/constants/status";
 
@@ -38,10 +40,24 @@ interface Booking {
   } | null;
 }
 
+interface RefundPreview {
+  percentage: number;
+  amount: number;
+  label: string;
+  hoursUntilBooking: number;
+}
+
 export default function AnglerBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
+
+  // Cancellation dialog state
+  const [cancelDialogBooking, setCancelDialogBooking] = useState<Booking | null>(null);
+  const [refundPreview, setRefundPreview] = useState<RefundPreview | null>(null);
+  const [refundPolicy, setRefundPolicy] = useState<string[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -60,13 +76,46 @@ export default function AnglerBookingsPage() {
     load();
   }, []);
 
-  async function handleCancel(bookingId: string) {
+  // Open cancellation dialog and fetch refund preview
+  const openCancelDialog = useCallback(async (booking: Booking) => {
+    setCancelDialogBooking(booking);
+    setRefundPreview(null);
+    setCancelReason("");
+    setPreviewLoading(true);
+
+    try {
+      const res = await fetch(`/api/bookings/${booking.id}/refund-preview`);
+      if (res.ok) {
+        const data = await res.json();
+        setRefundPreview(data.refund);
+        setRefundPolicy(data.policy ?? []);
+      }
+    } catch {
+      // Still show dialog, just without preview
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, []);
+
+  const closeCancelDialog = () => {
+    setCancelDialogBooking(null);
+    setRefundPreview(null);
+    setCancelReason("");
+  };
+
+  async function confirmCancel() {
+    if (!cancelDialogBooking) return;
+    const bookingId = cancelDialogBooking.id;
+
     setCancelling(bookingId);
     try {
       const res = await fetch(`/api/bookings/${bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "cancelled" }),
+        body: JSON.stringify({
+          status: "cancelled",
+          reason: cancelReason.trim() || undefined,
+        }),
       });
 
       if (res.ok) {
@@ -75,6 +124,7 @@ export default function AnglerBookingsPage() {
             b.id === bookingId ? { ...b, status: "cancelled" } : b
           )
         );
+        closeCancelDialog();
       }
     } catch {
       // Silent fail
@@ -154,7 +204,7 @@ export default function AnglerBookingsPage() {
             <BookingCard
               key={booking.id}
               booking={booking}
-              onCancel={() => handleCancel(booking.id)}
+              onCancel={() => openCancelDialog(booking)}
               isCancelling={cancelling === booking.id}
             />
           ))}
@@ -170,6 +220,142 @@ export default function AnglerBookingsPage() {
           {past.map((booking) => (
             <BookingCard key={booking.id} booking={booking} />
           ))}
+        </div>
+      )}
+
+      {/* ── Cancellation Confirmation Dialog ── */}
+      {cancelDialogBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-md rounded-xl border border-stone-light/20 bg-white p-6 shadow-xl">
+            {/* Close button */}
+            <button
+              onClick={closeCancelDialog}
+              className="absolute right-4 top-4 rounded-full p-1 text-text-light hover:bg-stone-light/10 hover:text-text-primary"
+            >
+              <X className="size-4" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+                <AlertTriangle className="size-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-medium text-text-primary">
+                  Cancel Booking
+                </h3>
+                <p className="mt-0.5 text-sm text-text-secondary">
+                  {cancelDialogBooking.properties?.name ?? "This property"} &mdash;{" "}
+                  {new Date(cancelDialogBooking.booking_date).toLocaleDateString(
+                    "en-US",
+                    { weekday: "long", month: "long", day: "numeric", year: "numeric" }
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Refund info */}
+            <div className="mt-5 rounded-lg border border-stone-light/20 bg-offwhite/50 p-4">
+              {previewLoading ? (
+                <div className="flex items-center justify-center py-3">
+                  <Loader2 className="size-5 animate-spin text-text-light" />
+                </div>
+              ) : cancelDialogBooking.status === "pending" ? (
+                <div>
+                  <p className="text-sm font-medium text-forest">
+                    No charge — this booking hasn&apos;t been confirmed yet
+                  </p>
+                  <p className="mt-1 text-xs text-text-secondary">
+                    Pending bookings can be cancelled freely since no payment has
+                    been processed.
+                  </p>
+                </div>
+              ) : refundPreview ? (
+                <div>
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-sm font-medium text-text-primary">
+                      {refundPreview.label}
+                    </p>
+                    {refundPreview.percentage > 0 && (
+                      <p className="text-lg font-semibold text-forest">
+                        ${refundPreview.amount.toFixed(2)}
+                      </p>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-text-secondary">
+                    {refundPreview.percentage === 100
+                      ? "You're cancelling more than 48 hours before the reservation."
+                      : refundPreview.percentage === 50
+                        ? "You're cancelling within 48 hours of the reservation."
+                        : "Same-day cancellations are not eligible for a refund."}
+                  </p>
+                  {refundPreview.percentage < 100 && (
+                    <p className="mt-1 text-xs text-text-light">
+                      Original total: ${cancelDialogBooking.total_amount}
+                    </p>
+                  )}
+                </div>
+              ) : null}
+            </div>
+
+            {/* Cancellation policy */}
+            {refundPolicy.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-medium text-text-secondary">
+                  Cancellation Policy
+                </p>
+                <ul className="mt-1.5 space-y-1">
+                  {refundPolicy.map((line, i) => (
+                    <li key={i} className="text-xs text-text-light">
+                      &bull; {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Optional reason */}
+            <div className="mt-4 space-y-2">
+              <label
+                htmlFor="cancel_reason"
+                className="text-xs font-medium text-text-secondary"
+              >
+                Reason for cancellation (optional)
+              </label>
+              <textarea
+                id="cancel_reason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Let us know why you're cancelling..."
+                maxLength={1000}
+                rows={2}
+                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="mt-5 flex justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={closeCancelDialog}
+                disabled={cancelling === cancelDialogBooking.id}
+              >
+                Keep Booking
+              </Button>
+              <Button
+                size="sm"
+                className="bg-red-500 text-white hover:bg-red-600"
+                onClick={confirmCancel}
+                disabled={cancelling === cancelDialogBooking.id}
+              >
+                {cancelling === cancelDialogBooking.id ? (
+                  <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                ) : null}
+                Confirm Cancellation
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

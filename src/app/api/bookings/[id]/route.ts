@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { bookingStatusSchema } from "@/lib/validations/bookings";
+import { calculateRefund } from "@/lib/cancellation";
 import {
   notifyBookingConfirmed,
   notifyBookingDeclined,
@@ -99,7 +100,7 @@ export async function PATCH(
     const { data: booking } = await admin
       .from("bookings")
       .select(
-        "id, status, angler_id, property_id, booking_date, properties(owner_id, name), profiles!bookings_angler_id_fkey(display_name)"
+        "id, status, angler_id, property_id, booking_date, total_amount, properties(owner_id, name), profiles!bookings_angler_id_fkey(display_name)"
       )
       .eq("id", id)
       .single();
@@ -133,12 +134,31 @@ export async function PATCH(
         );
       }
 
+      // Calculate refund based on cancellation policy
+      // Pending bookings haven't been charged, so refund is informational
+      // Confirmed bookings use the tiered refund policy
+      const totalAmount =
+        typeof booking.total_amount === "number"
+          ? booking.total_amount
+          : parseFloat(String(booking.total_amount ?? "0"));
+
+      const refund = calculateRefund(
+        booking.booking_date,
+        booking.status === "confirmed" ? totalAmount : 0
+      );
+
+      const cancellationReason =
+        typeof body.reason === "string" ? body.reason.trim().slice(0, 1000) : null;
+
       const { data: updated, error: updateError } = await admin
         .from("bookings")
         .update({
           status: "cancelled",
           cancelled_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          refund_percentage: refund.percentage,
+          refund_amount: refund.amount,
+          ...(cancellationReason ? { cancellation_reason: cancellationReason } : {}),
         })
         .eq("id", id)
         .select()
@@ -166,7 +186,7 @@ export async function PATCH(
         );
       }
 
-      return NextResponse.json({ booking: updated });
+      return NextResponse.json({ booking: updated, refund });
     }
 
     // Landowner confirm/decline
