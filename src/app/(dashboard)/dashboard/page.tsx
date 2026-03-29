@@ -14,73 +14,89 @@ import {
   ArrowRight,
   CheckCircle2,
   Circle,
+  type LucideIcon,
 } from "lucide-react";
+import { getProfile } from "@/lib/auth/get-profile";
 
 export const metadata = {
   title: "Dashboard",
 };
 
-const stats = [
-  {
-    label: "Properties",
-    value: "0",
-    description: "Active listings",
-    icon: MapPin,
-    color: "text-forest",
-    bg: "bg-forest/10",
-  },
-  {
-    label: "Upcoming Trips",
-    value: "0",
-    description: "Scheduled this month",
-    icon: CalendarDays,
-    color: "text-river",
-    bg: "bg-river/10",
-  },
-  {
-    label: "Connections",
-    value: "0",
-    description: "Club memberships",
-    icon: Users,
-    color: "text-bronze",
-    bg: "bg-bronze/10",
-  },
-];
+// ─── Role-specific configuration ────────────────────────────────────
 
-const gettingStartedSteps = [
-  {
-    label: "Complete your profile",
-    description: "Add your name, location, and fishing preferences",
-    href: "/dashboard/settings",
-    done: false,
-  },
-  {
-    label: "Choose your role",
-    description: "Set up as a landowner, club manager, or angler",
-    href: "/dashboard/settings",
-    done: false,
-  },
-  {
-    label: "Explore private waters",
-    description: "Browse available properties and membership opportunities",
-    href: "/angler/discover",
-    done: false,
-  },
-  {
-    label: "Make your first booking",
-    description: "Reserve a fishing day at a private property",
-    href: "/angler/bookings",
-    done: false,
-  },
-];
+interface StatItem {
+  label: string;
+  value: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  bg: string;
+}
 
-export default function DashboardPage() {
+interface StepItem {
+  label: string;
+  description: string;
+  href: string;
+  done: false;
+}
+
+const ROLE_STATS: Record<string, StatItem[]> = {
+  landowner: [
+    { label: "Properties", value: "0", description: "Active listings", icon: MapPin, color: "text-forest", bg: "bg-forest/10" },
+    { label: "Bookings", value: "0", description: "Pending review", icon: CalendarDays, color: "text-bronze", bg: "bg-bronze/10" },
+    { label: "Connections", value: "0", description: "Club partnerships", icon: Users, color: "text-river", bg: "bg-river/10" },
+  ],
+  club_admin: [
+    { label: "Members", value: "0", description: "Active members", icon: Users, color: "text-river", bg: "bg-river/10" },
+    { label: "Properties", value: "0", description: "Associated waters", icon: MapPin, color: "text-forest", bg: "bg-forest/10" },
+    { label: "Bookings", value: "0", description: "This month", icon: CalendarDays, color: "text-bronze", bg: "bg-bronze/10" },
+  ],
+  angler: [
+    { label: "Upcoming Trips", value: "0", description: "Scheduled this month", icon: CalendarDays, color: "text-river", bg: "bg-river/10" },
+    { label: "Properties", value: "0", description: "Available to book", icon: MapPin, color: "text-forest", bg: "bg-forest/10" },
+    { label: "Memberships", value: "0", description: "Club memberships", icon: Users, color: "text-bronze", bg: "bg-bronze/10" },
+  ],
+};
+
+const ROLE_STEPS: Record<string, StepItem[]> = {
+  landowner: [
+    { label: "Complete your profile", description: "Add your name and contact details", href: "/dashboard/settings", done: false },
+    { label: "Add your first property", description: "List a property with photos, rates, and availability", href: "/landowner/properties/new", done: false },
+    { label: "Review bookings", description: "Manage incoming booking requests from anglers", href: "/landowner/bookings", done: false },
+    { label: "Upload documents", description: "Add waivers and agreements for your properties", href: "/landowner/documents", done: false },
+  ],
+  club_admin: [
+    { label: "Complete your profile", description: "Add your name and contact details", href: "/dashboard/settings", done: false },
+    { label: "Set up your club", description: "Configure your club name, description, and settings", href: "/club/settings", done: false },
+    { label: "Invite members", description: "Add anglers to your club by email", href: "/club/members", done: false },
+    { label: "Associate properties", description: "Connect with landowner properties for club access", href: "/club/properties", done: false },
+  ],
+  angler: [
+    { label: "Complete your profile", description: "Add your name, location, and fishing preferences", href: "/dashboard/settings", done: false },
+    { label: "Explore private waters", description: "Browse available properties and membership opportunities", href: "/angler/discover", done: false },
+    { label: "Make your first booking", description: "Reserve a fishing day at a private property", href: "/angler/bookings", done: false },
+  ],
+};
+
+const DEFAULT_STATS: StatItem[] = ROLE_STATS.angler;
+const DEFAULT_STEPS: StepItem[] = ROLE_STEPS.angler;
+
+// ─── Page ───────────────────────────────────────────────────────────
+
+export default async function DashboardPage() {
+  const profile = await getProfile();
+  const role = profile?.role ?? "angler";
+  const displayName = profile?.display_name;
+
+  const stats = ROLE_STATS[role] ?? DEFAULT_STATS;
+  const steps = ROLE_STEPS[role] ?? DEFAULT_STEPS;
+
   return (
     <div className="mx-auto max-w-5xl space-y-8">
       {/* Welcome */}
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Welcome to AnglerPass
+          {displayName ? `Welcome back, ${displayName}` : "Welcome to AnglerPass"}
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
           Your platform for private water access. Here is an overview of your
@@ -126,7 +142,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {gettingStartedSteps.map((step, i) => (
+            {steps.map((step, i) => (
               <Link
                 key={i}
                 href={step.href}
