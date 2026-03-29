@@ -5,6 +5,7 @@ export type UserProfile = {
   id: string;
   display_name: string | null;
   role: string;
+  roles: string[];
   email: string | null;
 };
 
@@ -17,9 +18,16 @@ export async function getProfile(): Promise<UserProfile | null> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, display_name, role")
+    .select("id, display_name, role, roles")
     .eq("id", user.id)
-    .returns<{ id: string; display_name: string | null; role: string }[]>()
+    .returns<
+      {
+        id: string;
+        display_name: string | null;
+        role: string;
+        roles: string[] | null;
+      }[]
+    >()
     .single();
 
   if (profile) {
@@ -27,6 +35,7 @@ export async function getProfile(): Promise<UserProfile | null> {
       id: profile.id,
       display_name: profile.display_name,
       role: profile.role,
+      roles: profile.roles ?? [profile.role],
       email: user.email ?? null,
     };
   }
@@ -37,8 +46,7 @@ export async function getProfile(): Promise<UserProfile | null> {
     `[get-profile] No profile found for user ${user.id} — creating default`
   );
 
-  const defaultRole =
-    (user.user_metadata?.role as string) || "angler";
+  const defaultRole = (user.user_metadata?.role as string) || "angler";
   const displayName =
     (user.user_metadata?.display_name as string) ??
     (user.user_metadata?.first_name as string) ??
@@ -48,10 +56,15 @@ export async function getProfile(): Promise<UserProfile | null> {
   const { data: created, error: insertError } = await admin
     .from("profiles")
     .upsert(
-      { id: user.id, display_name: displayName, role: defaultRole },
+      {
+        id: user.id,
+        display_name: displayName,
+        role: defaultRole,
+        roles: [defaultRole],
+      },
       { onConflict: "id" }
     )
-    .select("id, display_name, role")
+    .select("id, display_name, role, roles")
     .single();
 
   if (insertError || !created) {
@@ -63,6 +76,7 @@ export async function getProfile(): Promise<UserProfile | null> {
     id: created.id,
     display_name: created.display_name,
     role: created.role,
+    roles: created.roles ?? [created.role],
     email: user.email ?? null,
   };
 }

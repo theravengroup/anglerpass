@@ -69,6 +69,7 @@ export type Database = {
           avatar_url: string | null;
           fishing_experience: string | null;
           favorite_species: string[];
+          roles: string[];
           suspended_at: string | null;
           suspended_reason: string | null;
           created_at: string;
@@ -83,6 +84,7 @@ export type Database = {
           avatar_url?: string | null;
           fishing_experience?: string | null;
           favorite_species?: string[];
+          roles?: string[];
           suspended_at?: string | null;
           suspended_reason?: string | null;
           created_at?: string;
@@ -97,6 +99,7 @@ export type Database = {
           avatar_url?: string | null;
           fishing_experience?: string | null;
           favorite_species?: string[];
+          roles?: string[];
           suspended_at?: string | null;
           suspended_reason?: string | null;
           created_at?: string;

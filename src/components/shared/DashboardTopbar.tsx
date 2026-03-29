@@ -2,6 +2,7 @@
 
 import { Bell, LogOut, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import RoleSwitcher from "@/components/shared/RoleSwitcher";
 import type { UserProfile } from "@/lib/auth/get-profile";
 
 interface DashboardTopbarProps {
@@ -37,6 +38,14 @@ export default function DashboardTopbar({
 
       {/* Right side actions */}
       <div className="ml-auto flex items-center gap-3">
+        {/* Role switcher */}
+        {user && (
+          <RoleSwitcher
+            activeRole={user.role}
+            roles={user.roles}
+          />
+        )}
+
         <Button
           variant="ghost"
           size="icon-sm"
