@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -17,66 +17,108 @@ import {
   Compass,
   Loader2,
   MapPin,
+  DollarSign,
+  Droplets,
+  Download,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 
-interface DashboardData {
-  upcomingTrips: number;
+interface Analytics {
+  trips_total: number;
+  trips_upcoming: number;
+  trips_period: number;
+  total_spent: number;
   memberships: number;
-  nextBooking: {
-    property_name: string;
-    booking_date: string;
-  } | null;
+  favorite_properties: FavoriteProp[];
+  recent_bookings: RecentBooking[];
 }
 
+interface FavoriteProp {
+  name: string;
+  count: number;
+  water_type: string | null;
+}
+
+interface RecentBooking {
+  id: string;
+  status: string;
+  booking_date: string;
+  total_amount: number;
+  duration: string;
+  property_name: string;
+  created_at: string;
+}
+
+const PERIOD_OPTIONS = [
+  { label: "7 days", value: 7 },
+  { label: "30 days", value: 30 },
+  { label: "90 days", value: 90 },
+  { label: "All time", value: 3650 },
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: "text-bronze bg-bronze/10",
+  confirmed: "text-forest bg-forest/10",
+  declined: "text-red-500 bg-red-50",
+  cancelled: "text-text-light bg-stone-light/10",
+  completed: "text-river bg-river/10",
+};
+
+const WATER_LABELS: Record<string, string> = {
+  river: "River",
+  stream: "Stream",
+  lake: "Lake",
+  pond: "Pond",
+  spring_creek: "Spring Creek",
+  tailwater: "Tailwater",
+  reservoir: "Reservoir",
+};
+
 export default function AnglerPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [days, setDays] = useState(30);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/analytics?view=angler&days=${days}`);
+      if (res.ok) {
+        setData(await res.json());
+      }
+    } catch {
+      // Silent fail
+    } finally {
+      setLoading(false);
+    }
+  }, [days]);
 
   useEffect(() => {
-    async function load() {
-      try {
-        // Fetch bookings and memberships in parallel
-        const [bookingsRes, clubsRes] = await Promise.all([
-          fetch("/api/bookings?role=angler"),
-          fetch("/api/clubs"),
-        ]);
-
-        let upcomingTrips = 0;
-        let nextBooking = null;
-
-        if (bookingsRes.ok) {
-          const bookingsData = await bookingsRes.json();
-          const upcoming = (bookingsData.bookings ?? []).filter(
-            (b: { status: string; booking_date: string }) =>
-              ["pending", "confirmed"].includes(b.status) &&
-              new Date(b.booking_date) >= new Date()
-          );
-          upcomingTrips = upcoming.length;
-          if (upcoming.length > 0) {
-            const next = upcoming[0];
-            nextBooking = {
-              property_name:
-                next.properties?.name ?? "Unknown Property",
-              booking_date: next.booking_date,
-            };
-          }
-        }
-
-        let memberships = 0;
-        if (clubsRes.ok) {
-          const clubsData = await clubsRes.json();
-          memberships = (clubsData.member_of ?? []).length + (clubsData.owned ?? []).length;
-        }
-
-        setData({ upcomingTrips, memberships, nextBooking });
-      } catch {
-        setData({ upcomingTrips: 0, memberships: 0, nextBooking: null });
-      } finally {
-        setLoading(false);
-      }
-    }
+    setLoading(true);
     load();
-  }, []);
+  }, [load]);
+
+  function exportCSV() {
+    if (!data) return;
+    const rows = [
+      ["Date", "Property", "Status", "Duration", "Amount"],
+      ...data.recent_bookings.map((b) => [
+        b.booking_date,
+        b.property_name,
+        b.status,
+        b.duration,
+        String(b.total_amount),
+      ]),
+    ];
+    const csv = rows.map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `anglerpass-trips-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   if (loading) {
     return (
@@ -89,11 +131,20 @@ export default function AnglerPage() {
   const stats = [
     {
       label: "Upcoming Trips",
-      value: String(data?.upcomingTrips ?? 0),
-      description: "Booked fishing days",
+      value: String(data?.trips_upcoming ?? 0),
+      description: `${data?.trips_total ?? 0} total trips`,
       icon: CalendarDays,
       color: "text-river",
       bg: "bg-river/10",
+      href: "/angler/bookings",
+    },
+    {
+      label: "Total Spent",
+      value: `$${(data?.total_spent ?? 0).toLocaleString()}`,
+      description: `${data?.trips_period ?? 0} trips last ${days}d`,
+      icon: DollarSign,
+      color: "text-bronze",
+      bg: "bg-bronze/10",
       href: "/angler/bookings",
     },
     {
@@ -108,18 +159,35 @@ export default function AnglerPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      <div>
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Your Fishing Dashboard
-        </h2>
-        <p className="mt-1 text-sm text-text-secondary">
-          Track your trips and club memberships.
-        </p>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+            Your Fishing Dashboard
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            Track your trips, spending, and club memberships.
+          </p>
+        </div>
+        <div className="flex rounded-lg border border-stone-light/20">
+          {PERIOD_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDays(opt.value)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
+                days === opt.value
+                  ? "bg-bronze text-white"
+                  : "text-text-secondary hover:bg-offwhite"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
@@ -148,40 +216,121 @@ export default function AnglerPage() {
         ))}
       </div>
 
-      {/* Next trip */}
-      {data?.nextBooking && (
-        <Card className="border-forest/20 bg-forest/5">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <MapPin className="size-4 text-forest" />
-              Next Trip
-            </CardTitle>
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Favorite Properties */}
+        {(data?.favorite_properties?.length ?? 0) > 0 && (
+          <Card className="border-stone-light/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MapPin className="size-4 text-forest" />
+                Favorite Properties
+              </CardTitle>
+              <CardDescription>Most visited waters</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {data!.favorite_properties.map((prop) => (
+                <div
+                  key={prop.name}
+                  className="flex items-center justify-between rounded-lg border border-stone-light/10 px-3 py-2.5"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-text-primary">
+                      {prop.name}
+                    </p>
+                    {prop.water_type && (
+                      <p className="flex items-center gap-1 text-xs text-text-light">
+                        <Droplets className="size-3" />
+                        {WATER_LABELS[prop.water_type] ?? prop.water_type}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-text-secondary">
+                    {prop.count} trip{prop.count !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recent Bookings */}
+        <Card className="border-stone-light/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div>
+              <CardTitle className="text-base">Recent Bookings</CardTitle>
+              <CardDescription>Your latest trips</CardDescription>
+            </div>
+            {(data?.recent_bookings?.length ?? 0) > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={exportCSV}
+              >
+                <Download className="mr-1 size-3" />
+                CSV
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-text-primary">
-              <strong>{data.nextBooking.property_name}</strong> on{" "}
-              {new Date(data.nextBooking.booking_date).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                }
-              )}
-            </p>
+            {(data?.recent_bookings?.length ?? 0) === 0 ? (
+              <p className="py-6 text-center text-sm text-text-light">
+                No bookings yet. Discover properties to book your first trip!
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {data!.recent_bookings.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between rounded-lg border border-stone-light/10 px-3 py-2.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-text-primary">
+                        {b.property_name}
+                      </p>
+                      <p className="text-xs text-text-light">
+                        {new Date(b.booking_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}{" "}
+                        · {b.duration === "full_day" ? "Full Day" : "Half Day"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-text-primary">
+                        ${b.total_amount}
+                      </span>
+                      <span
+                        className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                          STATUS_COLORS[b.status] ?? STATUS_COLORS.pending
+                        }`}
+                      >
+                        {b.status === "confirmed" || b.status === "completed" ? (
+                          <CheckCircle2 className="size-3" />
+                        ) : (
+                          <Clock className="size-3" />
+                        )}
+                        {b.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             <Link href="/angler/bookings">
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-3 border-forest text-forest"
+                className="mt-4 w-full text-xs"
               >
-                View Details
-                <ArrowRight className="ml-1 size-3.5" />
+                View All Bookings
+                <ArrowRight className="ml-1 size-3" />
               </Button>
             </Link>
           </CardContent>
         </Card>
-      )}
+      </div>
 
       {/* Discover CTA */}
       <Card className="border-bronze/20 bg-bronze/5">
