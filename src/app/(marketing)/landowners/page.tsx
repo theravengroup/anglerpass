@@ -227,8 +227,8 @@ export default function LandownersPage() {
                 lineHeight: 1.65,
               }}
             >
-              Purpose-built tools for managing private water access, designed
-              with input from landowners across the American West.
+              Purpose-built tools for managing private water access. Launching
+              in the Rocky Mountain region and expanding nationwide.
             </p>
           </div>
 
