@@ -1,5 +1,13 @@
 import { redirect } from "next/navigation";
-import { LayoutDashboard, ShieldCheck, Users, ScrollText } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShieldCheck,
+  Users,
+  ScrollText,
+  UserPlus,
+  Settings,
+  Building2,
+} from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
 import type { SidebarItem } from "@/components/shared/DashboardSidebar";
@@ -21,6 +29,21 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Users />,
   },
   {
+    label: "Clubs",
+    href: "/admin/clubs",
+    icon: <Building2 />,
+  },
+  {
+    label: "Team",
+    href: "/admin/team",
+    icon: <UserPlus />,
+  },
+  {
+    label: "Settings",
+    href: "/admin/settings",
+    icon: <Settings />,
+  },
+  {
     label: "Audit Log",
     href: "/admin/audit-log",
     icon: <ScrollText />,
@@ -31,6 +54,9 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin": "Admin Console",
   "/admin/moderation": "Moderation Queue",
   "/admin/users": "User Management",
+  "/admin/clubs": "Club Oversight",
+  "/admin/team": "Team Management",
+  "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
 };
 
