@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,7 @@ import {
 } from "@/lib/validations/properties";
 import { Loader2, Save, Send, Lock, Info } from "lucide-react";
 import PhotoUpload from "@/components/properties/PhotoUpload";
+import ClubAssociation from "@/components/properties/ClubAssociation";
 
 const WATER_TYPE_LABELS: Record<string, string> = {
   river: "River",
@@ -49,6 +50,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
   const [savedPropertyId, setSavedPropertyId] = useState<string | undefined>(
     initialData?.id
   );
+  const [hasClubInvitation, setHasClubInvitation] = useState(false);
 
   const {
     register,
@@ -81,6 +83,25 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       gate_code: "",
     },
   });
+
+  // Check for existing club invitations/associations
+  const checkClubAssociation = useCallback(async () => {
+    const pid = savedPropertyId ?? initialData?.id;
+    if (!pid) return;
+    try {
+      const res = await fetch(`/api/clubs/invite?property_id=${pid}`);
+      if (res.ok) {
+        const data = await res.json();
+        setHasClubInvitation((data.invitations ?? []).length > 0);
+      }
+    } catch {
+      // Silent fail
+    }
+  }, [savedPropertyId, initialData?.id]);
+
+  useEffect(() => {
+    checkClubAssociation();
+  }, [checkClubAssociation]);
 
   const species = watch("species");
   const waterType = watch("water_type");
@@ -181,6 +202,12 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
     // Validate capacity
     if (data.capacity == null) {
       setError("Capacity is required to submit for review.");
+      return;
+    }
+
+    // Validate club association
+    if (!hasClubInvitation) {
+      setError("At least one club must be invited or associated before submitting for review. Use the Club Association section below to invite your club.");
       return;
     }
 
@@ -591,6 +618,13 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Club Association */}
+      <ClubAssociation
+        propertyId={savedPropertyId ?? initialData?.id}
+        onEnsureSaved={ensureSaved}
+        onInvitationSent={checkClubAssociation}
+      />
 
       {/* Actions */}
       <div className="flex items-center justify-between border-t border-stone-light/20 pt-6">

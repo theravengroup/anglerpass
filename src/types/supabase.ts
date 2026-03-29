@@ -208,6 +208,57 @@ export type Database = {
         };
         Relationships: [];
       };
+      club_invitations: {
+        Row: {
+          id: string;
+          property_id: string;
+          invited_by: string;
+          club_name: string;
+          admin_email: string;
+          token: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          invited_by: string;
+          club_name: string;
+          admin_email: string;
+          token?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          invited_by?: string;
+          club_name?: string;
+          admin_email?: string;
+          token?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "club_invitations_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "club_invitations_invited_by_fkey";
+            columns: ["invited_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       moderation_notes: {
         Row: {
           id: number;
