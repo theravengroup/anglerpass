@@ -642,6 +642,124 @@ export type Database = {
           },
         ];
       };
+      document_templates: {
+        Row: {
+          id: string;
+          property_id: string;
+          owner_id: string;
+          title: string;
+          body: string;
+          required: boolean;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          owner_id: string;
+          title: string;
+          body: string;
+          required?: boolean;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          owner_id?: string;
+          title?: string;
+          body?: string;
+          required?: boolean;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "document_templates_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "document_templates_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      signed_documents: {
+        Row: {
+          id: string;
+          template_id: string;
+          booking_id: string;
+          signer_id: string;
+          signer_name: string;
+          signer_email: string;
+          template_snapshot: string;
+          template_title: string;
+          ip_address: string | null;
+          user_agent: string | null;
+          signed_at: string;
+        };
+        Insert: {
+          id?: string;
+          template_id: string;
+          booking_id: string;
+          signer_id: string;
+          signer_name: string;
+          signer_email: string;
+          template_snapshot: string;
+          template_title: string;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          signed_at?: string;
+        };
+        Update: {
+          id?: string;
+          template_id?: string;
+          booking_id?: string;
+          signer_id?: string;
+          signer_name?: string;
+          signer_email?: string;
+          template_snapshot?: string;
+          template_title?: string;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          signed_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "signed_documents_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "document_templates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "signed_documents_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "signed_documents_signer_id_fkey";
+            columns: ["signer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       calendar_tokens: {
         Row: {
           id: string;

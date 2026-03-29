@@ -14,6 +14,7 @@ import {
   Ban,
   Compass,
   Droplets,
+  FileText,
 } from "lucide-react";
 
 interface Booking {
@@ -310,22 +311,36 @@ function BookingCard({
           )}
         </div>
 
-        {/* Cancel button */}
-        {canCancel && onCancel && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="shrink-0 border-red-200 text-xs text-red-500 hover:bg-red-50"
-            onClick={onCancel}
-            disabled={isCancelling}
-          >
-            {isCancelling ? (
-              <Loader2 className="size-3 animate-spin" />
-            ) : (
-              "Cancel"
-            )}
-          </Button>
-        )}
+        {/* Action buttons */}
+        <div className="flex shrink-0 flex-col gap-1.5">
+          {booking.status === "confirmed" && (
+            <Link href={`/angler/sign/${booking.id}`}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full border-forest/20 text-xs text-forest hover:bg-forest/5"
+              >
+                <FileText className="mr-1 size-3" />
+                Documents
+              </Button>
+            </Link>
+          )}
+          {canCancel && onCancel && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-200 text-xs text-red-500 hover:bg-red-50"
+              onClick={onCancel}
+              disabled={isCancelling}
+            >
+              {isCancelling ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                "Cancel"
+              )}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

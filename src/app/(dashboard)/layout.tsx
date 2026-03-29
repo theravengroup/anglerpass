@@ -7,6 +7,7 @@ import {
   Bell,
   Settings,
   Compass,
+  FileText,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -41,6 +42,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       label: "Bookings",
       href: "/landowner/bookings",
       icon: <CalendarDays />,
+    },
+    {
+      label: "Documents",
+      href: "/landowner/documents",
+      icon: <FileText />,
     },
   ],
   club_admin: [
@@ -80,6 +86,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/landowner/properties": "Properties",
   "/landowner/properties/new": "Add Property",
   "/landowner/bookings": "Bookings",
+  "/landowner/documents": "Documents",
+  "/landowner/documents/new": "New Document",
   "/club": "Club Management",
   "/club/setup": "Set Up Your Club",
   "/club/members": "Members",
