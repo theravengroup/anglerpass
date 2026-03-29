@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { LayoutDashboard, ShieldCheck, Users } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, Users, ScrollText } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
 import type { SidebarItem } from "@/components/shared/DashboardSidebar";
@@ -20,12 +20,18 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     href: "/admin/users",
     icon: <Users />,
   },
+  {
+    label: "Audit Log",
+    href: "/admin/audit-log",
+    icon: <ScrollText />,
+  },
 ];
 
 const PAGE_TITLES: Record<string, string> = {
   "/admin": "Admin Console",
   "/admin/moderation": "Moderation Queue",
   "/admin/users": "User Management",
+  "/admin/audit-log": "Audit Log",
 };
 
 export default async function AdminLayout({

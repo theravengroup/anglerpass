@@ -56,16 +56,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Admin route protection - check role
-  if (user && pathname.startsWith("/admin")) {
+  // For all protected routes, check suspension and role
+  if (user && isProtected) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, suspended_at")
       .eq("id", user.id)
-      .returns<{ role: string }[]>()
+      .returns<{ role: string; suspended_at: string | null }[]>()
       .single();
 
-    if (profile?.role !== "admin") {
+    // Suspended users get redirected to a suspended page
+    if (profile?.suspended_at) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/suspended";
+      // Avoid redirect loop
+      if (pathname !== "/suspended") {
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Admin route protection - check role
+    if (pathname.startsWith("/admin") && profile?.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
