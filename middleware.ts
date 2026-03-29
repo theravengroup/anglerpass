@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { getRoleHomePath } from "@/types/roles";
 
+// ─── Route Classification ───────────────────────────────────────────
+
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/landowner",
@@ -10,44 +12,80 @@ const PROTECTED_PREFIXES = [
   "/admin",
 ];
 
-// Public marketing pages that start with protected prefixes (plural forms)
-const PUBLIC_OVERRIDES = ["/landowners", "/clubs", "/anglers"];
-const AUTH_ROUTES = [
+/** Public marketing pages whose paths happen to start with protected prefixes */
+const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers"]);
+
+const AUTH_ROUTES = new Set([
   "/login",
   "/signup",
   "/forgot-password",
   "/reset-password",
-];
+]);
+
+function isPublicOverride(pathname: string): boolean {
+  for (const p of PUBLIC_OVERRIDES) {
+    if (pathname.startsWith(p)) return true;
+  }
+  return false;
+}
+
+function isProtectedRoute(pathname: string): boolean {
+  if (isPublicOverride(pathname)) return false;
+  return PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
+function isAuthRoute(pathname: string): boolean {
+  for (const r of AUTH_ROUTES) {
+    if (pathname === r || pathname.startsWith(r + "/")) return true;
+  }
+  return false;
+}
+
+// ─── Profile helper (single query, reused) ──────────────────────────
+
+interface ProfileSlice {
+  role: string;
+  suspended_at: string | null;
+}
+
+async function fetchProfileSlice(
+  supabase: Awaited<ReturnType<typeof updateSession>>["supabase"],
+  userId: string
+): Promise<ProfileSlice | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("role, suspended_at")
+    .eq("id", userId)
+    .returns<ProfileSlice[]>()
+    .single();
+
+  if (error) {
+    console.error("[middleware] Profile fetch error:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
+// ─── Middleware ──────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
   const { supabase, response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
-  const isPublicOverride = PUBLIC_OVERRIDES.some((p) => pathname.startsWith(p));
-  const isProtected =
-    !isPublicOverride &&
-    PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
-  const isAuthRoute = AUTH_ROUTES.some(
-    (r) => pathname === r || pathname.startsWith(r + "/")
-  );
-
-  // Unauthenticated user trying to access protected route
-  if (!user && isProtected) {
+  // ── Unauthenticated user → redirect to login ──
+  if (!user && isProtectedRoute(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  // Authenticated user trying to access auth pages - redirect to their role home
-  if (user && isAuthRoute) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .returns<{ role: string }[]>()
-      .single();
+  if (!user) return response;
 
+  // ── Authenticated user on auth pages → redirect to role home ──
+  if (isAuthRoute(pathname)) {
+    const profile = await fetchProfileSlice(supabase, user.id);
     const rolePath = profile?.role
       ? getRoleHomePath(profile.role)
       : "/dashboard";
@@ -56,26 +94,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // For all protected routes, check suspension and role
-  if (user && isProtected) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role, suspended_at")
-      .eq("id", user.id)
-      .returns<{ role: string; suspended_at: string | null }[]>()
-      .single();
+  // ── Protected route checks (suspension, admin role) ──
+  if (isProtectedRoute(pathname)) {
+    const profile = await fetchProfileSlice(supabase, user.id);
 
-    // Suspended users get redirected to a suspended page
-    if (profile?.suspended_at) {
+    // Suspended users → redirect (avoid loop on /suspended itself)
+    if (profile?.suspended_at && pathname !== "/suspended") {
       const url = request.nextUrl.clone();
       url.pathname = "/suspended";
-      // Avoid redirect loop
-      if (pathname !== "/suspended") {
-        return NextResponse.redirect(url);
-      }
+      return NextResponse.redirect(url);
     }
 
-    // Admin route protection - check role
+    // Admin route → verify admin role
     if (pathname.startsWith("/admin") && profile?.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";

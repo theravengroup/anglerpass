@@ -55,9 +55,13 @@ export async function GET(request: Request) {
     }
 
     if (q) {
-      query = query.or(
-        `name.ilike.%${q}%,location_description.ilike.%${q}%,description.ilike.%${q}%`
-      );
+      // Sanitize search term: strip PostgREST filter operators to prevent injection
+      const sanitized = q.replace(/[.,%()]/g, " ").trim();
+      if (sanitized) {
+        query = query.or(
+          `name.ilike.%${sanitized}%,location_description.ilike.%${sanitized}%,description.ilike.%${sanitized}%`
+        );
+      }
     }
 
     const { data: properties, error } = await query;

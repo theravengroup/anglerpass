@@ -8,14 +8,11 @@ import {
   CalendarDays,
   Loader2,
   MapPin,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Ban,
   Compass,
   Droplets,
   FileText,
 } from "lucide-react";
+import { BOOKING_STATUS, WATER_TYPE_LABELS } from "@/lib/constants/status";
 
 interface Booking {
   id: string;
@@ -40,52 +37,6 @@ interface Booking {
     water_type: string | null;
   } | null;
 }
-
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; icon: typeof CheckCircle2; color: string; bg: string }
-> = {
-  pending: {
-    label: "Pending",
-    icon: Clock,
-    color: "text-bronze",
-    bg: "bg-bronze/10",
-  },
-  confirmed: {
-    label: "Confirmed",
-    icon: CheckCircle2,
-    color: "text-forest",
-    bg: "bg-forest/10",
-  },
-  declined: {
-    label: "Declined",
-    icon: XCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-  },
-  cancelled: {
-    label: "Cancelled",
-    icon: Ban,
-    color: "text-text-light",
-    bg: "bg-stone-light/10",
-  },
-  completed: {
-    label: "Completed",
-    icon: CheckCircle2,
-    color: "text-river",
-    bg: "bg-river/10",
-  },
-};
-
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
 
 export default function AnglerBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -235,7 +186,7 @@ function BookingCard({
   isCancelling?: boolean;
 }) {
   const property = booking.properties;
-  const config = STATUS_CONFIG[booking.status] ?? STATUS_CONFIG.pending;
+  const config = BOOKING_STATUS[booking.status] ?? BOOKING_STATUS.pending;
   const Icon = config.icon;
   const canCancel =
     ["pending", "confirmed"].includes(booking.status) &&

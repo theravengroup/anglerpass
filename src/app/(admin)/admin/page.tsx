@@ -23,6 +23,19 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import {
+  PERIOD_OPTIONS,
+  STATUS_BADGE_COLORS,
+} from "@/lib/constants/status";
+import { downloadCSV } from "@/lib/csv";
+
+/** Plural labels for the admin role breakdown chart */
+const ROLE_LABELS_PLURAL: Record<string, string> = {
+  angler: "Anglers",
+  landowner: "Landowners",
+  club_admin: "Club Admins",
+  admin: "Admins",
+};
 
 interface Analytics {
   users_total: number;
@@ -52,28 +65,6 @@ interface RecentBooking {
   created_at: string;
 }
 
-const PERIOD_OPTIONS = [
-  { label: "7 days", value: 7 },
-  { label: "30 days", value: 30 },
-  { label: "90 days", value: 90 },
-  { label: "1 year", value: 365 },
-];
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "text-bronze bg-bronze/10",
-  confirmed: "text-forest bg-forest/10",
-  declined: "text-red-500 bg-red-50",
-  cancelled: "text-text-light bg-stone-light/10",
-  completed: "text-river bg-river/10",
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  angler: "Anglers",
-  landowner: "Landowners",
-  club_admin: "Club Admins",
-  admin: "Admins",
-};
-
 export default function AdminPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,36 +88,31 @@ export default function AdminPage() {
     load();
   }, [load]);
 
-  function exportCSV() {
+  function handleExport() {
     if (!data) return;
-    const rows = [
-      ["Metric", "Value"],
-      ["Total Users", String(data.users_total)],
-      ["New Users (period)", String(data.users_new)],
-      ["Total Properties", String(data.properties_total)],
-      ["Published Properties", String(data.properties_published)],
-      ["Pending Review", String(data.pending_review)],
-      ["Total Bookings", String(data.bookings_total)],
-      ["Bookings (period)", String(data.bookings_period)],
-      ["Clubs", String(data.clubs_total)],
-      ["Total Leads", String(data.leads_total)],
-      ["Leads (period)", String(data.leads_period)],
-      ["Platform Revenue", data.platform_revenue.toFixed(2)],
-      ["Platform Revenue (period)", data.platform_revenue_period.toFixed(2)],
-      ["GMV Total", data.gmv_total.toFixed(2)],
-      ...Object.entries(data.users_by_role).map(([role, count]) => [
-        `Users: ${role}`,
-        String(count),
-      ]),
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `anglerpass-admin-report-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(
+      [
+        ["Metric", "Value"],
+        ["Total Users", String(data.users_total)],
+        ["New Users (period)", String(data.users_new)],
+        ["Total Properties", String(data.properties_total)],
+        ["Published Properties", String(data.properties_published)],
+        ["Pending Review", String(data.pending_review)],
+        ["Total Bookings", String(data.bookings_total)],
+        ["Bookings (period)", String(data.bookings_period)],
+        ["Clubs", String(data.clubs_total)],
+        ["Total Leads", String(data.leads_total)],
+        ["Leads (period)", String(data.leads_period)],
+        ["Platform Revenue", data.platform_revenue.toFixed(2)],
+        ["Platform Revenue (period)", data.platform_revenue_period.toFixed(2)],
+        ["GMV Total", data.gmv_total.toFixed(2)],
+        ...Object.entries(data.users_by_role).map(([role, count]) => [
+          `Users: ${role}`,
+          String(count),
+        ]),
+      ],
+      `anglerpass-admin-report-${new Date().toISOString().slice(0, 10)}.csv`
+    );
   }
 
   if (loading) {
@@ -220,7 +206,7 @@ export default function AdminPage() {
             variant="outline"
             size="sm"
             className="text-xs"
-            onClick={exportCSV}
+            onClick={handleExport}
           >
             <Download className="mr-1 size-3" />
             Export Report
@@ -296,7 +282,7 @@ export default function AdminPage() {
                   <div key={role} className="space-y-1.5">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-text-primary">
-                        {ROLE_LABELS[role] ?? role}
+                        {ROLE_LABELS_PLURAL[role] ?? role}
                       </span>
                       <span className="text-text-secondary">
                         {count} ({Math.round(pct)}%)
@@ -360,7 +346,7 @@ export default function AdminPage() {
                       </span>
                       <span
                         className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          STATUS_COLORS[b.status] ?? STATUS_COLORS.pending
+                          STATUS_BADGE_COLORS[b.status] ?? STATUS_BADGE_COLORS.pending
                         }`}
                       >
                         {b.status === "confirmed" || b.status === "completed" ? (

@@ -1,44 +1,26 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
 
 const PAGE_SIZE = 50;
 
 // GET: Fetch audit log entries (admin only)
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const admin = createAdminClient();
-
-    // Verify admin role
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
+    const { admin } = auth;
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+
+    const page = parsePositiveInt(searchParams.get("page"), 1, 1000);
     const entityType = searchParams.get("entity_type") ?? "";
     const actionFilter = searchParams.get("action") ?? "";
 
     let query = admin
       .from("audit_log")
-      .select("id, actor_id, action, entity_type, entity_id, old_data, new_data, created_at", {
-        count: "exact",
-      })
+      .select(
+        "id, actor_id, action, entity_type, entity_id, old_data, new_data, created_at",
+        { count: "exact" }
+      )
       .order("created_at", { ascending: false });
 
     if (entityType) {
@@ -56,18 +38,15 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[admin/audit-log] Query error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch audit log" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch audit log", 500);
     }
 
-    // Resolve actor names
+    // Resolve actor display names
     const actorIds = [
       ...new Set(
         (entries ?? [])
           .map((e: { actor_id: string | null }) => e.actor_id)
-          .filter(Boolean) as string[]
+          .filter((id): id is string => id !== null)
       ),
     ];
 
@@ -79,29 +58,34 @@ export async function GET(request: Request) {
         .in("id", actorIds);
 
       actorMap = (actors ?? []).reduce(
-        (acc: Record<string, string>, a: { id: string; display_name: string | null }) => {
+        (
+          acc: Record<string, string>,
+          a: { id: string; display_name: string | null }
+        ) => {
           acc[a.id] = a.display_name ?? "Unknown";
           return acc;
         },
-        {} as Record<string, string>
+        {}
       );
     }
 
-    const enriched = (entries ?? []).map((e: {
-      id: number;
-      actor_id: string | null;
-      action: string;
-      entity_type: string;
-      entity_id: string | null;
-      old_data: unknown;
-      new_data: unknown;
-      created_at: string;
-    }) => ({
-      ...e,
-      actor_name: e.actor_id ? actorMap[e.actor_id] ?? "Unknown" : "System",
-    }));
+    const enriched = (entries ?? []).map(
+      (e: {
+        id: number;
+        actor_id: string | null;
+        action: string;
+        entity_type: string;
+        entity_id: string | null;
+        old_data: unknown;
+        new_data: unknown;
+        created_at: string;
+      }) => ({
+        ...e,
+        actor_name: e.actor_id ? actorMap[e.actor_id] ?? "Unknown" : "System",
+      })
+    );
 
-    return NextResponse.json({
+    return jsonSuccess({
       entries: enriched,
       total: count ?? 0,
       page,
@@ -110,9 +94,6 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error("[admin/audit-log] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

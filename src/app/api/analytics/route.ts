@@ -16,8 +16,9 @@ export async function GET(request: Request) {
 
     const admin = createAdminClient();
     const { searchParams } = new URL(request.url);
-    const view = searchParams.get("view"); // landowner, club, angler, admin
-    const days = parseInt(searchParams.get("days") ?? "30", 10);
+    const view = searchParams.get("view"); // landowner, angler, admin
+    const rawDays = parseInt(searchParams.get("days") ?? "30", 10);
+    const days = Math.min(Math.max(isNaN(rawDays) ? 30 : rawDays, 1), 3650);
 
     const since = new Date();
     since.setDate(since.getDate() - days);

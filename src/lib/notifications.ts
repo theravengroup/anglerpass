@@ -1,5 +1,5 @@
 /**
- * Notification service — creates in-app notifications and sends emails
+ * Notification service — creates in-app notifications and sends emails.
  *
  * Used by API routes (server-side only) via the admin Supabase client.
  */
@@ -7,16 +7,18 @@
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+// Lazy-initialize Resend client to avoid holding a connection when not needed
+let _resend: Resend | null = null;
+function getResend(): Resend | null {
+  if (!process.env.RESEND_API_KEY) return null;
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+// ─── Types ──────────────────────────────────────────────────────────
 
 export type NotificationType =
   | "booking_requested"
@@ -36,7 +38,7 @@ interface NotificationPayload {
   metadata?: Record<string, unknown>;
 }
 
-// Map notification type → preference column name
+/** Maps notification type → preference column in notification_preferences */
 const EMAIL_PREF_MAP: Record<NotificationType, string> = {
   booking_requested: "email_booking_requested",
   booking_confirmed: "email_booking_confirmed",
@@ -47,10 +49,12 @@ const EMAIL_PREF_MAP: Record<NotificationType, string> = {
   property_access_granted: "email_property_access",
 };
 
-// ---------------------------------------------------------------------------
-// Core: create in-app + send email
-// ---------------------------------------------------------------------------
+// ─── Core ───────────────────────────────────────────────────────────
 
+/**
+ * Create an in-app notification and optionally send an email
+ * based on the user's preferences.
+ */
 export async function notify(
   admin: SupabaseClient,
   payload: NotificationPayload
@@ -69,26 +73,36 @@ export async function notify(
     console.error("[notify] Insert error:", insertErr);
   }
 
-  // 2. Check email preference
+  // 2. Check email preference (default to enabled)
   const prefCol = EMAIL_PREF_MAP[payload.type];
-  const { data: prefs } = await admin
+  const { data: prefs, error: prefErr } = await admin
     .from("notification_preferences")
     .select(prefCol)
     .eq("user_id", payload.userId)
     .maybeSingle();
 
-  // Default to sending if no preference row exists
+  if (prefErr) {
+    console.error("[notify] Preference lookup error:", prefErr);
+  }
+
   const shouldEmail =
-    !prefs || (prefs as unknown as Record<string, boolean>)[prefCol] !== false;
+    !prefs || (prefs as unknown as Record<string, boolean>)?.[prefCol] !== false;
 
   if (!shouldEmail) return;
 
-  // 3. Get user email
-  const { data: authData } = await admin.auth.admin.getUserById(payload.userId);
+  // 3. Resolve user email
+  const { data: authData, error: authErr } =
+    await admin.auth.admin.getUserById(payload.userId);
+
+  if (authErr) {
+    console.error("[notify] Auth lookup error:", authErr);
+    return;
+  }
+
   const email = authData?.user?.email;
   if (!email) return;
 
-  // 4. Get display name
+  // 4. Resolve display name
   const { data: profile } = await admin
     .from("profiles")
     .select("display_name")
@@ -97,7 +111,7 @@ export async function notify(
 
   const displayName = profile?.display_name ?? "there";
 
-  // 5. Send email
+  // 5. Send email (fire-and-forget, errors logged)
   await sendNotificationEmail({
     to: email,
     displayName,
@@ -108,9 +122,7 @@ export async function notify(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Email rendering
-// ---------------------------------------------------------------------------
+// ─── Email Rendering ────────────────────────────────────────────────
 
 interface EmailParams {
   to: string;
@@ -121,119 +133,111 @@ interface EmailParams {
   type: NotificationType;
 }
 
-function getSubjectForType(type: NotificationType, title: string): string {
-  switch (type) {
-    case "booking_requested":
-      return "New Booking Request";
-    case "booking_confirmed":
-      return "Booking Confirmed!";
-    case "booking_declined":
-      return "Booking Update";
-    case "booking_cancelled":
-      return "Booking Cancelled";
-    case "member_invited":
-      return "You've Been Invited";
-    case "member_approved":
-      return "Membership Approved!";
-    case "property_access_granted":
-      return "Property Access Granted";
-    default:
-      return title;
-  }
-}
+const SUBJECT_MAP: Record<NotificationType, string> = {
+  booking_requested: "New Booking Request",
+  booking_confirmed: "Booking Confirmed!",
+  booking_declined: "Booking Update",
+  booking_cancelled: "Booking Cancelled",
+  member_invited: "You've Been Invited",
+  member_approved: "Membership Approved!",
+  property_access_granted: "Property Access Granted",
+};
 
-function getCtaLabel(type: NotificationType): string {
-  switch (type) {
-    case "booking_requested":
-      return "Review Booking →";
-    case "booking_confirmed":
-      return "View Booking Details →";
-    case "booking_declined":
-      return "View Details →";
-    case "booking_cancelled":
-      return "View Bookings →";
-    case "member_invited":
-      return "View Membership →";
-    case "member_approved":
-      return "Browse Properties →";
-    case "property_access_granted":
-      return "View Properties →";
-    default:
-      return "View on AnglerPass →";
-  }
-}
+const CTA_LABEL_MAP: Record<NotificationType, string> = {
+  booking_requested: "Review Booking →",
+  booking_confirmed: "View Booking Details →",
+  booking_declined: "View Details →",
+  booking_cancelled: "View Bookings →",
+  member_invited: "View Membership →",
+  member_approved: "Browse Properties →",
+  property_access_granted: "View Properties →",
+};
 
-function getBrandColor(type: NotificationType): string {
-  switch (type) {
-    case "booking_requested":
-    case "booking_cancelled":
-      return "#2a5a3a"; // forest
-    case "booking_confirmed":
-    case "member_approved":
-    case "property_access_granted":
-      return "#2a5a3a"; // forest
-    case "booking_declined":
-      return "#3a6b7c"; // river
-    case "member_invited":
-      return "#8b6914"; // bronze
-    default:
-      return "#2a5a3a";
-  }
-}
+const CTA_COLOR_MAP: Record<NotificationType, string> = {
+  booking_requested: "#2a5a3a",
+  booking_confirmed: "#2a5a3a",
+  booking_declined: "#3a6b7c",
+  booking_cancelled: "#2a5a3a",
+  member_invited: "#8b6914",
+  member_approved: "#2a5a3a",
+  property_access_granted: "#2a5a3a",
+};
 
 async function sendNotificationEmail(params: EmailParams) {
+  const resend = getResend();
   if (!resend) return;
 
   const { to, displayName, title, body, link, type } = params;
-  const subject = getSubjectForType(type, title);
-  const ctaLabel = getCtaLabel(type);
-  const ctaColor = getBrandColor(type);
-  const ctaUrl = link ? `${SITE_URL}${link}` : SITE_URL;
+  const subject = SUBJECT_MAP[type] ?? title;
+  const ctaLabel = CTA_LABEL_MAP[type] ?? "View on AnglerPass →";
+  const ctaColor = CTA_COLOR_MAP[type] ?? "#2a5a3a";
+
+  // Validate link is a relative path (prevent javascript: or external URLs)
+  const safePath = link && link.startsWith("/") ? link : "";
+  const ctaUrl = safePath ? `${SITE_URL}${safePath}` : SITE_URL;
 
   try {
     await resend.emails.send({
       from: "AnglerPass <hello@anglerpass.com>",
       to,
       subject,
-      html: `
-<div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
-  <h2 style="font-size: 22px; font-weight: 500; margin-bottom: 8px;">${escapeHtml(title)}</h2>
-  <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
-    Hi ${escapeHtml(displayName)},
-  </p>
-  <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
-    ${escapeHtml(body)}
-  </p>
-  <div style="margin: 28px 0;">
-    <a href="${ctaUrl}"
-       style="display: inline-block; padding: 14px 32px; background: ${ctaColor}; color: #fff; text-decoration: none; border-radius: 6px; font-family: sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.3px;">
-      ${ctaLabel}
-    </a>
-  </div>
-  <p style="font-size: 13px; line-height: 1.6; color: #9a9a8e;">
-    You can manage your email preferences in your
-    <a href="${SITE_URL}/dashboard/settings" style="color: #3a6b7c;">account settings</a>.
-  </p>
-  <p style="font-size: 13px; color: #9a9a8e; margin-top: 24px;">— The AnglerPass Team</p>
-</div>
-      `.trim(),
+      html: buildEmailHtml({
+        title: escapeHtml(title),
+        displayName: escapeHtml(displayName),
+        body: escapeHtml(body),
+        ctaUrl,
+        ctaLabel,
+        ctaColor,
+      }),
     });
   } catch (err) {
     console.error("[notify] Email send error:", err);
   }
 }
 
+function buildEmailHtml(params: {
+  title: string;
+  displayName: string;
+  body: string;
+  ctaUrl: string;
+  ctaLabel: string;
+  ctaColor: string;
+}): string {
+  return `
+<div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
+  <h2 style="font-size: 22px; font-weight: 500; margin-bottom: 8px;">${params.title}</h2>
+  <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
+    Hi ${params.displayName},
+  </p>
+  <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
+    ${params.body}
+  </p>
+  <div style="margin: 28px 0;">
+    <a href="${params.ctaUrl}"
+       style="display: inline-block; padding: 14px 32px; background: ${params.ctaColor}; color: #fff; text-decoration: none; border-radius: 6px; font-family: sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.3px;">
+      ${params.ctaLabel}
+    </a>
+  </div>
+  <p style="font-size: 13px; line-height: 1.6; color: #9a9a8e;">
+    You can manage your email preferences in your
+    <a href="${SITE_URL}/dashboard/settings" style="color: #3a6b7c;">account settings</a>.
+  </p>
+  <p style="font-size: 13px; color: #9a9a8e; margin-top: 24px;">&mdash; The AnglerPass Team</p>
+</div>`.trim();
+}
+
+// ─── HTML Escaping ──────────────────────────────────────────────────
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
-// ---------------------------------------------------------------------------
-// Convenience helpers for common notification types
-// ---------------------------------------------------------------------------
+// ─── Convenience Helpers ────────────────────────────────────────────
 
 /** Notify landowner that a new booking was requested */
 export async function notifyBookingRequested(
@@ -277,13 +281,13 @@ export async function notifyBookingConfirmed(
 ) {
   let body = `Your booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)} has been confirmed! Access details are now available in your booking.`;
   if (opts.landownerNotes) {
-    body += ` Note from the landowner: "${opts.landownerNotes}"`;
+    body += ` Note from the landowner: \u201C${opts.landownerNotes}\u201D`;
   }
 
   await notify(admin, {
     userId: opts.anglerId,
     type: "booking_confirmed",
-    title: `Booking confirmed — ${opts.propertyName}`,
+    title: `Booking confirmed \u2014 ${opts.propertyName}`,
     body,
     link: "/angler/bookings",
     metadata: {
@@ -306,13 +310,13 @@ export async function notifyBookingDeclined(
 ) {
   let body = `Your booking request at ${opts.propertyName} on ${formatDate(opts.bookingDate)} was not approved.`;
   if (opts.landownerNotes) {
-    body += ` Reason: "${opts.landownerNotes}"`;
+    body += ` Reason: \u201C${opts.landownerNotes}\u201D`;
   }
 
   await notify(admin, {
     userId: opts.anglerId,
     type: "booking_declined",
-    title: `Booking declined — ${opts.propertyName}`,
+    title: `Booking declined \u2014 ${opts.propertyName}`,
     body,
     link: "/angler/bookings",
     metadata: {
@@ -336,7 +340,7 @@ export async function notifyBookingCancelled(
   await notify(admin, {
     userId: opts.landownerId,
     type: "booking_cancelled",
-    title: `Booking cancelled — ${opts.propertyName}`,
+    title: `Booking cancelled \u2014 ${opts.propertyName}`,
     body: `${opts.anglerName} has cancelled their booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)}.`,
     link: "/landowner/bookings",
     metadata: {
@@ -359,7 +363,7 @@ export async function notifyMemberApproved(
     userId: opts.userId,
     type: "member_approved",
     title: `Welcome to ${opts.clubName}!`,
-    body: `Your membership in ${opts.clubName} has been approved. You can now browse and book access to the club's private waters.`,
+    body: `Your membership in ${opts.clubName} has been approved. You can now browse and book access to the club\u2019s private waters.`,
     link: "/angler/discover",
     metadata: { club_id: opts.clubId },
   });
@@ -388,9 +392,7 @@ export async function notifyPropertyAccessGranted(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Utility
-// ---------------------------------------------------------------------------
+// ─── Utilities ──────────────────────────────────────────────────────
 
 function formatDate(dateStr: string): string {
   try {
@@ -400,6 +402,7 @@ function formatDate(dateStr: string): string {
       day: "numeric",
     });
   } catch {
+    console.warn("[notify] Failed to parse date:", dateStr);
     return dateStr;
   }
 }

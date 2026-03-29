@@ -1,73 +1,51 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
+import { VALID_ROLES } from "@/lib/constants/status";
 
-const VALID_ROLES = ["landowner", "club_admin", "angler", "admin"];
 const PAGE_SIZE = 25;
+const VALID_SORT_FIELDS = ["created_at", "display_name", "role", "updated_at"];
 
-// GET: List/search users (admin only)
+// ─── GET: List / search users ───────────────────────────────────────
+
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const admin = createAdminClient();
-
-    // Verify admin role
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
+    const { admin } = auth;
     const { searchParams } = new URL(request.url);
+
     const search = searchParams.get("search")?.trim() ?? "";
     const role = searchParams.get("role") ?? "";
-    const status = searchParams.get("status") ?? ""; // "active" | "suspended" | ""
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const status = searchParams.get("status") ?? "";
+    const page = parsePositiveInt(searchParams.get("page"), 1, 1000);
     const sortBy = searchParams.get("sort") ?? "created_at";
-    const sortDir = searchParams.get("dir") === "asc" ? true : false;
+    const ascending = searchParams.get("dir") === "asc";
 
     // Build query
     let query = admin
       .from("profiles")
-      .select("id, display_name, role, created_at, updated_at, suspended_at, suspended_reason", {
-        count: "exact",
-      });
+      .select(
+        "id, display_name, role, created_at, updated_at, suspended_at, suspended_reason",
+        { count: "exact" }
+      );
 
-    // Role filter
-    if (role && VALID_ROLES.includes(role)) {
+    if (role && (VALID_ROLES as readonly string[]).includes(role)) {
       query = query.eq("role", role);
     }
 
-    // Status filter
     if (status === "active") {
       query = query.is("suspended_at", null);
     } else if (status === "suspended") {
       query = query.not("suspended_at", "is", null);
     }
 
-    // Search by display_name (ilike)
     if (search) {
       query = query.ilike("display_name", `%${search}%`);
     }
 
-    // Sort
-    const validSorts = ["created_at", "display_name", "role", "updated_at"];
-    const sortField = validSorts.includes(sortBy) ? sortBy : "created_at";
-    query = query.order(sortField, { ascending: sortDir });
+    const sortField = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "created_at";
+    query = query.order(sortField, { ascending });
 
-    // Paginate
     const from = (page - 1) * PAGE_SIZE;
     query = query.range(from, from + PAGE_SIZE - 1);
 
@@ -75,40 +53,35 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[admin/users] Query error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch users" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch users", 500);
     }
 
-    // Fetch emails from auth for the returned users
-    const userIds = (users ?? []).map((u: { id: string }) => u.id);
+    // Batch-resolve emails from auth (sequential to avoid rate limits)
     const emailMap: Record<string, string> = {};
-
-    if (userIds.length > 0) {
-      // Use admin auth to list users
-      for (const uid of userIds) {
-        const { data: authData } = await admin.auth.admin.getUserById(uid);
-        if (authData?.user?.email) {
-          emailMap[uid] = authData.user.email;
-        }
+    for (const u of users ?? []) {
+      const uid = (u as { id: string }).id;
+      const { data: authData } = await admin.auth.admin.getUserById(uid);
+      if (authData?.user?.email) {
+        emailMap[uid] = authData.user.email;
       }
     }
 
-    const enriched = (users ?? []).map((u: {
-      id: string;
-      display_name: string | null;
-      role: string;
-      created_at: string;
-      updated_at: string;
-      suspended_at: string | null;
-      suspended_reason: string | null;
-    }) => ({
-      ...u,
-      email: emailMap[u.id] ?? null,
-    }));
+    const enriched = (users ?? []).map(
+      (u: {
+        id: string;
+        display_name: string | null;
+        role: string;
+        created_at: string;
+        updated_at: string;
+        suspended_at: string | null;
+        suspended_reason: string | null;
+      }) => ({
+        ...u,
+        email: emailMap[u.id] ?? null,
+      })
+    );
 
-    return NextResponse.json({
+    return jsonSuccess({
       users: enriched,
       total: count ?? 0,
       page,
@@ -117,94 +90,59 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error("[admin/users] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
-// PATCH: Update a user's role or suspension status
+// ─── PATCH: Change role or suspend / unsuspend ──────────────────────
+
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const admin = createAdminClient();
-
-    // Verify admin role
-    const { data: actorProfile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (actorProfile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
+    const { user, admin } = auth;
     const body = await request.json();
     const { user_id, action, role, reason } = body;
 
     if (!user_id || typeof user_id !== "string") {
-      return NextResponse.json(
-        { error: "user_id is required" },
-        { status: 400 }
-      );
+      return jsonError("user_id is required", 400);
     }
 
-    // Prevent self-modification for dangerous actions
+    // Prevent self-modification
     if (user_id === user.id && (action === "suspend" || action === "change_role")) {
-      return NextResponse.json(
-        { error: "Cannot modify your own account" },
-        { status: 400 }
-      );
+      return jsonError("Cannot modify your own account", 400);
     }
 
-    // Get target user
-    const { data: targetProfile } = await admin
+    // Fetch target
+    const { data: target } = await admin
       .from("profiles")
       .select("id, role, display_name, suspended_at")
       .eq("id", user_id)
       .single();
 
-    if (!targetProfile) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
+    if (!target) return jsonError("User not found", 404);
 
     switch (action) {
       case "change_role": {
-        if (!role || !VALID_ROLES.includes(role)) {
-          return NextResponse.json(
-            { error: `Invalid role. Must be one of: ${VALID_ROLES.join(", ")}` },
-            { status: 400 }
+        if (!role || !(VALID_ROLES as readonly string[]).includes(role)) {
+          return jsonError(
+            `Invalid role. Must be one of: ${VALID_ROLES.join(", ")}`,
+            400
           );
         }
 
-        const oldRole = targetProfile.role;
-        const { error: updateError } = await admin
+        const oldRole = target.role;
+        const { error: updateErr } = await admin
           .from("profiles")
           .update({ role })
           .eq("id", user_id);
 
-        if (updateError) {
-          console.error("[admin/users] Role update error:", updateError);
-          return NextResponse.json(
-            { error: "Failed to update role" },
-            { status: 500 }
-          );
+        if (updateErr) {
+          console.error("[admin/users] Role update error:", updateErr);
+          return jsonError("Failed to update role", 500);
         }
 
-        // Audit log
         await admin.from("audit_log").insert({
           actor_id: user.id,
           action: "user.role_changed",
@@ -214,94 +152,74 @@ export async function PATCH(request: Request) {
           new_data: { role },
         });
 
-        return NextResponse.json({ success: true, role });
+        return jsonSuccess({ success: true, role });
       }
 
       case "suspend": {
-        if (targetProfile.suspended_at) {
-          return NextResponse.json(
-            { error: "User is already suspended" },
-            { status: 400 }
-          );
+        if (target.suspended_at) {
+          return jsonError("User is already suspended", 400);
         }
 
-        const { error: updateError } = await admin
+        const now = new Date().toISOString();
+        const suspendReason = reason ?? "Suspended by admin";
+
+        const { error: updateErr } = await admin
           .from("profiles")
-          .update({
-            suspended_at: new Date().toISOString(),
-            suspended_reason: reason ?? "Suspended by admin",
-          })
+          .update({ suspended_at: now, suspended_reason: suspendReason })
           .eq("id", user_id);
 
-        if (updateError) {
-          console.error("[admin/users] Suspend error:", updateError);
-          return NextResponse.json(
-            { error: "Failed to suspend user" },
-            { status: 500 }
-          );
+        if (updateErr) {
+          console.error("[admin/users] Suspend error:", updateErr);
+          return jsonError("Failed to suspend user", 500);
         }
 
-        // Audit log
         await admin.from("audit_log").insert({
           actor_id: user.id,
           action: "user.suspended",
           entity_type: "profile",
           entity_id: user_id,
           old_data: { suspended_at: null },
-          new_data: { suspended_at: new Date().toISOString(), reason: reason ?? "Suspended by admin" },
+          new_data: { suspended_at: now, reason: suspendReason },
         });
 
-        return NextResponse.json({ success: true, suspended: true });
+        return jsonSuccess({ success: true, suspended: true });
       }
 
       case "unsuspend": {
-        if (!targetProfile.suspended_at) {
-          return NextResponse.json(
-            { error: "User is not suspended" },
-            { status: 400 }
-          );
+        if (!target.suspended_at) {
+          return jsonError("User is not suspended", 400);
         }
 
-        const { error: updateError } = await admin
+        const { error: updateErr } = await admin
           .from("profiles")
-          .update({
-            suspended_at: null,
-            suspended_reason: null,
-          })
+          .update({ suspended_at: null, suspended_reason: null })
           .eq("id", user_id);
 
-        if (updateError) {
-          console.error("[admin/users] Unsuspend error:", updateError);
-          return NextResponse.json(
-            { error: "Failed to unsuspend user" },
-            { status: 500 }
-          );
+        if (updateErr) {
+          console.error("[admin/users] Unsuspend error:", updateErr);
+          return jsonError("Failed to unsuspend user", 500);
         }
 
-        // Audit log
         await admin.from("audit_log").insert({
           actor_id: user.id,
           action: "user.unsuspended",
           entity_type: "profile",
           entity_id: user_id,
-          old_data: { suspended_at: targetProfile.suspended_at },
+          old_data: { suspended_at: target.suspended_at },
           new_data: { suspended_at: null },
         });
 
-        return NextResponse.json({ success: true, suspended: false });
+        return jsonSuccess({ success: true, suspended: false });
       }
 
       default:
-        return NextResponse.json(
-          { error: "Invalid action. Must be: change_role, suspend, or unsuspend" },
-          { status: 400 }
+        return jsonError(
+          "Invalid action. Must be: change_role, suspend, or unsuspend",
+          400
         );
     }
   } catch (err) {
     console.error("[admin/users] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

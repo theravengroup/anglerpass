@@ -22,6 +22,8 @@ import {
   Clock,
   Download,
 } from "lucide-react";
+import { PERIOD_OPTIONS, STATUS_BADGE_COLORS } from "@/lib/constants/status";
+import { downloadCSV } from "@/lib/csv";
 
 interface Analytics {
   properties_total: number;
@@ -53,21 +55,6 @@ interface PropertyRevenue {
   bookings: number;
 }
 
-const PERIOD_OPTIONS = [
-  { label: "7 days", value: 7 },
-  { label: "30 days", value: 30 },
-  { label: "90 days", value: 90 },
-  { label: "1 year", value: 365 },
-];
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "text-bronze bg-bronze/10",
-  confirmed: "text-forest bg-forest/10",
-  declined: "text-red-500 bg-red-50",
-  cancelled: "text-text-light bg-stone-light/10",
-  completed: "text-river bg-river/10",
-};
-
 export default function LandownerPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,22 +80,17 @@ export default function LandownerPage() {
 
   function exportCSV() {
     if (!data) return;
-    const rows = [
-      ["Property", "Revenue", "Bookings"],
-      ...data.revenue_by_property.map((p) => [
-        p.name,
-        p.revenue.toFixed(2),
-        String(p.bookings),
-      ]),
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `anglerpass-revenue-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(
+      [
+        ["Property", "Revenue", "Bookings"],
+        ...data.revenue_by_property.map((p) => [
+          p.name,
+          p.revenue.toFixed(2),
+          String(p.bookings),
+        ]),
+      ],
+      `anglerpass-revenue-${new Date().toISOString().slice(0, 10)}.csv`
+    );
   }
 
   if (loading) {
@@ -332,7 +314,7 @@ export default function LandownerPage() {
                       </span>
                       <span
                         className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          STATUS_COLORS[b.status] ?? STATUS_COLORS.pending
+                          STATUS_BADGE_COLORS[b.status] ?? STATUS_BADGE_COLORS.pending
                         }`}
                       >
                         {b.status === "confirmed" || b.status === "completed" ? (

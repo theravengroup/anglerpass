@@ -23,7 +23,7 @@ export async function GET(
 
     const { data: template, error } = await admin
       .from("document_templates")
-      .select("*")
+      .select("*, properties!document_templates_property_id_fkey(owner_id)")
       .eq("id", id)
       .single();
 
@@ -32,6 +32,13 @@ export async function GET(
         { error: "Template not found" },
         { status: 404 }
       );
+    }
+
+    // Authorization: only the property owner can view templates directly.
+    // Anglers access templates through the /documents/[id]/sign endpoint.
+    const propertyOwner = (template.properties as { owner_id: string } | null)?.owner_id;
+    if (propertyOwner !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     return NextResponse.json({ template });

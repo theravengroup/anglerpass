@@ -23,6 +23,19 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import {
+  STATUS_BADGE_COLORS,
+  WATER_TYPE_LABELS,
+} from "@/lib/constants/status";
+import { downloadCSV } from "@/lib/csv";
+
+/** Angler-specific period options (includes "All time") */
+const PERIOD_OPTIONS = [
+  { label: "7 days", value: 7 },
+  { label: "30 days", value: 30 },
+  { label: "90 days", value: 90 },
+  { label: "All time", value: 3650 },
+];
 
 interface Analytics {
   trips_total: number;
@@ -50,31 +63,6 @@ interface RecentBooking {
   created_at: string;
 }
 
-const PERIOD_OPTIONS = [
-  { label: "7 days", value: 7 },
-  { label: "30 days", value: 30 },
-  { label: "90 days", value: 90 },
-  { label: "All time", value: 3650 },
-];
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "text-bronze bg-bronze/10",
-  confirmed: "text-forest bg-forest/10",
-  declined: "text-red-500 bg-red-50",
-  cancelled: "text-text-light bg-stone-light/10",
-  completed: "text-river bg-river/10",
-};
-
-const WATER_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
-
 export default function AnglerPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,24 +88,19 @@ export default function AnglerPage() {
 
   function exportCSV() {
     if (!data) return;
-    const rows = [
-      ["Date", "Property", "Status", "Duration", "Amount"],
-      ...data.recent_bookings.map((b) => [
-        b.booking_date,
-        b.property_name,
-        b.status,
-        b.duration,
-        String(b.total_amount),
-      ]),
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `anglerpass-trips-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(
+      [
+        ["Date", "Property", "Status", "Duration", "Amount"],
+        ...data.recent_bookings.map((b) => [
+          b.booking_date,
+          b.property_name,
+          b.status,
+          b.duration,
+          String(b.total_amount),
+        ]),
+      ],
+      `anglerpass-trips-${new Date().toISOString().slice(0, 10)}.csv`
+    );
   }
 
   if (loading) {
@@ -240,7 +223,7 @@ export default function AnglerPage() {
                     {prop.water_type && (
                       <p className="flex items-center gap-1 text-xs text-text-light">
                         <Droplets className="size-3" />
-                        {WATER_LABELS[prop.water_type] ?? prop.water_type}
+                        {WATER_TYPE_LABELS[prop.water_type] ?? prop.water_type}
                       </p>
                     )}
                   </div>
@@ -303,7 +286,7 @@ export default function AnglerPage() {
                       </span>
                       <span
                         className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          STATUS_COLORS[b.status] ?? STATUS_COLORS.pending
+                          STATUS_BADGE_COLORS[b.status] ?? STATUS_BADGE_COLORS.pending
                         }`}
                       >
                         {b.status === "confirmed" || b.status === "completed" ? (

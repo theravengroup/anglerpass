@@ -18,6 +18,12 @@ import {
   MoreHorizontal,
   Download,
 } from "lucide-react";
+import {
+  ROLE_LABELS,
+  ROLE_BADGE_COLORS,
+  VALID_ROLES,
+} from "@/lib/constants/status";
+import { downloadCSV } from "@/lib/csv";
 
 interface User {
   id: string;
@@ -37,22 +43,9 @@ interface UsersResponse {
   total_pages: number;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  angler: "Angler",
-  landowner: "Landowner",
-  club_admin: "Club Admin",
-  admin: "Admin",
-};
-
-const ROLE_COLORS: Record<string, string> = {
-  angler: "text-bronze bg-bronze/10",
-  landowner: "text-forest bg-forest/10",
-  club_admin: "text-river bg-river/10",
-  admin: "text-charcoal bg-charcoal/10",
-};
-
-const ROLES = ["", "angler", "landowner", "club_admin", "admin"];
-const STATUSES = ["", "active", "suspended"];
+/** Role filter dropdown options (empty string = "All Roles") */
+const ROLE_FILTER_OPTIONS = ["", ...VALID_ROLES];
+const STATUS_FILTER_OPTIONS = ["", "active", "suspended"];
 
 export default function UsersPage() {
   const [data, setData] = useState<UsersResponse | null>(null);
@@ -117,26 +110,21 @@ export default function UsersPage() {
     }
   }
 
-  function exportCSV() {
+  function handleExport() {
     if (!data) return;
-    const rows = [
-      ["Name", "Email", "Role", "Status", "Joined"],
-      ...data.users.map((u) => [
-        u.display_name ?? "",
-        u.email ?? "",
-        u.role,
-        u.suspended_at ? "Suspended" : "Active",
-        new Date(u.created_at).toLocaleDateString(),
-      ]),
-    ];
-    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `anglerpass-users-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(
+      [
+        ["Name", "Email", "Role", "Status", "Joined"],
+        ...data.users.map((u) => [
+          u.display_name ?? "",
+          u.email ?? "",
+          u.role,
+          u.suspended_at ? "Suspended" : "Active",
+          new Date(u.created_at).toLocaleDateString(),
+        ]),
+      ],
+      `anglerpass-users-${new Date().toISOString().slice(0, 10)}.csv`
+    );
   }
 
   return (
@@ -159,7 +147,7 @@ export default function UsersPage() {
           variant="outline"
           size="sm"
           className="text-xs"
-          onClick={exportCSV}
+          onClick={handleExport}
           disabled={!data?.users?.length}
         >
           <Download className="mr-1 size-3" />
@@ -193,7 +181,7 @@ export default function UsersPage() {
                 }}
                 className="h-9 rounded-md border border-stone-light/25 bg-white px-3 text-sm text-text-primary focus:border-forest/40 focus:outline-none focus:ring-2 focus:ring-forest/15"
               >
-                {ROLES.map((r) => (
+                {ROLE_FILTER_OPTIONS.map((r) => (
                   <option key={r} value={r}>
                     {r ? ROLE_LABELS[r] : "All Roles"}
                   </option>
@@ -207,7 +195,7 @@ export default function UsersPage() {
                 }}
                 className="h-9 rounded-md border border-stone-light/25 bg-white px-3 text-sm text-text-primary focus:border-forest/40 focus:outline-none focus:ring-2 focus:ring-forest/15"
               >
-                {STATUSES.map((s) => (
+                {STATUS_FILTER_OPTIONS.map((s) => (
                   <option key={s} value={s}>
                     {s === "" ? "All Statuses" : s === "active" ? "Active" : "Suspended"}
                   </option>
@@ -267,7 +255,7 @@ export default function UsersPage() {
                   <span>
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        ROLE_COLORS[u.role] ?? ROLE_COLORS.angler
+                        ROLE_BADGE_COLORS[u.role] ?? ROLE_BADGE_COLORS.angler
                       }`}
                     >
                       {ROLE_LABELS[u.role] ?? u.role}
@@ -311,7 +299,7 @@ export default function UsersPage() {
                         <p className="px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-text-light">
                           Change Role
                         </p>
-                        {ROLES.filter((r) => r && r !== u.role).map((r) => (
+                        {ROLE_FILTER_OPTIONS.filter((r) => r && r !== u.role).map((r) => (
                           <button
                             key={r}
                             onClick={() => handleAction(u.id, "change_role", r)}
