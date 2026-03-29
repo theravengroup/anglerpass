@@ -19,6 +19,7 @@ import {
   MapPin,
   Fish,
   Users,
+  Compass,
   X,
 } from "lucide-react";
 import { FetchError } from "@/components/shared/FetchError";
@@ -460,71 +461,141 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Club Memberships ── */}
+      {/* ── Home Club ── */}
       <Card className="border-stone-light/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Users className="size-5 text-river" />
-            Club Memberships
+            Home Club
           </CardTitle>
           <CardDescription>
-            Clubs you belong to or have requested to join.
+            Your home club is your primary fishing club. Through the Cross-Club
+            Network, you can fish at partner clubs without needing separate
+            memberships.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {memberships.length === 0 ? (
-            <p className="py-4 text-center text-sm text-text-light">
-              You&apos;re not a member of any clubs yet. Browse clubs from the{" "}
+          {(() => {
+            const homeClub = memberships.find((m) => m.status === "active");
+            const pendingClub = memberships.find((m) => m.status === "pending");
+
+            if (homeClub) {
+              return (
+                <div className="flex items-center justify-between rounded-lg border border-river/20 bg-river/5 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-12 items-center justify-center rounded-full bg-river/10 text-base font-semibold text-river">
+                      {homeClub.clubs?.name?.charAt(0).toUpperCase() ?? "?"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">
+                        {homeClub.clubs?.name ?? "Unknown Club"}
+                      </p>
+                      {homeClub.clubs?.location && (
+                        <p className="flex items-center gap-1 text-xs text-text-light">
+                          <MapPin className="size-3" />
+                          {homeClub.clubs.location}
+                        </p>
+                      )}
+                      {homeClub.joined_at && (
+                        <p className="mt-0.5 text-xs text-text-light">
+                          Member since{" "}
+                          {new Date(homeClub.joined_at).toLocaleDateString(
+                            "en-US",
+                            { month: "long", year: "numeric" }
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-forest/10 px-2.5 py-1 text-xs font-medium text-forest">
+                    Home Club
+                  </span>
+                </div>
+              );
+            }
+
+            if (pendingClub) {
+              return (
+                <div className="flex items-center justify-between rounded-lg border border-bronze/20 bg-bronze/5 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-12 items-center justify-center rounded-full bg-bronze/10 text-base font-semibold text-bronze">
+                      {pendingClub.clubs?.name?.charAt(0).toUpperCase() ?? "?"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">
+                        {pendingClub.clubs?.name ?? "Unknown Club"}
+                      </p>
+                      {pendingClub.clubs?.location && (
+                        <p className="flex items-center gap-1 text-xs text-text-light">
+                          <MapPin className="size-3" />
+                          {pendingClub.clubs.location}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-bronze/10 px-2.5 py-1 text-xs font-medium text-bronze">
+                    Pending Approval
+                  </span>
+                </div>
+              );
+            }
+
+            return (
+              <div className="flex flex-col items-center py-6">
+                <div className="flex size-12 items-center justify-center rounded-full bg-river/10">
+                  <Users className="size-5 text-river" />
+                </div>
+                <p className="mt-3 text-sm font-medium text-text-primary">
+                  No Home Club Yet
+                </p>
+                <p className="mt-1 max-w-xs text-center text-sm text-text-secondary">
+                  Find and join a club to unlock access to private waters through
+                  the Cross-Club Network.
+                </p>
+                <a
+                  href="/angler/discover"
+                  className="mt-3 text-sm font-medium text-river hover:underline"
+                >
+                  Find a Club &rarr;
+                </a>
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
+      {/* ── Cross-Club Network ── */}
+      <Card className="border-stone-light/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Compass className="size-5 text-bronze" />
+            Cross-Club Network
+          </CardTitle>
+          <CardDescription>
+            Clubs you&apos;ve fished at through the network. Each visit earns a
+            badge on your profile.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center py-6">
+            <div className="flex size-12 items-center justify-center rounded-full bg-bronze/10">
+              <Compass className="size-5 text-bronze" />
+            </div>
+            <p className="mt-3 text-sm font-medium text-text-primary">
+              No Cross-Club Visits Yet
+            </p>
+            <p className="mt-1 max-w-xs text-center text-sm text-text-secondary">
+              Once you fish at a partner club through the Cross-Club Network,
+              you&apos;ll earn a badge here. Explore available waters from the{" "}
               <a
                 href="/angler/discover"
-                className="font-medium text-river hover:underline"
+                className="font-medium text-bronze hover:underline"
               >
                 Discover
               </a>{" "}
               page.
             </p>
-          ) : (
-            <div className="space-y-3">
-              {memberships.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center justify-between rounded-lg border border-stone-light/15 p-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-river/10 text-sm font-semibold text-river">
-                      {m.clubs?.name?.charAt(0).toUpperCase() ?? "?"}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">
-                        {m.clubs?.name ?? "Unknown Club"}
-                      </p>
-                      {m.clubs?.location && (
-                        <p className="flex items-center gap-1 text-xs text-text-light">
-                          <MapPin className="size-3" />
-                          {m.clubs.location}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                      m.status === "active"
-                        ? "bg-forest/10 text-forest"
-                        : m.status === "pending"
-                          ? "bg-bronze/10 text-bronze"
-                          : "bg-stone-light/10 text-text-light"
-                    }`}
-                  >
-                    {m.status === "active"
-                      ? "Active"
-                      : m.status === "pending"
-                        ? "Pending"
-                        : m.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 

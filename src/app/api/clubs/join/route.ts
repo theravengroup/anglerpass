@@ -46,7 +46,41 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if already a member
+    // Enforce one home club: check if user already has an active or pending membership
+    const { data: allMemberships } = await admin
+      .from("club_memberships")
+      .select("id, club_id, status")
+      .eq("user_id", user.id)
+      .in("status", ["active", "pending"]);
+
+    const activeClub = (allMemberships ?? []).find(
+      (m) => m.status === "active"
+    );
+    const pendingClub = (allMemberships ?? []).find(
+      (m) => m.status === "pending"
+    );
+
+    if (activeClub && activeClub.club_id !== club_id) {
+      return NextResponse.json(
+        {
+          error:
+            "You already have a home club. Through the Cross-Club Network, you can fish at partner clubs without needing to join them.",
+        },
+        { status: 409 }
+      );
+    }
+
+    if (pendingClub && pendingClub.club_id !== club_id) {
+      return NextResponse.json(
+        {
+          error:
+            "You already have a pending club request. Please wait for it to be approved or contact the club to withdraw it first.",
+        },
+        { status: 409 }
+      );
+    }
+
+    // Check if already a member of THIS club
     const { data: existing } = await admin
       .from("club_memberships")
       .select("id, status")

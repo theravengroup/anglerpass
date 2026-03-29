@@ -123,7 +123,8 @@ export default function DiscoverPage() {
           Discover Private Waters
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Browse properties available through your club memberships.
+          Browse properties available through your home club and the Cross-Club
+          Network.
         </p>
       </div>
 
@@ -244,6 +245,10 @@ function ClubBrowser() {
     fetchClubs(searchQ);
   };
 
+  // Check if user already has a home club (active) or pending request
+  const hasHomeClub = clubs.some((c) => c.membership_status === "active");
+  const hasPending = clubs.some((c) => c.membership_status === "pending");
+
   const handleJoin = async (clubId: string) => {
     setJoining(clubId);
     setMessage(null);
@@ -265,7 +270,7 @@ function ClubBrowser() {
           )
         );
       } else {
-        setMessage(data.error ?? "Failed to send join request");
+        setMessage(data.error ?? "Failed to send request");
       }
     } catch {
       setMessage("An error occurred. Please try again.");
@@ -284,12 +289,12 @@ function ClubBrowser() {
             </div>
             <div>
               <h3 className="text-sm font-medium text-text-primary">
-                Join a Club to Access Private Waters
+                Find Your Home Club
               </h3>
               <p className="mt-0.5 text-sm text-text-secondary">
-                Browse fishing clubs below and request to join. Once approved,
-                you&apos;ll be able to discover and book their associated
-                properties.
+                Choose a home club to get started. Through the Cross-Club
+                Network, your membership gives you access to fish at partner
+                clubs too — no need to join multiple clubs.
               </p>
             </div>
           </div>
@@ -303,7 +308,7 @@ function ClubBrowser() {
           <Input
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
-            placeholder="Search clubs by name or description..."
+            placeholder="Search clubs by name or location..."
             className="pl-9"
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSearch();
@@ -349,64 +354,79 @@ function ClubBrowser() {
 
       {!loading && clubs.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {clubs.map((club) => (
-            <Card key={club.id} className="border-stone-light/20">
-              <CardContent className="py-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-river/10 text-lg font-semibold text-river">
-                    {club.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-text-primary">
-                      {club.name}
-                    </h3>
-                    {club.location && (
-                      <p className="flex items-center gap-1 text-xs text-text-light">
-                        <MapPin className="size-3" />
-                        {club.location}
-                      </p>
-                    )}
-                    {club.description && (
-                      <p className="mt-1.5 line-clamp-2 text-xs text-text-secondary">
-                        {club.description}
-                      </p>
-                    )}
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-xs text-text-light">
-                        {club.member_count} member
-                        {club.member_count !== 1 ? "s" : ""}
-                      </span>
+          {clubs.map((club) => {
+            const isHome = club.membership_status === "active";
+            const isPending = club.membership_status === "pending";
+            // Disable join if user already has a home club or a pending request
+            const canJoin = !hasHomeClub && !hasPending && !isHome && !isPending;
 
-                      {club.membership_status === "active" ? (
-                        <span className="flex items-center gap-1 text-xs font-medium text-forest">
-                          <CheckCircle2 className="size-3.5" />
-                          Member
-                        </span>
-                      ) : club.membership_status === "pending" ? (
-                        <span className="flex items-center gap-1 text-xs font-medium text-bronze">
-                          <Clock className="size-3.5" />
-                          Pending
-                        </span>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-7 border-river/30 text-xs text-river hover:bg-river/5"
-                          onClick={() => handleJoin(club.id)}
-                          disabled={joining === club.id}
-                        >
-                          {joining === club.id ? (
-                            <Loader2 className="size-3 animate-spin" />
-                          ) : null}
-                          Request to Join
-                        </Button>
+            return (
+              <Card
+                key={club.id}
+                className={`border-stone-light/20 ${isHome ? "ring-2 ring-river/30" : ""}`}
+              >
+                <CardContent className="py-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-river/10 text-lg font-semibold text-river">
+                      {club.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-medium text-text-primary">
+                        {club.name}
+                      </h3>
+                      {club.location && (
+                        <p className="flex items-center gap-1 text-xs text-text-light">
+                          <MapPin className="size-3" />
+                          {club.location}
+                        </p>
                       )}
+                      {club.description && (
+                        <p className="mt-1.5 line-clamp-2 text-xs text-text-secondary">
+                          {club.description}
+                        </p>
+                      )}
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs text-text-light">
+                          {club.member_count} member
+                          {club.member_count !== 1 ? "s" : ""}
+                        </span>
+
+                        {isHome ? (
+                          <span className="flex items-center gap-1 text-xs font-medium text-forest">
+                            <CheckCircle2 className="size-3.5" />
+                            Home Club
+                          </span>
+                        ) : isPending ? (
+                          <span className="flex items-center gap-1 text-xs font-medium text-bronze">
+                            <Clock className="size-3.5" />
+                            Pending
+                          </span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 border-river/30 text-xs text-river hover:bg-river/5"
+                            onClick={() => handleJoin(club.id)}
+                            disabled={!canJoin || joining === club.id}
+                            title={
+                              !canJoin
+                                ? "You already have a home club or pending request"
+                                : undefined
+                            }
+                          >
+                            {joining === club.id ? (
+                              <Loader2 className="size-3 animate-spin" />
+                            ) : null}
+                            Request to Join
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
