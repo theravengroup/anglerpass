@@ -124,6 +124,15 @@ export const ROLE_BADGE_COLORS: Record<string, string> = {
 export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin"] as const;
 export type UserRole = (typeof VALID_ROLES)[number];
 
+// ─── Staff Discount Rates ────────────────────────────────────────────
+// Platform-wide constants applied during Stripe checkout.
+
+/** Staff get 50% off rod fees at their own club's properties. */
+export const STAFF_DISCOUNT_OWN_CLUB = 50;
+
+/** Staff get 25% off rod fees at cross-club network properties. */
+export const STAFF_DISCOUNT_CROSS_CLUB = 25;
+
 // ─── Period Options (analytics dashboards) ──────────────────────────
 
 export interface PeriodOption {

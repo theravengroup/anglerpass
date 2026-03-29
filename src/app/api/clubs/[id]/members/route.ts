@@ -3,10 +3,46 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberInviteSchema } from "@/lib/validations/clubs";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
+
+/**
+ * Check if the user is a club owner or active staff member.
+ * Returns { club, isOwner } on success, or null if unauthorized.
+ */
+async function verifyClubManager(
+  admin: SupabaseClient,
+  clubId: string,
+  userId: string
+): Promise<{ club: { owner_id: string; name: string }; isOwner: boolean } | null> {
+  const { data: club } = await admin
+    .from("clubs")
+    .select("owner_id, name")
+    .eq("id", clubId)
+    .single();
+
+  if (!club) return null;
+
+  // Owner always has access
+  if (club.owner_id === userId) return { club, isOwner: true };
+
+  // Check if user is active staff
+  const { data: staffMembership } = await admin
+    .from("club_memberships")
+    .select("id")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .eq("role", "staff")
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (staffMembership) return { club, isOwner: false };
+
+  return null;
+}
 
 // GET: List club members
 export async function GET(
@@ -26,14 +62,9 @@ export async function GET(
 
     const admin = createAdminClient();
 
-    // Verify user is club owner
-    const { data: club } = await admin
-      .from("clubs")
-      .select("owner_id, name")
-      .eq("id", id)
-      .single();
-
-    if (!club || club.owner_id !== user.id) {
+    // Verify user is club owner or staff
+    const auth = await verifyClubManager(admin, id, user.id);
+    if (!auth) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -106,19 +137,22 @@ export async function POST(
 
     const admin = createAdminClient();
 
-    // Verify user is club owner
-    const { data: club } = await admin
-      .from("clubs")
-      .select("owner_id, name")
-      .eq("id", id)
-      .single();
-
-    if (!club || club.owner_id !== user.id) {
+    // Verify user is club owner or staff
+    const auth = await verifyClubManager(admin, id, user.id);
+    if (!auth) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
     const result = clubMemberInviteSchema.safeParse(body);
+
+    // Staff can only invite members, not other staff
+    if (!auth.isOwner && result.success && result.data.role === "staff") {
+      return NextResponse.json(
+        { error: "Only the club owner can invite staff members" },
+        { status: 403 }
+      );
+    }
 
     if (!result.success) {
       return NextResponse.json(
@@ -175,7 +209,7 @@ export async function POST(
         );
       }
 
-      await sendMemberInviteEmail(email, club.name, false, role);
+      await sendMemberInviteEmail(email, auth.club.name, false, role);
 
       return NextResponse.json({ membership }, { status: 201 });
     }
@@ -217,7 +251,7 @@ export async function POST(
       );
     }
 
-    await sendMemberInviteEmail(email, club.name, true, role);
+    await sendMemberInviteEmail(email, auth.club.name, true, role);
 
     return NextResponse.json({ membership }, { status: 201 });
   } catch (err) {

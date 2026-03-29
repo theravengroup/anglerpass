@@ -3,6 +3,40 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
 import { notifyMemberApproved } from "@/lib/notifications";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+/**
+ * Check if the user is a club owner or active staff member.
+ * Returns { club, isOwner } on success, or null if unauthorized.
+ */
+async function verifyClubManager(
+  admin: SupabaseClient,
+  clubId: string,
+  userId: string
+): Promise<{ club: { owner_id: string; name: string }; isOwner: boolean } | null> {
+  const { data: club } = await admin
+    .from("clubs")
+    .select("owner_id, name")
+    .eq("id", clubId)
+    .single();
+
+  if (!club) return null;
+
+  if (club.owner_id === userId) return { club, isOwner: true };
+
+  const { data: staffMembership } = await admin
+    .from("club_memberships")
+    .select("id")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .eq("role", "staff")
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (staffMembership) return { club, isOwner: false };
+
+  return null;
+}
 
 // PATCH: Update member status (approve, decline, deactivate)
 export async function PATCH(
@@ -22,14 +56,9 @@ export async function PATCH(
 
     const admin = createAdminClient();
 
-    // Verify user is club owner
-    const { data: club } = await admin
-      .from("clubs")
-      .select("owner_id, name")
-      .eq("id", id)
-      .single();
-
-    if (!club || club.owner_id !== user.id) {
+    // Verify user is club owner or staff
+    const auth = await verifyClubManager(admin, id, user.id);
+    if (!auth) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -53,6 +82,14 @@ export async function PATCH(
       return NextResponse.json(
         { error: "Cannot modify the club owner's membership" },
         { status: 400 }
+      );
+    }
+
+    // Staff cannot modify other staff members — only the owner can
+    if (!auth.isOwner && membership.role === "staff") {
+      return NextResponse.json(
+        { error: "Only the club owner can manage staff members" },
+        { status: 403 }
       );
     }
 
@@ -99,7 +136,7 @@ export async function PATCH(
     ) {
       notifyMemberApproved(admin, {
         userId: membership.user_id,
-        clubName: club.name,
+        clubName: auth.club.name,
         clubId: id,
       }).catch((err) =>
         console.error("[clubs/members] Notification error:", err)
@@ -134,18 +171,13 @@ export async function DELETE(
 
     const admin = createAdminClient();
 
-    // Verify user is club owner
-    const { data: club } = await admin
-      .from("clubs")
-      .select("owner_id")
-      .eq("id", id)
-      .single();
-
-    if (!club || club.owner_id !== user.id) {
+    // Verify user is club owner or staff
+    const auth = await verifyClubManager(admin, id, user.id);
+    if (!auth) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Verify the membership and prevent removing the owner
+    // Verify the membership and check permissions
     const { data: membership } = await admin
       .from("club_memberships")
       .select("role")
@@ -164,6 +196,14 @@ export async function DELETE(
       return NextResponse.json(
         { error: "Cannot remove the club owner" },
         { status: 400 }
+      );
+    }
+
+    // Staff cannot remove other staff — only the owner can
+    if (!auth.isOwner && membership.role === "staff") {
+      return NextResponse.json(
+        { error: "Only the club owner can remove staff members" },
+        { status: 403 }
       );
     }
 

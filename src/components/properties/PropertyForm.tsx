@@ -78,7 +78,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       rate_adult_half_day: null,
       rate_youth_half_day: null,
       rate_child_half_day: null,
-      staff_rate_discount: 0,
       access_notes: "",
       gate_code_required: false,
       gate_code: "",
@@ -573,32 +572,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
             </div>
           )}
 
-          {/* Staff Discount */}
-          <div className="border-t border-stone-light/20 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="staff_rate_discount">
-                Staff Rate Discount (%)
-              </Label>
-              <p className="text-xs text-text-light">
-                Club staff members get this percentage off rod fees. Set to 100
-                for free access.
-              </p>
-              <Input
-                id="staff_rate_discount"
-                type="number"
-                min="0"
-                max="100"
-                placeholder="e.g. 50"
-                className="max-w-[160px]"
-                {...register("staff_rate_discount", { valueAsNumber: true })}
-              />
-              {errors.staff_rate_discount && (
-                <p className="text-sm text-red-600">
-                  {errors.staff_rate_discount.message}
-                </p>
-              )}
-            </div>
-          </div>
         </CardContent>
       </Card>
 

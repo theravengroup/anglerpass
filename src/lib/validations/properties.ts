@@ -87,14 +87,6 @@ export const propertySchema = z
     rate_youth_half_day: z.number().min(0).optional().nullable(),
     rate_child_half_day: z.number().min(0).optional().nullable(),
 
-    // Staff discount (percentage off rod fees for club staff)
-    staff_rate_discount: z
-      .number()
-      .int()
-      .min(0, "Discount cannot be negative")
-      .max(100, "Discount cannot exceed 100%")
-      .default(0),
-
     // Access (private — not displayed publicly)
     access_notes: z.string().max(2000).optional().or(z.literal("")),
     gate_code_required: z.boolean().default(false),

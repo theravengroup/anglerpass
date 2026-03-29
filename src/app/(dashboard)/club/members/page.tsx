@@ -35,6 +35,7 @@ export default function MembersPage() {
   const [error, setError] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "staff" | "pending">("all");
+  const [isOwner, setIsOwner] = useState(false);
 
   // Invite form state
   const [showInvite, setShowInvite] = useState(false);
@@ -73,6 +74,12 @@ export default function MembersPage() {
       if (data.owned?.length) {
         const cid = data.owned[0].id;
         setClubId(cid);
+        setIsOwner(true);
+        await fetchMembers(cid);
+      } else if (data.staff_of?.length) {
+        const cid = data.staff_of[0].id;
+        setClubId(cid);
+        setIsOwner(false);
         await fetchMembers(cid);
       }
     } catch {
@@ -229,21 +236,23 @@ export default function MembersPage() {
                   }}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="invite_role">Role</Label>
-                <select
-                  id="invite_role"
-                  value={inviteRole}
-                  onChange={(e) =>
-                    setInviteRole(e.target.value as "member" | "staff")
-                  }
-                  disabled={inviting}
-                  className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <option value="member">Member</option>
-                  <option value="staff">Staff</option>
-                </select>
-              </div>
+              {isOwner && (
+                <div className="space-y-2">
+                  <Label htmlFor="invite_role">Role</Label>
+                  <select
+                    id="invite_role"
+                    value={inviteRole}
+                    onChange={(e) =>
+                      setInviteRole(e.target.value as "member" | "staff")
+                    }
+                    disabled={inviting}
+                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <option value="member">Member</option>
+                    <option value="staff">Staff</option>
+                  </select>
+                </div>
+              )}
               <Button
                 onClick={handleInvite}
                 disabled={inviting || !inviteEmail.trim()}
@@ -394,8 +403,10 @@ export default function MembersPage() {
                       {config.label}
                     </div>
 
-                    {/* Actions (not for admin role) */}
-                    {member.role !== "admin" && !isLoading && (
+                    {/* Actions (not for admin; staff can only manage members, not other staff) */}
+                    {member.role !== "admin" &&
+                      (isOwner || member.role !== "staff") &&
+                      !isLoading && (
                       <div className="flex gap-1">
                         {member.status === "pending" && (
                           <>

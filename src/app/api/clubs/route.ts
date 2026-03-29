@@ -155,7 +155,7 @@ export async function GET() {
       );
     }
 
-    // Get clubs the user is a member of (but doesn't own)
+    // Get clubs the user is a member/staff of (but doesn't own)
     const { data: memberships, error: memberError } = await admin
       .from("club_memberships")
       .select("club_id, role, status, clubs(*)")
@@ -167,12 +167,19 @@ export async function GET() {
       console.error("[clubs] Fetch memberships error:", memberError);
     }
 
+    const staffClubs = (memberships ?? [])
+      .filter((m) => m.role === "staff")
+      .map((m) => m.clubs)
+      .filter(Boolean);
+
     const memberClubs = (memberships ?? [])
+      .filter((m) => m.role === "member")
       .map((m) => m.clubs)
       .filter(Boolean);
 
     return NextResponse.json({
       owned: ownedClubs ?? [],
+      staff_of: staffClubs,
       member_of: memberClubs,
     });
   } catch (err) {
