@@ -418,6 +418,88 @@ export type Database = {
           },
         ];
       };
+      bookings: {
+        Row: {
+          id: string;
+          property_id: string;
+          angler_id: string;
+          club_membership_id: string;
+          booking_date: string;
+          duration: string;
+          party_size: number;
+          base_rate: number;
+          platform_fee: number;
+          total_amount: number;
+          status: string;
+          message: string | null;
+          landowner_notes: string | null;
+          confirmed_at: string | null;
+          cancelled_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          angler_id: string;
+          club_membership_id: string;
+          booking_date: string;
+          duration?: string;
+          party_size?: number;
+          base_rate: number;
+          platform_fee?: number;
+          total_amount: number;
+          status?: string;
+          message?: string | null;
+          landowner_notes?: string | null;
+          confirmed_at?: string | null;
+          cancelled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          angler_id?: string;
+          club_membership_id?: string;
+          booking_date?: string;
+          duration?: string;
+          party_size?: number;
+          base_rate?: number;
+          platform_fee?: number;
+          total_amount?: number;
+          status?: string;
+          message?: string | null;
+          landowner_notes?: string | null;
+          confirmed_at?: string | null;
+          cancelled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bookings_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_angler_id_fkey";
+            columns: ["angler_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_club_membership_id_fkey";
+            columns: ["club_membership_id"];
+            isOneToOne: false;
+            referencedRelation: "club_memberships";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       moderation_notes: {
         Row: {
           id: number;
