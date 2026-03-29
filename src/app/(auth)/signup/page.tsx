@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,19 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
+  );
+}
+
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const invitationRole = searchParams.get("role");
+  const invitationToken = searchParams.get("invitation");
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
@@ -48,7 +60,17 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      role: invitationRole as SignupFormData["role"] | undefined,
+    },
   });
+
+  // Pre-fill role from invitation URL
+  useEffect(() => {
+    if (invitationRole && ["landowner", "club_admin", "angler"].includes(invitationRole)) {
+      setValue("role", invitationRole as SignupFormData["role"]);
+    }
+  }, [invitationRole, setValue]);
 
   async function onSubmit(data: SignupFormData) {
     setError(null);
@@ -91,9 +113,13 @@ export default function SignupPage() {
         return;
       }
 
-      // Redirect based on the role they just selected
+      // Redirect: if club_admin with invitation, go to setup; otherwise role home
       const { getRoleHomePath } = await import("@/types/roles");
-      router.push(getRoleHomePath(data.role));
+      if (data.role === "club_admin" && invitationToken) {
+        router.push(`/club/setup?invitation=${invitationToken}`);
+      } else {
+        router.push(getRoleHomePath(data.role));
+      }
       router.refresh();
     } catch {
       setError(

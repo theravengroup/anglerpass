@@ -259,6 +259,165 @@ export type Database = {
           },
         ];
       };
+      clubs: {
+        Row: {
+          id: string;
+          owner_id: string;
+          name: string;
+          description: string | null;
+          location: string | null;
+          rules: string | null;
+          website: string | null;
+          logo_url: string | null;
+          subscription_tier: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id: string;
+          name: string;
+          description?: string | null;
+          location?: string | null;
+          rules?: string | null;
+          website?: string | null;
+          logo_url?: string | null;
+          subscription_tier?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          owner_id?: string;
+          name?: string;
+          description?: string | null;
+          location?: string | null;
+          rules?: string | null;
+          website?: string | null;
+          logo_url?: string | null;
+          subscription_tier?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "clubs_owner_id_fkey";
+            columns: ["owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      club_memberships: {
+        Row: {
+          id: string;
+          club_id: string;
+          user_id: string | null;
+          role: string;
+          status: string;
+          invited_email: string | null;
+          invited_at: string | null;
+          joined_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          club_id: string;
+          user_id?: string | null;
+          role?: string;
+          status?: string;
+          invited_email?: string | null;
+          invited_at?: string | null;
+          joined_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          club_id?: string;
+          user_id?: string | null;
+          role?: string;
+          status?: string;
+          invited_email?: string | null;
+          invited_at?: string | null;
+          joined_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "club_memberships_club_id_fkey";
+            columns: ["club_id"];
+            isOneToOne: false;
+            referencedRelation: "clubs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "club_memberships_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      club_property_access: {
+        Row: {
+          id: string;
+          club_id: string;
+          property_id: string;
+          status: string;
+          requested_by: string;
+          approved_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          club_id: string;
+          property_id: string;
+          status?: string;
+          requested_by: string;
+          approved_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          club_id?: string;
+          property_id?: string;
+          status?: string;
+          requested_by?: string;
+          approved_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "club_property_access_club_id_fkey";
+            columns: ["club_id"];
+            isOneToOne: false;
+            referencedRelation: "clubs";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "club_property_access_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "club_property_access_requested_by_fkey";
+            columns: ["requested_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       moderation_notes: {
         Row: {
           id: number;

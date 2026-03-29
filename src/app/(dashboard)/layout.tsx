@@ -54,6 +54,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       href: "/club/properties",
       icon: <MapPin />,
     },
+    {
+      label: "Settings",
+      href: "/club/settings",
+      icon: <Settings />,
+    },
   ],
   angler: [
     {
@@ -76,8 +81,10 @@ const PAGE_TITLES: Record<string, string> = {
   "/landowner/properties/new": "Add Property",
   "/landowner/bookings": "Bookings",
   "/club": "Club Management",
+  "/club/setup": "Set Up Your Club",
   "/club/members": "Members",
   "/club/properties": "Properties",
+  "/club/settings": "Club Settings",
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/discover": "Discover",
