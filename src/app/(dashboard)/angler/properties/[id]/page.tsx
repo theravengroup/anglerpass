@@ -27,7 +27,10 @@ import {
   ScrollText,
   Send,
 } from "lucide-react";
-import { calculateBookingFees } from "@/lib/validations/bookings";
+import {
+  calculateFeeBreakdown,
+  ROD_NOMENCLATURE,
+} from "@/lib/constants/fees";
 
 interface PropertyDetail {
   id: string;
@@ -108,11 +111,13 @@ export default function PropertyDetailPage() {
     load();
   }, [id]);
 
-  const baseRate =
+  // TODO: detect cross-club when Cross-Club Network routing is complete
+  const isCrossClub = false;
+  const ratePerRod =
     duration === "full_day"
-      ? (property?.rate_adult_full_day ?? 0) * partySize
-      : (property?.rate_adult_half_day ?? 0) * partySize;
-  const fees = calculateBookingFees(baseRate);
+      ? (property?.rate_adult_full_day ?? 0)
+      : (property?.rate_adult_half_day ?? 0);
+  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub);
 
   async function handleBooking() {
     if (!property || !selectedMembership || !bookingDate) return;
@@ -363,10 +368,13 @@ export default function PropertyDetailPage() {
                       ${property.rate_adult_full_day}
                     </span>
                     <span className="text-sm text-text-light">
-                      / person / day
+                      / rod / day
                     </span>
                   </div>
                 )}
+                <p className="text-[11px] text-text-light">
+                  {ROD_NOMENCLATURE}
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Date */}
@@ -522,17 +530,32 @@ export default function PropertyDetailPage() {
                   <div className="space-y-1.5 rounded-lg bg-offwhite/80 p-3 text-sm">
                     <div className="flex justify-between text-text-secondary">
                       <span>
-                        ${duration === "full_day"
-                          ? property.rate_adult_full_day
-                          : property.rate_adult_half_day}{" "}
-                        x {partySize} angler{partySize > 1 ? "s" : ""}
+                        ${ratePerRod} x {partySize} rod
+                        {partySize > 1 ? "s" : ""}
                       </span>
                       <span>${fees.baseRate.toFixed(2)}</span>
                     </div>
+                    {fees.crossClubFee > 0 && (
+                      <div className="flex justify-between text-text-secondary">
+                        <span>
+                          Cross-club fee ($10 x {partySize} rod
+                          {partySize > 1 ? "s" : ""})
+                        </span>
+                        <span>${fees.crossClubFee.toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-text-light">
                       <span>Platform fee (5%)</span>
                       <span>${fees.platformFee.toFixed(2)}</span>
                     </div>
+                    {nonFishingGuests > 0 && (
+                      <div className="flex justify-between text-text-light">
+                        <span>
+                          Non-fishing guests ({nonFishingGuests})
+                        </span>
+                        <span className="text-forest">No charge</span>
+                      </div>
+                    )}
                     <div className="flex justify-between border-t border-stone-light/20 pt-1.5 font-medium text-text-primary">
                       <span>Total</span>
                       <span>${fees.totalAmount.toFixed(2)}</span>

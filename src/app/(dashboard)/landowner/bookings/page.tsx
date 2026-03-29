@@ -22,7 +22,11 @@ interface LandownerBooking {
   non_fishing_guests: number;
   base_rate: number;
   platform_fee: number;
+  cross_club_fee: number;
+  club_commission: number;
+  landowner_payout: number;
   total_amount: number;
+  is_cross_club: boolean;
   status: string;
   message: string | null;
   landowner_notes: string | null;
@@ -193,7 +197,7 @@ export default function LandownerBookingsPage() {
                             : "Half Day"}
                         </span>
                         <span>
-                          {booking.party_size} angler
+                          {booking.party_size} rod
                           {booking.party_size > 1 ? "s" : ""}
                         </span>
                         {booking.non_fishing_guests > 0 && (
@@ -203,7 +207,7 @@ export default function LandownerBookingsPage() {
                           </span>
                         )}
                         <span className="font-medium">
-                          ${booking.base_rate} (you receive)
+                          ${booking.landowner_payout || booking.base_rate} (you receive)
                         </span>
                       </div>
                     </div>
@@ -328,7 +332,7 @@ function BookingRow({ booking }: { booking: LandownerBooking }) {
                   {booking.non_fishing_guests > 1 ? "s" : ""}
                 </span>
               )}
-              <span>${booking.base_rate}</span>
+              <span>${booking.landowner_payout || booking.base_rate}</span>
             </div>
           </div>
         </div>

@@ -125,13 +125,8 @@ export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin"] as con
 export type UserRole = (typeof VALID_ROLES)[number];
 
 // ─── Staff Discount Rates ────────────────────────────────────────────
-// Platform-wide constants applied during Stripe checkout.
-
-/** Staff get 50% off rod fees at their own club's properties. */
-export const STAFF_DISCOUNT_OWN_CLUB = 50;
-
-/** Staff get 25% off rod fees at cross-club network properties. */
-export const STAFF_DISCOUNT_CROSS_CLUB = 25;
+// Re-exported for backward compatibility. Canonical source: @/lib/constants/fees
+export { STAFF_DISCOUNT_OWN_CLUB, STAFF_DISCOUNT_CROSS_CLUB } from "@/lib/constants/fees";
 
 // ─── Period Options (analytics dashboards) ──────────────────────────
 

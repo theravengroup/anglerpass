@@ -25,7 +25,9 @@ interface Booking {
   non_fishing_guests: number;
   base_rate: number;
   platform_fee: number;
+  cross_club_fee: number;
   total_amount: number;
+  is_cross_club: boolean;
   status: string;
   message: string | null;
   landowner_notes: string | null;
@@ -430,9 +432,12 @@ function BookingCard({
             <span>
               {booking.duration === "full_day" ? "Full Day" : "Half Day"}
             </span>
-            <span>{booking.party_size} angler{booking.party_size > 1 ? "s" : ""}</span>
+            <span>{booking.party_size} rod{booking.party_size > 1 ? "s" : ""}</span>
             {booking.non_fishing_guests > 0 && (
               <span>+{booking.non_fishing_guests} guest{booking.non_fishing_guests > 1 ? "s" : ""}</span>
+            )}
+            {booking.is_cross_club && (
+              <span className="text-bronze">Cross-Club</span>
             )}
             {property?.water_type && (
               <span className="flex items-center gap-1">

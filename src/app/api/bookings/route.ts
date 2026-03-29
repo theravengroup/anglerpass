@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import {
-  bookingSchema,
-  calculateBookingFees,
-} from "@/lib/validations/bookings";
+import { bookingSchema } from "@/lib/validations/bookings";
+import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import { notifyBookingRequested } from "@/lib/notifications";
 
 // POST: Create a booking request
@@ -206,15 +204,22 @@ export async function POST(request: Request) {
       }
     }
 
-    // Calculate fees
-    const baseRate =
+    // Determine if this is a cross-club booking.
+    // A booking is cross-club when the angler's home club does NOT have
+    // direct club_property_access — they access through the Cross-Club Network.
+    // Currently all bookings go through direct access; cross-club routing
+    // will set this flag when the Cross-Club Network feature is complete.
+    const isCrossClub = false; // TODO: detect via Cross-Club Network routing
+
+    // Calculate full fee breakdown
+    const ratePerRod =
       duration === "full_day"
-        ? (property.rate_adult_full_day ?? 0) * party_size
-        : (property.rate_adult_half_day ?? 0) * party_size;
+        ? (property.rate_adult_full_day ?? 0)
+        : (property.rate_adult_half_day ?? 0);
 
-    const { platformFee, totalAmount } = calculateBookingFees(baseRate);
+    const fees = calculateFeeBreakdown(ratePerRod, party_size, isCrossClub);
 
-    // Create the booking
+    // Create the booking with full fee breakdown
     const { data: booking, error: insertError } = await admin
       .from("bookings")
       .insert({
@@ -225,9 +230,13 @@ export async function POST(request: Request) {
         duration,
         party_size,
         non_fishing_guests,
-        base_rate: baseRate,
-        platform_fee: platformFee,
-        total_amount: totalAmount,
+        base_rate: fees.baseRate,
+        platform_fee: fees.platformFee,
+        cross_club_fee: fees.crossClubFee,
+        club_commission: fees.clubCommission,
+        landowner_payout: fees.landownerPayout,
+        total_amount: fees.totalAmount,
+        is_cross_club: isCrossClub,
         message: message || null,
         status: "pending",
       })

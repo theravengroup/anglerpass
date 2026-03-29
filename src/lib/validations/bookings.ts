@@ -10,6 +10,7 @@ export const BOOKING_STATUSES = [
 
 export const DURATIONS = ["full_day", "half_day"] as const;
 
+/** @deprecated Use PLATFORM_FEE_RATE from @/lib/constants/fees instead */
 export const PLATFORM_FEE_RATE = 0.05; // 5%
 
 // ─── Create Booking ────────────────────────────────────────────────
@@ -39,8 +40,9 @@ export const bookingCancelSchema = z.object({
 });
 
 // ─── Calculate fees ────────────────────────────────────────────────
-export function calculateBookingFees(baseRate: number) {
+/** @deprecated Use calculateFeeBreakdown from @/lib/constants/fees for full breakdown */
+export function calculateBookingFees(baseRate: number, crossClubFee: number = 0) {
   const platformFee = Math.round(baseRate * PLATFORM_FEE_RATE * 100) / 100;
-  const totalAmount = Math.round((baseRate + platformFee) * 100) / 100;
-  return { baseRate, platformFee, totalAmount };
+  const totalAmount = Math.round((baseRate + platformFee + crossClubFee) * 100) / 100;
+  return { baseRate, platformFee, crossClubFee, totalAmount };
 }
