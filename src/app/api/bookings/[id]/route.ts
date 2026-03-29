@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { bookingStatusSchema } from "@/lib/validations/bookings";
+import {
+  notifyBookingConfirmed,
+  notifyBookingDeclined,
+  notifyBookingCancelled,
+} from "@/lib/notifications";
 
 // GET: Fetch a single booking
 export async function GET(
@@ -93,7 +98,9 @@ export async function PATCH(
     // Fetch the booking
     const { data: booking } = await admin
       .from("bookings")
-      .select("id, status, angler_id, property_id, properties(owner_id)")
+      .select(
+        "id, status, angler_id, property_id, booking_date, properties(owner_id, name), profiles!bookings_angler_id_fkey(display_name)"
+      )
       .eq("id", id)
       .single();
 
@@ -105,7 +112,13 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const property = booking.properties as { owner_id: string } | null;
+    const property = booking.properties as {
+      owner_id: string;
+      name: string;
+    } | null;
+    const anglerProfile = booking.profiles as {
+      display_name: string | null;
+    } | null;
 
     // Angler cancellation
     if (body.status === "cancelled") {
@@ -136,6 +149,20 @@ export async function PATCH(
         return NextResponse.json(
           { error: "Failed to cancel booking" },
           { status: 500 }
+        );
+      }
+
+      // Notify landowner of cancellation
+      if (property) {
+        notifyBookingCancelled(admin, {
+          landownerId: property.owner_id,
+          anglerName:
+            anglerProfile?.display_name ?? "An angler",
+          propertyName: property.name,
+          bookingDate: booking.booking_date,
+          bookingId: booking.id,
+        }).catch((err) =>
+          console.error("[bookings/[id]] Notification error:", err)
         );
       }
 
@@ -188,6 +215,30 @@ export async function PATCH(
       return NextResponse.json(
         { error: "Failed to update booking" },
         { status: 500 }
+      );
+    }
+
+    // Notify angler of confirm/decline
+    const propertyName = property?.name ?? "the property";
+    if (result.data.status === "confirmed") {
+      notifyBookingConfirmed(admin, {
+        anglerId: booking.angler_id,
+        propertyName,
+        bookingDate: booking.booking_date,
+        bookingId: booking.id,
+        landownerNotes: result.data.landowner_notes,
+      }).catch((err) =>
+        console.error("[bookings/[id]] Notification error:", err)
+      );
+    } else if (result.data.status === "declined") {
+      notifyBookingDeclined(admin, {
+        anglerId: booking.angler_id,
+        propertyName,
+        bookingDate: booking.booking_date,
+        bookingId: booking.id,
+        landownerNotes: result.data.landowner_notes,
+      }).catch((err) =>
+        console.error("[bookings/[id]] Notification error:", err)
       );
     }
 

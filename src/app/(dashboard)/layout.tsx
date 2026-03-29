@@ -4,7 +4,7 @@ import {
   MapPin,
   Users,
   CalendarDays,
-  Mail,
+  Bell,
   Settings,
   Compass,
 } from "lucide-react";
@@ -19,9 +19,9 @@ const SHARED_ITEMS: SidebarItem[] = [
     icon: <LayoutDashboard />,
   },
   {
-    label: "Messages",
-    href: "/dashboard/messages",
-    icon: <Mail />,
+    label: "Notifications",
+    href: "/dashboard/notifications",
+    icon: <Bell />,
   },
   {
     label: "Settings",
@@ -88,7 +88,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/discover": "Discover",
-  "/dashboard/messages": "Messages",
+  "/dashboard/notifications": "Notifications",
   "/dashboard/settings": "Settings",
 };
 

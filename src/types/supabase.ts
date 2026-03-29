@@ -542,6 +542,100 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body: string;
+          link: string | null;
+          read: boolean;
+          metadata: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body: string;
+          link?: string | null;
+          read?: boolean;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: string;
+          title?: string;
+          body?: string;
+          link?: string | null;
+          read?: boolean;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      notification_preferences: {
+        Row: {
+          id: string;
+          user_id: string;
+          email_booking_requested: boolean;
+          email_booking_confirmed: boolean;
+          email_booking_declined: boolean;
+          email_booking_cancelled: boolean;
+          email_member_invited: boolean;
+          email_member_approved: boolean;
+          email_property_access: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          email_booking_requested?: boolean;
+          email_booking_confirmed?: boolean;
+          email_booking_declined?: boolean;
+          email_booking_cancelled?: boolean;
+          email_member_invited?: boolean;
+          email_member_approved?: boolean;
+          email_property_access?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          email_booking_requested?: boolean;
+          email_booking_confirmed?: boolean;
+          email_booking_declined?: boolean;
+          email_booking_cancelled?: boolean;
+          email_member_invited?: boolean;
+          email_member_approved?: boolean;
+          email_property_access?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       calendar_tokens: {
         Row: {
           id: string;

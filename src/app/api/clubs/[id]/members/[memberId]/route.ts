@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
+import { notifyMemberApproved } from "@/lib/notifications";
 
 // PATCH: Update member status (approve, decline, deactivate)
 export async function PATCH(
@@ -24,7 +25,7 @@ export async function PATCH(
     // Verify user is club owner
     const { data: club } = await admin
       .from("clubs")
-      .select("owner_id")
+      .select("owner_id, name")
       .eq("id", id)
       .single();
 
@@ -35,7 +36,7 @@ export async function PATCH(
     // Verify the membership belongs to this club
     const { data: membership } = await admin
       .from("club_memberships")
-      .select("id, status, role")
+      .select("id, user_id, status, role")
       .eq("id", memberId)
       .eq("club_id", id)
       .single();
@@ -87,6 +88,21 @@ export async function PATCH(
       return NextResponse.json(
         { error: "Failed to update membership" },
         { status: 500 }
+      );
+    }
+
+    // Notify member if approved
+    if (
+      result.data.status === "active" &&
+      membership.status === "pending" &&
+      membership.user_id
+    ) {
+      notifyMemberApproved(admin, {
+        userId: membership.user_id,
+        clubName: club.name,
+        clubId: id,
+      }).catch((err) =>
+        console.error("[clubs/members] Notification error:", err)
       );
     }
 

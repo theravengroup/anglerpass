@@ -5,6 +5,7 @@ import {
   bookingSchema,
   calculateBookingFees,
 } from "@/lib/validations/bookings";
+import { notifyBookingRequested } from "@/lib/notifications";
 
 // POST: Create a booking request
 export async function POST(request: Request) {
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     const { data: property, error: propError } = await admin
       .from("properties")
       .select(
-        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity"
+        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity, owner_id"
       )
       .eq("id", property_id)
       .single();
@@ -186,6 +187,23 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Notify landowner (fire-and-forget)
+    const { data: anglerProfile } = await admin
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .single();
+
+    notifyBookingRequested(admin, {
+      landownerId: property.owner_id,
+      anglerName: anglerProfile?.display_name ?? "An angler",
+      propertyName: property.name,
+      bookingDate: booking_date,
+      duration,
+      partySize: party_size,
+      bookingId: booking.id,
+    }).catch((err) => console.error("[bookings] Notification error:", err));
 
     return NextResponse.json({ booking }, { status: 201 });
   } catch (err) {

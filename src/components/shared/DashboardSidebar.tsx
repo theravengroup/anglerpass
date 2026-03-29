@@ -12,6 +12,7 @@ import {
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/lib/auth/get-profile";
+import { useUnreadCount } from "@/hooks/use-unread-count";
 
 const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
@@ -44,6 +45,7 @@ export default function DashboardSidebar({
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { count: unreadCount } = useUnreadCount();
 
   return (
     <>
@@ -89,6 +91,12 @@ export default function DashboardSidebar({
                 item.href !== "/admin" &&
                 pathname.startsWith(item.href));
 
+            // Inject unread count for notifications
+            const badge =
+              item.href === "/dashboard/notifications" && unreadCount > 0
+                ? String(unreadCount)
+                : item.badge;
+
             return (
               <Link
                 key={item.href}
@@ -101,15 +109,20 @@ export default function DashboardSidebar({
                 )}
                 title={collapsed ? item.label : undefined}
               >
-                <span className="shrink-0 [&>svg]:size-[18px]">
+                <span className="relative shrink-0 [&>svg]:size-[18px]">
                   {item.icon}
+                  {collapsed && badge && (
+                    <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-bronze text-[9px] font-bold text-white">
+                      {parseInt(badge) > 9 ? "9+" : badge}
+                    </span>
+                  )}
                 </span>
                 {!collapsed && (
                   <span className="truncate">{item.label}</span>
                 )}
-                {!collapsed && item.badge && (
+                {!collapsed && badge && (
                   <span className="ml-auto rounded-full bg-bronze/20 px-2 py-0.5 text-[11px] font-medium text-bronze-light">
-                    {item.badge}
+                    {badge}
                   </span>
                 )}
               </Link>
