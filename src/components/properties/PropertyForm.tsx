@@ -89,11 +89,25 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
     const pid = savedPropertyId ?? initialData?.id;
     if (!pid) return;
     try {
-      const res = await fetch(`/api/clubs/invite?property_id=${pid}`);
-      if (res.ok) {
-        const data = await res.json();
-        setHasClubInvitation((data.invitations ?? []).length > 0);
+      // Check both invitations and actual club associations
+      const [invRes, assocRes] = await Promise.all([
+        fetch(`/api/clubs/invite?property_id=${pid}`),
+        fetch(`/api/properties/${pid}/clubs`),
+      ]);
+
+      let hasLink = false;
+
+      if (invRes.ok) {
+        const data = await invRes.json();
+        if ((data.invitations ?? []).length > 0) hasLink = true;
       }
+
+      if (assocRes.ok) {
+        const data = await assocRes.json();
+        if ((data.associations ?? []).length > 0) hasLink = true;
+      }
+
+      setHasClubInvitation(hasLink);
     } catch {
       // Silent fail
     }

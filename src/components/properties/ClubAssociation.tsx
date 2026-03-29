@@ -5,7 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Send, CheckCircle2, Clock, Users, Mail } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  CheckCircle2,
+  Clock,
+  Users,
+  Mail,
+  XCircle,
+  Building2,
+} from "lucide-react";
 
 interface Invitation {
   id: string;
@@ -13,6 +22,18 @@ interface Invitation {
   admin_email: string;
   status: string;
   created_at: string;
+}
+
+interface ClubAccess {
+  id: string;
+  status: string;
+  approved_at: string | null;
+  created_at: string;
+  clubs: {
+    id: string;
+    name: string;
+    location: string | null;
+  } | null;
 }
 
 interface ClubAssociationProps {
@@ -32,18 +53,27 @@ export default function ClubAssociation({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [associations, setAssociations] = useState<ClubAccess[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchInvitations = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!propertyId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/clubs/invite?property_id=${propertyId}`
-      );
-      if (res.ok) {
-        const data = await res.json();
+      // Fetch both invitations and club associations in parallel
+      const [invRes, assocRes] = await Promise.all([
+        fetch(`/api/clubs/invite?property_id=${propertyId}`),
+        fetch(`/api/properties/${propertyId}/clubs`),
+      ]);
+
+      if (invRes.ok) {
+        const data = await invRes.json();
         setInvitations(data.invitations ?? []);
+      }
+
+      if (assocRes.ok) {
+        const data = await assocRes.json();
+        setAssociations(data.associations ?? []);
       }
     } catch {
       // Silent fail on fetch
@@ -53,8 +83,8 @@ export default function ClubAssociation({
   }, [propertyId]);
 
   useEffect(() => {
-    fetchInvitations();
-  }, [fetchInvitations]);
+    fetchData();
+  }, [fetchData]);
 
   async function handleSendInvite() {
     setError(null);
@@ -110,7 +140,7 @@ export default function ClubAssociation({
       setAdminEmail("");
       onInvitationSent?.();
 
-      // Refresh the invitations list
+      // Refresh data
       if (pid) {
         const listRes = await fetch(
           `/api/clubs/invite?property_id=${pid}`
@@ -127,19 +157,47 @@ export default function ClubAssociation({
     }
   }
 
-  const STATUS_CONFIG: Record<
+  const INVITATION_STATUS: Record<
     string,
     { label: string; icon: typeof CheckCircle2; color: string }
   > = {
     sent: { label: "Invitation Sent", icon: Clock, color: "text-bronze" },
     accepted: {
-      label: "Accepted",
+      label: "Club Created",
       icon: CheckCircle2,
       color: "text-forest",
     },
-    declined: { label: "Declined", icon: Mail, color: "text-red-500" },
+    declined: { label: "Declined", icon: XCircle, color: "text-red-500" },
     expired: { label: "Expired", icon: Clock, color: "text-text-light" },
   };
+
+  const ACCESS_STATUS: Record<
+    string,
+    { label: string; icon: typeof CheckCircle2; color: string }
+  > = {
+    pending: {
+      label: "Pending Club Approval",
+      icon: Clock,
+      color: "text-bronze",
+    },
+    approved: {
+      label: "Associated",
+      icon: CheckCircle2,
+      color: "text-forest",
+    },
+    declined: { label: "Declined", icon: XCircle, color: "text-red-500" },
+  };
+
+  // Filter invitations to only show those NOT yet linked to a club association
+  // (accepted invitations will have a corresponding club_property_access record)
+  const associatedClubIds = new Set(
+    associations.map((a) => a.clubs?.id).filter(Boolean)
+  );
+  const pendingInvitations = invitations.filter(
+    (inv) => inv.status === "sent" || inv.status === "expired"
+  );
+  const hasAssociationsOrInvitations =
+    associations.length > 0 || invitations.length > 0;
 
   return (
     <Card className="border-stone-light/20">
@@ -161,28 +219,34 @@ export default function ClubAssociation({
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        {/* Existing invitations */}
-        {invitations.length > 0 && (
+        {/* Active club associations */}
+        {associations.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-text-primary">
-              Club Invitations
+              Associated Clubs
             </p>
             <div className="space-y-2">
-              {invitations.map((inv) => {
-                const config = STATUS_CONFIG[inv.status] ?? STATUS_CONFIG.sent;
+              {associations.map((assoc) => {
+                const config =
+                  ACCESS_STATUS[assoc.status] ?? ACCESS_STATUS.pending;
                 const Icon = config.icon;
                 return (
                   <div
-                    key={inv.id}
+                    key={assoc.id}
                     className="flex items-center justify-between rounded-lg border border-stone-light/20 bg-offwhite/50 px-4 py-3"
                   >
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">
-                        {inv.club_name}
-                      </p>
-                      <p className="text-xs text-text-light">
-                        {inv.admin_email}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <Building2 className="size-4 text-river" />
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">
+                          {assoc.clubs?.name ?? "Unknown Club"}
+                        </p>
+                        {assoc.clubs?.location && (
+                          <p className="text-xs text-text-light">
+                            {assoc.clubs.location}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div
                       className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}
@@ -197,17 +261,59 @@ export default function ClubAssociation({
           </div>
         )}
 
-        {loading && invitations.length === 0 && (
+        {/* Pending invitations (not yet accepted) */}
+        {pendingInvitations.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-text-primary">
+              Pending Invitations
+            </p>
+            <div className="space-y-2">
+              {pendingInvitations.map((inv) => {
+                const config =
+                  INVITATION_STATUS[inv.status] ?? INVITATION_STATUS.sent;
+                const Icon = config.icon;
+                return (
+                  <div
+                    key={inv.id}
+                    className="flex items-center justify-between rounded-lg border border-dashed border-stone-light/30 bg-parchment/20 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Mail className="size-4 text-text-light" />
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">
+                          {inv.club_name}
+                        </p>
+                        <p className="text-xs text-text-light">
+                          {inv.admin_email}
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}
+                    >
+                      <Icon className="size-3.5" />
+                      {config.label}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {loading && !hasAssociationsOrInvitations && (
           <div className="flex items-center gap-2 text-sm text-text-light">
             <Loader2 className="size-4 animate-spin" />
-            Loading invitations...
+            Loading club associations...
           </div>
         )}
 
         {/* Invite form */}
         <div className="space-y-4 rounded-lg border border-dashed border-stone-light/30 bg-parchment/30 p-4">
           <p className="text-sm font-medium text-text-primary">
-            {invitations.length > 0 ? "Invite Another Club" : "Invite Your Club"}
+            {hasAssociationsOrInvitations
+              ? "Invite Another Club"
+              : "Invite Your Club"}
           </p>
           <p className="text-xs text-text-light">
             Enter your club&apos;s name and the club administrator&apos;s email.
@@ -239,9 +345,7 @@ export default function ClubAssociation({
             </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           {success && (
             <div className="flex items-start gap-2 rounded-md border border-forest/20 bg-forest/5 px-3 py-2.5">
