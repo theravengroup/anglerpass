@@ -49,6 +49,8 @@ export default async function PropertiesPage() {
     water_type: string | null;
     species: string[];
     capacity: number | null;
+    max_rods: number | null;
+    max_guests: number | null;
     updated_at: string;
   }[] = [];
 
@@ -56,7 +58,7 @@ export default async function PropertiesPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase as any)
       .from("properties")
-      .select("id, name, status, location_description, water_type, species, capacity, updated_at")
+      .select("id, name, status, location_description, water_type, species, capacity, max_rods, max_guests, updated_at")
       .eq("owner_id", user.id)
       .order("updated_at", { ascending: false });
 
@@ -140,9 +142,14 @@ export default async function PropertiesPage() {
                             {property.water_type.replace("_", " ")}
                           </span>
                         )}
-                        {property.capacity && (
+                        {(property.max_rods ?? property.capacity) && (
                           <span>
-                            {property.capacity} angler{property.capacity !== 1 ? "s" : ""}
+                            {property.max_rods ?? property.capacity} rod{(property.max_rods ?? property.capacity) !== 1 ? "s" : ""}
+                          </span>
+                        )}
+                        {property.max_guests && (
+                          <span>
+                            {property.max_guests} max people
                           </span>
                         )}
                       </div>

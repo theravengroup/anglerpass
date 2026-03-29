@@ -35,19 +35,35 @@ export async function POST(request: Request) {
       booking_date,
       duration,
       party_size,
+      non_fishing_guests,
       message,
     } = result.data;
 
     const admin = createAdminClient();
 
     // Verify the property is published
-    const { data: property, error: propError } = await admin
+    // max_rods / max_guests are new columns not yet in generated types
+    const { data: property, error: propError } = (await admin
       .from("properties")
       .select(
-        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity, owner_id"
+        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity, max_rods, max_guests, owner_id"
       )
       .eq("id", property_id)
-      .single();
+      .single()) as unknown as {
+      data: {
+        id: string;
+        name: string;
+        status: string;
+        half_day_allowed: boolean;
+        rate_adult_full_day: number | null;
+        rate_adult_half_day: number | null;
+        capacity: number | null;
+        max_rods: number | null;
+        max_guests: number | null;
+        owner_id: string;
+      } | null;
+      error: { message: string } | null;
+    };
 
     if (propError || !property) {
       return NextResponse.json(
@@ -123,20 +139,67 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check capacity (existing confirmed/pending bookings for that date)
-    if (property.capacity) {
-      const { count } = await admin
+    // Check rod limit (max_rods) and total guest limit (max_guests)
+    const maxRods = property.max_rods ?? property.capacity;
+    const maxGuests = property.max_guests ?? property.capacity;
+
+    // Validate party_size against max_rods
+    if (maxRods && party_size > maxRods) {
+      return NextResponse.json(
+        {
+          error: `This property allows a maximum of ${maxRods} anglers (rods). You requested ${party_size}.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate total people against max_guests
+    const totalPeople = party_size + non_fishing_guests;
+    if (maxGuests && totalPeople > maxGuests) {
+      return NextResponse.json(
+        {
+          error: `This property allows a maximum of ${maxGuests} total people. Your party of ${totalPeople} (${party_size} anglers + ${non_fishing_guests} non-fishing guests) exceeds this limit.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check existing bookings don't exceed capacity for the date
+    if (maxRods || maxGuests) {
+      // non_fishing_guests is a new column not yet in generated types
+      const { data: existingBookings } = (await admin
         .from("bookings")
-        .select("id", { count: "exact", head: true })
+        .select("party_size, non_fishing_guests")
         .eq("property_id", property_id)
         .eq("booking_date", booking_date)
-        .in("status", ["pending", "confirmed"]);
+        .in("status", ["pending", "confirmed"])) as unknown as {
+        data: { party_size: number; non_fishing_guests: number }[] | null;
+      };
 
-      if ((count ?? 0) + party_size > property.capacity) {
+      const existingRods = (existingBookings ?? []).reduce(
+        (sum, b) => sum + (b.party_size ?? 0),
+        0
+      );
+      const existingTotal = (existingBookings ?? []).reduce(
+        (sum, b) => sum + (b.party_size ?? 0) + (b.non_fishing_guests ?? 0),
+        0
+      );
+
+      if (maxRods && existingRods + party_size > maxRods) {
         return NextResponse.json(
           {
             error:
-              "This property has reached capacity for the selected date",
+              "This property has reached its rod limit for the selected date.",
+          },
+          { status: 409 }
+        );
+      }
+
+      if (maxGuests && existingTotal + totalPeople > maxGuests) {
+        return NextResponse.json(
+          {
+            error:
+              "This property has reached its guest capacity for the selected date.",
           },
           { status: 409 }
         );
@@ -161,6 +224,7 @@ export async function POST(request: Request) {
         booking_date,
         duration,
         party_size,
+        non_fishing_guests,
         base_rate: baseRate,
         platform_fee: platformFee,
         total_amount: totalAmount,

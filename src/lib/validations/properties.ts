@@ -69,8 +69,22 @@ export const propertySchema = z
     species: z.array(z.string()).default([]),
     water_miles: z.number().min(0).optional().nullable(),
 
-    // Capacity
-    capacity: z.number().int().min(1, "Must allow at least 1 angler").optional().nullable(),
+    // Capacity — legacy field kept for migration compatibility
+    capacity: z.number().int().min(1).optional().nullable(),
+
+    // Guest capacity — the new required fields
+    max_rods: z
+      .number()
+      .int()
+      .min(1, "Must allow at least 1 rod")
+      .optional()
+      .nullable(),
+    max_guests: z
+      .number()
+      .int()
+      .min(1, "Must allow at least 1 person")
+      .optional()
+      .nullable(),
 
     // Regulations
     regulations: z.string().max(5000).optional().or(z.literal("")),
@@ -106,6 +120,18 @@ export const propertySchema = z
     {
       message: "Half-day rates are required when half-day bookings are allowed",
       path: ["rate_adult_half_day"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.max_rods != null && data.max_guests != null) {
+        return data.max_rods <= data.max_guests;
+      }
+      return true;
+    },
+    {
+      message: "Max rods cannot exceed max guests (total people on property)",
+      path: ["max_rods"],
     }
   );
 

@@ -69,6 +69,8 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       species: [],
       water_miles: null,
       capacity: null,
+      max_rods: null,
+      max_guests: null,
       regulations: "",
       photos: [],
       rate_adult_full_day: null,
@@ -213,9 +215,14 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       return;
     }
 
-    // Validate capacity
-    if (data.capacity == null) {
-      setError("Capacity is required to submit for review.");
+    // Validate guest capacity
+    if (data.max_rods == null || data.max_guests == null) {
+      setError("Both Max Rods and Max Guests are required to submit for review.");
+      return;
+    }
+
+    if (data.max_rods > data.max_guests) {
+      setError("Max Rods cannot exceed Max Guests (total people on property).");
       return;
     }
 
@@ -339,19 +346,54 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="capacity">Capacity (Maximum Simultaneous Anglers)</Label>
-            <Input
-              id="capacity"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="e.g. 4"
-              {...register("capacity", { valueAsNumber: true })}
-            />
-            {errors.capacity && (
-              <p className="text-sm text-red-600">{errors.capacity.message}</p>
-            )}
+          {/* Guest Capacity */}
+          <div className="space-y-4 rounded-lg border border-stone-light/20 bg-offwhite/30 p-4">
+            <div>
+              <p className="text-sm font-medium text-text-primary">
+                Guest Capacity
+              </p>
+              <p className="mt-0.5 text-xs text-text-light">
+                Set limits for how many anglers (rods) and total people can be on
+                your property per day. Non-fishing guests (e.g. family members)
+                are not charged a rod fee but count toward the total.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="max_rods">Max Rods (Anglers) *</Label>
+                <Input
+                  id="max_rods"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 4"
+                  {...register("max_rods", { valueAsNumber: true })}
+                />
+                {errors.max_rods && (
+                  <p className="text-sm text-red-600">{errors.max_rods.message}</p>
+                )}
+                <p className="text-xs text-text-light">
+                  Maximum anglers fishing at the same time.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="max_guests">Max Total People *</Label>
+                <Input
+                  id="max_guests"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 10"
+                  {...register("max_guests", { valueAsNumber: true })}
+                />
+                {errors.max_guests && (
+                  <p className="text-sm text-red-600">{errors.max_guests.message}</p>
+                )}
+                <p className="text-xs text-text-light">
+                  Total people on property (anglers + non-fishing guests).
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

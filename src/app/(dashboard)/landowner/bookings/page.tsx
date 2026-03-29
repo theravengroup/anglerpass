@@ -19,6 +19,7 @@ interface LandownerBooking {
   booking_date: string;
   duration: string;
   party_size: number;
+  non_fishing_guests: number;
   base_rate: number;
   platform_fee: number;
   total_amount: number;
@@ -195,6 +196,12 @@ export default function LandownerBookingsPage() {
                           {booking.party_size} angler
                           {booking.party_size > 1 ? "s" : ""}
                         </span>
+                        {booking.non_fishing_guests > 0 && (
+                          <span>
+                            +{booking.non_fishing_guests} non-fishing guest
+                            {booking.non_fishing_guests > 1 ? "s" : ""}
+                          </span>
+                        )}
                         <span className="font-medium">
                           ${booking.base_rate} (you receive)
                         </span>
@@ -315,6 +322,12 @@ function BookingRow({ booking }: { booking: LandownerBooking }) {
                 {booking.party_size} angler
                 {booking.party_size > 1 ? "s" : ""}
               </span>
+              {booking.non_fishing_guests > 0 && (
+                <span>
+                  +{booking.non_fishing_guests} guest
+                  {booking.non_fishing_guests > 1 ? "s" : ""}
+                </span>
+              )}
               <span>${booking.base_rate}</span>
             </div>
           </div>

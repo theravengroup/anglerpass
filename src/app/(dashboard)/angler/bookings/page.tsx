@@ -22,6 +22,7 @@ interface Booking {
   booking_date: string;
   duration: string;
   party_size: number;
+  non_fishing_guests: number;
   base_rate: number;
   platform_fee: number;
   total_amount: number;
@@ -430,6 +431,9 @@ function BookingCard({
               {booking.duration === "full_day" ? "Full Day" : "Half Day"}
             </span>
             <span>{booking.party_size} angler{booking.party_size > 1 ? "s" : ""}</span>
+            {booking.non_fishing_guests > 0 && (
+              <span>+{booking.non_fishing_guests} guest{booking.non_fishing_guests > 1 ? "s" : ""}</span>
+            )}
             {property?.water_type && (
               <span className="flex items-center gap-1">
                 <Droplets className="size-3" />

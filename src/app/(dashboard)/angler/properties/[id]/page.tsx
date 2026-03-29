@@ -38,6 +38,8 @@ interface PropertyDetail {
   species: string[];
   photos: string[];
   capacity: number | null;
+  max_rods: number | null;
+  max_guests: number | null;
   rate_adult_full_day: number | null;
   rate_adult_half_day: number | null;
   half_day_allowed: boolean;
@@ -71,6 +73,7 @@ export default function PropertyDetailPage() {
   const [bookingDate, setBookingDate] = useState("");
   const [duration, setDuration] = useState("full_day");
   const [partySize, setPartySize] = useState(1);
+  const [nonFishingGuests, setNonFishingGuests] = useState(0);
   const [selectedMembership, setSelectedMembership] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -127,6 +130,7 @@ export default function PropertyDetailPage() {
           booking_date: bookingDate,
           duration,
           party_size: partySize,
+          non_fishing_guests: nonFishingGuests,
           message: message || undefined,
         }),
       });
@@ -255,10 +259,15 @@ export default function PropertyDetailPage() {
                 {property.water_miles} miles of water
               </div>
             )}
-            {property.capacity && (
+            {(property.max_rods ?? property.capacity) && (
               <div className="flex items-center gap-1.5 rounded-full bg-bronze/10 px-3 py-1.5 text-xs font-medium text-bronze">
                 <Users className="size-3.5" />
-                Max {property.capacity} anglers/day
+                Max {property.max_rods ?? property.capacity} rods/day
+              </div>
+            )}
+            {property.max_guests && (
+              <div className="flex items-center gap-1.5 rounded-full bg-stone/10 px-3 py-1.5 text-xs font-medium text-text-secondary">
+                Max {property.max_guests} people/day
               </div>
             )}
           </div>
@@ -393,21 +402,78 @@ export default function PropertyDetailPage() {
                   </div>
                 )}
 
-                {/* Party size */}
+                {/* Anglers (rods) */}
                 <div className="space-y-2">
-                  <Label htmlFor="party_size">Party Size</Label>
+                  <Label htmlFor="party_size">
+                    Anglers (Rods)
+                    {(property.max_rods ?? property.capacity) && (
+                      <span className="ml-1 font-normal text-text-light">
+                        max {property.max_rods ?? property.capacity}
+                      </span>
+                    )}
+                  </Label>
                   <Input
                     id="party_size"
                     type="number"
                     min={1}
-                    max={property.capacity ?? 20}
+                    max={property.max_rods ?? property.capacity ?? 20}
                     value={partySize}
                     onChange={(e) =>
                       setPartySize(parseInt(e.target.value) || 1)
                     }
                     disabled={submitting}
                   />
+                  <p className="text-xs text-text-light">
+                    Only you (the booking member) need to be a club member.
+                    Your fishing companions do not need memberships.
+                  </p>
                 </div>
+
+                {/* Non-fishing guests */}
+                <div className="space-y-2">
+                  <Label htmlFor="non_fishing_guests">
+                    Non-Fishing Guests
+                    <span className="ml-1 font-normal text-text-light">
+                      (no rod fee)
+                    </span>
+                  </Label>
+                  <Input
+                    id="non_fishing_guests"
+                    type="number"
+                    min={0}
+                    max={
+                      property.max_guests
+                        ? Math.max(0, property.max_guests - partySize)
+                        : 50
+                    }
+                    value={nonFishingGuests}
+                    onChange={(e) =>
+                      setNonFishingGuests(parseInt(e.target.value) || 0)
+                    }
+                    disabled={submitting}
+                  />
+                  <p className="text-xs text-text-light">
+                    Family or friends who won&apos;t be fishing. No charge, but
+                    they count toward the property&apos;s total guest limit
+                    {property.max_guests
+                      ? ` of ${property.max_guests}`
+                      : ""}
+                    .
+                  </p>
+                </div>
+
+                {/* Total people summary */}
+                {(partySize + nonFishingGuests > 1) && (
+                  <div className="rounded-md bg-offwhite/80 px-3 py-2 text-xs text-text-secondary">
+                    <span className="font-medium text-text-primary">
+                      Total party: {partySize + nonFishingGuests} people
+                    </span>
+                    {" — "}
+                    {partySize} angler{partySize > 1 ? "s" : ""} +{" "}
+                    {nonFishingGuests} non-fishing guest
+                    {nonFishingGuests !== 1 ? "s" : ""}
+                  </div>
+                )}
 
                 {/* Club membership (if multiple) */}
                 {property.accessible_through.length > 1 && (

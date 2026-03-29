@@ -74,10 +74,12 @@ export async function GET(request: Request) {
     }
 
     // Fetch the properties
-    let query = admin
-      .from("properties")
+    // max_rods / max_guests are new columns not yet in generated types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (admin
+      .from("properties") as any)
       .select(
-        "id, name, description, location_description, water_type, species, photos, capacity, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
+        "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
       .in("id", propertyIds)
       .eq("status", "published")
@@ -123,7 +125,8 @@ export async function GET(request: Request) {
     }
 
     // Enrich properties with club access info
-    const enriched = (properties ?? []).map((prop) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const enriched = (properties ?? []).map((prop: any) => {
       const accessibleClubIds = propertyClubMap[prop.id] ?? [];
       const accessibleClubs = memberships
         .filter((m) => accessibleClubIds.includes(m.club_id))
