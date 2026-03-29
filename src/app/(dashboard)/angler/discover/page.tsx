@@ -2,7 +2,17 @@
 
 import { useEffect, useState, useCallback, useMemo, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Users, Compass } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Loader2,
+  Users,
+  Compass,
+  Search,
+  MapPin,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 import SearchFilters, {
   type SearchFiltersState,
 } from "@/components/map/SearchFilters";
@@ -10,6 +20,19 @@ import PropertyCard from "@/components/map/PropertyCard";
 
 // Lazy-load map to keep bundle small
 const PropertyMap = lazy(() => import("@/components/map/PropertyMap"));
+
+// ─── Club browse types ──────────────────────────────────────────────
+
+interface BrowseClub {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string | null;
+  logo_url: string | null;
+  member_count: number;
+  membership_status: string | null;
+  is_member: boolean;
+}
 
 interface DiscoverProperty {
   id: string;
@@ -104,23 +127,9 @@ export default function DiscoverPage() {
         </p>
       </div>
 
-      {/* No clubs state */}
+      {/* No clubs state → show club browser */}
       {noClubs ? (
-        <Card className="border-bronze/20 bg-bronze/5">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="flex size-14 items-center justify-center rounded-full bg-bronze/10">
-              <Users className="size-6 text-bronze" />
-            </div>
-            <h3 className="mt-4 text-base font-medium text-text-primary">
-              Join a Club First
-            </h3>
-            <p className="mt-1 max-w-md text-center text-sm text-text-secondary">
-              To discover and book private waters on AnglerPass, you need to be
-              a member of at least one fishing club. Ask your club admin to
-              invite you.
-            </p>
-          </CardContent>
-        </Card>
+        <ClubBrowser />
       ) : (
         <>
           {/* Filters + view toggle */}
@@ -196,6 +205,209 @@ export default function DiscoverPage() {
             </div>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+// ─── Club Browser Component ─────────────────────────────────────────
+
+function ClubBrowser() {
+  const [clubs, setClubs] = useState<BrowseClub[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQ, setSearchQ] = useState("");
+  const [joining, setJoining] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const fetchClubs = useCallback(async (q = "") => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      const res = await fetch(`/api/clubs/browse?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setClubs(data.clubs ?? []);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchClubs();
+  }, [fetchClubs]);
+
+  const handleSearch = () => {
+    fetchClubs(searchQ);
+  };
+
+  const handleJoin = async (clubId: string) => {
+    setJoining(clubId);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/clubs/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ club_id: clubId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage(data.message);
+        // Update the club's status locally
+        setClubs((prev) =>
+          prev.map((c) =>
+            c.id === clubId
+              ? { ...c, membership_status: "pending", is_member: true }
+              : c
+          )
+        );
+      } else {
+        setMessage(data.error ?? "Failed to send join request");
+      }
+    } catch {
+      setMessage("An error occurred. Please try again.");
+    } finally {
+      setJoining(null);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="border-bronze/20 bg-bronze/5">
+        <CardContent className="py-5">
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-bronze/10">
+              <Users className="size-5 text-bronze" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-text-primary">
+                Join a Club to Access Private Waters
+              </h3>
+              <p className="mt-0.5 text-sm text-text-secondary">
+                Browse fishing clubs below and request to join. Once approved,
+                you&apos;ll be able to discover and book their associated
+                properties.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Search */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-light" />
+          <Input
+            value={searchQ}
+            onChange={(e) => setSearchQ(e.target.value)}
+            placeholder="Search clubs by name or description..."
+            className="pl-9"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
+          />
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleSearch}
+          disabled={loading}
+        >
+          Search
+        </Button>
+      </div>
+
+      {/* Status message */}
+      {message && (
+        <div className="rounded-lg border border-forest/20 bg-forest/5 px-4 py-3 text-sm text-forest">
+          {message}
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="size-6 animate-spin text-bronze" />
+        </div>
+      )}
+
+      {/* Club list */}
+      {!loading && clubs.length === 0 && (
+        <Card className="border-stone-light/20">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Compass className="size-8 text-text-light" />
+            <p className="mt-3 text-sm text-text-secondary">
+              {searchQ
+                ? "No clubs found matching your search."
+                : "No clubs are available yet. Check back soon!"}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {!loading && clubs.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {clubs.map((club) => (
+            <Card key={club.id} className="border-stone-light/20">
+              <CardContent className="py-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-river/10 text-lg font-semibold text-river">
+                    {club.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-medium text-text-primary">
+                      {club.name}
+                    </h3>
+                    {club.location && (
+                      <p className="flex items-center gap-1 text-xs text-text-light">
+                        <MapPin className="size-3" />
+                        {club.location}
+                      </p>
+                    )}
+                    {club.description && (
+                      <p className="mt-1.5 line-clamp-2 text-xs text-text-secondary">
+                        {club.description}
+                      </p>
+                    )}
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-xs text-text-light">
+                        {club.member_count} member
+                        {club.member_count !== 1 ? "s" : ""}
+                      </span>
+
+                      {club.membership_status === "active" ? (
+                        <span className="flex items-center gap-1 text-xs font-medium text-forest">
+                          <CheckCircle2 className="size-3.5" />
+                          Member
+                        </span>
+                      ) : club.membership_status === "pending" ? (
+                        <span className="flex items-center gap-1 text-xs font-medium text-bronze">
+                          <Clock className="size-3.5" />
+                          Pending
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 border-river/30 text-xs text-river hover:bg-river/5"
+                          onClick={() => handleJoin(club.id)}
+                          disabled={joining === club.id}
+                        >
+                          {joining === club.id ? (
+                            <Loader2 className="size-3 animate-spin" />
+                          ) : null}
+                          Request to Join
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

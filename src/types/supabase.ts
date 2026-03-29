@@ -64,6 +64,11 @@ export type Database = {
           id: string;
           display_name: string | null;
           role: string;
+          bio: string | null;
+          location: string | null;
+          avatar_url: string | null;
+          fishing_experience: string | null;
+          favorite_species: string[];
           suspended_at: string | null;
           suspended_reason: string | null;
           created_at: string;
@@ -73,6 +78,11 @@ export type Database = {
           id: string;
           display_name?: string | null;
           role?: string;
+          bio?: string | null;
+          location?: string | null;
+          avatar_url?: string | null;
+          fishing_experience?: string | null;
+          favorite_species?: string[];
           suspended_at?: string | null;
           suspended_reason?: string | null;
           created_at?: string;
@@ -82,6 +92,11 @@ export type Database = {
           id?: string;
           display_name?: string | null;
           role?: string;
+          bio?: string | null;
+          location?: string | null;
+          avatar_url?: string | null;
+          fishing_experience?: string | null;
+          favorite_species?: string[];
           suspended_at?: string | null;
           suspended_reason?: string | null;
           created_at?: string;
