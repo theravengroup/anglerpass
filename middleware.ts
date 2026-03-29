@@ -86,12 +86,14 @@ export async function middleware(request: NextRequest) {
   // ── Authenticated user on auth pages → redirect to role home ──
   if (isAuthRoute(pathname)) {
     const profile = await fetchProfileSlice(supabase, user.id);
-    const rolePath = profile?.role
-      ? getRoleHomePath(profile.role)
-      : "/dashboard";
-    const url = request.nextUrl.clone();
-    url.pathname = rolePath;
-    return NextResponse.redirect(url);
+    // Only redirect if we have a confirmed profile; otherwise let them
+    // stay on the auth page so the dashboard layout can handle setup.
+    if (profile?.role) {
+      const url = request.nextUrl.clone();
+      url.pathname = getRoleHomePath(profile.role);
+      return NextResponse.redirect(url);
+    }
+    return response;
   }
 
   // ── Protected route checks (suspension, admin role) ──

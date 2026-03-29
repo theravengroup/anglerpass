@@ -78,9 +78,10 @@ function LoginForm() {
         : "/dashboard";
       router.push(destination);
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error("[login] Auth error:", err);
       setError(
-        "Unable to connect to authentication service. Please ensure the application is properly configured."
+        "Unable to connect to authentication service. Please try again or contact support."
       );
     } finally {
       setIsLoading(false);
