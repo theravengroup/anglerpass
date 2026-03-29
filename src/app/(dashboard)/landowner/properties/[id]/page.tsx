@@ -7,6 +7,7 @@ import type { PropertyFormData } from "@/lib/validations/properties";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import CalendarSubscription from "@/components/properties/CalendarSubscription";
 
 interface PropertyData extends PropertyFormData {
   id: string;
@@ -176,6 +177,11 @@ export default function PropertyDetailPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Calendar Subscription — only for published properties */}
+      {property.status === "published" && (
+        <CalendarSubscription propertyId={property.id} />
       )}
 
       <PropertyForm mode="edit" initialData={property} />

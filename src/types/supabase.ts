@@ -542,6 +542,35 @@ export type Database = {
           },
         ];
       };
+      calendar_tokens: {
+        Row: {
+          id: string;
+          property_id: string;
+          token: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          token?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          token?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_tokens_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: true;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
