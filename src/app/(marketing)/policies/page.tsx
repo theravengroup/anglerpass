@@ -337,7 +337,7 @@ export default function PoliciesPage() {
 
             <h3 style={subHeadingStyle}>Booking fees</h3>
             <p style={textStyle}>
-              Fishing access bookings have a separate fee structure: a 5% platform fee on
+              Fishing access bookings have a separate fee structure: a 15% platform fee on
               rod fees, plus a $10/rod cross-club fee when booking outside your home club.
               See our{' '}
               <Link href="/pricing" style={{ color: 'var(--color-river)', textDecoration: 'underline' }}>

@@ -432,9 +432,10 @@ export default function AnglersPage() {
               margin: '0 auto 32px',
             }}
           >
-            When you book a fishing day through AnglerPass, a small platform fee of
-            5% is added to the property&rsquo;s base rate. Rod fees are set by each
-            landowner and vary by property. Here&rsquo;s how a typical booking breaks down:
+            When you book a fishing day through AnglerPass, a 15% platform fee is
+            added to the property&rsquo;s base rate. This fee covers the booking platform,
+            payment processing, and the trust infrastructure that makes private water
+            access possible. Here&rsquo;s how a typical booking breaks down:
           </p>
           <div
             style={{
@@ -455,12 +456,12 @@ export default function AnglersPage() {
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$125</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
-              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (5%)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$6.25</span>
+              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (15%)</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$18.75</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>You pay</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$131.25</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$143.75</span>
             </div>
           </div>
           <p

@@ -11,7 +11,7 @@ export const BOOKING_STATUSES = [
 export const DURATIONS = ["full_day", "half_day"] as const;
 
 /** @deprecated Use PLATFORM_FEE_RATE from @/lib/constants/fees instead */
-export const PLATFORM_FEE_RATE = 0.05; // 5%
+export const PLATFORM_FEE_RATE = 0.15; // 15%
 
 // ─── Create Booking ────────────────────────────────────────────────
 export const bookingSchema = z.object({

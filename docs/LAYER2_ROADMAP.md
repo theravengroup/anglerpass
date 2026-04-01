@@ -17,7 +17,7 @@
 - **Standard** — $349/month (up to 2,000 members, 100 properties, cross-club eligible)
 - **Pro** — $699/month (unlimited members, unlimited properties, cross-club eligible)
 
-**Angler booking fees:** 5% platform fee on each booking (paid by the angler on top of the property's base rate). No subscription required for anglers.
+**Angler booking fees:** 15% platform fee on each booking (paid by the angler on top of the property's base rate), plus a $10/rod cross-club fee when booking outside the angler's home club. No subscription required for anglers.
 
 **Cross-club access:** Standard and Pro clubs can opt in to reciprocal access agreements, allowing members of one club to book water managed by another club in the network. This is the network effect that grows the platform.
 
@@ -177,7 +177,7 @@
 - Cross-club property discovery (if angler's club has cross-club agreements)
 - Property detail page (photos, description, species, regulations, availability)
 - Booking request form (select date, party size, message to landowner — must select which club membership to book through)
-- Platform fee calculation (5% added to base rate, paid by angler)
+- Platform fee calculation (15% added to base rate, paid by angler)
 - Booking status tracking for anglers (pending, confirmed, declined)
 - Booking management for landowners (approve/decline requests, view calendar)
 - Angler's "My Bookings" page
@@ -266,7 +266,7 @@
 **Goal:** Anglers can pay for bookings; landowners receive payouts. Platform takes a fee.
 
 **Key Features:**
-- Stripe Checkout for booking payments (base rate + 5% platform fee)
+- Stripe Checkout for booking payments (base rate + 15% platform fee)
 - Stripe Connect for landowner payouts (Express accounts)
 - Stripe Subscriptions for club billing (Starter/Standard/Pro tiers)
 - Platform fee calculation (percentage per booking)

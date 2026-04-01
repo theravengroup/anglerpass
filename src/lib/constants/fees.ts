@@ -10,8 +10,8 @@
  */
 
 // ─── Platform Fee ────────────────────────────────────────────────────
-/** 5% markup on the base rod fee, paid by the angler to AnglerPass. */
-export const PLATFORM_FEE_RATE = 0.05;
+/** 15% markup on the base rod fee, paid by the angler to AnglerPass. */
+export const PLATFORM_FEE_RATE = 0.15;
 
 // ─── Cross-Club Network Fee ─────────────────────────────────────────
 /**
@@ -47,7 +47,7 @@ export interface FeeBreakdown {
   rodCount: number;
   /** Base rod fees: ratePerRod * rodCount */
   baseRate: number;
-  /** Platform fee (5% of baseRate), paid by angler to AnglerPass */
+  /** Platform fee (15% of baseRate), paid by angler to AnglerPass */
   platformFee: number;
   /** Cross-club fee ($10/rod), $0 if home-club booking */
   crossClubFee: number;

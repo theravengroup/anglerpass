@@ -8,7 +8,7 @@
 --
 -- Existing columns already in bookings:
 --   base_rate      — rod fee * party_size (total rod fees)
---   platform_fee   — 5% of base_rate
+--   platform_fee   — 15% of base_rate
 --   total_amount   — angler pays this (base_rate + platform_fee + cross_club_fee)
 
 alter table public.bookings

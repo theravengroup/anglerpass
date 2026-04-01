@@ -25,7 +25,7 @@ const faqItems = [
   },
   {
     question: 'How do anglers book private water?',
-    answer: 'All bookings on AnglerPass go through club membership. Anglers join a fly fishing club, get vetted as a member, and then book private water through their club\u2019s access agreements with landowners. A flat 5% platform fee is added to each booking. If your club participates in cross-club access, you can also book water managed by other clubs in the network.',
+    answer: 'All bookings on AnglerPass go through club membership. Anglers join a fly fishing club, get vetted as a member, and then book private water through their club\u2019s access agreements with landowners. A 15% platform fee is added to each booking. If your club participates in cross-club access, you can also book water managed by other clubs in the network.',
   },
   {
     question: 'How do I join the waitlist?',

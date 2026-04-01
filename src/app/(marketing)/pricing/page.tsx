@@ -389,7 +389,7 @@ export default function PricingPage() {
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {[
                   { label: 'Rod fee', detail: 'Per rod, per day, set by the property' },
-                  { label: 'Platform fee', detail: '5% of rod fees' },
+                  { label: 'Platform fee', detail: '15% of rod fees' },
                   { label: 'Cross-club fee', detail: '$10/rod (only when fishing outside your home club)' },
                 ].map((item) => (
                   <li key={item.label} style={{ padding: '8px 0', borderBottom: '1px solid var(--color-parchment)' }}>

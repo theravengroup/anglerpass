@@ -545,7 +545,7 @@ export default function PropertyDetailPage() {
                       </div>
                     )}
                     <div className="flex justify-between text-text-light">
-                      <span>Platform fee (5%)</span>
+                      <span>Platform fee (15%)</span>
                       <span>${fees.platformFee.toFixed(2)}</span>
                     </div>
                     {nonFishingGuests > 0 && (

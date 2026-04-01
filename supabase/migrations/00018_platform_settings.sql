@@ -33,7 +33,7 @@ create policy "Admins can insert platform settings"
 insert into public.platform_settings (key, value, description) values
   ('staff_discount_own_club', '50', 'Percentage discount on rod fees for staff at their own club (0-100)'),
   ('staff_discount_cross_club', '25', 'Percentage discount on rod fees for staff at cross-club properties (0-100)'),
-  ('platform_fee_percentage', '10', 'Platform fee percentage taken from each booking (0-100)'),
+  ('platform_fee_percentage', '15', 'Platform fee percentage added to rod fees on each booking (0-100)'),
   ('booking_cancellation_hours', '48', 'Hours before a booking that free cancellation is allowed'),
   ('max_properties_per_owner', '20', 'Maximum number of properties a landowner can list'),
   ('require_photo_minimum', '3', 'Minimum number of photos required for property listings'),

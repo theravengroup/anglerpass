@@ -33,7 +33,7 @@ Landowner/club receives payout to their bank
 
 2. **Hold period (request-to-book only).** The payment hold lasts up to 7 days. If the landowner confirms within 48h, the hold is captured. If declined or expired, the hold is released (no charge to angler).
 
-3. **Platform fee calculation.** On capture, AnglerPass deducts its fee before transferring to the landowner. Fee is calculated as: `platform_fee = total_cents * fee_rate`. The fee rate varies by plan tier.
+3. **Platform fee calculation.** The 15% platform fee is charged on top of the rod fee (paid by the angler). Rod fees pass through in full to the landowner/club split. Fee is calculated as: `platform_fee = base_rod_fee_cents * 0.15`.
 
 4. **Transfer to Connected Account.** Stripe Transfer moves funds from the AnglerPass platform account to the landowner's Connected Account. Transfers are batched daily or triggered on confirmation, depending on configuration.
 
@@ -43,14 +43,13 @@ Landowner/club receives payout to their bank
 
 ## Fee Structure
 
-| Transaction Type     | Platform Fee | Notes                               |
-|----------------------|-------------|---------------------------------------|
-| Booking (standard)   | 10%         | Deducted from landowner's share      |
-| Booking (premium)    | 7%          | Landowners on a paid plan get lower fee |
-| Club membership      | 5%          | Lower fee on recurring revenue       |
-| Angler premium sub   | N/A         | Paid directly to AnglerPass          |
+| Transaction Type     | Platform Fee | Notes                                          |
+|----------------------|-------------|-------------------------------------------------|
+| Booking (all)        | 15%         | Added on top of rod fee, paid by angler          |
+| Cross-club surcharge | $10/rod     | Additional flat fee for cross-club bookings      |
+| Club membership      | 3.5%        | Processing fee on initiation fees and annual dues |
 
-Anglers see the total price. The fee is invisible to them -- it comes out of the landowner/club side.
+The platform fee is a markup on the landowner's rod fee — it does not reduce the landowner or club's share. Rod fees flow through to the existing landowner/club split ($5/rod to club, remainder to landowner).
 
 ---
 
