@@ -48,6 +48,7 @@ interface PropertyDetail {
   half_day_allowed: boolean;
   water_miles: number | null;
   regulations: string | null;
+  is_cross_club?: boolean;
   accessible_through: {
     membership_id: string;
     club_id: string;
@@ -111,8 +112,7 @@ export default function PropertyDetailPage() {
     load();
   }, [id]);
 
-  // TODO: detect cross-club when Cross-Club Network routing is complete
-  const isCrossClub = false;
+  const isCrossClub = property?.is_cross_club ?? false;
   const ratePerRod =
     duration === "full_day"
       ? (property?.rate_adult_full_day ?? 0)

@@ -19,6 +19,7 @@ interface PropertyCardProps {
     rate_adult_half_day: number | null;
     half_day_allowed: boolean;
     water_miles: number | null;
+    is_cross_club?: boolean;
     accessible_through?: {
       club_name: string;
       membership_id: string;
@@ -75,6 +76,13 @@ export default function PropertyCard({
             <Badge className="absolute left-2 top-2 bg-river/90 text-white text-[10px]">
               <Droplets className="mr-1 size-2.5" />
               {WATER_TYPE_LABELS[property.water_type] ?? property.water_type}
+            </Badge>
+          )}
+
+          {/* Cross-club badge */}
+          {property.is_cross_club && (
+            <Badge className="absolute right-2 top-2 bg-bronze/90 text-white text-[10px]">
+              Cross-Club
             </Badge>
           )}
         </div>

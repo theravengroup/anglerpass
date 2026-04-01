@@ -49,6 +49,7 @@ interface DiscoverProperty {
   water_miles: number | null;
   latitude: number | null;
   longitude: number | null;
+  is_cross_club?: boolean;
   accessible_through: {
     membership_id: string;
     club_id: string;

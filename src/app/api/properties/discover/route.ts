@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { discoverCrossClubProperties } from "@/lib/cross-club";
 
 // GET: Discover properties accessible through the angler's club memberships
+// and through the Cross-Club Network
 export async function GET(request: Request) {
   try {
     const supabase = await createClient();
@@ -47,7 +49,49 @@ export async function GET(request: Request) {
       .in("club_id", clubIds)
       .eq("status", "approved");
 
-    if (!accessRecords?.length) {
+    // Note: even with no direct access records, the angler may have
+    // cross-club access through agreements. We continue to check.
+
+    const directPropertyIds = [
+      ...new Set((accessRecords ?? []).map((a) => a.property_id)),
+    ];
+
+    // Build a map of property -> clubs for the response
+    const propertyClubMap: Record<string, string[]> = {};
+    for (const record of (accessRecords ?? [])) {
+      if (!propertyClubMap[record.property_id]) {
+        propertyClubMap[record.property_id] = [];
+      }
+      propertyClubMap[record.property_id].push(record.club_id);
+    }
+
+    // ── Cross-Club Network discovery ──────────────────────────────
+    // Find additional properties reachable through cross-club agreements
+    const crossClubResults = await discoverCrossClubProperties(
+      admin,
+      clubIds,
+      directPropertyIds
+    );
+
+    // Map of cross-club property ID -> routing info
+    const crossClubMap: Record<
+      string,
+      { accessClubId: string; anglerClubId: string; agreementId: string }
+    > = {};
+    for (const result of crossClubResults) {
+      crossClubMap[result.propertyId] = {
+        accessClubId: result.accessClubId,
+        anglerClubId: result.anglerClubId,
+        agreementId: result.agreementId,
+      };
+    }
+
+    const crossClubPropertyIds = crossClubResults.map((r) => r.propertyId);
+
+    // Combine all accessible property IDs
+    const allPropertyIds = [...directPropertyIds, ...crossClubPropertyIds];
+
+    if (allPropertyIds.length === 0) {
       return NextResponse.json({
         properties: [],
         memberships: memberships.map((m) => ({
@@ -60,19 +104,6 @@ export async function GET(request: Request) {
       });
     }
 
-    const propertyIds = [
-      ...new Set(accessRecords.map((a) => a.property_id)),
-    ];
-
-    // Build a map of property -> clubs for the response
-    const propertyClubMap: Record<string, string[]> = {};
-    for (const record of accessRecords) {
-      if (!propertyClubMap[record.property_id]) {
-        propertyClubMap[record.property_id] = [];
-      }
-      propertyClubMap[record.property_id].push(record.club_id);
-    }
-
     // Fetch the properties
     // max_rods / max_guests are new columns not yet in generated types
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,7 +112,7 @@ export async function GET(request: Request) {
       .select(
         "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
-      .in("id", propertyIds)
+      .in("id", allPropertyIds)
       .eq("status", "published")
       .order("name");
 
@@ -124,9 +155,35 @@ export async function GET(request: Request) {
       );
     }
 
-    // Enrich properties with club access info
+    // Enrich properties with club access info and cross-club flag
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enriched = (properties ?? []).map((prop: any) => {
+      const crossClubInfo = crossClubMap[prop.id];
+      const isCrossClub = !!crossClubInfo;
+
+      if (isCrossClub) {
+        // Cross-club property: route through the angler's club that has the agreement
+        const anglerMembership = memberships.find(
+          (m) => m.club_id === crossClubInfo.anglerClubId
+        );
+        return {
+          ...prop,
+          is_cross_club: true,
+          accessible_through: anglerMembership
+            ? [
+                {
+                  membership_id: anglerMembership.id,
+                  club_id: anglerMembership.club_id,
+                  club_name:
+                    (anglerMembership.clubs as { name: string } | null)
+                      ?.name ?? "Unknown",
+                },
+              ]
+            : [],
+        };
+      }
+
+      // Home-club property: direct access
       const accessibleClubIds = propertyClubMap[prop.id] ?? [];
       const accessibleClubs = memberships
         .filter((m) => accessibleClubIds.includes(m.club_id))
@@ -139,6 +196,7 @@ export async function GET(request: Request) {
 
       return {
         ...prop,
+        is_cross_club: false,
         accessible_through: accessibleClubs,
       };
     });

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { bookingSchema } from "@/lib/validations/bookings";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import { notifyBookingRequested } from "@/lib/notifications";
+import { detectCrossClubRouting } from "@/lib/cross-club";
 
 // POST: Create a booking request
 export async function POST(request: Request) {
@@ -106,16 +107,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify the club has access to this property
-    const { data: access } = await admin
-      .from("club_property_access")
-      .select("id, status")
-      .eq("club_id", membership.club_id)
-      .eq("property_id", property_id)
-      .eq("status", "approved")
-      .maybeSingle();
+    // Determine access route: direct (home-club) or cross-club
+    const routing = await detectCrossClubRouting(
+      admin,
+      membership.club_id,
+      property_id
+    );
 
-    if (!access) {
+    if (!routing) {
       return NextResponse.json(
         {
           error:
@@ -204,12 +203,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Determine if this is a cross-club booking.
-    // A booking is cross-club when the angler's home club does NOT have
-    // direct club_property_access — they access through the Cross-Club Network.
-    // Currently all bookings go through direct access; cross-club routing
-    // will set this flag when the Cross-Club Network feature is complete.
-    const isCrossClub = false; // TODO: detect via Cross-Club Network routing
+    const isCrossClub = routing.isCrossClub;
 
     // Calculate full fee breakdown
     const ratePerRod =
