@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Settings } from "lucide-react";
 import ClubProfileForm from "@/components/clubs/ClubProfileForm";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 
 interface ClubData {
   id: string;
@@ -104,6 +105,9 @@ export default function ClubSettingsPage() {
           setTimeout(() => setSaved(false), 3000);
         }}
       />
+
+      {/* ── Payout Setup ── */}
+      <PayoutSetup type="club" />
     </div>
   );
 }

@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { FetchError } from "@/components/shared/FetchError";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -460,6 +461,9 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* ── Payout Setup (landowners only) ── */}
+      {profile?.role === "landowner" && <PayoutSetup type="landowner" />}
 
       {/* ── Home Club ── */}
       <Card className="border-stone-light/20">

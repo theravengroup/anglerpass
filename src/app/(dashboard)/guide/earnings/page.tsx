@@ -1,92 +1,96 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, CalendarDays, Info } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 
 export default function GuideEarningsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Earnings
-        </h2>
-        <p className="mt-1 text-sm text-text-secondary">
-          Track your earnings from guided trips.
-        </p>
+      <div className="flex items-start gap-4">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-charcoal/10">
+          <DollarSign className="size-6 text-charcoal" />
+        </div>
+        <div>
+          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+            Earnings
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            Track your guide earnings and manage payouts.
+          </p>
+        </div>
       </div>
 
-      {/* Summary cards */}
+      {/* Payout Setup */}
+      <PayoutSetup type="guide" />
+
+      {/* Earnings Overview - placeholder cards */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="border-stone-light/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-text-light">
+            <CardDescription className="flex items-center gap-1.5 text-xs">
+              <DollarSign className="size-3.5" />
+              Total Earnings
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold text-text-primary">$0.00</p>
+            <p className="mt-1 text-xs text-text-light">All time</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-stone-light/20">
+          <CardHeader className="pb-2">
+            <CardDescription className="flex items-center gap-1.5 text-xs">
+              <TrendingUp className="size-3.5" />
               This Month
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <DollarSign className="size-5 text-forest" />
-              <span className="text-2xl font-semibold text-text-primary">$0</span>
-            </div>
+            <p className="text-2xl font-semibold text-text-primary">$0.00</p>
+            <p className="mt-1 text-xs text-text-light">0 trips</p>
           </CardContent>
         </Card>
 
         <Card className="border-stone-light/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-text-light">
-              This Year
-            </CardTitle>
+            <CardDescription className="flex items-center gap-1.5 text-xs">
+              <Calendar className="size-3.5" />
+              Next Payout
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <CalendarDays className="size-5 text-river" />
-              <span className="text-2xl font-semibold text-text-primary">$0</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-text-light">
-              All Time
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <DollarSign className="size-5 text-bronze" />
-              <span className="text-2xl font-semibold text-text-primary">$0</span>
-            </div>
+            <p className="text-2xl font-semibold text-text-primary">&mdash;</p>
+            <p className="mt-1 text-xs text-text-light">No pending payouts</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Payout info */}
-      <Card className="border-river/20 bg-river/5">
-        <CardContent className="flex items-start gap-3 py-5">
-          <Info className="size-5 shrink-0 text-river" />
-          <div>
-            <h3 className="text-sm font-medium text-text-primary">
-              Payout Setup
-            </h3>
-            <p className="mt-1 text-sm text-text-secondary">
-              Payout setup via Stripe Connect is coming soon. Once available,
-              you&apos;ll be able to link your bank account for automatic payouts
-              after each completed trip. You keep 100% of your listed rate.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Empty bookings table */}
+      {/* Recent Earnings */}
       <Card className="border-stone-light/20">
         <CardHeader>
-          <CardTitle className="text-base">Booking Earnings</CardTitle>
+          <CardTitle className="text-lg">Recent Earnings</CardTitle>
+          <CardDescription>
+            Your guide trip earnings will appear here once you start receiving
+            bookings.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <DollarSign className="size-8 text-text-light" />
-            <p className="mt-3 text-sm text-text-secondary">
-              Your per-booking earnings will appear here after completed trips.
+          <div className="flex flex-col items-center py-8">
+            <div className="flex size-12 items-center justify-center rounded-full bg-charcoal/10">
+              <DollarSign className="size-5 text-charcoal" />
+            </div>
+            <p className="mt-3 text-sm font-medium text-text-primary">
+              No Earnings Yet
+            </p>
+            <p className="mt-1 max-w-xs text-center text-sm text-text-secondary">
+              Earnings from guided trips will be listed here as they come in.
             </p>
           </div>
         </CardContent>
