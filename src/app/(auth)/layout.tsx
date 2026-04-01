@@ -23,7 +23,7 @@ export default function AuthLayout({
           </span>
         </Link>
 
-        <div className="rounded-xl border border-[var(--color-parchment)] bg-white px-8 py-10 shadow-sm">
+        <div className="rounded-xl border border-[var(--color-parchment)] bg-white px-8 py-10 shadow-md shadow-black/5">
           {children}
         </div>
       </div>
