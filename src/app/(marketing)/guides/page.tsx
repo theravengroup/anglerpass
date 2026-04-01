@@ -182,7 +182,7 @@ export default function GuidesPage() {
               margin: '0 0 24px',
             }}
           >
-            Guide on Water<br />You Can&apos;t Access Alone.
+            Your Skills. Their Water.<br />More Clients.
           </h1>
           <p
             style={{
