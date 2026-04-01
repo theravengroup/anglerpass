@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ClubFaqSection from '@/components/clubs/ClubFaqSection';
 
 export const metadata: Metadata = {
   title: 'For Clubs — AnglerPass',
@@ -566,6 +567,9 @@ export default function ClubsPage() {
           </p>
         </div>
       </section>
+
+      {/* FAQ */}
+      <ClubFaqSection />
 
       {/* CTA */}
       <section

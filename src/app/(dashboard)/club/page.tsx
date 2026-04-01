@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Users,
   CalendarDays,
@@ -19,6 +20,10 @@ import {
   Loader2,
   UserPlus,
   Bell,
+  LinkIcon,
+  Check,
+  Copy,
+  Code,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -37,11 +42,15 @@ interface ClubStats {
   pending_properties: number;
 }
 
+const SITE_URL = "https://anglerpass.com";
+
 export default function ClubPage() {
   const router = useRouter();
   const [club, setClub] = useState<ClubData | null>(null);
   const [stats, setStats] = useState<ClubStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [hasClub, setHasClub] = useState<boolean | null>(null);
 
   const loadClub = useCallback(async () => {
@@ -210,6 +219,101 @@ export default function ClubPage() {
           </Link>
         ))}
       </div>
+
+      {/* Member Join Link */}
+      <Card className="border-stone-light/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-river/10">
+              <LinkIcon className="size-4 text-river" />
+            </div>
+            Member Join Link
+          </CardTitle>
+          <CardDescription>
+            Share this link with anglers to join your club directly. Use the
+            button code to add a join button to your club&rsquo;s website.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* Copy link */}
+          <div className="flex gap-2">
+            <Input
+              readOnly
+              value={`${SITE_URL}/join/${club.id}`}
+              className="font-mono text-xs"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${SITE_URL}/join/${club.id}`
+                );
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
+            >
+              {linkCopied ? (
+                <>
+                  <Check className="size-4 text-forest" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="size-4" />
+                  Copy Link
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Embed code */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Code className="size-4 text-text-light" />
+              <p className="text-sm font-medium text-text-primary">
+                Add a Join Button to Your Website
+              </p>
+            </div>
+            <p className="text-xs text-text-secondary">
+              Copy the code snippet below and paste it into your
+              website&rsquo;s HTML. Works with any platform &mdash;
+              WordPress, Squarespace, Wix, or custom sites.
+            </p>
+            <div className="overflow-x-auto rounded-lg bg-forest-deep p-4">
+              <pre className="font-[family-name:var(--font-mono)] text-xs leading-relaxed text-parchment/80">
+                {`<a href="${SITE_URL}/join/${club.id}" style="display:inline-block;padding:14px 28px;background:#1a3a2a;color:#fff;font-family:sans-serif;font-size:14px;font-weight:500;text-decoration:none;border-radius:6px;letter-spacing:.3px;">Join ${club.name} on AnglerPass</a>`}
+              </pre>
+            </div>
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `<a href="${SITE_URL}/join/${club.id}" style="display:inline-block;padding:14px 28px;background:#1a3a2a;color:#fff;font-family:sans-serif;font-size:14px;font-weight:500;text-decoration:none;border-radius:6px;letter-spacing:.3px;">Join ${club.name} on AnglerPass</a>`
+                  );
+                  setCodeCopied(true);
+                  setTimeout(() => setCodeCopied(false), 2000);
+                }}
+              >
+                {codeCopied ? (
+                  <>
+                    <Check className="size-4 text-forest" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="size-4" />
+                    Copy Code
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Action items */}
       {((stats?.pending_members ?? 0) > 0 ||

@@ -450,7 +450,7 @@ export default function PoliciesPage() {
             <p style={textStyle}>
               When an angler cancels a booking that includes a guide, the guide payout
               follows the same tiered refund schedule as the booking itself. Cancellations
-              within 24 hours of the trip date result in a full guide payout. The guide&rsquo;s
+              within 48 hours of the trip date result in a full guide payout. The guide&rsquo;s
               availability is automatically released upon cancellation.
             </p>
 
