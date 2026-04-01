@@ -615,7 +615,7 @@ export default function GuidesPage() {
                     <span style={{ fontWeight: 600, color: 'var(--color-forest)' }}>$500</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                    <span>Service fee (angler pays)</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>10% service fee<br /><span style={{ fontSize: 11, color: 'var(--color-text-light)' }}>paid by the angler</span></span>
                     <span style={{ color: 'var(--color-text-light)' }}>+$50</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0 4px', borderTop: '1px solid var(--color-parchment)', marginTop: 8 }}>
