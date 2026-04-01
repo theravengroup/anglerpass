@@ -120,6 +120,7 @@ export default function PoliciesPage() {
                 { href: '#rejoining', label: 'Rejoining a Club' },
                 { href: '#payments', label: 'Payment Processing' },
                 { href: '#bookings', label: 'Booking Cancellations & Refunds' },
+                { href: '#guide-services', label: 'Guide Services' },
                 { href: '#guest-policy', label: 'Guest Policy' },
                 { href: '#club-subscriptions', label: 'Club Subscriptions' },
               ].map((item) => (
@@ -339,6 +340,8 @@ export default function PoliciesPage() {
             <p style={textStyle}>
               Fishing access bookings have a separate fee structure: a 15% platform fee on
               rod fees, plus a $10/rod cross-club fee when booking outside your home club.
+              When a guide is added to a booking, a 10% service fee is applied to the guide&rsquo;s
+              rate, paid by the angler. The guide receives 100% of their stated rate.
               See our{' '}
               <Link href="/pricing" style={{ color: 'var(--color-river)', textDecoration: 'underline' }}>
                 pricing page
@@ -405,6 +408,58 @@ export default function PoliciesPage() {
             <p style={textStyle}>
               Refunds are processed back to the original payment method. Platform fees
               are refunded proportionally to the booking refund amount.
+            </p>
+          </div>
+
+          {/* Guide Services */}
+          <div id="guide-services" style={{ marginBottom: 64, scrollMarginTop: 120 }}>
+            <h2 style={sectionHeadingStyle}>Guide Services</h2>
+            <p style={textStyle}>
+              Professional fly fishing guides can apply to join the AnglerPass platform
+              as independent service providers. Guides are not employees of AnglerPass
+              or any club on the platform.
+            </p>
+
+            <h3 style={subHeadingStyle}>Guide requirements</h3>
+            <p style={textStyle}>
+              All guides must submit credentials for verification before being approved
+              to offer services on the platform. Required credentials include a valid
+              state guide license, professional liability insurance, and current first
+              aid certification. AnglerPass reviews all applications and may request
+              additional documentation.
+            </p>
+
+            <h3 style={subHeadingStyle}>Water access approvals</h3>
+            <p style={textStyle}>
+              Approved guides may request access to guide on specific properties. Each
+              request is reviewed by the club or landowner managing that water. Approval
+              is at the sole discretion of the managing entity and may be revoked at any
+              time.
+            </p>
+
+            <h3 style={subHeadingStyle}>Guide fees &amp; payouts</h3>
+            <p style={textStyle}>
+              There is no subscription or listing fee for guides. Guides set their own
+              full-day and half-day rates. A 10% service fee is added on top of the
+              guide&rsquo;s rate at checkout, paid by the angler. The guide receives 100%
+              of their stated rate for each completed trip. Payouts are processed through
+              Stripe Connect.
+            </p>
+
+            <h3 style={subHeadingStyle}>Cancellation &amp; guide payouts</h3>
+            <p style={textStyle}>
+              When an angler cancels a booking that includes a guide, the guide payout
+              follows the same tiered refund schedule as the booking itself. Cancellations
+              within 24 hours of the trip date result in a full guide payout. The guide&rsquo;s
+              availability is automatically released upon cancellation.
+            </p>
+
+            <h3 style={subHeadingStyle}>Reviews</h3>
+            <p style={textStyle}>
+              After a guided trip, both the angler and guide may submit reviews within
+              14 days. Reviews are revealed simultaneously once both parties have submitted,
+              or after the 14-day window closes &mdash; whichever comes first. This mutual
+              reveal system ensures honest, unbiased feedback.
             </p>
           </div>
 

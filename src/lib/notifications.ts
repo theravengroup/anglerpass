@@ -22,12 +22,24 @@ const SITE_URL =
 
 export type NotificationType =
   | "booking_requested"
+  | "booking_created"
   | "booking_confirmed"
   | "booking_declined"
   | "booking_cancelled"
   | "member_invited"
   | "member_approved"
-  | "property_access_granted";
+  | "property_access_granted"
+  | "guide_booking_created"
+  | "guide_booking_cancelled"
+  | "guide_water_approval_requested"
+  | "guide_water_approved"
+  | "guide_water_declined"
+  | "guide_profile_approved"
+  | "guide_profile_rejected"
+  | "guide_review_received"
+  | "guide_credential_expiring"
+  | "guide_message_received"
+  | "angler_review_received";
 
 interface NotificationPayload {
   userId: string;
@@ -39,14 +51,26 @@ interface NotificationPayload {
 }
 
 /** Maps notification type → preference column in notification_preferences */
-const EMAIL_PREF_MAP: Record<NotificationType, string> = {
+const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   booking_requested: "email_booking_requested",
+  booking_created: "email_booking_requested",
   booking_confirmed: "email_booking_confirmed",
   booking_declined: "email_booking_declined",
   booking_cancelled: "email_booking_cancelled",
   member_invited: "email_member_invited",
   member_approved: "email_member_approved",
   property_access_granted: "email_property_access",
+  guide_booking_created: "email_booking_confirmed",
+  guide_booking_cancelled: "email_booking_cancelled",
+  guide_water_approval_requested: "email_booking_requested",
+  guide_water_approved: "email_booking_confirmed",
+  guide_water_declined: "email_booking_declined",
+  guide_profile_approved: "email_member_approved",
+  guide_profile_rejected: "email_booking_declined",
+  guide_review_received: "email_booking_confirmed",
+  guide_credential_expiring: "email_booking_requested",
+  guide_message_received: "email_booking_confirmed",
+  angler_review_received: "email_booking_confirmed",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -74,7 +98,7 @@ export async function notify(
   }
 
   // 2. Check email preference (default to enabled)
-  const prefCol = EMAIL_PREF_MAP[payload.type];
+  const prefCol = EMAIL_PREF_MAP[payload.type] ?? "email_booking_confirmed";
   const { data: prefs, error: prefErr } = await admin
     .from("notification_preferences")
     .select(prefCol)
@@ -133,28 +157,53 @@ interface EmailParams {
   type: NotificationType;
 }
 
-const SUBJECT_MAP: Record<NotificationType, string> = {
+const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   booking_requested: "New Booking Request",
-  booking_confirmed: "Booking Confirmed!",
+  booking_created: "New Booking on Your Property",
+  booking_confirmed: "Your Booking is Confirmed!",
   booking_declined: "Booking Update",
   booking_cancelled: "Booking Cancelled",
   member_invited: "You've Been Invited",
   member_approved: "Membership Approved!",
   property_access_granted: "Property Access Granted",
+  guide_booking_created: "You've Been Added to a Booking",
+  guide_booking_cancelled: "A Booking Has Been Cancelled",
+  guide_water_approval_requested: "New Guide Approval Request",
+  guide_water_approved: "Water Approval Granted",
+  guide_water_declined: "Water Approval Update",
+  guide_profile_approved: "Your Guide Profile is Approved!",
+  guide_profile_rejected: "Guide Profile Update",
+  guide_review_received: "You Have a New Review",
+  guide_credential_expiring: "Credential Expiring Soon",
+  guide_message_received: "New Message",
+  angler_review_received: "Your Review is Now Visible",
 };
 
-const CTA_LABEL_MAP: Record<NotificationType, string> = {
+const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
   booking_requested: "Review Booking →",
+  booking_created: "View Bookings →",
   booking_confirmed: "View Booking Details →",
   booking_declined: "View Details →",
   booking_cancelled: "View Bookings →",
   member_invited: "View Membership →",
   member_approved: "Browse Properties →",
   property_access_granted: "View Properties →",
+  guide_booking_created: "View Booking →",
+  guide_booking_cancelled: "View Bookings →",
+  guide_water_approval_requested: "Review Request →",
+  guide_water_approved: "View Approvals →",
+  guide_water_declined: "View Details →",
+  guide_profile_approved: "View Profile →",
+  guide_profile_rejected: "View Profile →",
+  guide_review_received: "View Reviews →",
+  guide_credential_expiring: "Update Credentials →",
+  guide_message_received: "View Messages →",
+  angler_review_received: "View Review →",
 };
 
-const CTA_COLOR_MAP: Record<NotificationType, string> = {
+const CTA_COLOR_MAP: Partial<Record<NotificationType, string>> = {
   booking_requested: "#2a5a3a",
+  booking_created: "#2a5a3a",
   booking_confirmed: "#2a5a3a",
   booking_declined: "#3a6b7c",
   booking_cancelled: "#2a5a3a",
@@ -239,8 +288,24 @@ function escapeHtml(str: string): string {
 
 // ─── Convenience Helpers ────────────────────────────────────────────
 
-/** Notify landowner that a new booking was requested */
+/** @deprecated Use notifyBookingCreated instead (instant-book) */
 export async function notifyBookingRequested(
+  admin: SupabaseClient,
+  opts: {
+    landownerId: string;
+    anglerName: string;
+    propertyName: string;
+    bookingDate: string;
+    duration: string;
+    partySize: number;
+    bookingId: string;
+  }
+) {
+  return notifyBookingCreated(admin, opts);
+}
+
+/** Notify landowner that a new booking was made on their property (informational, not action-required) */
+export async function notifyBookingCreated(
   admin: SupabaseClient,
   opts: {
     landownerId: string;
@@ -257,9 +322,9 @@ export async function notifyBookingRequested(
 
   await notify(admin, {
     userId: opts.landownerId,
-    type: "booking_requested",
-    title: `New booking request for ${opts.propertyName}`,
-    body: `${opts.anglerName} has requested a ${durationLabel} booking for ${opts.partySize} angler${opts.partySize > 1 ? "s" : ""} on ${formatDate(opts.bookingDate)}.`,
+    type: "booking_created",
+    title: `New booking on ${opts.propertyName}`,
+    body: `${opts.anglerName} has booked a ${durationLabel} for ${opts.partySize} angler${opts.partySize > 1 ? "s" : ""} on ${formatDate(opts.bookingDate)}. The booking is confirmed.`,
     link: "/landowner/bookings",
     metadata: {
       booking_id: opts.bookingId,
@@ -268,7 +333,7 @@ export async function notifyBookingRequested(
   });
 }
 
-/** Notify angler that their booking was confirmed */
+/** Notify angler that their booking is confirmed (instant-book) */
 export async function notifyBookingConfirmed(
   admin: SupabaseClient,
   opts: {
@@ -277,9 +342,13 @@ export async function notifyBookingConfirmed(
     bookingDate: string;
     bookingId: string;
     landownerNotes?: string;
+    guideName?: string;
   }
 ) {
-  let body = `Your booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)} has been confirmed! Access details are now available in your booking.`;
+  let body = `Your booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)} is confirmed! Access details are now available in your booking.`;
+  if (opts.guideName) {
+    body += ` Your guide ${opts.guideName} will be in touch before your trip.`;
+  }
   if (opts.landownerNotes) {
     body += ` Note from the landowner: \u201C${opts.landownerNotes}\u201D`;
   }
@@ -389,6 +458,137 @@ export async function notifyPropertyAccessGranted(
       property_id: opts.propertyId,
       club_name: opts.clubName,
     },
+  });
+}
+
+// ─── Guide Notifications ────────────────────────────────────────────
+
+/** Notify guide that they've been added to a booking */
+export async function notifyGuideBookingCreated(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    anglerName: string;
+    propertyName: string;
+    bookingDate: string;
+    bookingId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_booking_created",
+    title: `New guided trip \u2014 ${opts.propertyName}`,
+    body: `${opts.anglerName} has booked you for a guided trip at ${opts.propertyName} on ${formatDate(opts.bookingDate)}.`,
+    link: "/guide/bookings",
+    metadata: { booking_id: opts.bookingId },
+  });
+}
+
+/** Notify guide that a booking with them was cancelled */
+export async function notifyGuideBookingCancelled(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    anglerName: string;
+    propertyName: string;
+    bookingDate: string;
+    bookingId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_booking_cancelled",
+    title: `Booking cancelled \u2014 ${opts.propertyName}`,
+    body: `${opts.anglerName} has cancelled their booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)}.`,
+    link: "/guide/bookings",
+    metadata: { booking_id: opts.bookingId },
+  });
+}
+
+/** Notify guide that their profile was approved by admin */
+export async function notifyGuideProfileApproved(
+  admin: SupabaseClient,
+  opts: { guideUserId: string }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_profile_approved",
+    title: "Your guide profile is approved!",
+    body: "Congratulations! Your guide profile has been reviewed and approved. You can now be added to bookings on waters you're approved for.",
+    link: "/guide/profile",
+  });
+}
+
+/** Notify guide that their profile was rejected by admin */
+export async function notifyGuideProfileRejected(
+  admin: SupabaseClient,
+  opts: { guideUserId: string; reason: string }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_profile_rejected",
+    title: "Guide profile update needed",
+    body: `Your guide profile was not approved. Reason: \u201C${opts.reason}\u201D. Please update your profile and resubmit.`,
+    link: "/guide/profile",
+  });
+}
+
+/** Notify club admin of a new guide water approval request */
+export async function notifyGuideWaterApprovalRequested(
+  admin: SupabaseClient,
+  opts: {
+    clubAdminId: string;
+    guideName: string;
+    propertyName: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.clubAdminId,
+    type: "guide_water_approval_requested",
+    title: `Guide approval request for ${opts.propertyName}`,
+    body: `${opts.guideName} has requested approval to guide on ${opts.propertyName}.`,
+    link: "/club/guide-approvals",
+  });
+}
+
+/** Notify guide that their water approval was granted */
+export async function notifyGuideWaterApproved(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    propertyName: string;
+    clubName: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_water_approved",
+    title: `Approved to guide on ${opts.propertyName}`,
+    body: `${opts.clubName} has approved your request to guide on ${opts.propertyName}. Anglers can now add you to bookings at this water.`,
+    link: "/guide/profile",
+  });
+}
+
+/** Notify guide that their water approval was declined */
+export async function notifyGuideWaterDeclined(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    propertyName: string;
+    reason?: string;
+  }
+) {
+  let body = `Your request to guide on ${opts.propertyName} was not approved.`;
+  if (opts.reason) {
+    body += ` Reason: \u201C${opts.reason}\u201D`;
+  }
+
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_water_declined",
+    title: `Water approval update \u2014 ${opts.propertyName}`,
+    body,
+    link: "/guide/profile",
   });
 }
 

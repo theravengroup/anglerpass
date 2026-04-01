@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { bookingStatusSchema } from "@/lib/validations/bookings";
 import { calculateRefund } from "@/lib/cancellation";
-import {
-  notifyBookingConfirmed,
-  notifyBookingDeclined,
-  notifyBookingCancelled,
-} from "@/lib/notifications";
+import { notifyBookingCancelled } from "@/lib/notifications";
 
 // GET: Fetch a single booking
 export async function GET(
@@ -121,148 +116,73 @@ export async function PATCH(
       display_name: string | null;
     } | null;
 
-    // Angler cancellation
-    if (body.status === "cancelled") {
-      if (booking.angler_id !== user.id) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      }
-
-      if (!["pending", "confirmed"].includes(booking.status)) {
-        return NextResponse.json(
-          { error: "This booking cannot be cancelled" },
-          { status: 400 }
-        );
-      }
-
-      // Calculate refund based on cancellation policy
-      // Pending bookings haven't been charged, so refund is informational
-      // Confirmed bookings use the tiered refund policy
-      const totalAmount =
-        typeof booking.total_amount === "number"
-          ? booking.total_amount
-          : parseFloat(String(booking.total_amount ?? "0"));
-
-      const refund = calculateRefund(
-        booking.booking_date,
-        booking.status === "confirmed" ? totalAmount : 0
+    // Only angler cancellation is supported (instant-book — no landowner approval)
+    if (body.status !== "cancelled") {
+      return NextResponse.json(
+        { error: "Only cancellation is supported. Bookings are confirmed instantly." },
+        { status: 400 }
       );
-
-      const cancellationReason =
-        typeof body.reason === "string" ? body.reason.trim().slice(0, 1000) : null;
-
-      const { data: updated, error: updateError } = await admin
-        .from("bookings")
-        .update({
-          status: "cancelled",
-          cancelled_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          refund_percentage: refund.percentage,
-          refund_amount: refund.amount,
-          ...(cancellationReason ? { cancellation_reason: cancellationReason } : {}),
-        })
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error("[bookings/[id]] Cancel error:", updateError);
-        return NextResponse.json(
-          { error: "Failed to cancel booking" },
-          { status: 500 }
-        );
-      }
-
-      // Notify landowner of cancellation
-      if (property) {
-        notifyBookingCancelled(admin, {
-          landownerId: property.owner_id,
-          anglerName:
-            anglerProfile?.display_name ?? "An angler",
-          propertyName: property.name,
-          bookingDate: booking.booking_date,
-          bookingId: booking.id,
-        }).catch((err) =>
-          console.error("[bookings/[id]] Notification error:", err)
-        );
-      }
-
-      return NextResponse.json({ booking: updated, refund });
     }
 
-    // Landowner confirm/decline
-    if (property?.owner_id !== user.id) {
+    if (booking.angler_id !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (booking.status !== "pending") {
+    if (booking.status !== "confirmed") {
       return NextResponse.json(
-        { error: "Only pending bookings can be confirmed or declined" },
+        { error: "This booking cannot be cancelled" },
         { status: 400 }
       );
     }
 
-    const result = bookingStatusSchema.safeParse(body);
+    // Calculate refund based on cancellation policy
+    const totalAmount =
+      typeof booking.total_amount === "number"
+        ? booking.total_amount
+        : parseFloat(String(booking.total_amount ?? "0"));
 
-    if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
-    }
+    const refund = calculateRefund(booking.booking_date, totalAmount);
 
-    const updates: Record<string, unknown> = {
-      status: result.data.status,
-      updated_at: new Date().toISOString(),
-    };
-
-    if (result.data.landowner_notes) {
-      updates.landowner_notes = result.data.landowner_notes;
-    }
-
-    if (result.data.status === "confirmed") {
-      updates.confirmed_at = new Date().toISOString();
-    }
+    const cancellationReason =
+      typeof body.reason === "string" ? body.reason.trim().slice(0, 1000) : null;
 
     const { data: updated, error: updateError } = await admin
       .from("bookings")
-      .update(updates)
+      .update({
+        status: "cancelled",
+        cancelled_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        refund_percentage: refund.percentage,
+        refund_amount: refund.amount,
+        ...(cancellationReason ? { cancellation_reason: cancellationReason } : {}),
+      })
       .eq("id", id)
       .select()
       .single();
 
     if (updateError) {
-      console.error("[bookings/[id]] Update error:", updateError);
+      console.error("[bookings/[id]] Cancel error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update booking" },
+        { error: "Failed to cancel booking" },
         { status: 500 }
       );
     }
 
-    // Notify angler of confirm/decline
-    const propertyName = property?.name ?? "the property";
-    if (result.data.status === "confirmed") {
-      notifyBookingConfirmed(admin, {
-        anglerId: booking.angler_id,
-        propertyName,
+    // Notify landowner of cancellation
+    if (property) {
+      notifyBookingCancelled(admin, {
+        landownerId: property.owner_id,
+        anglerName:
+          anglerProfile?.display_name ?? "An angler",
+        propertyName: property.name,
         bookingDate: booking.booking_date,
         bookingId: booking.id,
-        landownerNotes: result.data.landowner_notes,
-      }).catch((err) =>
-        console.error("[bookings/[id]] Notification error:", err)
-      );
-    } else if (result.data.status === "declined") {
-      notifyBookingDeclined(admin, {
-        anglerId: booking.angler_id,
-        propertyName,
-        bookingDate: booking.booking_date,
-        bookingId: booking.id,
-        landownerNotes: result.data.landowner_notes,
       }).catch((err) =>
         console.error("[bookings/[id]] Notification error:", err)
       );
     }
 
-    return NextResponse.json({ booking: updated });
+    return NextResponse.json({ booking: updated, refund });
   } catch (err) {
     console.error("[bookings/[id]] Unexpected error:", err);
     return NextResponse.json(

@@ -41,7 +41,7 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (!["pending", "confirmed"].includes(booking.status)) {
+    if (booking.status !== "confirmed") {
       return NextResponse.json(
         { error: "This booking cannot be cancelled" },
         { status: 400 }
@@ -53,11 +53,8 @@ export async function GET(
         ? booking.total_amount
         : parseFloat(String(booking.total_amount ?? "0"));
 
-    // Only confirmed bookings have been charged; pending ones are free to cancel
-    const refund = calculateRefund(
-      booking.booking_date,
-      booking.status === "confirmed" ? totalAmount : 0
-    );
+    // All bookings are instant-confirmed, so refund tiers always apply
+    const refund = calculateRefund(booking.booking_date, totalAmount);
 
     return NextResponse.json({
       refund,

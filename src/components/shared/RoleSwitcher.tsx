@@ -11,6 +11,7 @@ import {
   Plus,
   Check,
   Loader2,
+  Compass,
 } from "lucide-react";
 
 const ROLE_CONFIG: Record<
@@ -38,6 +39,13 @@ const ROLE_CONFIG: Record<
     bg: "bg-river/10",
     home: "/club",
   },
+  guide: {
+    label: "Guide",
+    icon: Compass,
+    color: "text-charcoal",
+    bg: "bg-charcoal/10",
+    home: "/guide",
+  },
 };
 
 const ADDABLE_ROLES = [
@@ -55,6 +63,11 @@ const ADDABLE_ROLES = [
     value: "angler",
     label: "Enable Angler Mode",
     description: "Browse and book private fishing waters",
+  },
+  {
+    value: "guide",
+    label: "Become a Guide",
+    description: "Offer guided fishing trips on AnglerPass",
   },
 ];
 

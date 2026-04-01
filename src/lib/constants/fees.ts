@@ -13,6 +13,10 @@
 /** 15% markup on the base rod fee, paid by the angler to AnglerPass. */
 export const PLATFORM_FEE_RATE = 0.15;
 
+// ─── Guide Service Fee ──────────────────────────────────────────────
+/** 10% service fee on guide rates, paid by the angler to AnglerPass. */
+export const GUIDE_SERVICE_FEE_RATE = 0.10;
+
 // ─── Cross-Club Network Fee ─────────────────────────────────────────
 /**
  * Flat fee per rod when an angler books a property through the Cross-Club
@@ -56,12 +60,20 @@ export interface FeeBreakdown {
   /** Whether this is a cross-club booking */
   isCrossClub: boolean;
 
+  // ── Guide fees ──
+  /** Guide's day rate (full or half day), $0 if no guide */
+  guideRate: number;
+  /** Guide service fee (10% of guideRate), paid by angler to AnglerPass */
+  guideServiceFee: number;
+  /** Guide payout (guideRate — guide keeps 100%) */
+  guidePayout: number;
+
   // ── Payout breakdown (for internal tracking / Stripe splits) ──
   /** Club commission ($5/rod from the landowner's rate) */
   clubCommission: number;
   /** Landowner net payout (baseRate - clubCommission) */
   landownerPayout: number;
-  /** Total AnglerPass revenue (platformFee + crossClubFee) */
+  /** Total AnglerPass revenue (platformFee + crossClubFee + guideServiceFee) */
   anglerpassRevenue: number;
 }
 
@@ -71,23 +83,32 @@ export interface FeeBreakdown {
  * @param ratePerRod  — Landowner's listed rate per rod (full or half day)
  * @param rodCount    — Number of anglers (rods)
  * @param isCrossClub — Whether the booking is through the Cross-Club Network
+ * @param guideRate   — Optional guide day rate (full or half day)
  */
 export function calculateFeeBreakdown(
   ratePerRod: number,
   rodCount: number,
-  isCrossClub: boolean = false
+  isCrossClub: boolean = false,
+  guideRate: number = 0
 ): FeeBreakdown {
   const baseRate = round(ratePerRod * rodCount);
   const platformFee = round(baseRate * PLATFORM_FEE_RATE);
   const crossClubFee = isCrossClub
     ? round(CROSS_CLUB_FEE_PER_ROD * rodCount)
     : 0;
-  const totalAmount = round(baseRate + platformFee + crossClubFee);
+
+  // Guide fees
+  const guideServiceFee = round(guideRate * GUIDE_SERVICE_FEE_RATE);
+  const guidePayout = round(guideRate);
+
+  const totalAmount = round(
+    baseRate + platformFee + crossClubFee + guideRate + guideServiceFee
+  );
 
   // Payout splits
   const clubCommission = round(CLUB_COMMISSION_PER_ROD * rodCount);
   const landownerPayout = round(baseRate - clubCommission);
-  const anglerpassRevenue = round(platformFee + crossClubFee);
+  const anglerpassRevenue = round(platformFee + crossClubFee + guideServiceFee);
 
   return {
     ratePerRod,
@@ -97,6 +118,9 @@ export function calculateFeeBreakdown(
     crossClubFee,
     totalAmount,
     isCrossClub,
+    guideRate,
+    guideServiceFee,
+    guidePayout,
     clubCommission,
     landownerPayout,
     anglerpassRevenue,

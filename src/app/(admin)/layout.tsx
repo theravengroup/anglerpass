@@ -7,6 +7,7 @@ import {
   UserPlus,
   Settings,
   Building2,
+  Compass,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -32,6 +33,11 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     label: "Clubs",
     href: "/admin/clubs",
     icon: <Building2 />,
+  },
+  {
+    label: "Guides",
+    href: "/admin/guides",
+    icon: <Compass />,
   },
   {
     label: "Team",

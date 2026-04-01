@@ -8,6 +8,11 @@ import {
   Settings,
   Compass,
   FileText,
+  Star,
+  MessageSquare,
+  DollarSign,
+  UserCircle,
+  Calendar,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -61,6 +66,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <MapPin />,
     },
     {
+      label: "Guide Approvals",
+      href: "/club/guide-approvals",
+      icon: <Compass />,
+    },
+    {
       label: "Settings",
       href: "/club/settings",
       icon: <Settings />,
@@ -78,6 +88,38 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <Compass />,
     },
   ],
+  guide: [
+    {
+      label: "My Profile",
+      href: "/guide/profile",
+      icon: <UserCircle />,
+    },
+    {
+      label: "Availability",
+      href: "/guide/availability",
+      icon: <Calendar />,
+    },
+    {
+      label: "Bookings",
+      href: "/guide/bookings",
+      icon: <CalendarDays />,
+    },
+    {
+      label: "Reviews",
+      href: "/guide/reviews",
+      icon: <Star />,
+    },
+    {
+      label: "Messages",
+      href: "/guide/messages",
+      icon: <MessageSquare />,
+    },
+    {
+      label: "Earnings",
+      href: "/guide/earnings",
+      icon: <DollarSign />,
+    },
+  ],
 };
 
 const PAGE_TITLES: Record<string, string> = {
@@ -93,9 +135,17 @@ const PAGE_TITLES: Record<string, string> = {
   "/club/members": "Members",
   "/club/properties": "Properties",
   "/club/settings": "Club Settings",
+  "/club/guide-approvals": "Guide Approvals",
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/discover": "Discover",
+  "/guide": "Guide Dashboard",
+  "/guide/profile": "Guide Profile",
+  "/guide/availability": "Availability",
+  "/guide/bookings": "Guide Bookings",
+  "/guide/reviews": "Reviews",
+  "/guide/messages": "Messages",
+  "/guide/earnings": "Earnings",
   "/dashboard/notifications": "Notifications",
   "/dashboard/settings": "Settings",
 };

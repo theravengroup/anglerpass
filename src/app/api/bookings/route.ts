@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { bookingSchema } from "@/lib/validations/bookings";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
-import { notifyBookingRequested } from "@/lib/notifications";
+import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated } from "@/lib/notifications";
 import { detectCrossClubRouting } from "@/lib/cross-club";
 
 // POST: Create a booking request
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       party_size,
       non_fishing_guests,
       message,
+      guide_id,
     } = result.data;
 
     const admin = createAdminClient();
@@ -205,13 +206,91 @@ export async function POST(request: Request) {
 
     const isCrossClub = routing.isCrossClub;
 
+    // ── Guide validation (optional add-on) ──────────────────────
+    let guideRate = 0;
+    let guideUserId: string | null = null;
+    let guideName: string | null = null;
+
+    if (guide_id) {
+      // Verify guide exists and is approved
+      const { data: guideProfile } = await (admin
+        .from("guide_profiles" as never)
+        .select("id, user_id, display_name, status, rate_full_day, rate_half_day, max_anglers")
+        .eq("id" as never, guide_id)
+        .single()) as unknown as {
+        data: {
+          id: string;
+          user_id: string;
+          display_name: string;
+          status: string;
+          rate_full_day: number | null;
+          rate_half_day: number | null;
+          max_anglers: number | null;
+        } | null;
+      };
+
+      if (!guideProfile || guideProfile.status !== "approved") {
+        return NextResponse.json(
+          { error: "Selected guide is not available" },
+          { status: 400 }
+        );
+      }
+
+      // Verify guide has water approval for this property
+      const { data: waterApproval } = await (admin
+        .from("guide_water_approvals" as never)
+        .select("id")
+        .eq("guide_id" as never, guide_id)
+        .eq("property_id" as never, property_id)
+        .eq("status" as never, "approved")
+        .single()) as unknown as { data: { id: string } | null };
+
+      if (!waterApproval) {
+        return NextResponse.json(
+          { error: "Selected guide is not approved for this property" },
+          { status: 400 }
+        );
+      }
+
+      // Verify guide is available on the date
+      const { data: blocked } = await (admin
+        .from("guide_availability" as never)
+        .select("id")
+        .eq("guide_id" as never, guide_id)
+        .eq("date" as never, booking_date)
+        .in("status" as never, ["blocked", "booked"])
+        .single()) as unknown as { data: { id: string } | null };
+
+      if (blocked) {
+        return NextResponse.json(
+          { error: "Selected guide is not available on this date" },
+          { status: 400 }
+        );
+      }
+
+      // Check party size fits guide capacity
+      if (guideProfile.max_anglers && party_size > guideProfile.max_anglers) {
+        return NextResponse.json(
+          { error: `Guide can accommodate up to ${guideProfile.max_anglers} anglers` },
+          { status: 400 }
+        );
+      }
+
+      guideRate =
+        duration === "full_day"
+          ? (guideProfile.rate_full_day ?? 0)
+          : (guideProfile.rate_half_day ?? 0);
+      guideUserId = guideProfile.user_id;
+      guideName = guideProfile.display_name;
+    }
+
     // Calculate full fee breakdown
     const ratePerRod =
       duration === "full_day"
         ? (property.rate_adult_full_day ?? 0)
         : (property.rate_adult_half_day ?? 0);
 
-    const fees = calculateFeeBreakdown(ratePerRod, party_size, isCrossClub);
+    const fees = calculateFeeBreakdown(ratePerRod, party_size, isCrossClub, guideRate);
 
     // Create the booking with full fee breakdown
     const { data: booking, error: insertError } = await admin
@@ -232,7 +311,16 @@ export async function POST(request: Request) {
         total_amount: fees.totalAmount,
         is_cross_club: isCrossClub,
         message: message || null,
-        status: "pending",
+        status: "confirmed",
+        confirmed_at: new Date().toISOString(),
+        ...(guide_id
+          ? {
+              guide_id,
+              guide_rate: guideRate,
+              guide_service_fee: fees.guideServiceFee,
+              guide_payout: fees.guidePayout,
+            }
+          : {}),
       })
       .select()
       .single();
@@ -255,22 +343,56 @@ export async function POST(request: Request) {
       );
     }
 
-    // Notify landowner (fire-and-forget)
+    // Mark guide availability as booked
+    if (guide_id) {
+      await (admin
+        .from("guide_availability" as never)
+        .upsert({
+          guide_id,
+          date: booking_date,
+          status: "booked",
+          booking_id: booking.id,
+        } as never));
+    }
+
+    // Notify landowner (informational — booking is already confirmed)
     const { data: anglerProfile } = await admin
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
       .single();
 
-    notifyBookingRequested(admin, {
+    const anglerName = anglerProfile?.display_name ?? "An angler";
+
+    notifyBookingCreated(admin, {
       landownerId: property.owner_id,
-      anglerName: anglerProfile?.display_name ?? "An angler",
+      anglerName,
       propertyName: property.name,
       bookingDate: booking_date,
       duration,
       partySize: party_size,
       bookingId: booking.id,
     }).catch((err) => console.error("[bookings] Notification error:", err));
+
+    // Notify angler of instant confirmation
+    notifyBookingConfirmed(admin, {
+      anglerId: user.id,
+      propertyName: property.name,
+      bookingDate: booking_date,
+      bookingId: booking.id,
+      guideName: guideName ?? undefined,
+    }).catch((err) => console.error("[bookings] Confirmation notification error:", err));
+
+    // Notify guide of new booking (if guide was selected)
+    if (guideUserId && guide_id) {
+      notifyGuideBookingCreated(admin, {
+        guideUserId,
+        anglerName,
+        propertyName: property.name,
+        bookingDate: booking_date,
+        bookingId: booking.id,
+      }).catch((err) => console.error("[bookings] Guide notification error:", err));
+    }
 
     return NextResponse.json({ booking }, { status: 201 });
   } catch (err) {

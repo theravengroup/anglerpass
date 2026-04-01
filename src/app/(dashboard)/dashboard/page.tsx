@@ -14,6 +14,9 @@ import {
   ArrowRight,
   CheckCircle2,
   Circle,
+  Star,
+  DollarSign,
+  Compass,
   type LucideIcon,
 } from "lucide-react";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -56,6 +59,11 @@ const ROLE_STATS: Record<string, StatItem[]> = {
     { label: "Properties", value: "0", description: "Available to book", icon: MapPin, color: "text-forest", bg: "bg-forest/10" },
     { label: "Memberships", value: "0", description: "Club memberships", icon: Users, color: "text-bronze", bg: "bg-bronze/10" },
   ],
+  guide: [
+    { label: "Upcoming Trips", value: "0", description: "Guiding this week", icon: CalendarDays, color: "text-river", bg: "bg-river/10" },
+    { label: "Rating", value: "--", description: "Average rating", icon: Star, color: "text-bronze", bg: "bg-bronze/10" },
+    { label: "Earnings", value: "$0", description: "This month", icon: DollarSign, color: "text-forest", bg: "bg-forest/10" },
+  ],
 };
 
 const ROLE_STEPS: Record<string, StepItem[]> = {
@@ -75,6 +83,13 @@ const ROLE_STEPS: Record<string, StepItem[]> = {
     { label: "Complete your profile", description: "Add your name, location, and fishing preferences", href: "/dashboard/settings", done: false },
     { label: "Explore private waters", description: "Browse available properties and membership opportunities", href: "/angler/discover", done: false },
     { label: "Make your first booking", description: "Reserve a fishing day at a private property", href: "/angler/bookings", done: false },
+  ],
+  guide: [
+    { label: "Complete your guide profile", description: "Add your bio, techniques, species, and pricing", href: "/guide/profile", done: false },
+    { label: "Upload credentials", description: "License, insurance, and First Aid certification", href: "/guide/profile", done: false },
+    { label: "Set your pricing and availability", description: "Configure rates and block off unavailable dates", href: "/guide/availability", done: false },
+    { label: "Request water approvals from clubs", description: "Ask clubs to approve you for their waters", href: "/guide/profile", done: false },
+    { label: "Wait for admin review", description: "Our team will review your credentials and approve your profile", href: "/guide/profile", done: false },
   ],
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,10 +26,13 @@ import {
   CheckCircle2,
   ScrollText,
   Send,
+  Star,
+  Compass,
 } from "lucide-react";
 import {
   calculateFeeBreakdown,
   ROD_NOMENCLATURE,
+  GUIDE_SERVICE_FEE_RATE,
 } from "@/lib/constants/fees";
 
 interface PropertyDetail {
@@ -66,6 +69,19 @@ const WATER_TYPE_LABELS: Record<string, string> = {
   reservoir: "Reservoir",
 };
 
+interface MatchedGuide {
+  id: string;
+  display_name: string;
+  profile_photo_url: string | null;
+  techniques: string[];
+  rating_avg: number;
+  rating_count: number;
+  trips_completed: number;
+  rate: number | null;
+  rate_full_day: number | null;
+  rate_half_day: number | null;
+}
+
 export default function PropertyDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -83,6 +99,11 @@ export default function PropertyDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  // Guide add-on state
+  const [availableGuides, setAvailableGuides] = useState<MatchedGuide[]>([]);
+  const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
+  const [loadingGuides, setLoadingGuides] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -112,12 +133,48 @@ export default function PropertyDetailPage() {
     load();
   }, [id]);
 
+  // Fetch available guides when date/duration/party changes
+  const fetchGuides = useCallback(async () => {
+    if (!property || !bookingDate) {
+      setAvailableGuides([]);
+      return;
+    }
+    setLoadingGuides(true);
+    try {
+      const params = new URLSearchParams({
+        property_id: property.id,
+        date: bookingDate,
+        party_size: String(partySize),
+        duration,
+      });
+      const res = await fetch(`/api/guides/match?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAvailableGuides(data.guides ?? []);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoadingGuides(false);
+    }
+  }, [property, bookingDate, partySize, duration]);
+
+  useEffect(() => {
+    fetchGuides();
+    setSelectedGuideId(null); // Reset guide selection when params change
+  }, [fetchGuides]);
+
+  const selectedGuide = availableGuides.find((g) => g.id === selectedGuideId);
+  const guideRate = selectedGuide
+    ? (selectedGuide.rate ?? 0)
+    : 0;
+
   const isCrossClub = property?.is_cross_club ?? false;
   const ratePerRod =
     duration === "full_day"
       ? (property?.rate_adult_full_day ?? 0)
       : (property?.rate_adult_half_day ?? 0);
-  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub);
+  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub, guideRate);
 
   async function handleBooking() {
     if (!property || !selectedMembership || !bookingDate) return;
@@ -137,6 +194,7 @@ export default function PropertyDetailPage() {
           party_size: partySize,
           non_fishing_guests: nonFishingGuests,
           message: message || undefined,
+          guide_id: selectedGuideId || undefined,
         }),
       });
 
@@ -330,11 +388,13 @@ export default function PropertyDetailPage() {
               <CardContent className="flex flex-col items-center py-8">
                 <CheckCircle2 className="size-10 text-forest" />
                 <h3 className="mt-3 text-base font-medium text-text-primary">
-                  Booking Requested
+                  Booking Confirmed!
                 </h3>
                 <p className="mt-1 text-center text-sm text-text-secondary">
-                  Your booking request has been sent to the landowner.
-                  You&apos;ll be notified when they respond.
+                  Your booking is confirmed. Access details are available in your bookings.
+                  {selectedGuide && (
+                    <> Your guide {selectedGuide.display_name} will be in touch before your trip.</>
+                  )}
                 </p>
                 <div className="mt-4 flex gap-2">
                   <Link href="/angler/bookings">
@@ -525,6 +585,87 @@ export default function PropertyDetailPage() {
                   />
                 </div>
 
+                {/* Guide add-on */}
+                {bookingDate && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-1.5">
+                      <Compass className="size-3.5 text-charcoal" />
+                      Add a Guide
+                    </Label>
+
+                    {loadingGuides ? (
+                      <div className="flex items-center gap-2 rounded-lg border border-stone-light/15 px-3 py-2 text-xs text-text-light">
+                        <Loader2 className="size-3 animate-spin" />
+                        Finding available guides...
+                      </div>
+                    ) : availableGuides.length === 0 ? (
+                      <p className="text-xs text-text-light">
+                        No guides available for this date
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {/* No guide option */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedGuideId(null)}
+                          className={`w-full rounded-lg border p-2.5 text-left text-sm transition-colors ${
+                            !selectedGuideId
+                              ? "border-charcoal bg-charcoal/5"
+                              : "border-stone-light/20 hover:border-stone-light/40"
+                          }`}
+                        >
+                          No guide needed
+                        </button>
+
+                        {availableGuides.slice(0, 5).map((guide, idx) => (
+                          <button
+                            key={guide.id}
+                            type="button"
+                            onClick={() => setSelectedGuideId(guide.id)}
+                            className={`w-full rounded-lg border p-2.5 text-left transition-colors ${
+                              selectedGuideId === guide.id
+                                ? "border-charcoal bg-charcoal/5"
+                                : "border-stone-light/20 hover:border-stone-light/40"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-charcoal/10 text-xs font-semibold text-charcoal">
+                                {guide.display_name.charAt(0)}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-medium text-text-primary truncate">
+                                    {guide.display_name}
+                                  </span>
+                                  {idx === 0 && (
+                                    <span className="shrink-0 rounded bg-bronze/10 px-1.5 py-0.5 text-[10px] font-medium text-bronze">
+                                      Best match
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-text-light">
+                                  {guide.rating_count > 0 && (
+                                    <span className="flex items-center gap-0.5">
+                                      <Star className="size-3 fill-bronze text-bronze" />
+                                      {Number(guide.rating_avg).toFixed(1)}
+                                    </span>
+                                  )}
+                                  {guide.trips_completed > 0 && (
+                                    <span>{guide.trips_completed} trips</span>
+                                  )}
+                                </div>
+                              </div>
+                              <span className="text-sm font-semibold text-forest">
+                                ${guide.rate}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Fee breakdown */}
                 {bookingDate && (
                   <div className="space-y-1.5 rounded-lg bg-offwhite/80 p-3 text-sm">
@@ -548,6 +689,20 @@ export default function PropertyDetailPage() {
                       <span>Platform fee (15%)</span>
                       <span>${fees.platformFee.toFixed(2)}</span>
                     </div>
+                    {fees.guideRate > 0 && (
+                      <>
+                        <div className="flex justify-between text-text-secondary">
+                          <span>
+                            Guide — {selectedGuide?.display_name} ({duration === "half_day" ? "half" : "full"} day)
+                          </span>
+                          <span>${fees.guideRate.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-text-light">
+                          <span>Guide service fee (10%)</span>
+                          <span>${fees.guideServiceFee.toFixed(2)}</span>
+                        </div>
+                      </>
+                    )}
                     {nonFishingGuests > 0 && (
                       <div className="flex justify-between text-text-light">
                         <span>
@@ -581,11 +736,11 @@ export default function PropertyDetailPage() {
                   ) : (
                     <Send className="size-4" />
                   )}
-                  Request Booking
+                  Book Now
                 </Button>
 
                 <p className="text-center text-xs text-text-light">
-                  The landowner will review and confirm your request.
+                  Instant confirmation — your spot is reserved immediately.
                 </p>
               </CardContent>
             </Card>

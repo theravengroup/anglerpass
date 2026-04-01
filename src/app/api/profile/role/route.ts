@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
 
-const SWITCHABLE_ROLES = ["landowner", "club_admin", "angler"] as const;
+const SWITCHABLE_ROLES = ["landowner", "club_admin", "angler", "guide"] as const;
 
 const switchRoleSchema = z.object({
   role: z.enum(SWITCHABLE_ROLES),

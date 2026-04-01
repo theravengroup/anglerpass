@@ -22,6 +22,7 @@ export const bookingSchema = z.object({
   party_size: z.number().int().min(1).max(20).default(1),
   non_fishing_guests: z.number().int().min(0).max(50).default(0),
   message: z.string().max(2000).optional().or(z.literal("")),
+  guide_id: z.string().uuid().optional(),
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
