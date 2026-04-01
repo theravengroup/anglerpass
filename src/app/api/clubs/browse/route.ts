@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { escapeIlike } from "@/lib/api/helpers";
 
 // GET: Browse/search clubs (for anglers looking to join)
 export async function GET(request: Request) {
@@ -40,16 +41,16 @@ export async function GET(request: Request) {
       .order("name", { ascending: true })
       .limit(50);
 
-    // Apply search filter (safe — no special PostgREST chars in ilike)
+    // Apply search filter with proper ilike escaping
     if (q) {
-      const safeQ = q.replace(/[%_]/g, "");
+      const safeQ = escapeIlike(q);
       query = query.or(
         `name.ilike.%${safeQ}%,description.ilike.%${safeQ}%`
       );
     }
 
     if (location) {
-      const safeLoc = location.replace(/[%_]/g, "");
+      const safeLoc = escapeIlike(location);
       query = query.ilike("location", `%${safeLoc}%`);
     }
 

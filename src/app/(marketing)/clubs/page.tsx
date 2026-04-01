@@ -86,101 +86,30 @@ export default function ClubsPage() {
   return (
     <>
       {/* Hero */}
-      <section
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'var(--color-forest-deep)',
-          padding: '160px 0 100px',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(ellipse at bottom left, rgba(154,115,64,0.1), transparent 60%)',
-          }}
-        />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            className="audience-hero-badge"
-            style={{
-              display: 'inline-block',
-              marginBottom: 20,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze-light)',
-            }}
-          >
+      <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
+        <div className="relative max-w-[800px] mx-auto px-8 text-center">
+          <span className="audience-hero-badge inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Clubs
           </span>
-          <h1
-            className="audience-hero-heading"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(38px, 5vw, 58px)',
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: 'var(--color-parchment)',
-              letterSpacing: '-.5px',
-              margin: '0 0 24px',
-            }}
-          >
+          <h1 className="audience-hero-heading font-heading text-[clamp(38px,5vw,58px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
             Run Your Club<br />Like It Deserves.
           </h1>
-          <p
-            className="audience-hero-sub"
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'rgba(240,234,214,.6)',
-              maxWidth: 560,
-              margin: '0 auto 40px',
-            }}
-          >
+          <p className="audience-hero-sub text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto mb-10">
             Clubs are the trust layer of AnglerPass. You vet your members,
             landowners trust your judgment, and everyone gets access to better water.
             Modern tools for clubs that take their operations seriously.
           </p>
-          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas flex gap-3.5 justify-center flex-wrap">
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'var(--color-bronze)',
-                color: '#fff',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
             >
               Join the Waitlist &rarr;
             </Link>
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'transparent',
-                color: 'var(--color-parchment)',
-                border: '1px solid rgba(240,234,214,.2)',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
               Talk to Us
             </Link>
@@ -189,104 +118,34 @@ export default function ClubsPage() {
       </section>
 
       {/* Features grid */}
-      <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-river)',
-              }}
-            >
+      <section className="py-[120px] bg-offwhite">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
               Club Operations
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-                textWrap: 'balance',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
               Modern tools for serious clubs
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Replace binders, email chains, and bulletin boards with a platform
               built specifically for fly fishing club management.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '36px 28px',
-                  transition: 'all .5s cubic-bezier(.22,1,.36,1)',
-                }}
+                className={`reveal d${(i % 3) + 1} bg-white border border-parchment rounded-[14px] px-7 py-9 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]`}
               >
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 10,
-                    background: 'rgba(58,107,124,.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 20,
-                    color: 'var(--color-river)',
-                  }}
-                >
+                <div className="w-[44px] h-[44px] rounded-[10px] bg-river/8 flex items-center justify-center mb-5 text-river">
                   {feature.icon}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 10,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-2.5 tracking-[-0.2px]">
                   {feature.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.7,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {feature.description}
                 </p>
               </div>
@@ -296,58 +155,23 @@ export default function ClubsPage() {
       </section>
 
       {/* Pricing tiers */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-river)',
-              }}
-            >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="max-w-[1000px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
               Club Pricing
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-                textWrap: 'balance',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
               Simple plans that grow with your club
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Your subscription covers the platform. You set your own initiation fees
               and annual dues &mdash; we just add a 3.5% processing fee at checkout,
               paid by the member, to cover payment processing. Your club receives 100%
               of your stated fees.
             </p>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
             {[
               {
                 name: 'Starter',
@@ -373,68 +197,30 @@ export default function ClubsPage() {
             ].map((tier, i) => (
               <div
                 key={tier.name}
-                className={`reveal d${i + 1}`}
-                style={{
-                  background: '#fff',
-                  border: tier.highlight ? '2px solid var(--color-river)' : '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '36px 28px',
-                  position: 'relative',
-                }}
+                className={`reveal d${i + 1} bg-white ${tier.highlight ? 'border-2 border-river' : 'border border-parchment'} rounded-[14px] px-7 py-9 relative`}
               >
                 {tier.highlight && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: -12,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      background: 'var(--color-river)',
-                      color: '#fff',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      padding: '4px 16px',
-                      borderRadius: 100,
-                    }}
-                  >
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-river text-white text-[11px] font-semibold tracking-[0.1em] uppercase px-4 py-1 rounded-full">
                     Most Popular
                   </span>
                 )}
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 4,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[22px] font-semibold text-forest mb-1 tracking-[-0.2px]">
                   {tier.name}
                 </h3>
-                <div style={{ marginBottom: 12 }}>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 600, color: 'var(--color-forest)' }}>
+                <div className="mb-3">
+                  <span className="font-heading text-[36px] font-semibold text-forest">
                     {tier.price}
                   </span>
-                  <span style={{ fontSize: 14, color: 'var(--color-text-light)' }}>/month</span>
+                  <span className="text-sm text-text-light">/month</span>
                 </div>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-text-secondary)', marginBottom: 20 }}>
+                <p className="text-sm leading-[1.6] text-text-secondary mb-5">
                   {tier.description}
                 </p>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                <ul className="list-none m-0 p-0">
                   {tier.features.map((feature) => (
                     <li
                       key={feature}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '6px 0',
-                        fontSize: 13.5,
-                        color: 'var(--color-text-secondary)',
-                      }}
+                      className="flex items-center gap-2 py-1.5 text-[13.5px] text-text-secondary"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-river)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
@@ -446,27 +232,19 @@ export default function ClubsPage() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 32, maxWidth: 600, margin: '32px auto 0' }}>
-            <p style={{ fontSize: 13, color: 'var(--color-text-light)', fontStyle: 'italic', marginBottom: 12 }}>
+          <div className="text-center max-w-[600px] mx-auto mt-8">
+            <p className="text-[13px] text-text-light italic mb-3">
               All plans include a 30-day free trial. No credit card required to start.
               <br />
               Need more properties? Additional properties available at tiered pricing.
             </p>
-            <div
-              style={{
-                background: 'rgba(58,107,124,.06)',
-                border: '1px solid rgba(58,107,124,.12)',
-                borderRadius: 10,
-                padding: '20px 24px',
-                marginTop: 20,
-              }}
-            >
-              <p style={{ fontSize: 13.5, color: 'var(--color-text-secondary)', lineHeight: 1.7, margin: 0 }}>
-                <strong style={{ color: 'var(--color-forest)' }}>Membership payments:</strong> You set your
+            <div className="bg-river/6 border border-river/12 rounded-[10px] px-6 py-5 mt-5">
+              <p className="text-[13.5px] text-text-secondary leading-[1.7] m-0">
+                <strong className="text-forest">Membership payments:</strong> You set your
                 initiation fees and annual dues. When members pay, we add a 3.5% processing fee at
                 checkout to cover credit card processing &mdash; paid by the member, not by your club.
                 Your club receives 100% of your stated fees. See our{' '}
-                <Link href="/pricing" style={{ color: 'var(--color-river)', textDecoration: 'underline' }}>
+                <Link href="/pricing" className="text-river underline">
                   pricing page
                 </Link>{' '}
                 for full details.
@@ -477,43 +255,15 @@ export default function ClubsPage() {
       </section>
 
       {/* Cross-club access */}
-      <section style={{ padding: '100px 0', background: 'var(--color-offwhite)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-river)',
-            }}
-          >
+      <section className="py-[100px] bg-offwhite">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
             Cross-Club Network
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             Expand your members&rsquo; access without expanding your lease
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
             Standard and Pro clubs can opt in to cross-club access &mdash; letting
             your members book fishing days on water managed by other clubs in the
             AnglerPass network, and vice versa. More value for your members, more
@@ -523,43 +273,15 @@ export default function ClubsPage() {
       </section>
 
       {/* Value prop */}
-      <section style={{ padding: '80px 0', background: 'var(--color-parchment-light)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
-            }}
-          >
+      <section className="py-20 bg-parchment-light">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             The Trust Layer
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             Clubs make private water access work
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
             Landowners don&rsquo;t want strangers on their property. They want vetted,
             responsible anglers &mdash; and your club is the one doing the vetting.
             AnglerPass makes your club the gateway to private water, giving your
@@ -572,55 +294,18 @@ export default function ClubsPage() {
       <ClubFaqSection />
 
       {/* CTA */}
-      <section
-        style={{
-          padding: '120px 0',
-          background: 'var(--color-forest-deep)',
-          textAlign: 'center',
-        }}
-      >
-        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 42px)',
-              fontWeight: 500,
-              color: 'var(--color-parchment)',
-              margin: '0 0 16px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+      <section className="py-[120px] bg-forest-deep text-center">
+        <div className="reveal max-w-[600px] mx-auto px-8">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium text-parchment mb-4 tracking-[-0.3px] text-balance">
             Bring your club into the modern era
           </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: 'rgba(240,234,214,.5)',
-              maxWidth: 440,
-              margin: '0 auto 40px',
-              lineHeight: 1.7,
-            }}
-          >
+          <p className="text-[16px] text-parchment/50 max-w-[440px] mx-auto mb-10 leading-[1.7]">
             Join the waitlist and be among the first clubs to use AnglerPass when
             we launch.
           </p>
           <Link
             href="/#waitlist"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '16px 40px',
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: '.3px',
-              textDecoration: 'none',
-              background: 'var(--color-bronze)',
-              color: '#fff',
-              transition: 'all .4s',
-            }}
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
           >
             Join the Waitlist
           </Link>

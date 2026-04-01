@@ -85,101 +85,30 @@ export default function AnglersPage() {
   return (
     <>
       {/* Hero */}
-      <section
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'var(--color-forest-deep)',
-          padding: '160px 0 100px',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(ellipse at bottom left, rgba(154,115,64,0.1), transparent 60%)',
-          }}
-        />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            className="audience-hero-badge"
-            style={{
-              display: 'inline-block',
-              marginBottom: 20,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze-light)',
-            }}
-          >
+      <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
+        <div className="relative max-w-[800px] mx-auto px-8 text-center">
+          <span className="audience-hero-badge inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Anglers
           </span>
-          <h1
-            className="audience-hero-heading"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(38px, 5vw, 58px)',
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: 'var(--color-parchment)',
-              letterSpacing: '-.5px',
-              margin: '0 0 24px',
-            }}
-          >
+          <h1 className="audience-hero-heading font-heading text-[clamp(38px,5vw,58px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
             Find the Water<br />Worth Finding.
           </h1>
-          <p
-            className="audience-hero-sub"
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'rgba(240,234,214,.6)',
-              maxWidth: 560,
-              margin: '0 auto 40px',
-            }}
-          >
+          <p className="audience-hero-sub text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto mb-10">
             Access private waters through trusted fly fishing clubs. AnglerPass
             connects serious anglers with exceptional properties through a
             club-based platform built on vetting, trust, and respect for the resource.
           </p>
-          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas flex gap-3.5 justify-center flex-wrap">
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'var(--color-bronze)',
-                color: '#fff',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
             >
               Join the Waitlist &rarr;
             </Link>
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'transparent',
-                color: 'var(--color-parchment)',
-                border: '1px solid rgba(240,234,214,.2)',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
               Get in Touch
             </Link>
@@ -188,104 +117,34 @@ export default function AnglersPage() {
       </section>
 
       {/* Features grid */}
-      <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-bronze)',
-              }}
-            >
+      <section className="py-[120px] bg-offwhite">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
               The Angler Experience
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-                textWrap: 'balance',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
               Access water worth the trip
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Join a club, get vetted, and unlock access to private waters that
               were previously available only through personal connections.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '36px 28px',
-                  transition: 'all .5s cubic-bezier(.22,1,.36,1)',
-                }}
+                className={`reveal d${(i % 3) + 1} bg-white border border-parchment rounded-[14px] px-7 py-9 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]`}
               >
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 10,
-                    background: 'rgba(154,115,64,.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 20,
-                    color: 'var(--color-bronze)',
-                  }}
-                >
+                <div className="w-[44px] h-[44px] rounded-[10px] bg-bronze/8 flex items-center justify-center mb-5 text-bronze">
                   {feature.icon}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 10,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-2.5 tracking-[-0.2px]">
                   {feature.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.7,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {feature.description}
                 </p>
               </div>
@@ -295,56 +154,20 @@ export default function AnglersPage() {
       </section>
 
       {/* Club membership trust section */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div className="reveal" style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
-            }}
-          >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="reveal max-w-[800px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             How It Works
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             Access starts with your club
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 620,
-              margin: '0 auto 48px',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[620px] mx-auto mb-12">
             AnglerPass is not a free-for-all booking site. Every angler accesses private
             water through a fly fishing club that vouches for its members. Clubs are the
             trust layer that makes landowners comfortable opening their gates.
           </p>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-              textAlign: 'left',
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6 text-left">
             {[
               { step: '01', title: 'Join a Club', text: 'Find a fly fishing club on AnglerPass and apply for membership. Clubs set their own standards and vet every applicant.' },
               { step: '02', title: 'Get Vetted', text: 'Your club reviews your application and vouches for you as a responsible angler. This vetting is what earns landowner trust.' },
@@ -352,40 +175,15 @@ export default function AnglersPage() {
             ].map((item, i) => (
               <div
                 key={item.step}
-                className={`reveal d${i + 1}`}
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '32px 24px',
-                }}
+                className={`reveal d${i + 1} bg-white border border-parchment rounded-[14px] px-6 py-8`}
               >
-                <span
-                  style={{
-                    display: 'inline-block',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: 'var(--color-bronze)',
-                    letterSpacing: '0.15em',
-                    marginBottom: 12,
-                  }}
-                >
+                <span className="inline-block font-mono text-[11px] font-semibold text-bronze tracking-[0.15em] mb-3">
                   STEP {item.step}
                 </span>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 10,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-2.5 tracking-[-0.2px]">
                   {item.title}
                 </h3>
-                <p style={{ fontSize: 14.5, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {item.text}
                 </p>
               </div>
@@ -395,126 +193,53 @@ export default function AnglersPage() {
       </section>
 
       {/* Booking fees section */}
-      <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
-            }}
-          >
+      <section className="py-20 bg-offwhite">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             Transparent Pricing
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             Simple, fair booking fees
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto 32px',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto mb-8">
             When you book a fishing day through AnglerPass, a 15% platform fee is
             added to the property&rsquo;s base rate. This fee covers the booking platform,
             payment processing, and the trust infrastructure that makes private water
             access possible. Here&rsquo;s how a typical booking breaks down:
           </p>
-          <div
-            style={{
-              background: '#fff',
-              border: '1px solid var(--color-parchment)',
-              borderRadius: 14,
-              padding: '28px 32px',
-              maxWidth: 480,
-              margin: '0 auto',
-              textAlign: 'left',
-            }}
-          >
-            <p style={{ fontSize: 11, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--color-text-light)', marginBottom: 16 }}>
+          <div className="bg-white border border-parchment rounded-[14px] px-8 py-7 max-w-[480px] mx-auto text-left">
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-text-light mb-4">
               Example booking
             </p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
-              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Rod fee (set by landowner)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$125</span>
+            <div className="flex justify-between items-center mb-3.5 pb-3.5 border-b border-parchment">
+              <span className="text-sm text-text-secondary">Rod fee (set by landowner)</span>
+              <span className="text-sm font-semibold text-forest">$125</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
-              <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Platform fee (15%)</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-bronze)' }}>$18.75</span>
+            <div className="flex justify-between items-center mb-3.5 pb-3.5 border-b border-parchment">
+              <span className="text-sm text-text-secondary">Platform fee (15%)</span>
+              <span className="text-sm font-semibold text-bronze">$18.75</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>You pay</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-forest)' }}>$143.75</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-forest">You pay</span>
+              <span className="text-[16px] font-bold text-forest">$143.75</span>
             </div>
           </div>
-          <p
-            style={{
-              fontSize: 13,
-              color: 'var(--color-text-light)',
-              marginTop: 16,
-              fontStyle: 'italic',
-            }}
-          >
+          <p className="text-[13px] text-text-light mt-4 italic">
             No hidden fees. No subscription required for anglers. You only pay when you book.
           </p>
         </div>
       </section>
 
       {/* Cross-club access section */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze)',
-            }}
-          >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             The Network Effect
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             One membership, expanding access
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
             Clubs on AnglerPass can opt in to cross-club access agreements, meaning
             your membership in one club can unlock fishing days on water managed by
             other clubs in the network. The more clubs that join, the more water
@@ -524,55 +249,18 @@ export default function AnglersPage() {
       </section>
 
       {/* CTA */}
-      <section
-        style={{
-          padding: '120px 0',
-          background: 'var(--color-forest-deep)',
-          textAlign: 'center',
-        }}
-      >
-        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 42px)',
-              fontWeight: 500,
-              color: 'var(--color-parchment)',
-              margin: '0 0 16px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+      <section className="py-[120px] bg-forest-deep text-center">
+        <div className="reveal max-w-[600px] mx-auto px-8">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium text-parchment mb-4 tracking-[-0.3px] text-balance">
             Your next best day on the water starts here
           </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: 'rgba(240,234,214,.5)',
-              maxWidth: 440,
-              margin: '0 auto 40px',
-              lineHeight: 1.7,
-            }}
-          >
+          <p className="text-[16px] text-parchment/50 max-w-[440px] mx-auto mb-10 leading-[1.7]">
             Join the waitlist and be among the first anglers to access
             exceptional private waters through club-vetted booking on AnglerPass.
           </p>
           <Link
             href="/#waitlist"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '16px 40px',
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: '.3px',
-              textDecoration: 'none',
-              background: 'var(--color-bronze)',
-              color: '#fff',
-              transition: 'all .4s',
-            }}
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
           >
             Join the Waitlist
           </Link>

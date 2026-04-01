@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema } from "@/lib/validations/properties";
 import { parseCoordinates } from "@/lib/geo";
@@ -14,8 +15,9 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const admin = createAdminClient();
+
+    const { data, error } = await admin
       .from("properties")
       .select("*")
       .eq("owner_id", user.id)
@@ -63,8 +65,9 @@ export async function POST(request: Request) {
     const { water_type, coordinates, ...rest } = result.data;
     const { latitude, longitude } = parseCoordinates(coordinates);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const admin = createAdminClient();
+
+    const { data, error } = await admin
       .from("properties")
       .insert({
         ...rest,

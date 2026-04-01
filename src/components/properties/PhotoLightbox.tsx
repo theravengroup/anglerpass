@@ -42,11 +42,15 @@ export default function PhotoLightbox({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Photo lightbox"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onClick={onClose}
     >
       {/* Close button */}
       <button
+        aria-label="Close lightbox"
         onClick={onClose}
         className="absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
       >
@@ -61,6 +65,7 @@ export default function PhotoLightbox({
       {/* Previous */}
       {photos.length > 1 && (
         <button
+          aria-label="Previous photo"
           onClick={(e) => {
             e.stopPropagation();
             goPrev();
@@ -82,6 +87,7 @@ export default function PhotoLightbox({
       {/* Next */}
       {photos.length > 1 && (
         <button
+          aria-label="Next photo"
           onClick={(e) => {
             e.stopPropagation();
             goNext();

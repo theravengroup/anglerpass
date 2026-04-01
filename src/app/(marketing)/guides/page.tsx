@@ -142,98 +142,30 @@ export default function GuidesPage() {
   return (
     <>
       {/* Hero */}
-      <section
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'var(--color-charcoal)',
-          padding: '160px 0 100px',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(ellipse at bottom right, rgba(58,107,124,0.15), transparent 60%)',
-          }}
-        />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 20,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze-light)',
-            }}
-          >
+      <section className="relative overflow-hidden bg-charcoal pt-[160px] pb-[100px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(58,107,124,0.15),_transparent_60%)]" />
+        <div className="relative max-w-[800px] mx-auto px-8 text-center">
+          <span className="inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Guides
           </span>
-          <h1
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(38px, 5vw, 58px)',
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: 'var(--color-parchment)',
-              letterSpacing: '-.5px',
-              margin: '0 0 24px',
-            }}
-          >
+          <h1 className="font-heading text-[clamp(38px,5vw,58px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
             Your Skills. Their Water.<br />More Clients.
           </h1>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'rgba(240,234,214,.6)',
-              maxWidth: 560,
-              margin: '0 auto 40px',
-            }}
-          >
+          <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto mb-10">
             AnglerPass connects professional guides with private water across the country.
             Get approved, set your rates, and let anglers book you directly when they
             reserve their trip. No cold calls, no middlemen.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="flex gap-[14px] justify-center flex-wrap">
             <Link
               href="/signup"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'var(--color-bronze)',
-                color: '#fff',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
             >
               Apply as a Guide &rarr;
             </Link>
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'transparent',
-                color: 'var(--color-parchment)',
-                border: '1px solid rgba(240,234,214,.2)',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
               Learn More
             </Link>
@@ -242,104 +174,34 @@ export default function GuidesPage() {
       </section>
 
       {/* Features grid */}
-      <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-charcoal)',
-              }}
-            >
+      <section className="py-[120px] bg-offwhite">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Guide Tools
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-                textWrap: 'balance',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
               Everything you need to run your guiding business
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Your dashboard, your schedule, your clients. AnglerPass handles the
               logistics so you can focus on putting people on fish.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '36px 28px',
-                  transition: 'all .5s cubic-bezier(.22,1,.36,1)',
-                }}
+                className={`reveal d${(i % 3) + 1} bg-white border border-parchment rounded-[14px] py-9 px-7 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]`}
               >
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 10,
-                    background: 'rgba(51,51,51,.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 20,
-                    color: 'var(--color-charcoal)',
-                  }}
-                >
+                <div className="w-[44px] h-[44px] rounded-[10px] bg-charcoal/8 flex items-center justify-center mb-5 text-charcoal">
                   {feature.icon}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 10,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-[10px] tracking-[-0.2px]">
                   {feature.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.7,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {feature.description}
                 </p>
               </div>
@@ -349,81 +211,31 @@ export default function GuidesPage() {
       </section>
 
       {/* How it works */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-charcoal)',
-              }}
-            >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="max-w-[900px] mx-auto px-8">
+          <div className="reveal text-center mb-16">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               How It Works
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
               From sign-up to first trip
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gap: 0 }}>
+          <div className="grid">
             {howItWorks.map((item, i) => (
               <div
                 key={item.step}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '60px 1fr',
-                  gap: 24,
-                  padding: '32px 0',
-                  borderBottom: i < howItWorks.length - 1 ? '1px solid var(--color-parchment)' : 'none',
-                }}
+                className={`reveal d${(i % 3) + 1} grid grid-cols-[60px_1fr] gap-6 py-8 ${i < howItWorks.length - 1 ? 'border-b border-parchment' : ''}`}
               >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 13,
-                    color: 'var(--color-charcoal)',
-                    fontWeight: 600,
-                    paddingTop: 4,
-                  }}
-                >
+                <span className="font-mono text-[13px] text-charcoal font-semibold pt-1">
                   {item.step}
                 </span>
                 <div>
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: 22,
-                      fontWeight: 600,
-                      color: 'var(--color-forest)',
-                      marginBottom: 8,
-                      letterSpacing: '-.2px',
-                    }}
-                  >
+                  <h3 className="font-heading text-[22px] font-semibold text-forest mb-2 tracking-[-0.2px]">
                     {item.title}
                   </h3>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      lineHeight: 1.7,
-                      color: 'var(--color-text-secondary)',
-                      margin: 0,
-                    }}
-                  >
+                  <p className="text-[15px] leading-[1.7] text-text-secondary m-0">
                     {item.description}
                   </p>
                 </div>
@@ -434,72 +246,27 @@ export default function GuidesPage() {
       </section>
 
       {/* Requirements */}
-      <section style={{ padding: '100px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-charcoal)',
-              }}
-            >
+      <section className="py-[100px] bg-offwhite">
+        <div className="max-w-[800px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Requirements
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
               What we look for
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               We vet every guide on the platform. Landowners and clubs need to trust
               that anyone guiding on their water meets professional standards.
             </p>
           </div>
 
-          <div
-            className="reveal"
-            style={{
-              background: '#fff',
-              border: '1px solid var(--color-parchment)',
-              borderRadius: 14,
-              padding: '40px 36px',
-              maxWidth: 500,
-              margin: '0 auto',
-            }}
-          >
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          <div className="reveal bg-white border border-parchment rounded-[14px] py-10 px-9 max-w-[500px] mx-auto">
+            <ul className="list-none m-0 p-0">
               {requirements.map((req) => (
                 <li
                   key={req}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '12px 0',
-                    fontSize: 15,
-                    color: 'var(--color-text-primary)',
-                    borderBottom: '1px solid var(--color-parchment)',
-                  }}
+                  className="flex items-center gap-3 py-3 text-[15px] text-text-primary border-b border-parchment"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
@@ -513,130 +280,56 @@ export default function GuidesPage() {
       </section>
 
       {/* Pricing */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-charcoal)',
-              }}
-            >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="max-w-[800px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Pricing
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
               No subscription. No sign-up fees.
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 560,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[560px] mx-auto leading-[1.65]">
               You set your rates. We add a 10% service fee on top, paid by the angler.
               You keep 100% of your stated rate on every trip.
             </p>
           </div>
 
-          <div
-            className="reveal"
-            style={{
-              background: '#fff',
-              border: '2px solid var(--color-charcoal)',
-              borderRadius: 14,
-              padding: '48px 40px',
-              maxWidth: 560,
-              margin: '0 auto',
-              textAlign: 'center',
-            }}
-          >
-            <h3
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 28,
-                fontWeight: 600,
-                color: 'var(--color-forest)',
-                marginBottom: 8,
-              }}
-            >
+          <div className="reveal bg-white border-2 border-charcoal rounded-[14px] py-12 px-10 max-w-[560px] mx-auto text-center">
+            <h3 className="font-heading text-[28px] font-semibold text-forest mb-2">
               Free to join
             </h3>
-            <p
-              style={{
-                fontSize: 15,
-                color: 'var(--color-text-secondary)',
-                lineHeight: 1.65,
-                marginBottom: 32,
-              }}
-            >
+            <p className="text-[15px] text-text-secondary leading-[1.65] mb-8">
               No monthly fee, no listing fee, no hidden costs.
             </p>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 20,
-                marginBottom: 32,
-                textAlign: 'left',
-              }}
-              className="marketing-features-grid"
-            >
-              <div
-                style={{
-                  background: 'var(--color-offwhite)',
-                  borderRadius: 10,
-                  padding: '24px 20px',
-                }}
-              >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--color-text-light)', marginBottom: 8 }}>
+            <div className="marketing-features-grid grid grid-cols-2 gap-5 mb-8 text-left">
+              <div className="bg-offwhite rounded-[10px] py-6 px-5">
+                <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-text-light mb-2">
                   Example
                 </div>
-                <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                <div className="text-[14px] text-text-secondary leading-[1.7]">
+                  <div className="flex justify-between py-1">
                     <span>Your rate</span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-forest)' }}>$500</span>
+                    <span className="font-semibold text-forest">$500</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                    <span style={{ whiteSpace: 'nowrap' }}>10% service fee<br /><span style={{ fontSize: 11, color: 'var(--color-text-light)' }}>paid by the angler</span></span>
-                    <span style={{ color: 'var(--color-text-light)' }}>+$50</span>
+                  <div className="flex justify-between py-1">
+                    <span className="whitespace-nowrap">10% service fee<br /><span className="text-[11px] text-text-light">paid by the angler</span></span>
+                    <span className="text-text-light">+$50</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0 4px', borderTop: '1px solid var(--color-parchment)', marginTop: 8 }}>
-                    <span style={{ fontWeight: 600 }}>You receive</span>
-                    <span style={{ fontWeight: 600, color: 'var(--color-forest)' }}>$500</span>
+                  <div className="flex justify-between pt-2 pb-1 border-t border-parchment mt-2">
+                    <span className="font-semibold">You receive</span>
+                    <span className="font-semibold text-forest">$500</span>
                   </div>
                 </div>
               </div>
-              <div
-                style={{
-                  background: 'var(--color-offwhite)',
-                  borderRadius: 10,
-                  padding: '24px 20px',
-                }}
-              >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--color-text-light)', marginBottom: 8 }}>
+              <div className="bg-offwhite rounded-[10px] py-6 px-5">
+                <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-text-light mb-2">
                   What&apos;s included
                 </div>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                <ul className="list-none m-0 p-0">
                   {['Profile & portfolio', 'Booking management', 'Calendar tools', 'Messaging', 'Review system', 'Stripe payouts'].map((item) => (
-                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '3px 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                    <li key={item} className="flex items-center gap-[6px] py-[3px] text-[13px] text-text-secondary">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-forest)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
@@ -649,20 +342,7 @@ export default function GuidesPage() {
 
             <Link
               href="/signup"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 40px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'var(--color-charcoal)',
-                color: '#fff',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-charcoal text-white transition-all duration-[400ms]"
             >
               Apply as a Guide &rarr;
             </Link>
@@ -671,66 +351,27 @@ export default function GuidesPage() {
       </section>
 
       {/* FAQ */}
-      <section style={{ padding: '100px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-charcoal)',
-              }}
-            >
+      <section className="py-[100px] bg-offwhite">
+        <div className="max-w-[700px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               FAQ
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
               Common questions
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gap: 0 }}>
+          <div className="grid">
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  padding: '24px 0',
-                  borderBottom: i < faqs.length - 1 ? '1px solid var(--color-parchment)' : 'none',
-                }}
+                className={`reveal d${(i % 3) + 1} py-6 ${i < faqs.length - 1 ? 'border-b border-parchment' : ''}`}
               >
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 18,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 8,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
                   {faq.q}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.7,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {faq.a}
                 </p>
               </div>
@@ -740,54 +381,18 @@ export default function GuidesPage() {
       </section>
 
       {/* CTA */}
-      <section
-        style={{
-          padding: '100px 0',
-          background: 'var(--color-charcoal)',
-          textAlign: 'center',
-        }}
-      >
-        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              fontWeight: 500,
-              color: 'var(--color-parchment)',
-              margin: '0 0 16px',
-              letterSpacing: '-.3px',
-            }}
-          >
+      <section className="py-[100px] bg-charcoal text-center">
+        <div className="reveal max-w-[600px] mx-auto px-8">
+          <h2 className="font-heading text-[clamp(28px,4vw,44px)] font-medium text-parchment mb-4 tracking-[-0.3px]">
             Ready to expand your range?
           </h2>
-          <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.7,
-              color: 'rgba(240,234,214,.55)',
-              maxWidth: 480,
-              margin: '0 auto 40px',
-            }}
-          >
+          <p className="text-[16px] leading-[1.7] text-parchment/55 max-w-[480px] mx-auto mb-10">
             Join a growing network of professional guides accessing private water
             across the country. Your next client is already looking.
           </p>
           <Link
             href="/signup"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '18px 40px',
-              borderRadius: 6,
-              fontSize: 15,
-              fontWeight: 500,
-              letterSpacing: '.3px',
-              textDecoration: 'none',
-              background: 'var(--color-bronze)',
-              color: '#fff',
-              transition: 'all .4s',
-            }}
+            className="inline-flex items-center gap-2 px-10 py-[18px] rounded-md text-[15px] font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
           >
             Apply as a Guide &rarr;
           </Link>

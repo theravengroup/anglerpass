@@ -5,6 +5,8 @@ import {
   XCircle,
   Ban,
   UserMinus,
+  FileEdit,
+  ShieldAlert,
 } from "lucide-react";
 
 // ─── Booking / Property Status ──────────────────────────────────────
@@ -87,6 +89,76 @@ export const MEMBERSHIP_STATUS: Record<string, StatusConfig> = {
   },
   removed: {
     label: "Removed",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+};
+
+// ─── Guide Profile Status ──────────────────────────────────────────
+
+export const GUIDE_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  pending_review: {
+    label: "Pending Review",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  approved: {
+    label: "Approved",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  suspended: {
+    label: "Suspended",
+    icon: ShieldAlert,
+    color: "text-red-600",
+    bg: "bg-red-50",
+  },
+  rejected: {
+    label: "Rejected",
+    icon: XCircle,
+    color: "text-red-600",
+    bg: "bg-red-50",
+  },
+};
+
+// ─── Property Status ───────────────────────────────────────────────
+
+export const PROPERTY_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  pending_review: {
+    label: "Pending Review",
+    icon: Clock,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  changes_requested: {
+    label: "Changes Requested",
+    icon: Clock,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  published: {
+    label: "Published",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  archived: {
+    label: "Archived",
     icon: Ban,
     color: "text-text-light",
     bg: "bg-stone-light/10",

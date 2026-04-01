@@ -10,32 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, X, Map, List } from "lucide-react";
-
-const WATER_TYPES = [
-  { value: "river", label: "River" },
-  { value: "stream", label: "Stream" },
-  { value: "lake", label: "Lake" },
-  { value: "pond", label: "Pond" },
-  { value: "spring_creek", label: "Spring Creek" },
-  { value: "tailwater", label: "Tailwater" },
-  { value: "reservoir", label: "Reservoir" },
-];
-
-const SPECIES_LIST = [
-  "Rainbow Trout",
-  "Brown Trout",
-  "Brook Trout",
-  "Cutthroat Trout",
-  "Bull Trout",
-  "Lake Trout",
-  "Largemouth Bass",
-  "Smallmouth Bass",
-  "Walleye",
-  "Northern Pike",
-  "Musky",
-  "Steelhead",
-  "Salmon",
-];
+import { WATER_TYPE_OPTIONS, COMMON_SPECIES } from "@/lib/constants/water-types";
 
 export interface SearchFiltersState {
   q: string;
@@ -131,7 +106,7 @@ export default function SearchFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="_all">All Water Types</SelectItem>
-            {WATER_TYPES.map((wt) => (
+            {WATER_TYPE_OPTIONS.map((wt) => (
               <SelectItem key={wt.value} value={wt.value}>
                 {wt.label}
               </SelectItem>
@@ -148,7 +123,7 @@ export default function SearchFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="_all">All Species</SelectItem>
-            {SPECIES_LIST.map((s) => (
+            {COMMON_SPECIES.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
               </SelectItem>

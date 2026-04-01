@@ -157,6 +157,8 @@ export default function RoleSwitcher({
           setOpen(!open);
           setShowAddRole(false);
         }}
+        aria-expanded={open}
+        aria-haspopup="listbox"
         className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${config.bg} ${config.color} hover:opacity-80`}
       >
         <ActiveIcon className="size-3.5" />
@@ -180,7 +182,7 @@ export default function RoleSwitcher({
             }}
           />
 
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-stone-light/20 bg-white shadow-lg">
+          <div role="listbox" className="absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-stone-light/20 bg-white shadow-lg">
             {/* Role list */}
             <div className="p-1.5">
               <p className="px-2 py-1.5 text-xs font-medium uppercase tracking-wider text-text-light">
@@ -197,6 +199,8 @@ export default function RoleSwitcher({
                   return (
                     <button
                       key={role}
+                      role="option"
+                      aria-selected={isActive}
                       onClick={() => handleSwitch(role)}
                       disabled={isLoading}
                       className={`flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-sm transition-colors ${

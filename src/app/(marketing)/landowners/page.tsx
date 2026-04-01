@@ -86,101 +86,30 @@ export default function LandownersPage() {
   return (
     <>
       {/* Hero */}
-      <section
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'var(--color-forest-deep)',
-          padding: '160px 0 100px',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(ellipse at top right, rgba(58,107,124,0.15), transparent 60%)',
-          }}
-        />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            className="audience-hero-badge"
-            style={{
-              display: 'inline-block',
-              marginBottom: 20,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-bronze-light)',
-            }}
-          >
+      <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(58,107,124,0.15),transparent_60%)]" />
+        <div className="relative max-w-[800px] mx-auto px-8 text-center">
+          <span className="audience-hero-badge inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Landowners
           </span>
-          <h1
-            className="audience-hero-heading"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(38px, 5vw, 58px)',
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: 'var(--color-parchment)',
-              letterSpacing: '-.5px',
-              margin: '0 0 24px',
-            }}
-          >
+          <h1 className="audience-hero-heading font-heading text-[clamp(38px,5vw,58px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
             Your Water. Your Rules.<br />Your Platform.
           </h1>
-          <p
-            className="audience-hero-sub"
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: 'rgba(240,234,214,.6)',
-              maxWidth: 560,
-              margin: '0 auto 40px',
-            }}
-          >
+          <p className="audience-hero-sub text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto mb-10">
             Manage private water access with the professionalism your property
             deserves. Every angler who reaches your listing has been vetted by a
             fly fishing club &mdash; so you control access with confidence.
           </p>
-          <div className="audience-hero-ctas" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="audience-hero-ctas flex gap-3.5 justify-center flex-wrap">
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'var(--color-bronze)',
-                color: '#fff',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
             >
               Join the Waitlist &rarr;
             </Link>
             <Link
               href="/#waitlist"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '16px 34px',
-                borderRadius: 6,
-                fontSize: 14,
-                fontWeight: 500,
-                letterSpacing: '.3px',
-                textDecoration: 'none',
-                background: 'transparent',
-                color: 'var(--color-parchment)',
-                border: '1px solid rgba(240,234,214,.2)',
-                transition: 'all .4s',
-              }}
+              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
               Talk to Us
             </Link>
@@ -189,104 +118,34 @@ export default function LandownersPage() {
       </section>
 
       {/* Features grid */}
-      <section style={{ padding: '120px 0', background: 'var(--color-offwhite)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <span
-              style={{
-                display: 'inline-block',
-                marginBottom: 12,
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.2em',
-                color: 'var(--color-forest)',
-              }}
-            >
+      <section className="py-[120px] bg-offwhite">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
               What You Get
             </span>
-            <h2
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 'clamp(28px, 3.5vw, 40px)',
-                fontWeight: 500,
-                color: 'var(--color-forest)',
-                margin: '0 0 16px',
-                letterSpacing: '-.3px',
-                textWrap: 'balance',
-              }}
-            >
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
               Everything a landowner needs
             </h2>
-            <p
-              style={{
-                fontSize: 16,
-                color: 'var(--color-text-secondary)',
-                maxWidth: 520,
-                margin: '0 auto',
-                lineHeight: 1.65,
-              }}
-            >
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Purpose-built tools for managing private water access. Launching
               in the Rocky Mountain region and expanding nationwide.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="marketing-features-grid"
-          >
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
-                className={`reveal d${(i % 3) + 1}`}
-                style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-parchment)',
-                  borderRadius: 14,
-                  padding: '36px 28px',
-                  transition: 'all .5s cubic-bezier(.22,1,.36,1)',
-                }}
+                className={`reveal d${(i % 3) + 1} bg-white border border-parchment rounded-[14px] px-7 py-9 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]`}
               >
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 10,
-                    background: 'rgba(45,80,50,.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 20,
-                    color: 'var(--color-forest)',
-                  }}
-                >
+                <div className="w-[44px] h-[44px] rounded-[10px] bg-forest/8 flex items-center justify-center mb-5 text-forest">
                   {feature.icon}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: 'var(--color-forest)',
-                    marginBottom: 10,
-                    letterSpacing: '-.2px',
-                  }}
-                >
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-2.5 tracking-[-0.2px]">
                   {feature.title}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.7,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
                   {feature.description}
                 </p>
               </div>
@@ -296,43 +155,15 @@ export default function LandownersPage() {
       </section>
 
       {/* Trust / vetting section */}
-      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-forest)',
-            }}
-          >
+      <section className="py-[100px] bg-parchment-light">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
             Built-In Trust
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             No strangers at your gate
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
             AnglerPass is not an open marketplace. Every angler who can view or book
             your property is a member of a fly fishing club that has vetted them.
             Clubs serve as the trust layer between you and the people on your water
@@ -342,43 +173,15 @@ export default function LandownersPage() {
       </section>
 
       {/* Cross-club access */}
-      <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
-        <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              marginBottom: 12,
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: 'var(--color-forest)',
-            }}
-          >
+      <section className="py-20 bg-offwhite">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
             The Network
           </span>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 500,
-              color: 'var(--color-forest)',
-              margin: '0 0 20px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
             More clubs, more demand, more bookings
           </h2>
-          <p
-            style={{
-              fontSize: 16.5,
-              lineHeight: 1.7,
-              color: 'var(--color-text-secondary)',
-              maxWidth: 560,
-              margin: '0 auto',
-            }}
-          >
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
             As more clubs join AnglerPass and opt in to cross-club access, your
             property reaches a growing network of vetted anglers &mdash; without any
             extra work on your part. Every new club in the network is a new source
@@ -388,55 +191,18 @@ export default function LandownersPage() {
       </section>
 
       {/* CTA */}
-      <section
-        style={{
-          padding: '120px 0',
-          background: 'var(--color-forest-deep)',
-          textAlign: 'center',
-        }}
-      >
-        <div className="reveal" style={{ maxWidth: 600, margin: '0 auto', padding: '0 32px' }}>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(28px, 3.5vw, 42px)',
-              fontWeight: 500,
-              color: 'var(--color-parchment)',
-              margin: '0 0 16px',
-              letterSpacing: '-.3px',
-              textWrap: 'balance',
-            }}
-          >
+      <section className="py-[120px] bg-forest-deep text-center">
+        <div className="reveal max-w-[600px] mx-auto px-8">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium text-parchment mb-4 tracking-[-0.3px] text-balance">
             Ready to modernize access to your water?
           </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: 'rgba(240,234,214,.5)',
-              maxWidth: 440,
-              margin: '0 auto 40px',
-              lineHeight: 1.7,
-            }}
-          >
+          <p className="text-[16px] text-parchment/50 max-w-[440px] mx-auto mb-10 leading-[1.7]">
             Join the waitlist and be among the first landowners to use AnglerPass
             when we launch.
           </p>
           <Link
             href="/#waitlist"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '16px 40px',
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: '.3px',
-              textDecoration: 'none',
-              background: 'var(--color-bronze)',
-              color: '#fff',
-              transition: 'all .4s',
-            }}
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
           >
             Join the Waitlist
           </Link>

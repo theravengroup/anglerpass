@@ -67,7 +67,7 @@ export default function DashboardSidebar({
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-4 border-b border-white/10">
-          <img src="/images/anglerpass-noword-logo.svg" alt="" style={{ height: 28, width: 'auto', opacity: 0.8 }} />
+          <img src="/images/anglerpass-noword-logo.svg" alt="" className="h-7 w-auto opacity-80" />
           {!collapsed && (
             <div className="flex items-center gap-2 overflow-hidden">
               <span className="font-[family-name:var(--font-heading)] text-lg font-semibold tracking-tight">

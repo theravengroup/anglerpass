@@ -1,17 +1,26 @@
 import "server-only";
 
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Standard API Responses ─────────────────────────────────────────
 
-export function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
+export function jsonOk<T>(data: T, status = 200) {
+  return Response.json(data, { status });
 }
 
+export function jsonCreated<T>(data: T) {
+  return Response.json(data, { status: 201 });
+}
+
+export function jsonError(message: string, status = 500) {
+  return Response.json({ error: message }, { status });
+}
+
+/** @deprecated Use jsonOk instead */
 export function jsonSuccess<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status });
+  return Response.json(data, { status });
 }
 
 // ─── Authentication Helpers ─────────────────────────────────────────
@@ -55,6 +64,46 @@ export async function requireAdmin() {
   return { ...auth, admin };
 }
 
+// ─── Ownership Verification ─────────────────────────────────────────
+
+/**
+ * Verify that the given user owns the property.
+ * Returns the property row on success, or null if not found / not owned.
+ */
+export async function requirePropertyOwner(
+  admin: SupabaseClient,
+  propertyId: string,
+  userId: string
+) {
+  const { data: property } = await admin
+    .from("properties")
+    .select("*")
+    .eq("id", propertyId)
+    .single();
+
+  if (!property || property.owner_id !== userId) return null;
+  return property;
+}
+
+/**
+ * Verify that the given user is the club manager (owner).
+ * Returns the club row on success, or null if not found / not owned.
+ */
+export async function requireClubManager(
+  admin: SupabaseClient,
+  clubId: string,
+  userId: string
+) {
+  const { data: club } = await admin
+    .from("clubs")
+    .select("*")
+    .eq("id", clubId)
+    .single();
+
+  if (!club || club.owner_id !== userId) return null;
+  return club;
+}
+
 // ─── Input Sanitization ─────────────────────────────────────────────
 
 /**
@@ -68,4 +117,12 @@ export function parsePositiveInt(
   const parsed = parseInt(value ?? String(defaultValue), 10);
   if (isNaN(parsed) || parsed < 1) return defaultValue;
   return Math.min(parsed, max);
+}
+
+/**
+ * Escape special characters for Supabase/Postgres ilike patterns.
+ * Prevents user input from being interpreted as wildcards.
+ */
+export function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, "\\$&");
 }

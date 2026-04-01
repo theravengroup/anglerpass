@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema, propertyStatusTransition, MIN_PHOTOS } from "@/lib/validations/properties";
 import { parseCoordinates } from "@/lib/geo";
@@ -18,8 +19,9 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const admin = createAdminClient();
+
+    const { data, error } = await admin
       .from("properties")
       .select("*")
       .eq("id", id)
@@ -57,9 +59,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const admin = createAdminClient();
+
     // Verify ownership — fetch full property for validation
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (supabase as any)
+    const { data: existing } = await admin
       .from("properties")
       .select("*")
       .eq("id", id)
@@ -141,8 +144,7 @@ export async function PATCH(
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
+      const { data, error } = await admin
         .from("properties")
         .update({ status: statusResult.data.status })
         .eq("id", id)
@@ -172,8 +174,7 @@ export async function PATCH(
     const { water_type, coordinates, ...rest } = result.data;
     const { latitude, longitude } = parseCoordinates(coordinates);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await admin
       .from("properties")
       .update({
         ...rest,
@@ -219,16 +220,21 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch property to get photo URLs for cleanup
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: property } = await (supabase as any)
+    const admin = createAdminClient();
+
+    // Verify ownership
+    const { data: property } = await admin
       .from("properties")
-      .select("photos")
+      .select("owner_id, photos")
       .eq("id", id)
       .single();
 
+    if (!property || property.owner_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Delete photos from storage
-    if (property?.photos?.length > 0) {
+    if ((property.photos as string[])?.length > 0) {
       const paths = (property.photos as string[]).map((url: string) => {
         try {
           const urlObj = new URL(url);
@@ -240,16 +246,16 @@ export async function DELETE(
       }).filter(Boolean);
 
       if (paths.length > 0) {
-        await supabase.storage.from("property-photos").remove(paths);
+        await admin.storage.from("property-photos").remove(paths);
       }
     }
 
-    // RLS policy only allows deleting drafts owned by the user
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    // Only allow deleting drafts
+    const { error } = await admin
       .from("properties")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("status", "draft");
 
     if (error) {
       console.error("[properties] Delete error:", error);

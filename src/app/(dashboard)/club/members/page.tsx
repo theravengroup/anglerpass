@@ -3,19 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Users,
   UserPlus,
   Loader2,
-  CheckCircle2,
-  Mail,
-  Send,
-  Shield,
 } from "lucide-react";
-import { MEMBERSHIP_STATUS } from "@/lib/constants/status";
 import { FetchError } from "@/components/shared/FetchError";
+import MemberCard from "@/components/clubs/MemberCard";
+import InviteForm from "@/components/clubs/InviteForm";
 
 interface Member {
   id: string;
@@ -216,74 +211,17 @@ export default function MembersPage() {
 
       {/* Invite form */}
       {showInvite && (
-        <Card className="border-river/20 bg-river/5">
-          <CardContent className="space-y-4 py-5">
-            <div className="flex items-end gap-3">
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="invite_email">Email Address</Label>
-                <Input
-                  id="invite_email"
-                  type="email"
-                  placeholder="angler@example.com"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  disabled={inviting}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleInvite();
-                    }
-                  }}
-                />
-              </div>
-              {isOwner && (
-                <div className="space-y-2">
-                  <Label htmlFor="invite_role">Role</Label>
-                  <select
-                    id="invite_role"
-                    value={inviteRole}
-                    onChange={(e) =>
-                      setInviteRole(e.target.value as "member" | "staff")
-                    }
-                    disabled={inviting}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <option value="member">Member</option>
-                    <option value="staff">Staff</option>
-                  </select>
-                </div>
-              )}
-              <Button
-                onClick={handleInvite}
-                disabled={inviting || !inviteEmail.trim()}
-                className="bg-river text-white hover:bg-river/90"
-              >
-                {inviting ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Send className="size-4" />
-                )}
-                Send
-              </Button>
-            </div>
-            {inviteRole === "staff" && (
-              <p className="flex items-center gap-1.5 text-xs text-text-secondary">
-                <Shield className="size-3.5 text-river" />
-                Staff can help manage the club and get discounted rod fees at
-                your properties.
-              </p>
-            )}
-            {inviteError && (
-              <p className="text-sm text-red-600">{inviteError}</p>
-            )}
-            {inviteSuccess && (
-              <div className="flex items-center gap-2 text-sm text-forest">
-                <CheckCircle2 className="size-4" />
-                {inviteSuccess}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <InviteForm
+          inviteEmail={inviteEmail}
+          onEmailChange={setInviteEmail}
+          inviteRole={inviteRole}
+          onRoleChange={setInviteRole}
+          isOwner={isOwner}
+          inviting={inviting}
+          inviteError={inviteError}
+          inviteSuccess={inviteSuccess}
+          onInvite={handleInvite}
+        />
       )}
 
       {/* Filter tabs */}
@@ -338,146 +276,16 @@ export default function MembersPage() {
         </Card>
       ) : (
         <div className="space-y-2">
-          {filteredMembers.map((member) => {
-            const config =
-              MEMBERSHIP_STATUS[member.status] ?? MEMBERSHIP_STATUS.pending;
-            const Icon = config.icon;
-            const isLoading = actionLoading === member.id;
-
-            return (
-              <Card
-                key={member.id}
-                className="border-stone-light/20"
-              >
-                <CardContent className="flex items-center justify-between py-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-offwhite text-sm font-medium text-text-secondary">
-                      {member.display_name
-                        ? member.display_name.charAt(0).toUpperCase()
-                        : member.email
-                          ? member.email.charAt(0).toUpperCase()
-                          : "?"}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">
-                        {member.display_name ?? member.email ?? "Unknown"}
-                        {member.role === "admin" && (
-                          <span className="ml-2 rounded-full bg-river/10 px-2 py-0.5 text-xs font-medium text-river">
-                            Owner
-                          </span>
-                        )}
-                        {member.role === "staff" && (
-                          <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-forest/10 px-2 py-0.5 text-xs font-medium text-forest">
-                            <Shield className="size-2.5" />
-                            Staff
-                          </span>
-                        )}
-                      </p>
-                      {member.display_name && member.email && (
-                        <p className="flex items-center gap-1 text-xs text-text-light">
-                          <Mail className="size-3" />
-                          {member.email}
-                        </p>
-                      )}
-                      {member.joined_at && (
-                        <p className="text-xs text-text-light">
-                          Joined{" "}
-                          {new Date(member.joined_at).toLocaleDateString()}
-                        </p>
-                      )}
-                      {!member.joined_at && member.invited_at && (
-                        <p className="text-xs text-text-light">
-                          Invited{" "}
-                          {new Date(member.invited_at).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {/* Status badge */}
-                    <div
-                      className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${config.bg} ${config.color}`}
-                    >
-                      <Icon className="size-3" />
-                      {config.label}
-                    </div>
-
-                    {/* Actions (not for admin; staff can only manage members, not other staff) */}
-                    {member.role !== "admin" &&
-                      (isOwner || member.role !== "staff") &&
-                      !isLoading && (
-                      <div className="flex gap-1">
-                        {member.status === "pending" && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 border-forest/30 text-xs text-forest hover:bg-forest/5"
-                              onClick={() =>
-                                handleStatusChange(member.id, "active")
-                              }
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 border-red-200 text-xs text-red-500 hover:bg-red-50"
-                              onClick={() =>
-                                handleStatusChange(member.id, "declined")
-                              }
-                            >
-                              Decline
-                            </Button>
-                          </>
-                        )}
-                        {member.status === "active" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs text-text-light hover:text-red-500"
-                            onClick={() =>
-                              handleStatusChange(member.id, "inactive")
-                            }
-                          >
-                            Deactivate
-                          </Button>
-                        )}
-                        {(member.status === "inactive" ||
-                          member.status === "declined") && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 border-forest/30 text-xs text-forest hover:bg-forest/5"
-                              onClick={() =>
-                                handleStatusChange(member.id, "active")
-                              }
-                            >
-                              Activate
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 border-red-200 text-xs text-red-500 hover:bg-red-50"
-                              onClick={() => handleRemove(member.id)}
-                            >
-                              Remove
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {isLoading && (
-                      <Loader2 className="size-4 animate-spin text-text-light" />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {filteredMembers.map((member) => (
+            <MemberCard
+              key={member.id}
+              member={member}
+              isOwner={isOwner}
+              isLoading={actionLoading === member.id}
+              onStatusChange={handleStatusChange}
+              onRemove={handleRemove}
+            />
+          ))}
         </div>
       )}
     </div>

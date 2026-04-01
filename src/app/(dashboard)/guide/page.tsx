@@ -1,3 +1,4 @@
+// TODO: Convert to server component with async data fetching
 "use client";
 
 import { useEffect, useState, useCallback } from "react";

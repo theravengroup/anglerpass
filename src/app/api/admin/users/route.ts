@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
 import { VALID_ROLES } from "@/lib/constants/status";
 
 const PAGE_SIZE = 25;
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     }
 
     if (search) {
-      query = query.ilike("display_name", `%${search}%`);
+      query = query.ilike("display_name", `%${escapeIlike(search)}%`);
     }
 
     const sortField = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "created_at";

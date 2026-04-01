@@ -59,12 +59,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Marketing responsive */
+/* Marketing responsive — !important overrides are needed because marketing pages
+   use Tailwind grid-cols-* utilities (e.g. grid-cols-3) that set
+   grid-template-columns inline. These media queries force single/two-column
+   layouts on smaller screens. Do not remove without converting to responsive
+   Tailwind classes (sm:/md:/lg:) on every marketing page that uses these classes. */
 @media (max-width: 768px) {
   .marketing-footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
   .marketing-footer-bottom { flex-direction: column !important; gap: 10px !important; text-align: center; }
   .marketing-features-grid { grid-template-columns: 1fr !important; }
-  .marketing-contact-grid { grid-template-columns: 1fr !important; }
 }
 @media (min-width: 769px) and (max-width: 1024px) {
   .marketing-features-grid { grid-template-columns: repeat(2, 1fr) !important; }

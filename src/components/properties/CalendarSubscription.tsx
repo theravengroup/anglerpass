@@ -80,15 +80,8 @@ export default function CalendarSubscription({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
-      const input = document.createElement("input");
-      input.value = feedUrl;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      document.body.removeChild(input);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Clipboard API not available
+      console.warn("Clipboard API is not available in this browser.");
     }
   };
 

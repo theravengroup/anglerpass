@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Droplets, Fish, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 
 interface PropertyCardProps {
   property: {
@@ -28,16 +29,6 @@ interface PropertyCardProps {
   href: string;
   selected?: boolean;
 }
-
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
 
 export default function PropertyCard({
   property,

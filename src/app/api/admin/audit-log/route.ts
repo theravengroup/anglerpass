@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
 
 const PAGE_SIZE = 50;
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     }
 
     if (actionFilter) {
-      query = query.ilike("action", `%${actionFilter}%`);
+      query = query.ilike("action", `%${escapeIlike(actionFilter)}%`);
     }
 
     const from = (page - 1) * PAGE_SIZE;

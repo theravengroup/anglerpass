@@ -13,79 +13,34 @@ export default function MarketingFooter() {
 
   return (
     <>
-      <footer
-        style={{
-          padding: '60px 0 44px',
-          background: 'var(--color-forest-deep)',
-          color: 'rgba(255,255,255,.5)',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <footer className="pt-15 pb-11 bg-forest-deep text-white/50">
+        <div className="mx-auto max-w-[1200px] px-8">
           <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr 1fr',
-              gap: 40,
-            }}
-            className="marketing-footer-grid"
+            className="marketing-footer-grid grid grid-cols-[2fr_1fr_1fr_1fr] gap-10"
           >
             {/* Brand */}
             <div>
               <Link
                 href="/"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  textDecoration: 'none',
-                  marginBottom: 14,
-                }}
+                className="flex items-center gap-2.5 no-underline mb-3.5"
               >
                 <img
                   src="/images/anglerpass-noword-logo.svg"
                   alt=""
-                  style={{ height: 32, width: 'auto', opacity: 0.7 }}
+                  className="h-8 w-auto opacity-70"
                 />
-                <span
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: '#fff',
-                    letterSpacing: '-.3px',
-                  }}
-                >
+                <span className="font-heading text-xl font-semibold text-white tracking-[-0.3px]">
                   AnglerPass
                 </span>
               </Link>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: 'rgba(255,255,255,.38)',
-                  maxWidth: 280,
-                  lineHeight: 1.6,
-                }}
-              >
+              <p className="text-[13px] text-white/[.38] max-w-[280px] leading-[1.6]">
                 The operating platform for private fly fishing access. Connecting
                 landowners, clubs, and anglers.
               </p>
               <a
                 href="#"
                 onClick={(e) => { e.preventDefault(); setActiveModal('dashboard-preview'); }}
-                style={{
-                  display: 'inline-block',
-                  marginTop: 18,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  letterSpacing: '.3px',
-                  color: 'var(--color-bronze-light)',
-                  textDecoration: 'none',
-                  padding: '6px 14px',
-                  borderRadius: 100,
-                  border: '1px solid rgba(184,148,78,.25)',
-                  transition: 'all .3s',
-                  cursor: 'pointer',
-                }}
+                className="inline-block mt-[18px] text-[11px] font-medium tracking-[.3px] text-bronze-light no-underline px-3.5 py-1.5 rounded-full border border-[rgba(184,148,78,.25)] transition-all duration-300 cursor-pointer"
               >
                 Preview Dashboard
               </a>
@@ -93,19 +48,10 @@ export default function MarketingFooter() {
 
             {/* Platform */}
             <div>
-              <h4
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  color: 'var(--color-bronze-light)',
-                  marginBottom: 16,
-                }}
-              >
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-bronze-light mb-4">
                 Platform
               </h4>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <ul className="list-none m-0 p-0">
                 {[
                   { href: '/landowners', label: 'For Landowners' },
                   { href: '/clubs', label: 'For Clubs' },
@@ -113,15 +59,10 @@ export default function MarketingFooter() {
                   { href: '/guides', label: 'For Guides' },
                   { href: '/pricing', label: 'Pricing' },
                 ].map((link) => (
-                  <li key={link.href} style={{ marginBottom: 10 }}>
+                  <li key={link.href} className="mb-2.5">
                     <Link
                       href={link.href}
-                      style={{
-                        fontSize: 13,
-                        color: 'rgba(255,255,255,.4)',
-                        textDecoration: 'none',
-                        transition: 'color .3s',
-                      }}
+                      className="text-[13px] text-white/40 no-underline transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -132,56 +73,31 @@ export default function MarketingFooter() {
 
             {/* Company */}
             <div>
-              <h4
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  color: 'var(--color-bronze-light)',
-                  marginBottom: 16,
-                }}
-              >
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-bronze-light mb-4">
                 Company
               </h4>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                <li style={{ marginBottom: 10 }}>
+              <ul className="list-none m-0 p-0">
+                <li className="mb-2.5">
                   <Link
                     href="/#faq"
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
                   >
                     FAQ
                   </Link>
                 </li>
-                <li style={{ marginBottom: 10 }}>
+                <li className="mb-2.5">
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); setActiveModal('contact'); }}
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                      cursor: 'pointer',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300 cursor-pointer"
                   >
                     Contact
                   </a>
                 </li>
-                <li style={{ marginBottom: 10 }}>
+                <li className="mb-2.5">
                   <Link
                     href="/#investors"
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
                   >
                     Investors
                   </Link>
@@ -191,58 +107,32 @@ export default function MarketingFooter() {
 
             {/* Legal */}
             <div>
-              <h4
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  color: 'var(--color-bronze-light)',
-                  marginBottom: 16,
-                }}
-              >
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-bronze-light mb-4">
                 Legal
               </h4>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                <li style={{ marginBottom: 10 }}>
+              <ul className="list-none m-0 p-0">
+                <li className="mb-2.5">
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); setActiveModal('privacy'); }}
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                      cursor: 'pointer',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300 cursor-pointer"
                   >
                     Privacy Policy
                   </a>
                 </li>
-                <li style={{ marginBottom: 10 }}>
+                <li className="mb-2.5">
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); setActiveModal('terms'); }}
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                      cursor: 'pointer',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300 cursor-pointer"
                   >
                     Terms of Service
                   </a>
                 </li>
-                <li style={{ marginBottom: 10 }}>
+                <li className="mb-2.5">
                   <Link
                     href="/policies"
-                    style={{
-                      fontSize: 13,
-                      color: 'rgba(255,255,255,.4)',
-                      textDecoration: 'none',
-                      transition: 'color .3s',
-                    }}
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
                   >
                     Policies
                   </Link>
@@ -253,17 +143,7 @@ export default function MarketingFooter() {
 
           {/* Bottom bar */}
           <div
-            style={{
-              marginTop: 44,
-              paddingTop: 28,
-              borderTop: '1px solid rgba(255,255,255,.06)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontSize: 12,
-              color: 'rgba(255,255,255,.25)',
-            }}
-            className="marketing-footer-bottom"
+            className="marketing-footer-bottom mt-11 pt-7 border-t border-white/[.06] flex justify-between items-center text-xs text-white/25"
           >
             <span>&copy; {new Date().getFullYear()} AnglerPass. All rights reserved.</span>
             <a
@@ -272,11 +152,7 @@ export default function MarketingFooter() {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } : undefined}
-              style={{
-                color: 'rgba(255,255,255,.35)',
-                textDecoration: 'none',
-                transition: 'color .3s',
-              }}
+              className="text-white/35 no-underline transition-colors duration-300"
             >
               Back to home
             </a>
@@ -437,7 +313,7 @@ export default function MarketingFooter() {
           </div>
         </div>
 
-        <p className="modal-text" style={{ marginTop: 24, fontSize: 13, opacity: 0.6 }}>
+        <p className="modal-text mt-6 text-[13px] opacity-60">
           We typically respond within 24&ndash;48 hours.
         </p>
       </FooterModal>

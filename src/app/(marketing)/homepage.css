@@ -1,4 +1,7 @@
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+/* Wrapped in @layer base so Tailwind utilities (padding, margin) on non-homepage
+   marketing pages are not overridden. Homepage components are unaffected because
+   Tailwind's own base layer applies the same reset. */
+@layer base{*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}}
 :root{
 --forest:#1a3a2a;--forest-deep:#0f2219;--river:#3a6b7c;--river-light:#5a9aad;--river-pale:#c5dde5;
 --stone:#6b6b60;--stone-light:#9a9a8e;--sand:#c8b89a;--parchment:#f0ead6;--parchment-light:#f7f4ec;

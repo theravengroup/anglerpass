@@ -26,16 +26,7 @@ import {
 import { Loader2, Save, Send, Lock, Info } from "lucide-react";
 import PhotoUpload from "@/components/properties/PhotoUpload";
 import ClubAssociation from "@/components/properties/ClubAssociation";
-
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 
 interface PropertyFormProps {
   initialData?: PropertyFormData & { id?: string; status?: string };
