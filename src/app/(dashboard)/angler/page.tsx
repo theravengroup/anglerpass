@@ -29,6 +29,7 @@ import {
 } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 import InviteClubCard from "@/components/angler/InviteClubCard";
+import CorporateInviteSection from "@/components/angler/CorporateInviteSection";
 
 /** Angler-specific period options (includes "All time") */
 const PERIOD_OPTIONS = [
@@ -72,17 +73,27 @@ interface ClubInvitation {
   created_at: string;
 }
 
+interface CorporateMembership {
+  membership_id: string;
+  club_id: string;
+  club_name: string;
+  company_name: string;
+}
+
 export default function AnglerPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
   const [clubInvitations, setClubInvitations] = useState<ClubInvitation[]>([]);
+  const [corporateMembership, setCorporateMembership] =
+    useState<CorporateMembership | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [analyticsRes, invitationsRes] = await Promise.all([
+      const [analyticsRes, invitationsRes, corpRes] = await Promise.all([
         fetch(`/api/analytics?view=angler&days=${days}`),
         fetch("/api/anglers/invite-club"),
+        fetch("/api/anglers/corporate-membership"),
       ]);
       if (analyticsRes.ok) {
         setData(await analyticsRes.json());
@@ -90,6 +101,12 @@ export default function AnglerPage() {
       if (invitationsRes.ok) {
         const invData = await invitationsRes.json();
         setClubInvitations(invData.invitations ?? []);
+      }
+      if (corpRes.ok) {
+        const corpData = await corpRes.json();
+        if (corpData.membership) {
+          setCorporateMembership(corpData.membership);
+        }
       }
     } catch {
       // Silent fail
@@ -221,6 +238,16 @@ export default function AnglerPage() {
         existingInvitations={clubInvitations}
         hasMemberships={(data?.memberships ?? 0) > 0}
       />
+
+      {/* Corporate Employee Invitation Section */}
+      {corporateMembership && (
+        <CorporateInviteSection
+          membershipId={corporateMembership.membership_id}
+          clubId={corporateMembership.club_id}
+          clubName={corporateMembership.club_name}
+          companyName={corporateMembership.company_name}
+        />
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Favorite Properties */}

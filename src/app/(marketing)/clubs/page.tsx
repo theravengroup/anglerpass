@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Building2, DollarSign, Users } from 'lucide-react';
 import ClubFaqSection from '@/components/clubs/ClubFaqSection';
 
 export const metadata: Metadata = {
@@ -254,8 +255,66 @@ export default function ClubsPage() {
         </div>
       </section>
 
+      {/* Corporate memberships */}
+      <section id="corporate" className="py-[100px] bg-offwhite">
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
+              Grow Your Club
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+              Grow Your Club With Corporate Memberships
+            </h2>
+            <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
+              Give local businesses a reason to invest in your club. Corporate
+              memberships let companies pay an initiation fee and invite their
+              employees to join &mdash; expanding your roster and deepening
+              community ties.
+            </p>
+          </div>
+
+          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+            {[
+              {
+                icon: Building2,
+                title: 'Unlimited Employee Access',
+                description:
+                  'Corporate members can invite their entire team. Each employee pays only annual dues \u2014 no initiation fee.',
+              },
+              {
+                icon: DollarSign,
+                title: 'You Set the Price',
+                description:
+                  'Configure your own corporate initiation fee. AnglerPass handles invitations, onboarding, and payment collection.',
+              },
+              {
+                icon: Users,
+                title: 'Deeper Community Ties',
+                description:
+                  'Build relationships with local businesses. Corporate memberships create lasting partnerships between companies and your club.',
+              },
+            ].map((card, i) => (
+              <div
+                key={card.title}
+                className={`reveal d${i + 1} bg-white border border-parchment rounded-[14px] px-7 py-9 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]`}
+              >
+                <div className="w-[44px] h-[44px] rounded-[10px] bg-river/8 flex items-center justify-center mb-5 text-river">
+                  <card.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-heading text-[20px] font-semibold text-forest mb-2.5 tracking-[-0.2px]">
+                  {card.title}
+                </h3>
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
+                  {card.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Cross-club access */}
-      <section className="py-[100px] bg-offwhite">
+      <section className="py-[100px] bg-parchment-light">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
             Cross-Club Network
@@ -273,7 +332,7 @@ export default function ClubsPage() {
       </section>
 
       {/* Value prop */}
-      <section className="py-20 bg-parchment-light">
+      <section className="py-20 bg-offwhite">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             The Trust Layer

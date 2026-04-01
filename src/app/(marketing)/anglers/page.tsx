@@ -248,6 +248,22 @@ export default function AnglersPage() {
         </div>
       </section>
 
+      {/* Corporate access callout */}
+      <section className="py-20 bg-offwhite">
+        <div className="reveal max-w-[700px] mx-auto px-8">
+          <div className="bg-bronze/5 border border-bronze/15 rounded-xl p-6 text-center">
+            <h3 className="font-heading text-[20px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+              Corporate Access Available
+            </h3>
+            <p className="text-[15px] leading-[1.65] text-text-secondary m-0">
+              Does your company offer a corporate membership? Ask your employer
+              about corporate membership through AnglerPass &mdash; you could
+              join a club with no initiation fee.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">

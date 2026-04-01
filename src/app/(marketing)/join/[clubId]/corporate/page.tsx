@@ -1,33 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { notFound } from "next/navigation";
-import JoinCta from "./JoinCta";
+import CorporateJoinCta from "./CorporateJoinCta";
 
-interface ClubPublicData {
+interface ClubCorporateData {
   id: string;
   name: string;
   description: string | null;
   location: string | null;
   initiation_fee: number | null;
   annual_dues: number | null;
-  membership_application_required: boolean;
   corporate_memberships_enabled: boolean;
+  corporate_initiation_fee: number | null;
+  membership_application_required: boolean;
 }
 
-async function getClub(clubId: string): Promise<ClubPublicData | null> {
+async function getClub(clubId: string): Promise<ClubCorporateData | null> {
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
       .from("clubs")
       .select(
-        "id, name, description, location, initiation_fee, annual_dues, membership_application_required, corporate_memberships_enabled"
+        "id, name, description, location, initiation_fee, annual_dues, corporate_memberships_enabled, corporate_initiation_fee, membership_application_required"
       )
       .eq("id", clubId)
       .single();
 
     if (error || !data) return null;
-    return data as unknown as ClubPublicData;
+    return data as unknown as ClubCorporateData;
   } catch {
     return null;
   }
@@ -46,28 +46,25 @@ export async function generateMetadata({
   }
 
   return {
-    title: `Join ${club.name} — AnglerPass`,
-    description:
-      club.description ??
-      `Join ${club.name} on AnglerPass and get access to private fly fishing water.`,
+    title: `Corporate Membership — ${club.name} — AnglerPass`,
+    description: `Join ${club.name} with a corporate membership on AnglerPass. Includes your own angler access plus unlimited employee invitations.`,
     openGraph: {
-      title: `Join ${club.name} — AnglerPass`,
-      description:
-        club.description ??
-        `Join ${club.name} on AnglerPass and get access to private fly fishing water.`,
+      title: `Corporate Membership — ${club.name} — AnglerPass`,
+      description: `Join ${club.name} with a corporate membership on AnglerPass. Includes your own angler access plus unlimited employee invitations.`,
     },
   };
 }
 
 function formatCurrency(amount: number | null): string {
-  if (amount === null || amount === undefined || amount === 0) return "Set by club";
+  if (amount === null || amount === undefined || amount === 0)
+    return "Set by club";
   return `$${Number(amount).toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })}`;
 }
 
-export default async function JoinClubPage({
+export default async function CorporateJoinPage({
   params,
 }: {
   params: Promise<{ clubId: string }>;
@@ -99,11 +96,32 @@ export default async function JoinClubPage({
     );
   }
 
-  const initiationDisplay = formatCurrency(club.initiation_fee);
+  if (!club.corporate_memberships_enabled) {
+    return (
+      <>
+        <section className="bg-forest-deep py-40 text-center">
+          <div className="mx-auto max-w-lg px-8">
+            <h1 className="mb-4 font-[family-name:var(--font-heading)] text-[clamp(28px,4vw,42px)] font-medium text-parchment">
+              Corporate Memberships Not Available
+            </h1>
+            <p className="mb-8 text-base leading-relaxed text-parchment/50">
+              {club.name} does not currently offer corporate memberships. You
+              can still join as an individual member.
+            </p>
+            <Link
+              href={`/join/${club.id}`}
+              className="inline-flex items-center gap-2 rounded-md bg-bronze px-8 py-3.5 text-sm font-medium tracking-wide text-white transition-colors hover:bg-bronze-light"
+            >
+              View Individual Membership
+            </Link>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  const corporateFeeDisplay = formatCurrency(club.corporate_initiation_fee);
   const duesDisplay = formatCurrency(club.annual_dues);
-  // TODO: initiation_fee and annual_dues exist in DB (migration 00022) but may not be
-  // in the generated Supabase TypeScript types yet. The query works via admin client
-  // and the values are cast through `as unknown as ClubPublicData`.
 
   return (
     <>
@@ -112,7 +130,7 @@ export default async function JoinClubPage({
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
         <div className="relative mx-auto max-w-2xl px-8 text-center">
           <span className="mb-4 inline-block font-[family-name:var(--font-mono)] text-xs uppercase tracking-widest text-bronze-light">
-            Membership Invitation
+            Corporate Membership
           </span>
           <h1 className="mb-3 font-[family-name:var(--font-heading)] text-[clamp(32px,5vw,52px)] font-medium leading-tight text-parchment">
             {club.name}
@@ -121,7 +139,7 @@ export default async function JoinClubPage({
             <p className="mb-4 text-sm text-parchment/50">{club.location}</p>
           )}
           <p className="text-lg leading-relaxed text-parchment/60">
-            Join {club.name} on AnglerPass
+            Corporate access to {club.name} on AnglerPass
           </p>
         </div>
       </section>
@@ -138,21 +156,33 @@ export default async function JoinClubPage({
             </div>
           )}
 
-          {/* Membership fees */}
+          {/* Corporate value proposition */}
+          <div className="mb-10 rounded-xl border border-bronze/20 bg-bronze/5 p-6">
+            <h2 className="mb-3 font-[family-name:var(--font-heading)] text-xl font-semibold text-forest">
+              What&rsquo;s Included
+            </h2>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              Your corporate membership includes your own angler access plus the
+              ability to invite unlimited employees. Each employee pays only the
+              annual dues &mdash; no initiation fee.
+            </p>
+          </div>
+
+          {/* Fee breakdown */}
           <div className="mb-10 rounded-xl border border-stone-light/20 bg-white p-6">
             <h2 className="mb-4 font-[family-name:var(--font-heading)] text-xl font-semibold text-forest">
-              Membership Fees
+              Fee Breakdown
             </h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-stone-light/15 pb-3">
                 <span className="text-sm text-text-secondary">
-                  Initiation Fee
+                  Corporate Initiation Fee
                 </span>
                 <span className="text-sm font-medium text-text-primary">
-                  {initiationDisplay}
+                  {corporateFeeDisplay}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between border-b border-stone-light/15 pb-3">
                 <span className="text-sm text-text-secondary">
                   Annual Dues
                 </span>
@@ -162,41 +192,32 @@ export default async function JoinClubPage({
                     : duesDisplay}
                 </span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">
+                  Employee Initiation Fee
+                </span>
+                <span className="text-sm font-medium text-forest">Waived</span>
+              </div>
             </div>
             <p className="mt-4 text-xs leading-relaxed text-text-light">
               A 3.5% processing fee will be added at checkout to cover payment
-              processing.
+              processing. Employees you invite will only pay the annual dues.
             </p>
           </div>
 
           {/* Stripe payment placeholder */}
           <div className="mb-10 rounded-xl border-2 border-dashed border-stone-light/30 bg-parchment-light/50 px-6 py-10 text-center">
             <p className="text-sm font-medium text-text-light">
-              Membership Payment &mdash; Stripe integration coming soon
+              Corporate Membership Payment &mdash; Stripe integration coming
+              soon
             </p>
-            {/* STRIPE PAYMENT INTEGRATION — add Stripe Elements here */}
           </div>
 
-          {/* Join CTA */}
-          <JoinCta clubId={club.id} clubName={club.name} />
-
-          {/* Corporate membership link */}
-          {club.corporate_memberships_enabled && (
-            <div className="mt-8 text-center">
-              <p className="text-sm text-text-secondary">
-                Looking for a corporate membership?{" "}
-                <Link
-                  href={`/join/${club.id}/corporate`}
-                  className="font-medium text-river underline transition-colors hover:text-river-dark"
-                >
-                  Learn about corporate access &rarr;
-                </Link>
-              </p>
-            </div>
-          )}
+          {/* Corporate Join CTA */}
+          <CorporateJoinCta clubId={club.id} clubName={club.name} />
 
           {/* Footer note */}
-          <div className="mt-10 text-center">
+          <div className="mt-10 space-y-3 text-center">
             <p className="text-xs text-text-light">
               By joining, you agree to the club&rsquo;s rules and the{" "}
               <Link
@@ -206,6 +227,15 @@ export default async function JoinClubPage({
                 AnglerPass platform policies
               </Link>
               .
+            </p>
+            <p className="text-xs text-text-light">
+              Looking for an individual membership instead?{" "}
+              <Link
+                href={`/join/${club.id}`}
+                className="font-medium text-river underline"
+              >
+                Join as an individual
+              </Link>
             </p>
           </div>
         </div>

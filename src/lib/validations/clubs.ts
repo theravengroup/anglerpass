@@ -49,3 +49,24 @@ export const clubPropertyAccessSchema = z.object({
 });
 
 export type ClubPropertyAccessData = z.infer<typeof clubPropertyAccessSchema>;
+
+// ─── Membership Types ─────────────────────────────────────────────
+export const MEMBERSHIP_TYPES = ["individual", "corporate", "corporate_employee"] as const;
+
+// ─── Corporate Settings ───────────────────────────────────────────
+export const corporateSettingsSchema = z.object({
+  corporate_memberships_enabled: z.boolean(),
+  corporate_initiation_fee: z
+    .number()
+    .min(0, "Fee must be positive")
+    .nullable(),
+});
+
+export type CorporateSettingsData = z.infer<typeof corporateSettingsSchema>;
+
+// ─── Corporate Invitation ─────────────────────────────────────────
+export const corporateInviteSchema = z.object({
+  emails: z.array(z.string().email("Invalid email")).min(1, "At least one email required"),
+});
+
+export type CorporateInviteData = z.infer<typeof corporateInviteSchema>;

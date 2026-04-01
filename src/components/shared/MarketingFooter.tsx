@@ -57,6 +57,7 @@ export default function MarketingFooter() {
                   { href: '/clubs', label: 'For Clubs' },
                   { href: '/anglers', label: 'For Anglers' },
                   { href: '/guides', label: 'For Guides' },
+                  { href: '/clubs#corporate', label: 'Corporate Memberships' },
                   { href: '/pricing', label: 'Pricing' },
                 ].map((link) => (
                   <li key={link.href} className="mb-2.5">

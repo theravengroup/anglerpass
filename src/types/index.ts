@@ -23,3 +23,16 @@ export interface Lead {
   source: string | null;
   created_at: string;
 }
+
+export type MembershipType = "individual" | "corporate" | "corporate_employee";
+
+export interface CorporateInvitation {
+  id: string;
+  club_id: string;
+  corporate_member_id: string;
+  email: string;
+  status: "pending" | "accepted" | "expired";
+  token: string;
+  invited_at: string;
+  accepted_at: string | null;
+}
