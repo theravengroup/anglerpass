@@ -433,9 +433,8 @@ export default function AnglersPage() {
             }}
           >
             When you book a fishing day through AnglerPass, a small platform fee of
-            5% is added to the property&rsquo;s base rate. This fee covers the
-            booking platform, payment processing, and the trust infrastructure that
-            makes private water access possible.
+            5% is added to the property&rsquo;s base rate. Rod fees are set by each
+            landowner and vary by property. Here&rsquo;s how a typical booking breaks down:
           </p>
           <div
             style={{
@@ -448,6 +447,9 @@ export default function AnglersPage() {
               textAlign: 'left',
             }}
           >
+            <p style={{ fontSize: 11, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--color-text-light)', marginBottom: 16 }}>
+              Example booking
+            </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--color-parchment)' }}>
               <span style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Rod fee (set by landowner)</span>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-forest)' }}>$125</span>
