@@ -110,6 +110,7 @@ export default function MarketingFooter() {
                   { href: '/landowners', label: 'For Landowners' },
                   { href: '/clubs', label: 'For Clubs' },
                   { href: '/anglers', label: 'For Anglers' },
+                  { href: '/guides', label: 'For Guides' },
                   { href: '/pricing', label: 'Pricing' },
                 ].map((link) => (
                   <li key={link.href} style={{ marginBottom: 10 }}>
