@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Pricing — AnglerPass',
   description:
-    'Transparent pricing for clubs, landowners, and anglers. See exactly what you pay and what you receive on AnglerPass.',
+    'Transparent pricing for clubs, landowners, anglers, and guides. See exactly what you pay and what you receive on AnglerPass.',
   openGraph: {
     title: 'Pricing — AnglerPass',
     description:
@@ -391,6 +391,7 @@ export default function PricingPage() {
                   { label: 'Rod fee', detail: 'Per rod, per day, set by the property' },
                   { label: 'Platform fee', detail: '15% of rod fees' },
                   { label: 'Cross-club fee', detail: '$10/rod (only when fishing outside your home club)' },
+                  { label: 'Guide service fee', detail: '10% of guide rate (only when adding a guide)' },
                 ].map((item) => (
                   <li key={item.label} style={{ padding: '8px 0', borderBottom: '1px solid var(--color-parchment)' }}>
                     <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-forest)' }}>{item.label}</span>
@@ -494,8 +495,102 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* For Guides */}
+      <section style={{ padding: '100px 0', background: 'var(--color-parchment-light)' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 32px' }}>
+          <div className="reveal" style={{ marginBottom: 48 }}>
+            <span
+              style={{
+                display: 'inline-block',
+                marginBottom: 12,
+                fontFamily: 'var(--font-mono)',
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                color: 'var(--color-charcoal)',
+              }}
+            >
+              For Guides
+            </span>
+            <h2
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(28px, 3.5vw, 40px)',
+                fontWeight: 500,
+                color: 'var(--color-forest)',
+                margin: '0 0 16px',
+                letterSpacing: '-.3px',
+              }}
+            >
+              What guides receive
+            </h2>
+            <p style={{ fontSize: 16, color: 'var(--color-text-secondary)', lineHeight: 1.65, maxWidth: 680 }}>
+              No subscription. No listing fee. You set your rates and keep 100% of them.
+              The angler pays a 10% service fee on top &mdash; it never comes out of your pocket.
+            </p>
+          </div>
+
+          <div
+            className="reveal"
+            style={{
+              background: '#fff',
+              border: '1px solid var(--color-parchment)',
+              borderRadius: 14,
+              padding: '32px 28px',
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 20,
+                fontWeight: 600,
+                color: 'var(--color-forest)',
+                marginBottom: 20,
+              }}
+            >
+              Per-trip payout breakdown
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {[
+                { label: 'Your full-day rate (set by you)', example: 'e.g. $500', color: 'var(--color-forest)' },
+                { label: '10% service fee', example: 'e.g. +$50 (paid by the angler)', color: 'var(--color-text-secondary)' },
+                { label: 'Angler pays at checkout', example: 'e.g. $550 (your rate + service fee)', color: 'var(--color-text-secondary)' },
+                { label: 'You receive', example: '$500 (100% of your rate)', color: 'var(--color-forest)', bold: true },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '14px 0',
+                    borderBottom: '1px solid var(--color-parchment)',
+                  }}
+                >
+                  <span style={{ fontSize: 14, fontWeight: row.bold ? 600 : 400, color: row.color }}>
+                    {row.label}
+                  </span>
+                  <span style={{ fontSize: 13, color: 'var(--color-text-light)' }}>
+                    {row.example}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--color-text-light)', marginTop: 16, lineHeight: 1.6 }}>
+              Guide add-on is optional for anglers. When an angler selects you for their trip,
+              the service fee is added to their checkout total. You also set a half-day rate
+              separately. Payouts are processed via{' '}
+              <Link href="/guides" style={{ color: 'var(--color-charcoal)', textDecoration: 'underline' }}>
+                Stripe Connect
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* How money flows */}
-      <section style={{ padding: '80px 0', background: 'var(--color-parchment-light)' }}>
+      <section style={{ padding: '80px 0', background: 'var(--color-offwhite)' }}>
         <div className="reveal" style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}>
           <span
             style={{
