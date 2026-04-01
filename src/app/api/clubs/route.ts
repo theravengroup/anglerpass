@@ -116,6 +116,67 @@ export async function POST(request: Request) {
       }
     }
 
+    // Check for angler club invitations: anglers who invited this club admin
+    // and auto-link them as members
+    try {
+      const clubAdminEmail = user.email;
+      if (clubAdminEmail) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: anglerInvitations } = await (admin as any)
+          .from("angler_club_invitations")
+          .select("id, angler_id")
+          .eq("admin_email", clubAdminEmail)
+          .eq("status", "sent") as { data: { id: string; angler_id: string }[] | null };
+
+        if (anglerInvitations && anglerInvitations.length > 0) {
+          for (const inv of anglerInvitations) {
+            // Mark invitation as accepted
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (admin as any)
+              .from("angler_club_invitations")
+              .update({
+                status: "accepted",
+                club_id: club.id,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", inv.id);
+
+            // Create active membership for the angler
+            await admin
+              .from("club_memberships")
+              .insert({
+                club_id: club.id,
+                user_id: inv.angler_id,
+                role: "member",
+                status: "active",
+                joined_at: new Date().toISOString(),
+              })
+              .select()
+              .single()
+              .then(({ error: memErr }) => {
+                if (memErr) {
+                  // May fail if duplicate — that's fine
+                  console.error("[clubs] Angler membership insert:", memErr.message);
+                }
+              });
+
+            // Notify the angler that their club joined
+            await admin.from("notifications").insert({
+              user_id: inv.angler_id,
+              type: "membership_activated",
+              title: `${club.name} joined AnglerPass!`,
+              body: `Great news — ${club.name} just set up their club on AnglerPass. Your membership is now active and you can start booking fishing days.`,
+              link: "/angler",
+              metadata: { club_id: club.id },
+            });
+          }
+        }
+      }
+    } catch (anglerErr) {
+      console.error("[clubs] Angler invitation linking error:", anglerErr);
+      // Don't fail club creation for this
+    }
+
     return NextResponse.json({ club }, { status: 201 });
   } catch (err) {
     console.error("[clubs] Unexpected error:", err);

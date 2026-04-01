@@ -333,8 +333,10 @@ export default function ClubsPage() {
                 lineHeight: 1.65,
               }}
             >
-              No per-member fees. No surprise charges. Pick the plan that fits your club
-              and upgrade anytime.
+              Your subscription covers the platform. You set your own initiation fees
+              and annual dues &mdash; we just add a 3.5% processing fee at checkout,
+              paid by the member, to cover payment processing. Your club receives 100%
+              of your stated fees.
             </p>
           </div>
           <div
@@ -443,11 +445,33 @@ export default function ClubsPage() {
               </div>
             ))}
           </div>
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--color-text-light)', marginTop: 20, fontStyle: 'italic' }}>
-            All plans include a 30-day free trial. No credit card required to start.
-            <br />
-            Need more properties? Additional properties available at tiered pricing.
-          </p>
+          <div style={{ textAlign: 'center', marginTop: 32, maxWidth: 600, margin: '32px auto 0' }}>
+            <p style={{ fontSize: 13, color: 'var(--color-text-light)', fontStyle: 'italic', marginBottom: 12 }}>
+              All plans include a 30-day free trial. No credit card required to start.
+              <br />
+              Need more properties? Additional properties available at tiered pricing.
+            </p>
+            <div
+              style={{
+                background: 'rgba(58,107,124,.06)',
+                border: '1px solid rgba(58,107,124,.12)',
+                borderRadius: 10,
+                padding: '20px 24px',
+                marginTop: 20,
+              }}
+            >
+              <p style={{ fontSize: 13.5, color: 'var(--color-text-secondary)', lineHeight: 1.7, margin: 0 }}>
+                <strong style={{ color: 'var(--color-forest)' }}>Membership payments:</strong> You set your
+                initiation fees and annual dues. When members pay, we add a 3.5% processing fee at
+                checkout to cover credit card processing &mdash; paid by the member, not by your club.
+                Your club receives 100% of your stated fees. See our{' '}
+                <Link href="/pricing" style={{ color: 'var(--color-river)', textDecoration: 'underline' }}>
+                  pricing page
+                </Link>{' '}
+                for full details.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

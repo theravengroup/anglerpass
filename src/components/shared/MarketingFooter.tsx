@@ -110,6 +110,7 @@ export default function MarketingFooter() {
                   { href: '/landowners', label: 'For Landowners' },
                   { href: '/clubs', label: 'For Clubs' },
                   { href: '/anglers', label: 'For Anglers' },
+                  { href: '/pricing', label: 'Pricing' },
                 ].map((link) => (
                   <li key={link.href} style={{ marginBottom: 10 }}>
                     <Link
@@ -231,6 +232,19 @@ export default function MarketingFooter() {
                   >
                     Terms of Service
                   </a>
+                </li>
+                <li style={{ marginBottom: 10 }}>
+                  <Link
+                    href="/policies"
+                    style={{
+                      fontSize: 13,
+                      color: 'rgba(255,255,255,.4)',
+                      textDecoration: 'none',
+                      transition: 'color .3s',
+                    }}
+                  >
+                    Policies
+                  </Link>
                 </li>
               </ul>
             </div>

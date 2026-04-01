@@ -28,6 +28,7 @@ import {
   WATER_TYPE_LABELS,
 } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
+import InviteClubCard from "@/components/angler/InviteClubCard";
 
 /** Angler-specific period options (includes "All time") */
 const PERIOD_OPTIONS = [
@@ -63,16 +64,32 @@ interface RecentBooking {
   created_at: string;
 }
 
+interface ClubInvitation {
+  id: string;
+  club_name: string;
+  admin_email: string;
+  status: string;
+  created_at: string;
+}
+
 export default function AnglerPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
+  const [clubInvitations, setClubInvitations] = useState<ClubInvitation[]>([]);
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/analytics?view=angler&days=${days}`);
-      if (res.ok) {
-        setData(await res.json());
+      const [analyticsRes, invitationsRes] = await Promise.all([
+        fetch(`/api/analytics?view=angler&days=${days}`),
+        fetch("/api/anglers/invite-club"),
+      ]);
+      if (analyticsRes.ok) {
+        setData(await analyticsRes.json());
+      }
+      if (invitationsRes.ok) {
+        const invData = await invitationsRes.json();
+        setClubInvitations(invData.invitations ?? []);
       }
     } catch {
       // Silent fail
@@ -198,6 +215,12 @@ export default function AnglerPage() {
           </Link>
         ))}
       </div>
+
+      {/* Invite Club Card — shown prominently when angler has no memberships */}
+      <InviteClubCard
+        existingInvitations={clubInvitations}
+        hasMemberships={(data?.memberships ?? 0) > 0}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Favorite Properties */}
