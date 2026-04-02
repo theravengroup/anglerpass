@@ -190,6 +190,77 @@ export default function LandownersPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-[100px] bg-parchment-light">
+        <div className="max-w-[700px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
+              FAQ
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+              Common questions
+            </h2>
+          </div>
+
+          <div className="grid">
+            {[
+              {
+                q: 'How does AnglerPass protect my property and privacy?',
+                a: 'Your property is never visible to the general public. Only members of approved fly fishing clubs can see your listing. You control which clubs have access, and every angler who books has been vetted by their club before they can even view your water.',
+              },
+              {
+                q: 'What does it cost me as a landowner?',
+                a: 'There is no cost to list your property on AnglerPass. You set your own rod fees and receive 100% of those fees. A 15% platform fee is added on top and paid by the angler at checkout.',
+              },
+              {
+                q: 'How do I control who accesses my property?',
+                a: 'You have full control. You decide which clubs can offer your water to their members, set daily rod limits, define seasonal availability windows, and can block off private dates at any time. You can also require approval for individual bookings before they are confirmed.',
+              },
+              {
+                q: 'What if someone damages my property or violates my rules?',
+                a: 'Every angler is tied to a club that vouches for them. If an issue arises, you report it through the platform and work with the club to resolve it. Clubs have a direct incentive to maintain good standing — repeated violations can result in a club losing access to your property.',
+              },
+              {
+                q: 'Can I list multiple properties or water sections?',
+                a: 'Yes. You can list as many properties as you own, each with its own profile, photos, species list, rules, pricing, and availability calendar. Many landowners list different stretches of the same river as separate properties.',
+              },
+              {
+                q: 'How are rod fees and pricing determined?',
+                a: 'You set your own rod fee per angler per day. You can price based on season, water type, or however you see fit. AnglerPass does not dictate pricing — you decide what your water is worth.',
+              },
+              {
+                q: 'What kind of properties work on AnglerPass?',
+                a: 'Any private water suitable for fly fishing — rivers, streams, spring creeks, ponds, and lakes. Properties range from small spring creeks to large ranch operations with miles of river frontage. If you have private water and want to manage access professionally, AnglerPass is built for you.',
+              },
+              {
+                q: 'How do bookings and scheduling work?',
+                a: 'You set your availability through a visual calendar. Anglers can only book dates you have opened and within the rod limits you define. You receive a notification for each booking and can see your upcoming schedule in your dashboard at any time.',
+              },
+              {
+                q: 'Can I offer lodging alongside fishing access?',
+                a: 'Yes. If you have lodging available through Airbnb, VRBO, or another platform, you can toggle on a lodging indicator and link directly to your listing. Anglers will see that lodging is available when they view your property, making multi-day trips easier to plan.',
+              },
+              {
+                q: 'How do I get started?',
+                a: 'Join the waitlist or contact us directly. We will walk you through the onboarding process, help you set up your property profile with photos and details, and connect you with clubs in your region. Most landowners are fully set up within a week.',
+              },
+            ].map((faq, i) => (
+              <div
+                key={i}
+                className={`reveal d${(i % 3) + 1} py-6 ${i < 9 ? 'border-b border-parchment' : ''}`}
+              >
+                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                  {faq.q}
+                </h3>
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">

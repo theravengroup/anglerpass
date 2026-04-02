@@ -136,6 +136,22 @@ const faqs = [
     q: 'Do I need to be affiliated with a club?',
     a: 'No. Guides are independent providers on AnglerPass. You request water access from clubs, but you\'re not bound to any single club.',
   },
+  {
+    q: 'How long does the verification process take?',
+    a: 'Most guide profiles are reviewed within 48 hours of submitting all required documents. Make sure your guide license, insurance, and first aid certification are current and clearly readable to avoid delays.',
+  },
+  {
+    q: 'Can I guide on multiple properties and for multiple clubs?',
+    a: 'Yes. There is no limit to how many properties or clubs you can be approved for. Many guides build a network of approved waters across multiple regions to maximize their bookings.',
+  },
+  {
+    q: 'What happens if a property or club removes my access?',
+    a: 'If a club or landowner revokes your access, any future bookings on that water are canceled and the angler is notified. Existing completed trips and reviews remain on your profile.',
+  },
+  {
+    q: 'Do anglers have to book a guide for their trip?',
+    a: 'No. Guides are entirely optional on AnglerPass. Anglers can book water on their own or choose to add a guide during the booking process. Your profile is shown to anglers who are looking for guided experiences.',
+  },
 ];
 
 export default function GuidesPage() {

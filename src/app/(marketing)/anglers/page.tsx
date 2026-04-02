@@ -264,6 +264,77 @@ export default function AnglersPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-[100px] bg-parchment-light">
+        <div className="max-w-[700px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
+              FAQ
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+              Common questions
+            </h2>
+          </div>
+
+          <div className="grid">
+            {[
+              {
+                q: 'Do I need to be a member of a club to use AnglerPass?',
+                a: 'Yes. AnglerPass is a club-based platform. You must be an active member of at least one fly fishing club on the platform to browse properties and book fishing days. This club vetting is what earns landowner trust and makes private water access possible.',
+              },
+              {
+                q: 'How much does it cost to book a fishing day?',
+                a: 'The rod fee is set by each landowner and varies by property. A 15% platform fee is added on top of the rod fee at checkout. There is no subscription or membership fee charged by AnglerPass itself — you only pay when you book.',
+              },
+              {
+                q: 'How do I find and join a club?',
+                a: 'You can browse clubs on AnglerPass and apply directly through the platform. Each club sets its own membership criteria, initiation fees, and annual dues. Some clubs accept all applicants, while others have a vetting or interview process.',
+              },
+              {
+                q: 'What kind of water is available on AnglerPass?',
+                a: 'Private rivers, spring creeks, ponds, and lakes that are not accessible to the general public. Properties range from intimate spring creeks to multi-mile stretches of premium trout water on working ranches. All water on the platform is fly fishing only.',
+              },
+              {
+                q: 'Can I book a guide for my trip?',
+                a: 'Yes, but it is entirely optional. When booking a fishing day, you can choose to add a verified guide to your trip. Guides set their own rates, and a 10% service fee is added on top, paid by you. Many anglers fish without a guide.',
+              },
+              {
+                q: 'Can I book multi-day trips?',
+                a: 'Yes. You can select a date range when booking and reserve consecutive days on the same property. The fee breakdown shows the per-day rate multiplied by the number of days so you know exactly what you are paying before you confirm.',
+              },
+              {
+                q: 'What is cross-club access?',
+                a: 'Some clubs on AnglerPass opt in to reciprocal access agreements with other clubs. If your club has a cross-club agreement, you may be able to book water managed by partner clubs without needing a separate membership. This expands your options as the network grows.',
+              },
+              {
+                q: 'What is the cancellation policy?',
+                a: 'Cancellation terms vary by property and are shown before you confirm your booking. Generally, cancellations made well in advance receive a full refund, while last-minute cancellations may be subject to partial or no refund to protect landowners and guides.',
+              },
+              {
+                q: 'What does my employer\u2019s corporate membership get me?',
+                a: 'If your company holds a corporate membership with a club on AnglerPass, you can join that club as a corporate employee member — typically with no initiation fee. You get the same access to properties and booking capabilities as any other club member.',
+              },
+              {
+                q: 'Is there lodging available near the properties?',
+                a: 'Some properties offer lodging through platforms like Airbnb or VRBO. When lodging is available, you will see a lodging indicator on the property listing with a direct link to the accommodation. This makes it easy to plan multi-day trips to remote waters.',
+              },
+            ].map((faq, i) => (
+              <div
+                key={i}
+                className={`reveal d${(i % 3) + 1} py-6 ${i < 9 ? 'border-b border-parchment' : ''}`}
+              >
+                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                  {faq.q}
+                </h3>
+                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">
