@@ -87,6 +87,7 @@ nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 .hero-content{max-width:580px}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:7px 18px;margin-bottom:30px;backdrop-filter:blur(8px);animation:fadeIn .8s ease .3s both}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--bronze-light);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 .hero-badge span{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.85);font-weight:500}
