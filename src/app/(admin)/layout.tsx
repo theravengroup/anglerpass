@@ -9,6 +9,7 @@ import {
   Settings,
   Building2,
   Compass,
+  DollarSign,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -46,6 +47,11 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Compass />,
   },
   {
+    label: "Financials",
+    href: "/admin/financials",
+    icon: <DollarSign />,
+  },
+  {
     label: "Team",
     href: "/admin/team",
     icon: <UserPlus />,
@@ -68,6 +74,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/review-moderation": "Review Moderation",
   "/admin/users": "User Management",
   "/admin/clubs": "Club Oversight",
+  "/admin/financials": "Platform Financials",
   "/admin/team": "Team Management",
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",

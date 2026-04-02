@@ -86,8 +86,8 @@ export default function HeroSection() {
                 />
               </svg>
             </a>
-            <a href="#waitlist" className="btn btn-secondary">
-              Request Early Access
+            <a href="#how" className="btn btn-secondary">
+              How It Works
             </a>
           </div>
           <p className="hero-note">

@@ -1,0 +1,91 @@
+import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { getPropertyForecast } from "@/lib/weather";
+
+/**
+ * POST /api/admin/weather-prefetch
+ *
+ * Pre-warms the weather cache for all published properties with coordinates.
+ * Intended to be called by a cron job every 30 minutes, or manually by admins.
+ *
+ * Processes properties sequentially with a small delay between calls
+ * to avoid hammering the NWS API.
+ */
+export async function POST(request: Request) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const admin = createAdminClient();
+
+    // Verify admin role
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Fetch all published properties with coordinates
+    const { data: properties } = await admin
+      .from("properties")
+      .select("id, name, latitude, longitude")
+      .eq("status", "published")
+      .not("latitude", "is", null)
+      .not("longitude", "is", null);
+
+    if (!properties?.length) {
+      return NextResponse.json({
+        message: "No properties to prefetch",
+        prefetched: 0,
+        failed: 0,
+      });
+    }
+
+    let prefetched = 0;
+    let failed = 0;
+
+    for (const prop of properties) {
+      try {
+        const result = await getPropertyForecast(
+          prop.latitude as number,
+          prop.longitude as number
+        );
+        if (result) {
+          prefetched++;
+        } else {
+          failed++;
+        }
+      } catch {
+        failed++;
+      }
+
+      // Small delay between requests to be a good NWS API citizen
+      // (cache hits return instantly so only cache misses actually hit NWS)
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+
+    return NextResponse.json({
+      message: `Prefetched ${prefetched} of ${properties.length} properties`,
+      prefetched,
+      failed,
+      total: properties.length,
+    });
+  } catch (err) {
+    console.error("[weather-prefetch] Error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

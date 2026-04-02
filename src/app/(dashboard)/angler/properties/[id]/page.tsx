@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import BookingForm from "@/components/angler/BookingForm";
 import PropertyReviewSection from "@/components/reviews/PropertyReviewSection";
+import PropertyWeather from "@/components/properties/PropertyWeather";
 
 interface PropertyDetail {
   id: string;
@@ -34,6 +35,8 @@ interface PropertyDetail {
   half_day_allowed: boolean;
   water_miles: number | null;
   regulations: string | null;
+  latitude: number | null;
+  longitude: number | null;
   lodging_available: boolean;
   lodging_url: string | null;
   is_cross_club?: boolean;
@@ -278,6 +281,11 @@ export default function PropertyDetailPage() {
                 manage or guarantee lodging availability.
               </p>
             </div>
+          )}
+
+          {/* Weather forecast */}
+          {property.latitude != null && property.longitude != null && (
+            <PropertyWeather propertyId={property.id} />
           )}
 
           {/* Verified trip reviews */}

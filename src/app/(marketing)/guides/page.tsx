@@ -181,7 +181,7 @@ export default function GuidesPage() {
               Apply as a Guide &rarr;
             </Link>
             <Link
-              href="/#waitlist"
+              href="#features"
               className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
               Learn More
@@ -191,7 +191,7 @@ export default function GuidesPage() {
       </section>
 
       {/* Features grid */}
-      <section className="py-[120px] bg-offwhite">
+      <section id="features" className="py-[120px] bg-offwhite">
         <div className="max-w-[1200px] mx-auto px-8">
           <div className="reveal text-center mb-[72px]">
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">

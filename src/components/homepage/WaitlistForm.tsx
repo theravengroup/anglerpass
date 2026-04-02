@@ -66,9 +66,11 @@ export default function WaitlistForm() {
           <select id="role" required defaultValue="" {...register('role')}>
             <option value="" disabled>Select your role</option>
             <option value="landowner">Landowner</option>
-            <option value="club">Club or Association</option>
             <option value="angler">Individual Angler</option>
-            <option value="other">Other</option>
+            <option value="club">Club or Association</option>
+            <option value="guide">Guide</option>
+            <option value="corporate">Corporate Member</option>
+            <option value="partner">Partner</option>
           </select>
         </div>
         <div className="form-group">
@@ -96,7 +98,7 @@ export default function WaitlistForm() {
           </button>
         </div>
       </form>
-      <p className="form-partner">Interested in becoming an early partner? <a href="mailto:hello@anglerpass.com">Request early access</a></p>
+      <p className="form-partner">Questions? Reach us at <a href="mailto:hello@anglerpass.com">hello@anglerpass.com</a></p>
     </div>
   );
 }
