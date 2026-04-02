@@ -173,8 +173,48 @@ export default function LandownersPage() {
         </div>
       </section>
 
-      {/* Cross-club access */}
+      {/* Club affiliation */}
       <section className="py-20 bg-offwhite">
+        <div className="reveal max-w-[700px] mx-auto px-8 text-center">
+          <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
+            How It Works
+          </span>
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
+            Your property, backed by a club
+          </h2>
+          <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[580px] mx-auto mb-8">
+            When you register a property on AnglerPass, you affiliate it with
+            at least one fly fishing club. The club acts as the trust layer
+            &mdash; vetting the anglers who can see and book your water.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-[640px] mx-auto text-left">
+            <div className="bg-white border border-parchment rounded-xl px-5 py-5">
+              <span className="inline-flex items-center justify-center size-8 rounded-lg bg-forest/8 text-forest font-heading text-[15px] font-bold mb-3">1</span>
+              <h3 className="text-[14px] font-semibold text-forest mb-1.5">Register your property</h3>
+              <p className="text-[13px] leading-[1.6] text-text-secondary m-0">
+                Add your water with photos, species, rules, and GPS coordinates.
+              </p>
+            </div>
+            <div className="bg-white border border-parchment rounded-xl px-5 py-5">
+              <span className="inline-flex items-center justify-center size-8 rounded-lg bg-forest/8 text-forest font-heading text-[15px] font-bold mb-3">2</span>
+              <h3 className="text-[14px] font-semibold text-forest mb-1.5">Choose a club</h3>
+              <p className="text-[13px] leading-[1.6] text-text-secondary m-0">
+                We match you with clubs in your area based on your property&rsquo;s location. You pick the ones you trust.
+              </p>
+            </div>
+            <div className="bg-white border border-parchment rounded-xl px-5 py-5">
+              <span className="inline-flex items-center justify-center size-8 rounded-lg bg-forest/8 text-forest font-heading text-[15px] font-bold mb-3">3</span>
+              <h3 className="text-[14px] font-semibold text-forest mb-1.5">Start receiving bookings</h3>
+              <p className="text-[13px] leading-[1.6] text-text-secondary m-0">
+                Only vetted members of your affiliated clubs can view and book your water.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cross-club access */}
+      <section className="py-[100px] bg-parchment-light">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
             The Network
@@ -243,7 +283,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'How do I get started?',
-                a: 'Join the waitlist or contact us directly. We will walk you through the onboarding process, help you set up your property profile with photos and details, and connect you with clubs in your region. Most landowners are fully set up within a week.',
+                a: 'Join the waitlist or contact us directly. When you register a property, you enter its GPS coordinates and we automatically match you with fly fishing clubs operating in your area. You choose which clubs to affiliate with, and only their vetted members can see and book your water. Most landowners are fully set up within a week.',
               },
             ]}
           />
