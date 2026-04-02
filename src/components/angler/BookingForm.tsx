@@ -60,7 +60,8 @@ interface BookingFormProps {
 }
 
 export default function BookingForm({ property, initialMembership }: BookingFormProps) {
-  const [bookingDate, setBookingDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [duration, setDuration] = useState("full_day");
   const [partySize, setPartySize] = useState(1);
   const [nonFishingGuests, setNonFishingGuests] = useState(0);
@@ -77,7 +78,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
 
   // Fetch available guides when date/duration/party changes
   const fetchGuides = useCallback(async () => {
-    if (!bookingDate) {
+    if (!startDate) {
       setAvailableGuides([]);
       return;
     }
@@ -85,7 +86,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
     try {
       const params = new URLSearchParams({
         property_id: property.id,
-        date: bookingDate,
+        date: startDate,
         party_size: String(partySize),
         duration,
       });
@@ -99,7 +100,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
     } finally {
       setLoadingGuides(false);
     }
-  }, [property.id, bookingDate, partySize, duration]);
+  }, [property.id, startDate, partySize, duration]);
 
   useEffect(() => {
     fetchGuides();
@@ -109,27 +110,38 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   const selectedGuide = availableGuides.find((g) => g.id === selectedGuideId);
   const guideRate = selectedGuide ? (selectedGuide.rate ?? 0) : 0;
 
+  // Calculate number of days
+  const numberOfDays = startDate && endDate
+    ? Math.max(1, Math.round(
+        (new Date(endDate + "T00:00:00").getTime() - new Date(startDate + "T00:00:00").getTime())
+        / (24 * 60 * 60 * 1000)
+      ) + 1)
+    : 1;
+
   const isCrossClub = property.is_cross_club ?? false;
   const ratePerRod =
     duration === "full_day"
       ? (property.rate_adult_full_day ?? 0)
       : (property.rate_adult_half_day ?? 0);
-  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub, guideRate);
+  const perDayGuideRate = guideRate;
+  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub, guideRate, numberOfDays);
 
   async function handleBooking() {
-    if (!selectedMembership || !bookingDate) return;
+    if (!selectedMembership || !startDate) return;
 
     setBookingError(null);
     setSubmitting(true);
 
     try {
+      const effectiveEndDate = endDate || startDate;
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           property_id: property.id,
           club_membership_id: selectedMembership,
-          booking_date: bookingDate,
+          booking_date: startDate,
+          booking_end_date: effectiveEndDate !== startDate ? effectiveEndDate : undefined,
           duration,
           party_size: partySize,
           non_fishing_guests: nonFishingGuests,
@@ -211,17 +223,43 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         <p className="text-[11px] text-text-light">{ROD_NOMENCLATURE}</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Date */}
+        {/* Date range */}
         <div className="space-y-2">
-          <Label htmlFor="booking_date">Date</Label>
-          <Input
-            id="booking_date"
-            type="date"
-            min={minDate}
-            value={bookingDate}
-            onChange={(e) => setBookingDate(e.target.value)}
-            disabled={submitting}
-          />
+          <Label>Dates</Label>
+          <div className="flex gap-2">
+            <div className="flex-1 space-y-1">
+              <span className="text-xs text-text-light">Start</span>
+              <Input
+                id="start_date"
+                type="date"
+                min={minDate}
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  if (!endDate || e.target.value > endDate) {
+                    setEndDate(e.target.value);
+                  }
+                }}
+                disabled={submitting}
+              />
+            </div>
+            <div className="flex-1 space-y-1">
+              <span className="text-xs text-text-light">End</span>
+              <Input
+                id="end_date"
+                type="date"
+                min={startDate || minDate}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                disabled={submitting || !startDate}
+              />
+            </div>
+          </div>
+          {startDate && numberOfDays > 1 && (
+            <p className="text-xs font-medium text-bronze">
+              {numberOfDays} day{numberOfDays > 1 ? "s" : ""} selected
+            </p>
+          )}
         </div>
 
         {/* Duration */}
@@ -351,7 +389,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         </div>
 
         {/* Guide add-on */}
-        {bookingDate && (
+        {startDate && (
           <GuidesSection
             loadingGuides={loadingGuides}
             availableGuides={availableGuides}
@@ -361,24 +399,28 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         )}
 
         {/* Fee breakdown */}
-        {bookingDate && (
+        {startDate && (
           <FeeBreakdown
             ratePerRod={ratePerRod}
             partySize={partySize}
             fees={fees}
             duration={duration}
             nonFishingGuests={nonFishingGuests}
+            numberOfDays={numberOfDays}
+            perDayGuideRate={perDayGuideRate}
             selectedGuideName={selectedGuide?.display_name}
           />
         )}
 
         {bookingError && (
-          <p className="text-sm text-red-600">{bookingError}</p>
+          <p className="text-sm text-red-600" role="alert" aria-live="polite">
+            {bookingError}
+          </p>
         )}
 
         <Button
           onClick={handleBooking}
-          disabled={submitting || !bookingDate || !selectedMembership}
+          disabled={submitting || !startDate || !selectedMembership}
           className="w-full bg-bronze text-white hover:bg-bronze/90"
         >
           {submitting ? (

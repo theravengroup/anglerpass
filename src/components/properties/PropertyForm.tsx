@@ -23,7 +23,7 @@ import {
   COMMON_SPECIES,
   MIN_PHOTOS,
 } from "@/lib/validations/properties";
-import { Loader2, Save, Send, Lock, Info } from "lucide-react";
+import { Loader2, Save, Send, Lock, Info, Home } from "lucide-react";
 import PhotoUpload from "@/components/properties/PhotoUpload";
 import ClubAssociation from "@/components/properties/ClubAssociation";
 import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
@@ -71,6 +71,8 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       rate_adult_half_day: null,
       rate_youth_half_day: null,
       rate_child_half_day: null,
+      lodging_available: false,
+      lodging_url: "",
       access_notes: "",
       gate_code_required: false,
       gate_code: "",
@@ -113,6 +115,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
   const species = watch("species");
   const waterType = watch("water_type");
   const halfDayAllowed = watch("half_day_allowed");
+  const lodgingAvailable = watch("lodging_available");
   const gateCodeRequired = watch("gate_code_required");
   const photos = watch("photos");
   const currentName = watch("name");
@@ -663,6 +666,57 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
                 placeholder="e.g. 4582"
                 {...register("gate_code")}
               />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Lodging */}
+      <Card className="border-stone-light/20">
+        <CardHeader>
+          <div className="flex items-start gap-3">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-bronze/10">
+              <Home className="size-4 text-bronze" />
+            </div>
+            <div>
+              <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
+                Lodging
+              </CardTitle>
+              <p className="mt-1 text-xs text-text-light">
+                If your property offers on-site lodging through Airbnb or VRBO,
+                enable this to display it on your listing.
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="border-t border-stone-light/20 pt-4">
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                className="size-4 rounded border-stone-light/30 accent-forest"
+                {...register("lodging_available")}
+              />
+              <span className="text-sm font-medium text-text-primary">
+                Lodging available on this property
+              </span>
+            </label>
+          </div>
+
+          {lodgingAvailable && (
+            <div className="space-y-2">
+              <Label htmlFor="lodging_url">Airbnb or VRBO listing link</Label>
+              <Input
+                id="lodging_url"
+                type="url"
+                placeholder="Paste your Airbnb or VRBO URL here"
+                {...register("lodging_url")}
+              />
+              {errors.lodging_url && (
+                <p className="text-sm text-red-600">
+                  {errors.lodging_url.message}
+                </p>
+              )}
             </div>
           )}
         </CardContent>

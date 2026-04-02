@@ -106,6 +106,10 @@ export type Database = {
           angler_id: string
           base_rate: number
           booking_date: string
+          booking_days: number
+          booking_end_date: string | null
+          booking_group_id: string | null
+          booking_start_date: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
           club_commission: number
@@ -137,6 +141,10 @@ export type Database = {
           angler_id: string
           base_rate: number
           booking_date: string
+          booking_days?: number
+          booking_end_date?: string | null
+          booking_group_id?: string | null
+          booking_start_date?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           club_commission?: number
@@ -168,6 +176,10 @@ export type Database = {
           angler_id?: string
           base_rate?: number
           booking_date?: string
+          booking_days?: number
+          booking_end_date?: string | null
+          booking_group_id?: string | null
+          booking_start_date?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           club_commission?: number
@@ -1632,6 +1644,8 @@ export type Database = {
           id: string
           latitude: number | null
           location_description: string | null
+          lodging_available: boolean
+          lodging_url: string | null
           longitude: number | null
           max_guests: number | null
           max_rods: number | null
@@ -1664,6 +1678,8 @@ export type Database = {
           id?: string
           latitude?: number | null
           location_description?: string | null
+          lodging_available?: boolean
+          lodging_url?: string | null
           longitude?: number | null
           max_guests?: number | null
           max_rods?: number | null
@@ -1696,6 +1712,8 @@ export type Database = {
           id?: string
           latitude?: number | null
           location_description?: string | null
+          lodging_available?: boolean
+          lodging_url?: string | null
           longitude?: number | null
           max_guests?: number | null
           max_rods?: number | null

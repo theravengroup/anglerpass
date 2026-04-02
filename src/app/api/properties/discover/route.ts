@@ -22,6 +22,7 @@ export async function GET(request: Request) {
     const species = searchParams.get("species");
     const minPrice = searchParams.get("min_price");
     const maxPrice = searchParams.get("max_price");
+    const lodging = searchParams.get("lodging");
     const bounds = searchParams.get("bounds"); // "south,west,north,east"
 
     // Get the user's active club memberships
@@ -108,7 +109,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
+        "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, lodging_available, lodging_url"
       )
       .in("id", allPropertyIds)
       .eq("status", "published")
@@ -128,6 +129,10 @@ export async function GET(request: Request) {
 
     if (maxPrice) {
       query = query.lte("rate_adult_full_day", parseFloat(maxPrice));
+    }
+
+    if (lodging === "true") {
+      query = query.eq("lodging_available", true);
     }
 
     // Bounding box filter for map viewport

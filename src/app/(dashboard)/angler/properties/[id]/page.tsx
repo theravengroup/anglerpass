@@ -12,6 +12,8 @@ import {
   Users,
   ArrowLeft,
   ScrollText,
+  Home,
+  ExternalLink,
 } from "lucide-react";
 import BookingForm from "@/components/angler/BookingForm";
 
@@ -31,6 +33,8 @@ interface PropertyDetail {
   half_day_allowed: boolean;
   water_miles: number | null;
   regulations: string | null;
+  lodging_available: boolean;
+  lodging_url: string | null;
   is_cross_club?: boolean;
   accessible_through: {
     membership_id: string;
@@ -240,6 +244,37 @@ export default function PropertyDetailPage() {
               </h3>
               <p className="mt-2 whitespace-pre-line text-sm text-text-secondary">
                 {property.regulations}
+              </p>
+            </div>
+          )}
+
+          {/* Lodging callout */}
+          {property.lodging_available && property.lodging_url && (
+            <div className="rounded-xl border border-bronze/20 bg-bronze/5 p-5">
+              <div className="flex items-center gap-2.5">
+                <Home className="size-5 text-bronze" />
+                <h3 className="font-[family-name:var(--font-heading)] text-lg font-semibold text-text-primary">
+                  Lodging Available
+                </h3>
+              </div>
+              <p className="mt-2 text-sm text-text-secondary">
+                This property offers on-site lodging through a third-party
+                platform.
+              </p>
+              <a
+                href={property.lodging_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-bronze px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-bronze/90"
+              >
+                <ExternalLink className="size-4" />
+                View Lodging on Airbnb / VRBO
+              </a>
+              <p className="mt-3 text-xs leading-relaxed text-text-light">
+                Lodging is managed independently through a third-party platform.
+                Confirm your lodging availability for your specific dates before
+                completing your fishing access booking. AnglerPass does not
+                manage or guarantee lodging availability.
               </p>
             </div>
           )}

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X, Map, List } from "lucide-react";
+import { Search, X, Map, List, Home } from "lucide-react";
 import { WATER_TYPE_OPTIONS, COMMON_SPECIES } from "@/lib/constants/water-types";
 
 export interface SearchFiltersState {
@@ -18,6 +18,7 @@ export interface SearchFiltersState {
   species: string;
   min_price: string;
   max_price: string;
+  lodging: boolean;
 }
 
 interface SearchFiltersProps {
@@ -44,7 +45,8 @@ export default function SearchFilters({
     filters.water_type ||
     filters.species ||
     filters.min_price ||
-    filters.max_price;
+    filters.max_price ||
+    filters.lodging;
 
   const clearFilters = () => {
     onChange({
@@ -53,6 +55,7 @@ export default function SearchFilters({
       species: "",
       min_price: "",
       max_price: "",
+      lodging: false,
     });
   };
 
@@ -148,6 +151,19 @@ export default function SearchFilters({
             className="w-[80px] text-xs"
           />
         </div>
+
+        <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-stone-light/20 px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-bronze/30 hover:bg-bronze/5">
+          <input
+            type="checkbox"
+            checked={filters.lodging}
+            onChange={(e) =>
+              onChange({ ...filters, lodging: e.target.checked })
+            }
+            className="size-3.5 rounded border-stone-light/30 accent-bronze"
+          />
+          <Home className="size-3.5 text-bronze" />
+          Lodging
+        </label>
 
         {hasFilters && (
           <Button

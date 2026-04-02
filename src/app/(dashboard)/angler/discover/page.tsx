@@ -47,6 +47,7 @@ export default function DiscoverPage() {
     species: "",
     min_price: "",
     max_price: "",
+    lodging: false,
   });
 
   const fetchProperties = useCallback(async () => {
@@ -56,6 +57,7 @@ export default function DiscoverPage() {
       if (filters.species) params.set("species", filters.species);
       if (filters.min_price) params.set("min_price", filters.min_price);
       if (filters.max_price) params.set("max_price", filters.max_price);
+      if (filters.lodging) params.set("lodging", "true");
 
       const res = await fetch(`/api/properties/discover?${params}`);
       if (res.ok) {
@@ -68,7 +70,7 @@ export default function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters.water_type, filters.species, filters.min_price, filters.max_price]);
+  }, [filters.water_type, filters.species, filters.min_price, filters.max_price, filters.lodging]);
 
   useEffect(() => {
     fetchProperties();

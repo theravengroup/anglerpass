@@ -101,6 +101,10 @@ export const propertySchema = z
     rate_youth_half_day: z.number().min(0).optional().nullable(),
     rate_child_half_day: z.number().min(0).optional().nullable(),
 
+    // Lodging
+    lodging_available: z.boolean().default(false),
+    lodging_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+
     // Access (private — not displayed publicly)
     access_notes: z.string().max(2000).optional().or(z.literal("")),
     gate_code_required: z.boolean().default(false),
@@ -132,6 +136,18 @@ export const propertySchema = z
     {
       message: "Max rods cannot exceed max guests (total people on property)",
       path: ["max_rods"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.lodging_available) {
+        return !!data.lodging_url && data.lodging_url.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "A lodging URL is required when lodging is available",
+      path: ["lodging_url"],
     }
   );
 

@@ -49,11 +49,13 @@ export interface FeeBreakdown {
   ratePerRod: number;
   /** Number of rods (anglers) in the booking */
   rodCount: number;
-  /** Base rod fees: ratePerRod * rodCount */
+  /** Number of days in the booking */
+  numberOfDays: number;
+  /** Base rod fees: ratePerRod * rodCount * numberOfDays */
   baseRate: number;
   /** Platform fee (15% of baseRate), paid by angler to AnglerPass */
   platformFee: number;
-  /** Cross-club fee ($10/rod), $0 if home-club booking */
+  /** Cross-club fee ($10/rod/day), $0 if home-club booking */
   crossClubFee: number;
   /** Total charged to the angler */
   totalAmount: number;
@@ -61,15 +63,15 @@ export interface FeeBreakdown {
   isCrossClub: boolean;
 
   // ── Guide fees ──
-  /** Guide's day rate (full or half day), $0 if no guide */
+  /** Guide's day rate (full or half day) * numberOfDays, $0 if no guide */
   guideRate: number;
   /** Guide service fee (10% of guideRate), paid by angler to AnglerPass */
   guideServiceFee: number;
-  /** Guide payout (guideRate — guide keeps 100%) */
+  /** Guide payout (guideRate -- guide keeps 100%) */
   guidePayout: number;
 
   // ── Payout breakdown (for internal tracking / Stripe splits) ──
-  /** Club commission ($5/rod from the landowner's rate) */
+  /** Club commission ($5/rod/day from the landowner's rate) */
   clubCommission: number;
   /** Landowner net payout (baseRate - clubCommission) */
   landownerPayout: number;
@@ -80,45 +82,50 @@ export interface FeeBreakdown {
 /**
  * Calculate the full fee breakdown for a booking.
  *
- * @param ratePerRod  — Landowner's listed rate per rod (full or half day)
- * @param rodCount    — Number of anglers (rods)
- * @param isCrossClub — Whether the booking is through the Cross-Club Network
- * @param guideRate   — Optional guide day rate (full or half day)
+ * @param ratePerRod    — Landowner's listed rate per rod (full or half day)
+ * @param rodCount      — Number of anglers (rods)
+ * @param isCrossClub   — Whether the booking is through the Cross-Club Network
+ * @param guideRate     — Optional guide day rate (full or half day)
+ * @param numberOfDays  — Number of days in the booking (default 1)
  */
 export function calculateFeeBreakdown(
   ratePerRod: number,
   rodCount: number,
   isCrossClub: boolean = false,
-  guideRate: number = 0
+  guideRate: number = 0,
+  numberOfDays: number = 1
 ): FeeBreakdown {
-  const baseRate = round(ratePerRod * rodCount);
+  const days = Math.max(1, Math.floor(numberOfDays));
+  const baseRate = round(ratePerRod * rodCount * days);
   const platformFee = round(baseRate * PLATFORM_FEE_RATE);
   const crossClubFee = isCrossClub
-    ? round(CROSS_CLUB_FEE_PER_ROD * rodCount)
+    ? round(CROSS_CLUB_FEE_PER_ROD * rodCount * days)
     : 0;
 
-  // Guide fees
-  const guideServiceFee = round(guideRate * GUIDE_SERVICE_FEE_RATE);
-  const guidePayout = round(guideRate);
+  // Guide fees (multiplied by days)
+  const totalGuideRate = round(guideRate * days);
+  const guideServiceFee = round(totalGuideRate * GUIDE_SERVICE_FEE_RATE);
+  const guidePayout = round(totalGuideRate);
 
   const totalAmount = round(
-    baseRate + platformFee + crossClubFee + guideRate + guideServiceFee
+    baseRate + platformFee + crossClubFee + totalGuideRate + guideServiceFee
   );
 
   // Payout splits
-  const clubCommission = round(CLUB_COMMISSION_PER_ROD * rodCount);
+  const clubCommission = round(CLUB_COMMISSION_PER_ROD * rodCount * days);
   const landownerPayout = round(baseRate - clubCommission);
   const anglerpassRevenue = round(platformFee + crossClubFee + guideServiceFee);
 
   return {
     ratePerRod,
     rodCount,
+    numberOfDays: days,
     baseRate,
     platformFee,
     crossClubFee,
     totalAmount,
     isCrossClub,
-    guideRate,
+    guideRate: totalGuideRate,
     guideServiceFee,
     guidePayout,
     clubCommission,
