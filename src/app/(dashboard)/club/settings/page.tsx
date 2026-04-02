@@ -126,9 +126,9 @@ export default function ClubSettingsPage() {
   }
 
   const TIER_LABELS: Record<string, string> = {
-    starter: "Starter ($149/mo)",
-    standard: "Standard ($349/mo)",
-    pro: "Pro ($699/mo)",
+    starter: "Starter ($79/mo)",
+    standard: "Standard ($199/mo)",
+    pro: "Pro ($499/mo)",
   };
 
   return (

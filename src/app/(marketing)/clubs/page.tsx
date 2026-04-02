@@ -177,23 +177,23 @@ export default function ClubsPage() {
             {[
               {
                 name: 'Starter',
-                price: '$149',
-                description: 'For new or small clubs getting organized.',
-                features: ['Up to 500 members', 'Up to 25 properties', 'Basic scheduling', 'Member roster', 'Email support'],
+                price: '$79',
+                description: 'For new or small clubs getting started.',
+                features: ['Up to 100 members', 'Up to 10 properties', 'Member vetting & roster', 'Booking management', 'Cross-club access', 'Email support'],
                 highlight: false,
               },
               {
                 name: 'Standard',
-                price: '$349',
+                price: '$199',
                 description: 'For established clubs managing active rosters.',
-                features: ['Up to 2,000 members', 'Up to 100 properties', 'Advanced scheduling & rotation', 'Cross-club access eligible', 'Member communication tools', 'Priority support'],
+                features: ['Up to 500 members', 'Up to 50 properties', 'Advanced scheduling & rotation', 'Member communication tools', 'Financial reporting', 'Priority support'],
                 highlight: true,
               },
               {
                 name: 'Pro',
-                price: '$699',
+                price: '$499',
                 description: 'For large clubs with complex operations.',
-                features: ['Unlimited members', 'Unlimited properties', 'Cross-club access eligible', 'Multi-rod group bookings', 'Analytics & reporting', 'Dedicated support'],
+                features: ['Unlimited members', 'Unlimited properties', 'Multi-rod group bookings', 'Custom club branding', 'Analytics & reporting', 'Dedicated account manager'],
                 highlight: false,
               },
             ].map((tier, i) => (

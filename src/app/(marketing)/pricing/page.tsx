@@ -52,9 +52,9 @@ export default function PricingPage() {
           {/* Subscription tiers */}
           <div className="marketing-features-grid grid grid-cols-3 gap-6 mb-10">
             {[
-              { name: 'Starter', price: '$149', members: '500', properties: '25' },
-              { name: 'Standard', price: '$349', members: '2,000', properties: '100', highlight: true },
-              { name: 'Pro', price: '$699', members: 'Unlimited', properties: 'Unlimited' },
+              { name: 'Starter', price: '$79', members: '100', properties: '10' },
+              { name: 'Standard', price: '$199', members: '500', properties: '50', highlight: true },
+              { name: 'Pro', price: '$499', members: 'Unlimited', properties: 'Unlimited' },
             ].map((tier) => (
               <div
                 key={tier.name}
