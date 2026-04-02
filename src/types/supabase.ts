@@ -110,6 +110,7 @@ export type Database = {
           booking_end_date: string | null
           booking_group_id: string | null
           booking_start_date: string | null
+          cancellation_fault: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
           club_commission: number
@@ -145,6 +146,7 @@ export type Database = {
           booking_end_date?: string | null
           booking_group_id?: string | null
           booking_start_date?: string | null
+          cancellation_fault?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           club_commission?: number
@@ -180,6 +182,7 @@ export type Database = {
           booking_end_date?: string | null
           booking_group_id?: string | null
           booking_start_date?: string | null
+          cancellation_fault?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           club_commission?: number
@@ -1875,9 +1878,328 @@ export type Database = {
           },
         ]
       }
+      trip_reviews: {
+        Row: {
+          id: string
+          booking_id: string
+          property_id: string
+          angler_user_id: string
+          overall_rating: number
+          review_text: string
+          would_fish_again: boolean
+          private_feedback_text: string | null
+          submitted_at: string | null
+          published_at: string | null
+          review_window_expires_at: string
+          extension_requested: boolean
+          extension_expires_at: string | null
+          status: string
+          moderation_reason: string | null
+          moderation_resolved_at: string | null
+          host_response_text: string | null
+          host_response_published_at: string | null
+          trip_completed: boolean
+          is_anonymous: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          property_id: string
+          angler_user_id: string
+          overall_rating: number
+          review_text: string
+          would_fish_again: boolean
+          private_feedback_text?: string | null
+          submitted_at?: string | null
+          published_at?: string | null
+          review_window_expires_at: string
+          extension_requested?: boolean
+          extension_expires_at?: string | null
+          status?: string
+          moderation_reason?: string | null
+          moderation_resolved_at?: string | null
+          host_response_text?: string | null
+          host_response_published_at?: string | null
+          trip_completed: boolean
+          is_anonymous?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          property_id?: string
+          angler_user_id?: string
+          overall_rating?: number
+          review_text?: string
+          would_fish_again?: boolean
+          private_feedback_text?: string | null
+          submitted_at?: string | null
+          published_at?: string | null
+          review_window_expires_at?: string
+          extension_requested?: boolean
+          extension_expires_at?: string | null
+          status?: string
+          moderation_reason?: string | null
+          moderation_resolved_at?: string | null
+          host_response_text?: string | null
+          host_response_published_at?: string | null
+          trip_completed?: boolean
+          is_anonymous?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_reviews_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_reviews_angler_user_id_fkey"
+            columns: ["angler_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_category_ratings: {
+        Row: {
+          id: string
+          review_id: string
+          category_key: string
+          rating_value: number
+        }
+        Insert: {
+          id?: string
+          review_id: string
+          category_key: string
+          rating_value: number
+        }
+        Update: {
+          id?: string
+          review_id?: string
+          category_key?: string
+          rating_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_category_ratings_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "trip_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_prompt_log: {
+        Row: {
+          id: string
+          booking_id: string
+          angler_id: string
+          property_id: string
+          prompt_type: string
+          sent_at: string
+          channel: string
+          status: string
+          error_message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          angler_id: string
+          property_id: string
+          prompt_type: string
+          sent_at?: string
+          channel: string
+          status?: string
+          error_message?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          angler_id?: string
+          property_id?: string
+          prompt_type?: string
+          sent_at?: string
+          channel?: string
+          status?: string
+          error_message?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_prompt_log_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_prompt_log_angler_id_fkey"
+            columns: ["angler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_prompt_log_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_flags: {
+        Row: {
+          id: string
+          review_id: string
+          flagged_by_user_id: string | null
+          flagged_by_role: string
+          flag_reason: string
+          flag_notes: string | null
+          flagged_at: string
+          acknowledged_at: string | null
+          resolved_at: string | null
+          resolution: string | null
+          resolved_by_user_id: string | null
+        }
+        Insert: {
+          id?: string
+          review_id: string
+          flagged_by_user_id?: string | null
+          flagged_by_role: string
+          flag_reason: string
+          flag_notes?: string | null
+          flagged_at?: string
+          acknowledged_at?: string | null
+          resolved_at?: string | null
+          resolution?: string | null
+          resolved_by_user_id?: string | null
+        }
+        Update: {
+          id?: string
+          review_id?: string
+          flagged_by_user_id?: string | null
+          flagged_by_role?: string
+          flag_reason?: string
+          flag_notes?: string | null
+          flagged_at?: string
+          acknowledged_at?: string | null
+          resolved_at?: string | null
+          resolution?: string | null
+          resolved_by_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_flags_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "trip_reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_flags_flagged_by_user_id_fkey"
+            columns: ["flagged_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_flags_resolved_by_user_id_fkey"
+            columns: ["resolved_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_responses: {
+        Row: {
+          id: string
+          review_id: string
+          responder_user_id: string
+          responder_role: string
+          response_text: string
+          submitted_at: string
+          published_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          review_id: string
+          responder_user_id: string
+          responder_role: string
+          response_text: string
+          submitted_at?: string
+          published_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          review_id?: string
+          responder_user_id?: string
+          responder_role?: string
+          response_text?: string
+          submitted_at?: string
+          published_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_responses_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: true
+            referencedRelation: "trip_reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_responses_responder_user_id_fkey"
+            columns: ["responder_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      property_review_stats: {
+        Row: {
+          property_id: string
+          review_count: number
+          avg_rating: number
+          would_fish_again_count: number
+          latest_review_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_reviews_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

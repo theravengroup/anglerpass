@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 
 export const metadata: Metadata = {
   title: 'For Guides — AnglerPass',
@@ -378,21 +379,7 @@ export default function GuidesPage() {
             </h2>
           </div>
 
-          <div className="grid">
-            {faqs.map((faq, i) => (
-              <div
-                key={i}
-                className={`reveal d${(i % 3) + 1} py-6 ${i < faqs.length - 1 ? 'border-b border-parchment' : ''}`}
-              >
-                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
-                  {faq.q}
-                </h3>
-                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
+          <AudienceFaqAccordion faqs={faqs} />
         </div>
       </section>
 

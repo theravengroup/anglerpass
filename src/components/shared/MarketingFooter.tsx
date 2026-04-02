@@ -138,6 +138,14 @@ export default function MarketingFooter() {
                     Policies
                   </Link>
                 </li>
+                <li className="mb-2.5">
+                  <Link
+                    href="/legal/review-policy"
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
+                  >
+                    Review Policy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

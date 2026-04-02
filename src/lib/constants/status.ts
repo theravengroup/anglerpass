@@ -7,6 +7,11 @@ import {
   UserMinus,
   FileEdit,
   ShieldAlert,
+  Send,
+  Eye,
+  Flag,
+  EyeOff,
+  Trash2,
 } from "lucide-react";
 
 // ─── Booking / Property Status ──────────────────────────────────────
@@ -199,6 +204,47 @@ export type UserRole = (typeof VALID_ROLES)[number];
 // ─── Staff Discount Rates ────────────────────────────────────────────
 // Re-exported for backward compatibility. Canonical source: @/lib/constants/fees
 export { STAFF_DISCOUNT_OWN_CLUB, STAFF_DISCOUNT_CROSS_CLUB } from "@/lib/constants/fees";
+
+// ─── Trip Review Status ──────────────────────────────────────────────
+
+export const TRIP_REVIEW_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  submitted: {
+    label: "Submitted",
+    icon: Send,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  published: {
+    label: "Published",
+    icon: Eye,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  flagged: {
+    label: "Flagged",
+    icon: Flag,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  suppressed: {
+    label: "Suppressed",
+    icon: EyeOff,
+    color: "text-red-600",
+    bg: "bg-red-50",
+  },
+  removed: {
+    label: "Removed",
+    icon: Trash2,
+    color: "text-red-600",
+    bg: "bg-red-50",
+  },
+};
 
 // ─── Period Options (analytics dashboards) ──────────────────────────
 

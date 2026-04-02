@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import {
   LayoutDashboard,
   ShieldCheck,
+  ShieldAlert,
   Users,
   ScrollText,
   UserPlus,
@@ -23,6 +24,11 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     label: "Moderation Queue",
     href: "/admin/moderation",
     icon: <ShieldCheck />,
+  },
+  {
+    label: "Review Moderation",
+    href: "/admin/review-moderation",
+    icon: <ShieldAlert />,
   },
   {
     label: "Users",
@@ -59,6 +65,7 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
 const PAGE_TITLES: Record<string, string> = {
   "/admin": "Admin Console",
   "/admin/moderation": "Moderation Queue",
+  "/admin/review-moderation": "Review Moderation",
   "/admin/users": "User Management",
   "/admin/clubs": "Club Oversight",
   "/admin/team": "Team Management",

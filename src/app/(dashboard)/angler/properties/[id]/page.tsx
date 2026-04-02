@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import BookingForm from "@/components/angler/BookingForm";
+import PropertyReviewSection from "@/components/reviews/PropertyReviewSection";
 
 interface PropertyDetail {
   id: string;
@@ -278,6 +279,9 @@ export default function PropertyDetailPage() {
               </p>
             </div>
           )}
+
+          {/* Verified trip reviews */}
+          <PropertyReviewSection propertyId={property.id} />
         </div>
 
         {/* Booking sidebar */}

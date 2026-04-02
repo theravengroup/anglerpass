@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 
 export const metadata: Metadata = {
   title: 'For Landowners — AnglerPass',
@@ -202,8 +203,8 @@ export default function LandownersPage() {
             </h2>
           </div>
 
-          <div className="grid">
-            {[
+          <AudienceFaqAccordion
+            faqs={[
               {
                 q: 'How does AnglerPass protect my property and privacy?',
                 a: 'Your property is never visible to the general public. Only members of approved fly fishing clubs can see your listing. You control which clubs have access, and every angler who books has been vetted by their club before they can even view your water.',
@@ -244,20 +245,8 @@ export default function LandownersPage() {
                 q: 'How do I get started?',
                 a: 'Join the waitlist or contact us directly. We will walk you through the onboarding process, help you set up your property profile with photos and details, and connect you with clubs in your region. Most landowners are fully set up within a week.',
               },
-            ].map((faq, i) => (
-              <div
-                key={i}
-                className={`reveal d${(i % 3) + 1} py-6 ${i < 9 ? 'border-b border-parchment' : ''}`}
-              >
-                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
-                  {faq.q}
-                </h3>
-                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
+            ]}
+          />
         </div>
       </section>
 

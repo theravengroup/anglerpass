@@ -57,6 +57,37 @@
 
 ---
 
+### Verified Trip Review System — Completed
+
+The verified trip review system shipped as a cross-cutting feature built on top of the booking and property infrastructure. All items below are complete and in production.
+
+**Completed:**
+- ✅ Verified review tied to completed booking (no booking, no review)
+- ✅ One review per booking enforced at database level
+- ✅ 21-day review window from end of last fishing day
+- ✅ One 7-day angler-requested extension
+- ✅ Landowner-fault cancellation review with restricted categories and trip-did-not-complete badge
+- ✅ Five-step submission flow (overall rating, category ratings, written review, would-fish-again, private notes)
+- ✅ Seven fishing-specific category ratings
+- ✅ Private feedback field (never public)
+- ✅ Blind review period (published at window close or 48-hour buffer)
+- ✅ Landowner and club admin public response (one per review, 24-hour edit)
+- ✅ Moderation queue with 24-hour acknowledgment and 72-hour resolution SLA
+- ✅ Landowner and club admin flagging rights
+- ✅ Ranking suppression for properties with fewer than 5 reviews
+- ✅ Automated email and SMS prompts with day-14 email and day-18 SMS reminders
+- ✅ Property listing review section: summary strip, category averages, individual review cards
+- ✅ Verified Angler Review badge and trip-completion status badge
+- ✅ Would-fish-again percentage in summary strip
+- ✅ Public moderation policy at /legal/review-policy
+- ✅ No anonymous reviews enforced
+
+**Database tables:** `trip_reviews`, `review_category_ratings`, `review_flags`, `review_responses`, `review_prompt_log`, `property_review_stats` (view)
+
+**Migrations:** `00033_verified_trip_reviews.sql`, `00034_review_prompt_log.sql`, `00035_nullable_flag_user.sql`
+
+---
+
 ## Phase 2: Landowner Property Management
 
 **Goal:** Landowners can create, edit, and manage property listings through a full CRUD interface.
@@ -415,6 +446,28 @@
 - Impersonation is powerful but dangerous. Implement as read-only first — admin sees what the user sees but can't take actions on their behalf.
 - All admin actions must write to the audit log. No exceptions.
 - Platform settings (fee percentage, etc.) should be stored in the database, not environment variables, so they can be changed without a deploy.
+
+---
+
+## Review System — Phase 2 Features
+
+The following review enhancements are planned for a future phase. None are scheduled for immediate build.
+
+**Planned:**
+
+- **Review photos**
+  > ⚠️ Photo reviews require a separate design and policy review before building. Issues to resolve before building: image metadata stripping, landowner approval flow, prohibition on photos revealing access routes or gate codes, privacy policy update. Do not build until these are explicitly addressed in a Phase 2 planning session.
+
+- **AI-generated review summaries per property listing**
+
+- **Helpful votes on individual reviews**
+
+- **Search and filter by rating category**
+
+- **Reputation badges** (examples: "Consistently Accurate Access," "Top-Rated Water," "Highly Responsive Host")
+
+- **Two-way review evaluation**
+  > ⚠️ Deferred from MVP. Landowners typically have no direct interaction with anglers, making meaningful two-way reviews impractical at launch. Revisit only if operational data suggests otherwise.
 
 ---
 

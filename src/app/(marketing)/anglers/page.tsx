@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 
 export const metadata: Metadata = {
   title: 'For Anglers — AnglerPass',
@@ -276,15 +277,15 @@ export default function AnglersPage() {
             </h2>
           </div>
 
-          <div className="grid">
-            {[
+          <AudienceFaqAccordion
+            faqs={[
               {
                 q: 'Do I need to be a member of a club to use AnglerPass?',
                 a: 'Yes. AnglerPass is a club-based platform. You must be an active member of at least one fly fishing club on the platform to browse properties and book fishing days. This club vetting is what earns landowner trust and makes private water access possible.',
               },
               {
                 q: 'How much does it cost to book a fishing day?',
-                a: 'The rod fee is set by each landowner and varies by property. A 15% platform fee is added on top of the rod fee at checkout. There is no subscription or membership fee charged by AnglerPass itself — you only pay when you book.',
+                a: 'The rod fee is set by each landowner and varies by property. A 15% platform fee is added on top of the rod fee at checkout. There is no subscription or membership fee charged by AnglerPass itself \u2014 you only pay when you book.',
               },
               {
                 q: 'How do I find and join a club?',
@@ -312,26 +313,14 @@ export default function AnglersPage() {
               },
               {
                 q: 'What does my employer\u2019s corporate membership get me?',
-                a: 'If your company holds a corporate membership with a club on AnglerPass, you can join that club as a corporate employee member — typically with no initiation fee. You get the same access to properties and booking capabilities as any other club member.',
+                a: 'If your company holds a corporate membership with a club on AnglerPass, you can join that club as a corporate employee member \u2014 typically with no initiation fee. You get the same access to properties and booking capabilities as any other club member.',
               },
               {
                 q: 'Is there lodging available near the properties?',
                 a: 'Some properties offer lodging through platforms like Airbnb or VRBO. When lodging is available, you will see a lodging indicator on the property listing with a direct link to the accommodation. This makes it easy to plan multi-day trips to remote waters.',
               },
-            ].map((faq, i) => (
-              <div
-                key={i}
-                className={`reveal d${(i % 3) + 1} py-6 ${i < 9 ? 'border-b border-parchment' : ''}`}
-              >
-                <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
-                  {faq.q}
-                </h3>
-                <p className="text-[14.5px] leading-[1.7] text-text-secondary m-0">
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
+            ]}
+          />
         </div>
       </section>
 
