@@ -48,7 +48,31 @@ function LandownerDashboard() {
           <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>Welcome back, James</div>
           <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Silver Creek Ranch</div>
         </div>
-        <div style={{ padding: '5px 12px', borderRadius: 6, background: accentLight, fontSize: 11, fontWeight: 600, color: accent }}>2 properties</div>
+        <div style={{ position: 'relative' }}>
+          <select
+            disabled
+            defaultValue="all"
+            style={{
+              appearance: 'none',
+              padding: '6px 28px 6px 10px',
+              borderRadius: 6,
+              border: '1px solid var(--border)',
+              background: '#fff',
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: 'var(--body)',
+              color: accent,
+              cursor: 'default',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b6b60' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 8px center',
+            }}
+          >
+            <option value="all">All Properties</option>
+            <option value="east-fork">Silver Creek — East Fork</option>
+            <option value="elk-meadow">Elk Meadow Spring</option>
+          </select>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
