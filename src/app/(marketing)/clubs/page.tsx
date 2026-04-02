@@ -125,7 +125,7 @@ export default function ClubsPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
               Club Operations
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Modern tools for serious clubs
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -162,7 +162,7 @@ export default function ClubsPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
               Club Pricing
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Simple plans that grow with your club
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -262,7 +262,7 @@ export default function ClubsPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
               Grow Your Club
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Grow Your Club With Corporate Memberships
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -319,7 +319,7 @@ export default function ClubsPage() {
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
             Cross-Club Network
           </span>
-          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
             Expand your members&rsquo; access without expanding your lease
           </h2>
           <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
@@ -337,7 +337,7 @@ export default function ClubsPage() {
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             The Trust Layer
           </span>
-          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
             Clubs make private water access work
           </h2>
           <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
@@ -355,7 +355,7 @@ export default function ClubsPage() {
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">
-          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium text-parchment mb-4 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium leading-[1.15] text-parchment mb-4 tracking-[-0.3px] text-balance">
             Bring your club into the modern era
           </h2>
           <p className="text-[16px] text-parchment/50 max-w-[440px] mx-auto mb-10 leading-[1.7]">

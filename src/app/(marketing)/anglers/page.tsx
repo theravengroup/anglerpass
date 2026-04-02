@@ -124,7 +124,7 @@ export default function AnglersPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
               The Angler Experience
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Access water worth the trip
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -160,7 +160,7 @@ export default function AnglersPage() {
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             How It Works
           </span>
-          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
             Access starts with your club
           </h2>
           <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[620px] mx-auto mb-12">
@@ -199,7 +199,7 @@ export default function AnglersPage() {
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             Transparent Pricing
           </span>
-          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
             Simple, fair booking fees
           </h2>
           <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto mb-8">
@@ -237,7 +237,7 @@ export default function AnglersPage() {
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
             The Network Effect
           </span>
-          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-5 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
             One membership, expanding access
           </h2>
           <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[560px] mx-auto">
@@ -272,7 +272,7 @@ export default function AnglersPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
               FAQ
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
               Common questions
             </h2>
           </div>
@@ -327,7 +327,7 @@ export default function AnglersPage() {
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">
-          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium text-parchment mb-4 tracking-[-0.3px] text-balance">
+          <h2 className="font-heading text-[clamp(28px,3.5vw,42px)] font-medium leading-[1.15] text-parchment mb-4 tracking-[-0.3px] text-balance">
             Your next best day on the water starts here
           </h2>
           <p className="text-[16px] text-parchment/50 max-w-[440px] mx-auto mb-10 leading-[1.7]">

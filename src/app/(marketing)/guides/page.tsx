@@ -197,7 +197,7 @@ export default function GuidesPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Guide Tools
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px] text-balance">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Everything you need to run your guiding business
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -234,7 +234,7 @@ export default function GuidesPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               How It Works
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
               From sign-up to first trip
             </h2>
           </div>
@@ -269,7 +269,7 @@ export default function GuidesPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Requirements
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
               What we look for
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
@@ -303,7 +303,7 @@ export default function GuidesPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               Pricing
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
               No subscription. No sign-up fees.
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[560px] mx-auto leading-[1.65]">
@@ -374,7 +374,7 @@ export default function GuidesPage() {
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
               FAQ
             </span>
-            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium text-forest mb-4 tracking-[-0.3px]">
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
               Common questions
             </h2>
           </div>
@@ -386,7 +386,7 @@ export default function GuidesPage() {
       {/* CTA */}
       <section className="py-[100px] bg-charcoal text-center">
         <div className="reveal max-w-[600px] mx-auto px-8">
-          <h2 className="font-heading text-[clamp(28px,4vw,44px)] font-medium text-parchment mb-4 tracking-[-0.3px]">
+          <h2 className="font-heading text-[clamp(28px,4vw,44px)] font-medium leading-[1.15] text-parchment mb-4 tracking-[-0.3px]">
             Ready to expand your range?
           </h2>
           <p className="text-[16px] leading-[1.7] text-parchment/55 max-w-[480px] mx-auto mb-10">
