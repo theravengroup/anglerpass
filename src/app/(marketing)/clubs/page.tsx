@@ -73,9 +73,9 @@ const features = [
     ),
   },
   {
-    title: 'Guest & Event Management',
+    title: 'Events & Group Bookings',
     description:
-      'Handle guest passes, tournament days, and special events within the same platform. Track guest history and set club policies.',
+      'Coordinate tournament days, group outings, and special events within the same platform. Members book multiple rods and bring their guests.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
@@ -193,7 +193,7 @@ export default function ClubsPage() {
                 name: 'Pro',
                 price: '$699',
                 description: 'For large clubs with complex operations.',
-                features: ['Unlimited members', 'Unlimited properties', 'Cross-club access eligible', 'Guest pass system', 'Analytics & reporting', 'Dedicated support'],
+                features: ['Unlimited members', 'Unlimited properties', 'Cross-club access eligible', 'Multi-rod group bookings', 'Analytics & reporting', 'Dedicated support'],
                 highlight: false,
               },
             ].map((tier, i) => (
