@@ -81,7 +81,7 @@ nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 100px;overflow:hidden}
 .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
 .hero-bg img{width:100%;height:120%;object-fit:cover;object-position:center 40%;will-change:transform;transform:scale(1.05)}
-.hero-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,34,25,.45) 0%,rgba(15,34,25,.30) 30%,rgba(15,34,25,.35) 60%,rgba(15,34,25,.65) 100%);z-index:1}
+.hero-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,34,25,.55) 0%,rgba(15,34,25,.48) 30%,rgba(15,34,25,.50) 60%,rgba(15,34,25,.70) 100%);z-index:1}
 .hero-bg-grain{display:none}
 .hero .container{position:relative;z-index:3;display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
 .hero-content{max-width:580px}
@@ -95,7 +95,7 @@ nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 .hero h1 em{font-style:italic;color:var(--river-pale)}
 .hero-word{display:inline-block;opacity:0;transform:translateY(30px);animation:wordReveal .7s cubic-bezier(.22,1,.36,1) forwards}
 @keyframes wordReveal{to{opacity:1;transform:translateY(0)}}
-.hero-sub{font-size:17px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:40px;max-width:480px;opacity:0;animation:fadeUp .9s ease 1s both}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.85);line-height:1.75;margin-bottom:40px;max-width:480px;opacity:0;animation:fadeUp .9s ease 1s both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .9s ease 1.15s both}
 .hero-note{margin-top:28px;font-size:14px;color:rgba(255,255,255,.9);opacity:0;animation:fadeUp .9s ease 1.3s both}
