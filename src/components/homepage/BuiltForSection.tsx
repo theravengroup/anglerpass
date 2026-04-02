@@ -28,7 +28,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Clubs</span>
               <h3>Clubs &amp; Associations</h3>
               <p>Managing memberships, scheduling water access, and keeping track of participation shouldn&apos;t require a full-time administrator. AnglerPass gives your club the operational backbone to run smoothly so members can focus on fishing.</p>
-              <a href="#waitlist" className="btn btn-dark-outline">Streamline Your Club</a>
+              <a href="#waitlist" className="btn btn-river">Streamline Your Club</a>
             </div>
           </div>
           <div className="built-for-row reveal">

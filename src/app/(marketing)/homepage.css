@@ -51,6 +51,8 @@ body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite
 .btn-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
 .btn-dark-outline{background:transparent;color:var(--forest);border:1.5px solid var(--forest)}
 .btn-dark-outline:hover{background:var(--forest);color:#fff;transform:translateY(-2px)}
+.btn-river{background:var(--river);color:#fff}
+.btn-river:hover{background:var(--river-light);transform:translateY(-2px);box-shadow:0 8px 30px rgba(64,120,154,.3)}
 .btn-bronze{background:var(--bronze);color:#fff}
 .btn-bronze:hover{background:var(--bronze-light);transform:translateY(-2px);box-shadow:0 8px 30px rgba(154,115,64,.3)}
 
