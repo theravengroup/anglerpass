@@ -59,6 +59,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Prevent orphan words globally.
+   text-wrap: balance evens out line lengths on headings.
+   text-wrap: pretty prevents a single word on the last line of body text. */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, li, figcaption, blockquote, dd, dt, label, caption {
+  text-wrap: pretty;
+}
+
 /* Marketing responsive — !important overrides are needed because marketing pages
    use Tailwind grid-cols-* utilities (e.g. grid-cols-3) that set
    grid-template-columns inline. These media queries force single/two-column
