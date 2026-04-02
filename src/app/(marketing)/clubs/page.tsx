@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Building2, DollarSign, Users } from 'lucide-react';
 import ClubFaqSection from '@/components/clubs/ClubFaqSection';
+import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
 
 export const metadata: Metadata = {
   title: 'For Clubs — AnglerPass',
@@ -348,6 +349,9 @@ export default function ClubsPage() {
           </p>
         </div>
       </section>
+
+      {/* Dashboard Preview */}
+      <DashboardPreviewSection role="club" />
 
       {/* FAQ */}
       <ClubFaqSection />

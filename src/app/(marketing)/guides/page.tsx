@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
+import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
 
 export const metadata: Metadata = {
   title: 'For Guides — AnglerPass',
@@ -367,8 +368,11 @@ export default function GuidesPage() {
         </div>
       </section>
 
+      {/* Dashboard Preview */}
+      <DashboardPreviewSection role="guide" />
+
       {/* FAQ */}
-      <section className="py-[100px] bg-offwhite">
+      <section className="py-[100px] bg-parchment-light">
         <div className="max-w-[700px] mx-auto px-8">
           <div className="reveal text-center mb-14">
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
+import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
 
 export const metadata: Metadata = {
   title: 'For Anglers — AnglerPass',
@@ -264,6 +265,9 @@ export default function AnglersPage() {
           </div>
         </div>
       </section>
+
+      {/* Dashboard Preview */}
+      <DashboardPreviewSection role="angler" />
 
       {/* FAQ */}
       <section className="py-[100px] bg-parchment-light">
