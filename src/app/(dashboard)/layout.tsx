@@ -87,6 +87,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       href: "/angler/discover",
       icon: <Compass />,
     },
+    {
+      label: "Find Guides",
+      href: "/angler/guides",
+      icon: <Users />,
+    },
   ],
   guide: [
     {
@@ -139,6 +144,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/discover": "Discover",
+  "/angler/guides": "Find Guides",
   "/guide": "Guide Dashboard",
   "/guide/profile": "Guide Profile",
   "/guide/availability": "Availability",

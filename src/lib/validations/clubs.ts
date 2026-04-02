@@ -39,6 +39,7 @@ export type ClubMemberInviteData = z.infer<typeof clubMemberInviteSchema>;
 // ─── Member Status Update ──────────────────────────────────────────
 export const clubMemberStatusSchema = z.object({
   status: z.enum(["active", "inactive", "declined"]),
+  decline_reason: z.string().max(500).optional(),
 });
 
 export type ClubMemberStatusData = z.infer<typeof clubMemberStatusSchema>;
@@ -70,3 +71,17 @@ export const corporateInviteSchema = z.object({
 });
 
 export type CorporateInviteData = z.infer<typeof corporateInviteSchema>;
+
+// ─── Cross-Club Agreements ───────────────────────────────────────
+
+export const proposeAgreementSchema = z.object({
+  partner_club_id: z.string().uuid("Invalid club ID"),
+});
+
+export type ProposeAgreementData = z.infer<typeof proposeAgreementSchema>;
+
+export const agreementActionSchema = z.object({
+  action: z.enum(["accept", "revoke"]),
+});
+
+export type AgreementActionData = z.infer<typeof agreementActionSchema>;

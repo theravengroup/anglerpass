@@ -25,6 +25,7 @@ import {
   Check,
   Copy,
   Code,
+  Network,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -362,7 +363,7 @@ export default function ClubPage() {
       )}
 
       {/* Quick actions */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Link href="/club/members">
           <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
             <CardContent className="flex items-center gap-4 py-5">
@@ -392,6 +393,23 @@ export default function ClubPage() {
                 </p>
                 <p className="text-xs text-text-light">
                   View and approve property associations
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/club/network">
+          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
+            <CardContent className="flex items-center gap-4 py-5">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-river/10">
+                <Network className="size-5 text-river" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  Club Network
+                </p>
+                <p className="text-xs text-text-light">
+                  Partner with other clubs for shared access
                 </p>
               </div>
             </CardContent>

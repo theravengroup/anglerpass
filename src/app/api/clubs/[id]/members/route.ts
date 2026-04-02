@@ -71,7 +71,7 @@ export async function GET(
     // Fetch members with profile info
     const { data: members, error } = await admin
       .from("club_memberships")
-      .select("id, user_id, role, status, invited_email, invited_at, joined_at, created_at, profiles!club_memberships_user_id_fkey(display_name)")
+      .select("id, user_id, role, status, invited_email, invited_at, joined_at, created_at, membership_type, company_name, profiles!club_memberships_user_id_fkey(display_name)")
       .eq("club_id", id)
       .order("created_at", { ascending: false });
 
@@ -103,6 +103,9 @@ export async function GET(
           invited_at: member.invited_at,
           joined_at: member.joined_at,
           created_at: member.created_at,
+          membership_type: member.membership_type ?? "individual",
+          company_name: member.company_name ?? null,
+          origin: member.invited_at ? "invited" : "applied",
         };
       })
     );

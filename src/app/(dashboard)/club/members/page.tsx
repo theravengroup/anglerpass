@@ -22,14 +22,19 @@ interface Member {
   invited_at: string | null;
   joined_at: string | null;
   created_at: string;
+  membership_type: string;
+  company_name: string | null;
+  origin: "invited" | "applied";
 }
+
+type FilterTab = "all" | "active" | "staff" | "pending" | "applications";
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [clubId, setClubId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "active" | "staff" | "pending">("all");
+  const [filter, setFilter] = useState<FilterTab>("all");
   const [isOwner, setIsOwner] = useState(false);
 
   // Invite form state
@@ -121,15 +126,20 @@ export default function MembersPage() {
     }
   }
 
-  async function handleStatusChange(memberId: string, status: string) {
+  async function handleStatusChange(memberId: string, status: string, declineReason?: string) {
     if (!clubId) return;
 
     setActionLoading(memberId);
     try {
+      const body: Record<string, string> = { status };
+      if (declineReason) {
+        body.decline_reason = declineReason;
+      }
+
       const res = await fetch(`/api/clubs/${clubId}/members/${memberId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(body),
       });
 
       if (res.ok) {
@@ -161,13 +171,20 @@ export default function MembersPage() {
     }
   }
 
+  const applicationCount = members.filter(
+    (m) => m.status === "pending" && m.origin === "applied"
+  ).length;
+
   const filteredMembers = members.filter((m) => {
     if (m.role === "admin") return filter === "all" || filter === "active" || filter === "staff";
     if (filter === "staff") return m.role === "staff" && m.status !== "declined";
     if (filter === "active") return m.status === "active";
     if (filter === "pending") return m.status === "pending";
+    if (filter === "applications") return m.status === "pending" && m.origin === "applied";
     return true;
   });
+
+  const filterTabs: FilterTab[] = ["all", "active", "staff", "pending", "applications"];
 
   if (loading) {
     return (
@@ -227,25 +244,33 @@ export default function MembersPage() {
       {/* Filter tabs */}
       {members.length > 0 && (
         <div className="flex gap-1 rounded-lg border border-stone-light/20 bg-offwhite/50 p-1">
-          {(["all", "active", "staff", "pending"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-                filter === f
-                  ? "bg-white text-text-primary shadow-sm"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-              {f === "pending" &&
-                members.filter((m) => m.status === "pending").length > 0 && (
+          {filterTabs.map((f) => {
+            const label = f === "applications" ? "Applications" : f.charAt(0).toUpperCase() + f.slice(1);
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                  filter === f
+                    ? "bg-white text-text-primary shadow-sm"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {label}
+                {f === "pending" &&
+                  members.filter((m) => m.status === "pending").length > 0 && (
+                    <span className="ml-1.5 inline-flex size-5 items-center justify-center rounded-full bg-bronze/20 text-xs text-bronze">
+                      {members.filter((m) => m.status === "pending").length}
+                    </span>
+                  )}
+                {f === "applications" && applicationCount > 0 && (
                   <span className="ml-1.5 inline-flex size-5 items-center justify-center rounded-full bg-bronze/20 text-xs text-bronze">
-                    {members.filter((m) => m.status === "pending").length}
+                    {applicationCount}
                   </span>
                 )}
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       )}
 

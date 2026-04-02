@@ -113,6 +113,11 @@ export async function PATCH(
       updates.joined_at = new Date().toISOString();
     }
 
+    // Store decline reason in removal_reason field
+    if (result.data.status === "declined" && result.data.decline_reason) {
+      updates.removal_reason = result.data.decline_reason;
+    }
+
     const { data: updated, error: updateError } = await admin
       .from("club_memberships")
       .update(updates)
