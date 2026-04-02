@@ -33,27 +33,27 @@ export async function GET(request: Request) {
 
     // Find guides approved for this property
     const { data: approvals } = await admin
-      .from("guide_water_approvals" as never)
+      .from("guide_water_approvals")
       .select("guide_id")
-      .eq("property_id" as never, propertyId)
-      .eq("status" as never, "approved");
+      .eq("property_id", propertyId)
+      .eq("status", "approved");
 
     if (!approvals?.length) {
       return NextResponse.json({ guides: [] });
     }
 
-    const guideIds = (approvals as unknown as { guide_id: string }[]).map((a) => a.guide_id);
+    const guideIds = approvals.map((a) => a.guide_id);
 
     // Fetch approved guide profiles with capacity check
     const { data: guides } = await admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .select(
         "id, user_id, display_name, bio, profile_photo_url, techniques, species, skill_levels, max_anglers, gear_included, rate_full_day, rate_half_day, rating_avg, rating_count, trips_completed, response_time_hours"
       )
-      .in("id" as never, guideIds)
-      .eq("status" as never, "approved")
-      .gte("max_anglers" as never, partySize)
-      .order("rating_avg" as never, { ascending: false });
+      .in("id", guideIds)
+      .eq("status", "approved")
+      .gte("max_anglers", partySize)
+      .order("rating_avg", { ascending: false });
 
     if (!guides?.length) {
       return NextResponse.json({ guides: [] });
@@ -61,14 +61,14 @@ export async function GET(request: Request) {
 
     // Check availability — exclude blocked/booked guides
     const { data: unavailable } = await admin
-      .from("guide_availability" as never)
+      .from("guide_availability")
       .select("guide_id")
-      .in("guide_id" as never, (guides as unknown as { id: string }[]).map((g) => g.id))
-      .eq("date" as never, date)
-      .in("status" as never, ["blocked", "booked"]);
+      .in("guide_id", guides.map((g) => g.id))
+      .eq("date", date)
+      .in("status", ["blocked", "booked"]);
 
     const unavailableIds = new Set(
-      ((unavailable ?? []) as unknown as { guide_id: string }[]).map((u) => u.guide_id)
+      (unavailable ?? []).map((u) => u.guide_id)
     );
 
     // Also check lead time
@@ -79,7 +79,7 @@ export async function GET(request: Request) {
       (bookingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    const availableGuides = (guides as unknown as { id: string; rate_half_day: number | null; rate_full_day: number | null; [key: string]: unknown }[])
+    const availableGuides = guides
       .filter((g) => !unavailableIds.has(g.id))
       .filter((g) => {
         // Check if guide has a lead_time_days constraint

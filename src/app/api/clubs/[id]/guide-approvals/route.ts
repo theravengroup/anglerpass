@@ -40,15 +40,15 @@ export async function GET(
     const status = searchParams.get("status");
 
     let query = admin
-      .from("guide_water_approvals" as never)
+      .from("guide_water_approvals")
       .select(
         "id, guide_id, property_id, status, requested_at, reviewed_at, decline_reason, guide_profiles(id, display_name, profile_photo_url, techniques, species, rating_avg, rating_count, license_url, insurance_url, first_aid_cert_url), properties(name)"
       )
-      .eq("club_id" as never, clubId)
-      .order("requested_at" as never, { ascending: false });
+      .eq("club_id", clubId)
+      .order("requested_at", { ascending: false });
 
     if (status) {
-      query = query.eq("status" as never, status);
+      query = query.eq("status", status);
     }
 
     const { data: approvals, error } = await query;
@@ -120,14 +120,14 @@ export async function PATCH(
     }
 
     // Fetch the approval
-    const { data: approval } = await (admin
-      .from("guide_water_approvals" as never)
+    const { data: approval } = await admin
+      .from("guide_water_approvals")
       .select(
         "id, guide_id, property_id, status, guide_profiles(user_id, display_name), properties(name)"
       )
-      .eq("id" as never, approval_id)
-      .eq("club_id" as never, clubId)
-      .single()) as unknown as { data: { id: string; guide_id: string; property_id: string; status: string; guide_profiles: { user_id: string; display_name: string } | null; properties: { name: string } | null } | null };
+      .eq("id", approval_id)
+      .eq("club_id", clubId)
+      .single();
 
     if (!approval) {
       return NextResponse.json(
@@ -144,15 +144,15 @@ export async function PATCH(
           : "revoked";
 
     const { data: updated, error: updateError } = await admin
-      .from("guide_water_approvals" as never)
+      .from("guide_water_approvals")
       .update({
         status: newStatus,
         reviewed_by: user.id,
         reviewed_at: new Date().toISOString(),
         decline_reason: result.data.decline_reason || null,
         updated_at: new Date().toISOString(),
-      } as never)
-      .eq("id" as never, approval_id)
+      })
+      .eq("id", approval_id)
       .select()
       .single();
 
@@ -165,11 +165,8 @@ export async function PATCH(
     }
 
     // Notify the guide
-    const guideProfile = approval.guide_profiles as {
-      user_id: string;
-      display_name: string;
-    } | null;
-    const property = approval.properties as { name: string } | null;
+    const guideProfile = approval.guide_profiles;
+    const property = approval.properties;
 
     if (guideProfile) {
       if (newStatus === "approved") {

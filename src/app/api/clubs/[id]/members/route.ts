@@ -71,7 +71,7 @@ export async function GET(
     // Fetch members with profile info
     const { data: members, error } = await admin
       .from("club_memberships")
-      .select("id, user_id, role, status, invited_email, invited_at, joined_at, created_at, profiles(display_name)")
+      .select("id, user_id, role, status, invited_email, invited_at, joined_at, created_at, profiles!club_memberships_user_id_fkey(display_name)")
       .eq("club_id", id)
       .order("created_at", { ascending: false });
 
@@ -99,9 +99,7 @@ export async function GET(
           role: member.role,
           status: member.status,
           email,
-          display_name:
-            (member.profiles as { display_name: string | null } | null)
-              ?.display_name ?? null,
+          display_name: member.profiles?.display_name ?? null,
           invited_at: member.invited_at,
           joined_at: member.joined_at,
           created_at: member.created_at,

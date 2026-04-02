@@ -1,5 +1,6 @@
 import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
 import { z } from "zod";
+import type { Json } from "@/types/supabase";
 
 const updateClubSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -89,16 +90,7 @@ export async function GET(
       }
     }
 
-    const members = (memberships ?? []).map(
-      (m: {
-        id: string;
-        user_id: string | null;
-        role: string;
-        status: string;
-        invited_email: string | null;
-        joined_at: string | null;
-        created_at: string;
-      }) => ({
+    const members = (memberships ?? []).map((m) => ({
         id: m.id,
         user_id: m.user_id,
         display_name: m.user_id ? memberProfileMap[m.user_id] ?? null : null,
@@ -219,7 +211,7 @@ export async function PATCH(
     }
 
     // Build old_data for audit
-    const oldData: Record<string, unknown> = {};
+    const oldData: Record<string, string | number | boolean | null> = {};
     for (const key of Object.keys(updates)) {
       oldData[key] = existing[key as keyof typeof existing];
     }
@@ -243,8 +235,8 @@ export async function PATCH(
       action: "club.updated",
       entity_type: "club",
       entity_id: id,
-      old_data: oldData,
-      new_data: updates,
+      old_data: oldData as Json,
+      new_data: updates as Json,
     });
 
     return jsonSuccess({ club: updated });

@@ -42,28 +42,13 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Verify the property is published
-    // max_rods / max_guests are new columns not yet in generated types
-    const { data: property, error: propError } = (await admin
+    const { data: property, error: propError } = await admin
       .from("properties")
       .select(
         "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity, max_rods, max_guests, owner_id"
       )
       .eq("id", property_id)
-      .single()) as unknown as {
-      data: {
-        id: string;
-        name: string;
-        status: string;
-        half_day_allowed: boolean;
-        rate_adult_full_day: number | null;
-        rate_adult_half_day: number | null;
-        capacity: number | null;
-        max_rods: number | null;
-        max_guests: number | null;
-        owner_id: string;
-      } | null;
-      error: { message: string } | null;
-    };
+      .single();
 
     if (propError || !property) {
       return NextResponse.json(
@@ -164,15 +149,12 @@ export async function POST(request: Request) {
 
     // Check existing bookings don't exceed capacity for the date
     if (maxRods || maxGuests) {
-      // non_fishing_guests is a new column not yet in generated types
-      const { data: existingBookings } = (await admin
+      const { data: existingBookings } = await admin
         .from("bookings")
         .select("party_size, non_fishing_guests")
         .eq("property_id", property_id)
         .eq("booking_date", booking_date)
-        .in("status", ["pending", "confirmed"])) as unknown as {
-        data: { party_size: number; non_fishing_guests: number }[] | null;
-      };
+        .in("status", ["pending", "confirmed"]);
 
       const existingRods = (existingBookings ?? []).reduce(
         (sum, b) => sum + (b.party_size ?? 0),
@@ -213,21 +195,11 @@ export async function POST(request: Request) {
 
     if (guide_id) {
       // Verify guide exists and is approved
-      const { data: guideProfile } = await (admin
-        .from("guide_profiles" as never)
+      const { data: guideProfile } = await admin
+        .from("guide_profiles")
         .select("id, user_id, display_name, status, rate_full_day, rate_half_day, max_anglers")
-        .eq("id" as never, guide_id)
-        .single()) as unknown as {
-        data: {
-          id: string;
-          user_id: string;
-          display_name: string;
-          status: string;
-          rate_full_day: number | null;
-          rate_half_day: number | null;
-          max_anglers: number | null;
-        } | null;
-      };
+        .eq("id", guide_id)
+        .single();
 
       if (!guideProfile || guideProfile.status !== "approved") {
         return NextResponse.json(
@@ -237,13 +209,13 @@ export async function POST(request: Request) {
       }
 
       // Verify guide has water approval for this property
-      const { data: waterApproval } = await (admin
-        .from("guide_water_approvals" as never)
+      const { data: waterApproval } = await admin
+        .from("guide_water_approvals")
         .select("id")
-        .eq("guide_id" as never, guide_id)
-        .eq("property_id" as never, property_id)
-        .eq("status" as never, "approved")
-        .single()) as unknown as { data: { id: string } | null };
+        .eq("guide_id", guide_id)
+        .eq("property_id", property_id)
+        .eq("status", "approved")
+        .single();
 
       if (!waterApproval) {
         return NextResponse.json(
@@ -253,13 +225,13 @@ export async function POST(request: Request) {
       }
 
       // Verify guide is available on the date
-      const { data: blocked } = await (admin
-        .from("guide_availability" as never)
+      const { data: blocked } = await admin
+        .from("guide_availability")
         .select("id")
-        .eq("guide_id" as never, guide_id)
-        .eq("date" as never, booking_date)
-        .in("status" as never, ["blocked", "booked"])
-        .single()) as unknown as { data: { id: string } | null };
+        .eq("guide_id", guide_id)
+        .eq("date", booking_date)
+        .in("status", ["blocked", "booked"])
+        .single();
 
       if (blocked) {
         return NextResponse.json(
@@ -345,14 +317,14 @@ export async function POST(request: Request) {
 
     // Mark guide availability as booked
     if (guide_id) {
-      await (admin
-        .from("guide_availability" as never)
+      await admin
+        .from("guide_availability")
         .upsert({
           guide_id,
           date: booking_date,
           status: "booked",
           booking_id: booking.id,
-        } as never));
+        });
     }
 
     // Notify landowner (informational — booking is already confirmed)

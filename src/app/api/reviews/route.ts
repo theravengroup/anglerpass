@@ -25,14 +25,14 @@ export async function GET(request: Request) {
     if (guideId) {
       // Public: revealed reviews for a guide (by guide_profile.user_id)
       const { data: reviews, error } = await admin
-        .from("reviews" as never)
+        .from("reviews")
         .select(
           "id, rating, title, body, created_at, reviewer_role, profiles!reviews_reviewer_id_fkey(display_name)"
         )
-        .eq("subject_id" as never, guideId)
-        .eq("subject_role" as never, "guide")
-        .eq("is_revealed" as never, true)
-        .order("created_at" as never, { ascending: false });
+        .eq("subject_id", guideId)
+        .eq("subject_role", "guide")
+        .eq("is_revealed", true)
+        .order("created_at", { ascending: false });
 
       if (error) {
         return NextResponse.json(
@@ -47,11 +47,11 @@ export async function GET(request: Request) {
     if (bookingId) {
       // Fetch reviews for a booking (revealed or user is participant)
       const { data: reviews, error } = await admin
-        .from("reviews" as never)
+        .from("reviews")
         .select(
           "id, rating, title, body, created_at, reviewer_id, reviewer_role, subject_id, subject_role, is_revealed, profiles!reviews_reviewer_id_fkey(display_name)"
         )
-        .eq("booking_id" as never, bookingId);
+        .eq("booking_id", bookingId);
 
       if (error) {
         return NextResponse.json(
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       }
 
       // Filter: only show revealed reviews or ones written by the current user
-      const filtered = ((reviews ?? []) as unknown as { is_revealed: boolean; reviewer_id: string; [key: string]: unknown }[]).filter(
+      const filtered = (reviews ?? []).filter(
         (r) => r.is_revealed || r.reviewer_id === user.id
       );
 
@@ -71,13 +71,13 @@ export async function GET(request: Request) {
     if (subjectId) {
       // Revealed reviews where user is the subject
       const { data: reviews, error } = await admin
-        .from("reviews" as never)
+        .from("reviews")
         .select(
           "id, rating, title, body, created_at, reviewer_role, is_revealed, profiles!reviews_reviewer_id_fkey(display_name)"
         )
-        .eq("subject_id" as never, subjectId)
-        .eq("is_revealed" as never, true)
-        .order("created_at" as never, { ascending: false });
+        .eq("subject_id", subjectId)
+        .eq("is_revealed", true)
+        .order("created_at", { ascending: false });
 
       if (error) {
         return NextResponse.json(
@@ -90,26 +90,24 @@ export async function GET(request: Request) {
     }
 
     // Default: user's pending reviews to write
-    const { data: bookings } = await (admin
-      .from("bookings" as never)
+    const { data: bookings } = await admin
+      .from("bookings")
       .select("id, booking_date, guide_id, property_id, angler_id, guide_profiles(user_id, display_name), properties(name)")
-      .or(`angler_id.eq.${user.id},guide_profiles.user_id.eq.${user.id}` as never)
-      .eq("status" as never, "confirmed")
-      .lt("booking_date" as never, new Date().toISOString().split("T")[0])
-      .not("guide_id" as never, "is", null)) as unknown as {
-      data: { id: string; booking_date: string; guide_id: string; property_id: string; angler_id: string; guide_profiles: { user_id: string; display_name: string } | null; properties: { name: string } | null }[] | null;
-    };
+      .or(`angler_id.eq.${user.id},guide_profiles.user_id.eq.${user.id}`)
+      .eq("status", "confirmed")
+      .lt("booking_date", new Date().toISOString().split("T")[0])
+      .not("guide_id", "is", null);
 
     // Find which ones the user hasn't reviewed yet
     const bookingIds = (bookings ?? []).map((b) => b.id);
     const { data: existingReviews } = await admin
-      .from("reviews" as never)
+      .from("reviews")
       .select("booking_id, reviewer_id")
-      .in("booking_id" as never, bookingIds.length ? bookingIds : ["none"])
-      .eq("reviewer_id" as never, user.id);
+      .in("booking_id", bookingIds.length ? bookingIds : ["none"])
+      .eq("reviewer_id", user.id);
 
     const reviewedBookings = new Set(
-      ((existingReviews ?? []) as unknown as { booking_id: string }[]).map((r) => r.booking_id)
+      (existingReviews ?? []).map((r) => r.booking_id)
     );
 
     const pendingReviews = (bookings ?? [])
@@ -157,19 +155,11 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Fetch booking
-    const { data: booking } = await (admin
-      .from("bookings" as never)
+    const { data: booking } = await admin
+      .from("bookings")
       .select("id, angler_id, guide_id, booking_date, guide_profiles(user_id)")
-      .eq("id" as never, result.data.booking_id)
-      .single()) as unknown as {
-      data: {
-        id: string;
-        angler_id: string;
-        guide_id: string | null;
-        booking_date: string;
-        guide_profiles: { user_id: string } | null;
-      } | null;
-    };
+      .eq("id", result.data.booking_id)
+      .single();
 
     if (!booking) {
       return NextResponse.json(
@@ -186,9 +176,7 @@ export async function POST(request: Request) {
     }
 
     // Verify user is the angler or guide
-    const guideProfile = booking.guide_profiles as {
-      user_id: string;
-    } | null;
+    const guideProfile = booking.guide_profiles;
 
     const isAngler = booking.angler_id === user.id;
     const isGuide = guideProfile?.user_id === user.id;
@@ -225,10 +213,10 @@ export async function POST(request: Request) {
 
     // Check for existing review
     const { data: existing } = await admin
-      .from("reviews" as never)
+      .from("reviews")
       .select("id")
-      .eq("booking_id" as never, result.data.booking_id)
-      .eq("reviewer_role" as never, reviewerRole)
+      .eq("booking_id", result.data.booking_id)
+      .eq("reviewer_role", reviewerRole)
       .maybeSingle();
 
     if (existing) {
@@ -240,7 +228,7 @@ export async function POST(request: Request) {
 
     // Create the review
     const { data: review, error: insertError } = await admin
-      .from("reviews" as never)
+      .from("reviews")
       .insert({
         booking_id: result.data.booking_id,
         reviewer_id: user.id,
@@ -252,7 +240,7 @@ export async function POST(request: Request) {
         body: result.data.body || null,
         is_revealed: false,
         review_window_closes_at: windowClose.toISOString(),
-      } as never)
+      })
       .select()
       .single();
 
@@ -266,18 +254,18 @@ export async function POST(request: Request) {
 
     // Check if both sides have submitted → reveal both
     const { data: counterReview } = await admin
-      .from("reviews" as never)
+      .from("reviews")
       .select("id")
-      .eq("booking_id" as never, result.data.booking_id)
-      .neq("reviewer_role" as never, reviewerRole)
+      .eq("booking_id", result.data.booking_id)
+      .neq("reviewer_role", reviewerRole)
       .maybeSingle();
 
     if (counterReview) {
       // Both reviews exist → reveal both
       await admin
-        .from("reviews" as never)
-        .update({ is_revealed: true } as never)
-        .eq("booking_id" as never, result.data.booking_id);
+        .from("reviews")
+        .update({ is_revealed: true })
+        .eq("booking_id", result.data.booking_id);
 
       // Recalculate guide stats
       await recalculateGuideStats(admin, isAngler ? subjectId : user.id);
@@ -294,8 +282,7 @@ export async function POST(request: Request) {
 }
 
 async function recalculateGuideStats(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  admin: any,
+  admin: ReturnType<typeof createAdminClient>,
   guideUserId: string
 ) {
   try {

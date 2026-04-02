@@ -18,13 +18,13 @@ export async function GET() {
     const admin = createAdminClient();
 
     // Fetch threads where user is a participant
-    const { data: threads, error } = await (admin
-      .from("message_threads" as never)
+    const { data: threads, error } = await admin
+      .from("message_threads")
       .select(
         "id, participant_a, participant_b, booking_id, last_message_at, created_at"
       )
       .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
-      .order("last_message_at" as never, { ascending: false })) as unknown as { data: { id: string; participant_a: string; participant_b: string; booking_id: string | null; last_message_at: string; created_at: string }[] | null; error: unknown };
+      .order("last_message_at", { ascending: false });
 
     if (error) {
       console.error("[messages] Threads fetch error:", error);
@@ -53,21 +53,21 @@ export async function GET() {
           .single();
 
         // Get last message preview
-        const { data: lastMessage } = await (admin
-          .from("messages" as never)
+        const { data: lastMessage } = await admin
+          .from("messages")
           .select("body, sender_id, created_at")
-          .eq("thread_id" as never, thread.id)
-          .order("created_at" as never, { ascending: false })
+          .eq("thread_id", thread.id)
+          .order("created_at", { ascending: false })
           .limit(1)
-          .single()) as unknown as { data: { body: string; sender_id: string; created_at: string } | null };
+          .single();
 
         // Get unread count
-        const { count: unreadCount } = await (admin
-          .from("messages" as never)
+        const { count: unreadCount } = await admin
+          .from("messages")
           .select("id", { count: "exact", head: true })
-          .eq("thread_id" as never, thread.id)
-          .eq("recipient_id" as never, user.id)
-          .is("read_at" as never, null)) as unknown as { count: number | null };
+          .eq("thread_id", thread.id)
+          .eq("recipient_id", user.id)
+          .is("read_at", null);
 
         return {
           ...thread,
@@ -134,38 +134,38 @@ export async function POST(request: Request) {
 
     // Check for existing thread
     let query = admin
-      .from("message_threads" as never)
+      .from("message_threads")
       .select("id")
-      .eq("participant_a" as never, participantA)
-      .eq("participant_b" as never, participantB);
+      .eq("participant_a", participantA)
+      .eq("participant_b", participantB);
 
     if (result.data.booking_id) {
-      query = query.eq("booking_id" as never, result.data.booking_id);
+      query = query.eq("booking_id", result.data.booking_id);
     } else {
-      query = query.is("booking_id" as never, null);
+      query = query.is("booking_id", null);
     }
 
-    const { data: existingThread } = await (query.maybeSingle()) as unknown as { data: { id: string } | null };
+    const { data: existingThread } = await query.maybeSingle();
 
     if (existingThread) {
       threadId = existingThread.id;
 
       // Update last_message_at
       await admin
-        .from("message_threads" as never)
-        .update({ last_message_at: new Date().toISOString() } as never)
-        .eq("id" as never, threadId);
+        .from("message_threads")
+        .update({ last_message_at: new Date().toISOString() })
+        .eq("id", threadId);
     } else {
       // Create new thread
-      const { data: newThread, error: threadError } = await (admin
-        .from("message_threads" as never)
+      const { data: newThread, error: threadError } = await admin
+        .from("message_threads")
         .insert({
           participant_a: participantA,
           participant_b: participantB,
           booking_id: result.data.booking_id ?? null,
-        } as never)
+        })
         .select()
-        .single()) as unknown as { data: { id: string } | null; error: unknown };
+        .single();
 
       if (threadError) {
         console.error("[messages] Thread creation error:", threadError);
@@ -180,14 +180,14 @@ export async function POST(request: Request) {
 
     // Create message
     const { data: message, error: msgError } = await admin
-      .from("messages" as never)
+      .from("messages")
       .insert({
         thread_id: threadId,
         sender_id: user.id,
         recipient_id: result.data.recipient_id,
         body: result.data.body,
         booking_id: result.data.booking_id ?? null,
-      } as never)
+      })
       .select()
       .single();
 

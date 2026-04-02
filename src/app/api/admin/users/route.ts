@@ -1,5 +1,6 @@
 import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
 import { VALID_ROLES } from "@/lib/constants/status";
+import type { Json } from "@/types/supabase";
 
 const PAGE_SIZE = 25;
 const VALID_SORT_FIELDS = ["created_at", "display_name", "role", "updated_at"];
@@ -66,16 +67,7 @@ export async function GET(request: Request) {
       }
     }
 
-    const enriched = (users ?? []).map(
-      (u: {
-        id: string;
-        display_name: string | null;
-        role: string;
-        created_at: string;
-        updated_at: string;
-        suspended_at: string | null;
-        suspended_reason: string | null;
-      }) => ({
+    const enriched = (users ?? []).map((u) => ({
         ...u,
         email: emailMap[u.id] ?? null,
       })
@@ -148,8 +140,8 @@ export async function PATCH(request: Request) {
           action: "user.role_changed",
           entity_type: "profile",
           entity_id: user_id,
-          old_data: { role: oldRole },
-          new_data: { role },
+          old_data: { role: oldRole } as Json,
+          new_data: { role } as Json,
         });
 
         return jsonSuccess({ success: true, role });
@@ -178,8 +170,8 @@ export async function PATCH(request: Request) {
           action: "user.suspended",
           entity_type: "profile",
           entity_id: user_id,
-          old_data: { suspended_at: null },
-          new_data: { suspended_at: now, reason: suspendReason },
+          old_data: { suspended_at: null } as Json,
+          new_data: { suspended_at: now, reason: suspendReason } as Json,
         });
 
         return jsonSuccess({ success: true, suspended: true });
@@ -205,8 +197,8 @@ export async function PATCH(request: Request) {
           action: "user.unsuspended",
           entity_type: "profile",
           entity_id: user_id,
-          old_data: { suspended_at: target.suspended_at },
-          new_data: { suspended_at: null },
+          old_data: { suspended_at: target.suspended_at } as Json,
+          new_data: { suspended_at: null } as Json,
         });
 
         return jsonSuccess({ success: true, suspended: false });

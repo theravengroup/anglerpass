@@ -10,28 +10,6 @@ const resend = process.env.RESEND_API_KEY
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
-// ─── Row shapes (columns from migration 00030, not yet in generated types)
-
-interface CorporateInvitationRow {
-  id: string;
-  email: string;
-  token: string;
-  status: string;
-  club_id: string;
-  corporate_member_id: string;
-}
-
-interface MembershipRow {
-  id: string;
-  user_id: string;
-  company_name: string | null;
-}
-
-interface ClubRow {
-  name: string;
-  annual_dues: number | null;
-}
-
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -50,30 +28,26 @@ export async function POST(
     const admin = createAdminClient();
 
     // Fetch the invitation
-    const { data: rawInvitation, error: fetchErr } = await admin
-      .from("corporate_invitations" as never)
-      .select("id, email, token, status, club_id, corporate_member_id" as never)
-      .eq("id" as never, id)
+    const { data: invitation, error: fetchErr } = await admin
+      .from("corporate_invitations")
+      .select("id, email, token, status, club_id, corporate_member_id")
+      .eq("id", id)
       .single();
 
-    if (fetchErr || !rawInvitation) {
+    if (fetchErr || !invitation) {
       return NextResponse.json(
         { error: "Invitation not found" },
         { status: 404 }
       );
     }
 
-    const invitation = rawInvitation as unknown as CorporateInvitationRow;
-
     // Verify the user owns the corporate membership
-    const { data: rawMembership } = await admin
+    const { data: membership } = await admin
       .from("club_memberships")
-      .select("id, user_id, company_name" as never)
+      .select("id, user_id, company_name")
       .eq("id", invitation.corporate_member_id)
       .eq("user_id", user.id)
       .maybeSingle();
-
-    const membership = rawMembership as unknown as MembershipRow | null;
 
     if (!membership) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -92,12 +66,12 @@ export async function POST(
       crypto.randomUUID().replace(/-/g, "");
 
     const { error: updateErr } = await admin
-      .from("corporate_invitations" as never)
+      .from("corporate_invitations")
       .update({
         token: newToken,
         invited_at: new Date().toISOString(),
-      } as never)
-      .eq("id" as never, id);
+      })
+      .eq("id", id);
 
     if (updateErr) {
       console.error("[corporate-invitations/resend] Update error:", updateErr);
@@ -108,13 +82,11 @@ export async function POST(
     }
 
     // Fetch club info
-    const { data: rawClub } = await admin
+    const { data: club } = await admin
       .from("clubs")
-      .select("name, annual_dues" as never)
+      .select("name, annual_dues")
       .eq("id", invitation.club_id)
       .single();
-
-    const club = rawClub as unknown as ClubRow | null;
 
     // Get sponsor display name
     const { data: profile } = await admin

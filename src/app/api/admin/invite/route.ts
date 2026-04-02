@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Resend } from "resend";
 import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
+import type { Json } from "@/types/supabase";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -96,7 +97,7 @@ export async function POST(request: Request) {
           email,
           invited_by_name: inviterName,
           promoted_existing: true,
-        },
+        } as Json,
       });
 
       return jsonSuccess({
@@ -110,7 +111,7 @@ export async function POST(request: Request) {
       actor_id: user.id,
       action: "admin.invited",
       entity_type: "invite",
-      new_data: { email, invited_by_name: inviterName },
+      new_data: { email, invited_by_name: inviterName } as Json,
     });
 
     // Also create an audit entry under "profile" entity type for tracking
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
       actor_id: user.id,
       action: "admin.invited",
       entity_type: "profile",
-      new_data: { email, invited_by_name: inviterName },
+      new_data: { email, invited_by_name: inviterName } as Json,
     });
 
     // Send invitation email

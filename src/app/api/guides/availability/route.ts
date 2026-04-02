@@ -26,11 +26,11 @@ export async function GET(request: Request) {
     let targetGuideId = guideId;
 
     if (!targetGuideId) {
-      const { data: profile } = await (admin
-        .from("guide_profiles" as never)
+      const { data: profile } = await admin
+        .from("guide_profiles")
         .select("id")
-        .eq("user_id" as never, user.id)
-        .single()) as unknown as { data: { id: string } | null };
+        .eq("user_id", user.id)
+        .single();
 
       if (!profile) {
         return NextResponse.json(
@@ -42,16 +42,16 @@ export async function GET(request: Request) {
     }
 
     let query = admin
-      .from("guide_availability" as never)
+      .from("guide_availability")
       .select("id, date, status, booking_id")
-      .eq("guide_id" as never, targetGuideId)
-      .order("date" as never);
+      .eq("guide_id", targetGuideId)
+      .order("date");
 
     if (startDate) {
-      query = query.gte("date" as never, startDate);
+      query = query.gte("date", startDate);
     }
     if (endDate) {
-      query = query.lte("date" as never, endDate);
+      query = query.lte("date", endDate);
     }
 
     const { data: availability, error } = await query;
@@ -98,11 +98,11 @@ export async function PUT(request: Request) {
 
     const admin = createAdminClient();
 
-    const { data: profile } = await (admin
-      .from("guide_profiles" as never)
+    const { data: profile } = await admin
+      .from("guide_profiles")
       .select("id")
-      .eq("user_id" as never, user.id)
-      .single()) as unknown as { data: { id: string } | null };
+      .eq("user_id", user.id)
+      .single();
 
     if (!profile) {
       return NextResponse.json(
@@ -115,12 +115,12 @@ export async function PUT(request: Request) {
 
     // Don't overwrite booked dates
     if (status === "blocked") {
-      const { data: bookedDates } = await (admin
-        .from("guide_availability" as never)
+      const { data: bookedDates } = await admin
+        .from("guide_availability")
         .select("date")
-        .eq("guide_id" as never, profile.id)
-        .eq("status" as never, "booked")
-        .in("date" as never, dates)) as unknown as { data: { date: string }[] | null };
+        .eq("guide_id", profile.id)
+        .eq("status", "booked")
+        .in("date", dates);
 
       const bookedSet = new Set((bookedDates ?? []).map((d) => d.date));
       const filteredDates = dates.filter((d) => !bookedSet.has(d));
@@ -140,8 +140,8 @@ export async function PUT(request: Request) {
       }));
 
       const { error } = await admin
-        .from("guide_availability" as never)
-        .upsert(records as never, { onConflict: "guide_id,date" });
+        .from("guide_availability")
+        .upsert(records, { onConflict: "guide_id,date" });
 
       if (error) {
         console.error("[guides/availability] Upsert error:", error);
@@ -161,11 +161,11 @@ export async function PUT(request: Request) {
     // (default state is available, so we remove blocked entries)
     if (status === "available") {
       const { error } = await admin
-        .from("guide_availability" as never)
+        .from("guide_availability")
         .delete()
-        .eq("guide_id" as never, profile.id)
-        .eq("status" as never, "blocked")
-        .in("date" as never, dates);
+        .eq("guide_id", profile.id)
+        .eq("status", "blocked")
+        .in("date", dates);
 
       if (error) {
         console.error("[guides/availability] Delete error:", error);

@@ -18,11 +18,11 @@ export async function GET() {
 
     const admin = createAdminClient();
 
-    const { data: profile } = await (admin
-      .from("guide_profiles" as never)
+    const { data: profile } = await admin
+      .from("guide_profiles")
       .select("id")
-      .eq("user_id" as never, user.id)
-      .single()) as unknown as { data: { id: string } | null };
+      .eq("user_id", user.id)
+      .single();
 
     if (!profile) {
       return NextResponse.json(
@@ -32,12 +32,12 @@ export async function GET() {
     }
 
     const { data: approvals, error } = await admin
-      .from("guide_water_approvals" as never)
+      .from("guide_water_approvals")
       .select(
         "id, property_id, club_id, status, requested_at, reviewed_at, decline_reason, properties(name, location_description), clubs(name)"
       )
-      .eq("guide_id" as never, profile.id)
-      .order("requested_at" as never, { ascending: false });
+      .eq("guide_id", profile.id)
+      .order("requested_at", { ascending: false });
 
     if (error) {
       console.error("[guides/water-approvals] Fetch error:", error);
@@ -82,11 +82,11 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Verify guide profile exists and is approved
-    const { data: profile } = await (admin
-      .from("guide_profiles" as never)
+    const { data: profile } = await admin
+      .from("guide_profiles")
       .select("id, display_name, status")
-      .eq("user_id" as never, user.id)
-      .single()) as unknown as { data: { id: string; display_name: string; status: string } | null };
+      .eq("user_id", user.id)
+      .single();
 
     if (!profile) {
       return NextResponse.json(
@@ -105,12 +105,12 @@ export async function POST(request: Request) {
     const { property_id, club_id } = result.data;
 
     // Check existing approval
-    const { data: existing } = await (admin
-      .from("guide_water_approvals" as never)
+    const { data: existing } = await admin
+      .from("guide_water_approvals")
       .select("id, status")
-      .eq("guide_id" as never, profile.id)
-      .eq("property_id" as never, property_id)
-      .maybeSingle()) as unknown as { data: { id: string; status: string } | null };
+      .eq("guide_id", profile.id)
+      .eq("property_id", property_id)
+      .maybeSingle();
 
     if (existing) {
       return NextResponse.json(
@@ -121,13 +121,13 @@ export async function POST(request: Request) {
 
     // Create approval request
     const { data: approval, error } = await admin
-      .from("guide_water_approvals" as never)
+      .from("guide_water_approvals")
       .insert({
         guide_id: profile.id,
         property_id,
         club_id,
         status: "pending",
-      } as never)
+      })
       .select()
       .single();
 

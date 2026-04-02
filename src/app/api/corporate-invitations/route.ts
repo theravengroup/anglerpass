@@ -11,33 +11,6 @@ const resend = process.env.RESEND_API_KEY
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
-// ─── Row shapes (columns added by migration 00030, not yet in generated types)
-
-interface CorporateInvitationRow {
-  id: string;
-  email: string;
-  status: string;
-  token: string;
-  club_id: string;
-  corporate_member_id: string;
-  invited_at: string;
-  accepted_at: string | null;
-}
-
-interface CorporateMembershipRow {
-  id: string;
-  user_id: string;
-  membership_type: string;
-  status: string;
-  company_name: string | null;
-  club_id: string;
-}
-
-interface ClubRow {
-  name: string;
-  annual_dues: number | null;
-}
-
 // ─── GET: Fetch invitations for a corporate member ─────────────────
 
 export async function GET(request: Request) {
@@ -64,24 +37,24 @@ export async function GET(request: Request) {
     const admin = createAdminClient();
 
     // Verify the user owns this corporate membership
-    const { data: rawMembership } = await admin
+    const { data: membershipCheck } = await admin
       .from("club_memberships")
-      .select("id, user_id, status" as never)
+      .select("id, user_id, status")
       .eq("id", membershipId)
       .eq("user_id", user.id)
-      .eq("membership_type" as never, "corporate")
+      .eq("membership_type", "corporate")
       .maybeSingle();
 
-    if (!rawMembership) {
+    if (!membershipCheck) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Fetch invitations
-    const { data: rawInvitations, error } = await admin
-      .from("corporate_invitations" as never)
-      .select("id, email, status, invited_at, accepted_at" as never)
-      .eq("corporate_member_id" as never, membershipId)
-      .order("invited_at" as never, { ascending: false });
+    const { data: invitations, error } = await admin
+      .from("corporate_invitations")
+      .select("id, email, status, invited_at, accepted_at")
+      .eq("corporate_member_id", membershipId)
+      .order("invited_at", { ascending: false });
 
     if (error) {
       console.error("[corporate-invitations] Fetch error:", error);
@@ -91,9 +64,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const invitations = (rawInvitations ?? []) as unknown as CorporateInvitationRow[];
-
-    return NextResponse.json({ invitations });
+    return NextResponse.json({ invitations: invitations ?? [] });
   } catch (err) {
     console.error("[corporate-invitations] Unexpected error:", err);
     return NextResponse.json(
@@ -140,16 +111,14 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Verify the user is an active corporate member
-    const { data: rawMembership } = await admin
+    const { data: membership } = await admin
       .from("club_memberships")
-      .select("id, user_id, membership_type, status, company_name, club_id" as never)
+      .select("id, user_id, membership_type, status, company_name, club_id")
       .eq("id", membershipId)
       .eq("user_id", user.id)
-      .eq("membership_type" as never, "corporate")
+      .eq("membership_type", "corporate")
       .eq("status", "active")
       .maybeSingle();
-
-    const membership = rawMembership as unknown as CorporateMembershipRow | null;
 
     if (!membership) {
       return NextResponse.json(
@@ -166,13 +135,12 @@ export async function POST(request: Request) {
     }
 
     // Fetch club info for email
-    const { data: rawClub } = await admin
+    const { data: club } = await admin
       .from("clubs")
-      .select("name, annual_dues" as never)
+      .select("name, annual_dues")
       .eq("id", clubId)
       .single();
 
-    const club = rawClub as unknown as ClubRow | null;
     const clubName = club?.name ?? "the club";
     const annualDues = club?.annual_dues ?? null;
 
@@ -187,12 +155,10 @@ export async function POST(request: Request) {
     const companyName = membership.company_name ?? "your company";
 
     // Fetch existing invitations + members for this club
-    const { data: rawExistingInvitations } = await admin
-      .from("corporate_invitations" as never)
-      .select("email, status" as never)
-      .eq("club_id" as never, clubId);
-
-    const existingInvitations = (rawExistingInvitations ?? []) as unknown as CorporateInvitationRow[];
+    const { data: existingInvitations } = await admin
+      .from("corporate_invitations")
+      .select("email, status")
+      .eq("club_id", clubId);
 
     const { data: existingMembers } = await admin
       .from("club_memberships")
@@ -201,7 +167,7 @@ export async function POST(request: Request) {
       .eq("status", "active");
 
     const pendingEmails = new Set(
-      existingInvitations
+      (existingInvitations ?? [])
         .filter((inv) => inv.status === "pending")
         .map((inv) => inv.email.toLowerCase())
     );
@@ -241,24 +207,22 @@ export async function POST(request: Request) {
       }
 
       // Create invitation
-      const { data: rawInvitation, error: insertError } = await admin
-        .from("corporate_invitations" as never)
+      const { data: invitation, error: insertError } = await admin
+        .from("corporate_invitations")
         .insert({
           club_id: clubId,
           corporate_member_id: membershipId,
           email,
           status: "pending",
-        } as never)
-        .select("id, token" as never)
+        })
+        .select("id, token")
         .single();
 
-      if (insertError) {
+      if (insertError || !invitation) {
         console.error("[corporate-invitations] Insert error:", insertError);
         skipped.push({ email, reason: "Failed to create invitation" });
         continue;
       }
-
-      const invitation = rawInvitation as unknown as CorporateInvitationRow;
 
       // Send email
       await sendCorporateInviteEmail({

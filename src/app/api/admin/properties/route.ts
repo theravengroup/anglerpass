@@ -91,17 +91,7 @@ export async function GET(request: Request) {
       }
     }
 
-    const enriched = (properties ?? []).map(
-      (p: {
-        id: string;
-        name: string;
-        location_description: string | null;
-        status: string;
-        water_type: string | null;
-        owner_id: string;
-        created_at: string;
-        updated_at: string;
-      }) => ({
+    const enriched = (properties ?? []).map((p) => ({
         id: p.id,
         name: p.name,
         location_description: p.location_description,

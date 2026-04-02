@@ -3,19 +3,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CorporateJoinCta from "./CorporateJoinCta";
 
-interface ClubCorporateData {
-  id: string;
-  name: string;
-  description: string | null;
-  location: string | null;
-  initiation_fee: number | null;
-  annual_dues: number | null;
-  corporate_memberships_enabled: boolean;
-  corporate_initiation_fee: number | null;
-  membership_application_required: boolean;
-}
-
-async function getClub(clubId: string): Promise<ClubCorporateData | null> {
+async function getClub(clubId: string) {
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
@@ -27,7 +15,7 @@ async function getClub(clubId: string): Promise<ClubCorporateData | null> {
       .single();
 
     if (error || !data) return null;
-    return data as unknown as ClubCorporateData;
+    return data;
   } catch {
     return null;
   }

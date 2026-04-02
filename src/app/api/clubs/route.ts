@@ -121,18 +121,16 @@ export async function POST(request: Request) {
     try {
       const clubAdminEmail = user.email;
       if (clubAdminEmail) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: anglerInvitations } = await (admin as any)
+        const { data: anglerInvitations } = await admin
           .from("angler_club_invitations")
           .select("id, angler_id")
           .eq("admin_email", clubAdminEmail)
-          .eq("status", "sent") as { data: { id: string; angler_id: string }[] | null };
+          .eq("status", "sent");
 
         if (anglerInvitations && anglerInvitations.length > 0) {
           for (const inv of anglerInvitations) {
             // Mark invitation as accepted
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (admin as any)
+            await admin
               .from("angler_club_invitations")
               .update({
                 status: "accepted",

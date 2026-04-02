@@ -28,8 +28,8 @@ interface AuditEntry {
   action: string;
   entity_type: string;
   entity_id: string | null;
-  old_data: Record<string, unknown> | null;
-  new_data: Record<string, unknown> | null;
+  old_data: Record<string, string | number | boolean | null> | null;
+  new_data: Record<string, string | number | boolean | null> | null;
   created_at: string;
 }
 

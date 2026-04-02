@@ -105,10 +105,8 @@ export async function GET(request: Request) {
     }
 
     // Fetch the properties
-    // max_rods / max_guests are new columns not yet in generated types
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (admin
-      .from("properties") as any)
+    let query = admin
+      .from("properties")
       .select(
         "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
@@ -156,8 +154,7 @@ export async function GET(request: Request) {
     }
 
     // Enrich properties with club access info and cross-club flag
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const enriched = (properties ?? []).map((prop: any) => {
+    const enriched = (properties ?? []).map((prop) => {
       const crossClubInfo = crossClubMap[prop.id];
       const isCrossClub = !!crossClubInfo;
 

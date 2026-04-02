@@ -101,7 +101,7 @@ export async function notify(
   const prefCol = EMAIL_PREF_MAP[payload.type] ?? "email_booking_confirmed";
   const { data: prefs, error: prefErr } = await admin
     .from("notification_preferences")
-    .select(prefCol)
+    .select("*")
     .eq("user_id", payload.userId)
     .maybeSingle();
 
@@ -110,7 +110,7 @@ export async function notify(
   }
 
   const shouldEmail =
-    !prefs || (prefs as unknown as Record<string, boolean>)?.[prefCol] !== false;
+    !prefs || (prefs as Record<string, unknown>)[prefCol] !== false;
 
   if (!shouldEmail) return;
 

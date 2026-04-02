@@ -18,9 +18,9 @@ export async function GET() {
     const admin = createAdminClient();
 
     const { data: profile, error } = await admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .select("*")
-      .eq("user_id" as never, user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (error) {
@@ -74,9 +74,9 @@ export async function POST(request: Request) {
 
     // Check if guide profile already exists
     const { data: existing } = await admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .select("id")
-      .eq("user_id" as never, user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (existing) {
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
 
     // Create guide profile
     const { data: profile, error } = await admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .insert({
         user_id: user.id,
         display_name: result.data.display_name,
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
         has_motorized_vessel: result.data.has_motorized_vessel,
         uscg_license_expiry: result.data.uscg_license_expiry || null,
         status: "draft",
-      } as never)
+      })
       .select()
       .single();
 
@@ -173,11 +173,11 @@ export async function PATCH(request: Request) {
     const admin = createAdminClient();
 
     // Fetch existing profile
-    const { data: existing } = await (admin
-      .from("guide_profiles" as never)
+    const { data: existing } = await admin
+      .from("guide_profiles")
       .select("id, status")
-      .eq("user_id" as never, user.id)
-      .single()) as unknown as { data: { id: string; status: string } | null };
+      .eq("user_id", user.id)
+      .single();
 
     if (!existing) {
       return NextResponse.json(
@@ -219,9 +219,9 @@ export async function PATCH(request: Request) {
     }
 
     const { data: profile, error } = await admin
-      .from("guide_profiles" as never)
-      .update(updates as never)
-      .eq("id" as never, existing.id)
+      .from("guide_profiles")
+      .update(updates)
+      .eq("id", existing.id)
       .select()
       .single();
 

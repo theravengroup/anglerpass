@@ -26,7 +26,9 @@ create policy "Admins can update all profiles"
     )
   );
 
--- Admin can read audit_log
+-- Admin can read audit_log (drop first — originally created in 00006)
+drop policy if exists "Admins can read audit log" on public.audit_log;
+drop policy if exists "Admins can view audit log" on public.audit_log;
 create policy "Admins can read audit log"
   on public.audit_log for select
   using (
@@ -36,7 +38,8 @@ create policy "Admins can read audit log"
     )
   );
 
--- Admin can insert audit_log entries
+-- Admin can insert audit_log entries (drop first — originally created in 00006)
+drop policy if exists "Admins can insert audit log" on public.audit_log;
 create policy "Admins can insert audit log"
   on public.audit_log for insert
   with check (

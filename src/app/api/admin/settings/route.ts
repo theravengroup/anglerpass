@@ -1,13 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
-
-interface PlatformSetting {
-  key: string;
-  value: unknown;
-  description: string | null;
-  updated_at: string;
-}
+import type { Json } from "@/types/supabase";
 
 // ─── GET: Fetch all platform settings ──────────────────────────────
 
@@ -17,11 +11,8 @@ export async function GET() {
     if (!auth) return jsonError("Forbidden", 403);
 
     const { data, error } = await auth.admin
-      .from("platform_settings" as never)
-      .select("key, value, description, updated_at") as unknown as {
-      data: PlatformSetting[] | null;
-      error: { message: string } | null;
-    };
+      .from("platform_settings")
+      .select("key, value, description, updated_at");
 
     if (error) {
       console.error("[admin/settings] Failed to fetch settings:", error);
@@ -31,7 +22,7 @@ export async function GET() {
     // Transform array into keyed object
     const settings: Record<
       string,
-      { value: unknown; description: string | null; updated_at: string }
+      { value: unknown; description: string | null; updated_at: string | null }
     > = {};
 
     for (const row of data ?? []) {
@@ -71,14 +62,11 @@ export async function PATCH(request: NextRequest) {
     const { key, value } = parsed.data;
 
     // Fetch the current value for audit logging
-    const { data: existing, error: fetchError } = (await auth.admin
-      .from("platform_settings" as never)
+    const { data: existing, error: fetchError } = await auth.admin
+      .from("platform_settings")
       .select("value")
-      .eq("key" as never, key as never)
-      .single()) as unknown as {
-      data: { value: unknown } | null;
-      error: { message: string } | null;
-    };
+      .eq("key", key)
+      .single();
 
     if (fetchError || !existing) {
       console.error("[admin/settings] Setting not found:", key);
@@ -88,19 +76,16 @@ export async function PATCH(request: NextRequest) {
     const oldValue = existing.value;
 
     // Update the setting
-    const { data: updated, error: updateError } = (await auth.admin
-      .from("platform_settings" as never)
+    const { data: updated, error: updateError } = await auth.admin
+      .from("platform_settings")
       .update({
         value: JSON.stringify(value),
         updated_at: new Date().toISOString(),
         updated_by: auth.user.id,
-      } as never)
-      .eq("key" as never, key as never)
+      })
+      .eq("key", key)
       .select("key, value, description, updated_at")
-      .single()) as unknown as {
-      data: PlatformSetting | null;
-      error: { message: string } | null;
-    };
+      .single();
 
     if (updateError || !updated) {
       console.error("[admin/settings] Failed to update setting:", updateError);
@@ -115,8 +100,8 @@ export async function PATCH(request: NextRequest) {
         action: "settings.updated",
         entity_type: "platform_settings",
         entity_id: key,
-        old_data: { value: oldValue },
-        new_data: { value },
+        old_data: { value: oldValue } as Json,
+        new_data: { value } as Json,
       })
       .then(({ error: auditError }) => {
         if (auditError) {

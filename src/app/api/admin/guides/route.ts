@@ -36,7 +36,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
 
     let query = admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .select(
         "*, profiles!guide_profiles_user_id_fkey(display_name, email:id)"
       )
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       query = query.eq("status", status);
     }
 
-    const { data: guides, error } = await query as { data: Record<string, unknown>[] | null; error: { message: string } | null };
+    const { data: guides, error } = await query;
 
     if (error) {
       console.error("[admin/guides] Fetch error:", error);
@@ -127,11 +127,11 @@ export async function PATCH(request: Request) {
     }
 
     // Fetch guide profile
-    const { data: guideProfile } = await (admin
-      .from("guide_profiles" as never)
+    const { data: guideProfile } = await admin
+      .from("guide_profiles")
       .select("id, user_id, status")
-      .eq("id" as never, guide_id)
-      .single()) as unknown as { data: { id: string; user_id: string; status: string } | null };
+      .eq("id", guide_id)
+      .single();
 
     if (!guideProfile) {
       return NextResponse.json(
@@ -165,12 +165,12 @@ export async function PATCH(request: Request) {
       updates.suspended_reason = result.data.reason || "Suspended by admin";
     }
 
-    const { data: updated, error: updateError } = await (admin
-      .from("guide_profiles" as never)
-      .update(updates as never)
-      .eq("id" as never, guide_id)
+    const { data: updated, error: updateError } = await admin
+      .from("guide_profiles")
+      .update(updates)
+      .eq("id", guide_id)
       .select()
-      .single()) as unknown as { data: Record<string, unknown> | null; error: { message: string } | null };
+      .single();
 
     if (updateError) {
       console.error("[admin/guides] Update error:", updateError);

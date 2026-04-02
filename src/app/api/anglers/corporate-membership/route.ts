@@ -2,14 +2,6 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-// Row shape for columns from migration 00030 (not in generated types)
-interface CorporateMembershipRow {
-  id: string;
-  club_id: string;
-  company_name: string | null;
-  clubs: { name: string } | null;
-}
-
 /**
  * GET: Return the authenticated user's active corporate membership (if any).
  * Used by the angler dashboard to conditionally show the employee invite section.
@@ -28,15 +20,13 @@ export async function GET() {
     const admin = createAdminClient();
 
     // Find active corporate membership for this user
-    const { data: rawMembership } = await admin
+    const { data: membership } = await admin
       .from("club_memberships")
-      .select("id, club_id, company_name, clubs(name)" as never)
+      .select("id, club_id, company_name, clubs(name)")
       .eq("user_id", user.id)
-      .eq("membership_type" as never, "corporate")
+      .eq("membership_type", "corporate")
       .eq("status", "active")
       .maybeSingle();
-
-    const membership = rawMembership as unknown as CorporateMembershipRow | null;
 
     if (!membership) {
       return NextResponse.json({ membership: null });

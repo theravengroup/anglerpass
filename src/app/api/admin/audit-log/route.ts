@@ -69,17 +69,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const enriched = (entries ?? []).map(
-      (e: {
-        id: number;
-        actor_id: string | null;
-        action: string;
-        entity_type: string;
-        entity_id: string | null;
-        old_data: unknown;
-        new_data: unknown;
-        created_at: string;
-      }) => ({
+    const enriched = (entries ?? []).map((e) => ({
         ...e,
         actor_name: e.actor_id ? actorMap[e.actor_id] ?? "Unknown" : "System",
       })

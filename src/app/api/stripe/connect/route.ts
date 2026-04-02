@@ -49,7 +49,7 @@ async function stripeGet(path: string) {
 type EntityType = "guide" | "landowner" | "club";
 
 interface EntityRecord {
-  table: string;
+  table: "guide_profiles" | "profiles" | "clubs";
   idColumn: string;
   idValue: string;
   stripeAccountId: string | null;
@@ -63,45 +63,35 @@ async function resolveEntity(
 ): Promise<EntityRecord | null> {
   if (type === "guide") {
     const { data } = await admin
-      .from("guide_profiles" as never)
-      .select("id, stripe_connect_account_id, stripe_connect_onboarded" as never)
-      .eq("user_id" as never, userId as never)
+      .from("guide_profiles")
+      .select("id, stripe_connect_account_id, stripe_connect_onboarded")
+      .eq("user_id", userId)
       .single();
 
     if (!data) return null;
-    const row = data as unknown as {
-      id: string;
-      stripe_connect_account_id: string | null;
-      stripe_connect_onboarded: boolean;
-    };
     return {
       table: "guide_profiles",
       idColumn: "id",
-      idValue: row.id,
-      stripeAccountId: row.stripe_connect_account_id,
-      onboarded: row.stripe_connect_onboarded,
+      idValue: data.id,
+      stripeAccountId: data.stripe_connect_account_id,
+      onboarded: data.stripe_connect_onboarded,
     };
   }
 
   if (type === "landowner") {
     const { data } = await admin
       .from("profiles")
-      .select("id, stripe_connect_account_id, stripe_connect_onboarded" as never)
+      .select("id, stripe_connect_account_id, stripe_connect_onboarded")
       .eq("id", userId)
       .single();
 
     if (!data) return null;
-    const row = data as unknown as {
-      id: string;
-      stripe_connect_account_id: string | null;
-      stripe_connect_onboarded: boolean;
-    };
     return {
       table: "profiles",
       idColumn: "id",
-      idValue: row.id,
-      stripeAccountId: row.stripe_connect_account_id,
-      onboarded: row.stripe_connect_onboarded,
+      idValue: data.id,
+      stripeAccountId: data.stripe_connect_account_id,
+      onboarded: data.stripe_connect_onboarded,
     };
   }
 
@@ -109,23 +99,18 @@ async function resolveEntity(
     // Find the club this user owns
     const { data } = await admin
       .from("clubs")
-      .select("id, stripe_connect_account_id, stripe_connect_onboarded" as never)
+      .select("id, stripe_connect_account_id, stripe_connect_onboarded")
       .eq("owner_id", userId)
       .limit(1)
       .single();
 
     if (!data) return null;
-    const row = data as unknown as {
-      id: string;
-      stripe_connect_account_id: string | null;
-      stripe_connect_onboarded: boolean;
-    };
     return {
       table: "clubs",
       idColumn: "id",
-      idValue: row.id,
-      stripeAccountId: row.stripe_connect_account_id,
-      onboarded: row.stripe_connect_onboarded,
+      idValue: data.id,
+      stripeAccountId: data.stripe_connect_account_id,
+      onboarded: data.stripe_connect_onboarded,
     };
   }
 
@@ -179,9 +164,9 @@ export async function POST(request: NextRequest) {
 
       // Store the account ID in the appropriate table
       await admin
-        .from(entity.table as never)
-        .update({ stripe_connect_account_id: accountId } as never)
-        .eq(entity.idColumn as never, entity.idValue as never);
+        .from(entity.table)
+        .update({ stripe_connect_account_id: accountId })
+        .eq(entity.idColumn, entity.idValue);
     }
 
     // Create an Account Link for onboarding
@@ -250,9 +235,9 @@ export async function GET(request: NextRequest) {
     // Update the DB if status changed
     if (onboarded !== entity.onboarded) {
       await admin
-        .from(entity.table as never)
-        .update({ stripe_connect_onboarded: onboarded } as never)
-        .eq(entity.idColumn as never, entity.idValue as never);
+        .from(entity.table)
+        .update({ stripe_connect_onboarded: onboarded })
+        .eq(entity.idColumn, entity.idValue);
     }
 
     return NextResponse.json({

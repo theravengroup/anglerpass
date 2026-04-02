@@ -18,13 +18,8 @@ export async function GET(
     if (!auth) return jsonError("Unauthorized", 401);
 
     const admin = createAdminClient();
-    const rawClub = await requireClubManager(admin, id, auth.user.id);
-    if (!rawClub) return jsonError("Forbidden", 403);
-
-    const club = rawClub as unknown as {
-      corporate_memberships_enabled?: boolean;
-      corporate_initiation_fee?: number | null;
-    };
+    const club = await requireClubManager(admin, id, auth.user.id);
+    if (!club) return jsonError("Forbidden", 403);
 
     return jsonOk({
       corporate_memberships_enabled: club.corporate_memberships_enabled ?? false,
@@ -74,10 +69,10 @@ export async function PATCH(
 
     const { data: updated, error: updateError } = await admin
       .from("clubs")
-      .update(updates as never)
+      .update(updates)
       .eq("id", id)
       .select(
-        "corporate_memberships_enabled, corporate_initiation_fee" as never
+        "corporate_memberships_enabled, corporate_initiation_fee"
       )
       .single();
 

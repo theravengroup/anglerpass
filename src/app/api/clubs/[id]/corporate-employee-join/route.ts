@@ -8,23 +8,6 @@ const bodySchema = z.object({
   token: z.string().min(1, "Token is required"),
 });
 
-// ─── Row shapes (columns from migration 00030, not in generated types)
-
-interface InvitationRow {
-  id: string;
-  email: string;
-  status: string;
-  club_id: string;
-  corporate_member_id: string;
-  invited_at: string | null;
-}
-
-interface CorporateMembershipRow {
-  id: string;
-  company_name: string | null;
-  user_id: string | null;
-}
-
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -54,20 +37,18 @@ export async function POST(
     const admin = createAdminClient();
 
     // Look up invitation by token
-    const { data: rawInvitation, error: invErr } = await admin
-      .from("corporate_invitations" as never)
-      .select("id, email, status, club_id, corporate_member_id" as never)
-      .eq("token" as never, token)
+    const { data: invitation, error: invErr } = await admin
+      .from("corporate_invitations")
+      .select("id, email, status, club_id, corporate_member_id, invited_at")
+      .eq("token", token)
       .single();
 
-    if (invErr || !rawInvitation) {
+    if (invErr || !invitation) {
       return NextResponse.json(
         { error: "Invalid invitation token" },
         { status: 404 }
       );
     }
-
-    const invitation = rawInvitation as unknown as InvitationRow;
 
     // Verify status is pending
     if (invitation.status !== "pending") {
@@ -101,14 +82,11 @@ export async function POST(
     }
 
     // Get corporate member info
-    const { data: rawCorporateMembership } = await admin
+    const { data: corporateMembership } = await admin
       .from("club_memberships")
-      .select("id, company_name, user_id" as never)
+      .select("id, company_name, user_id")
       .eq("id", invitation.corporate_member_id)
       .single();
-
-    const corporateMembership =
-      rawCorporateMembership as unknown as CorporateMembershipRow | null;
 
     if (!corporateMembership) {
       return NextResponse.json(
@@ -131,7 +109,7 @@ export async function POST(
         invited_email: invitation.email,
         invited_at: invitation.invited_at ?? new Date().toISOString(),
         joined_at: new Date().toISOString(),
-      } as never)
+      })
       .select()
       .single();
 
@@ -145,12 +123,12 @@ export async function POST(
 
     // Update invitation status
     const { error: updateErr } = await admin
-      .from("corporate_invitations" as never)
+      .from("corporate_invitations")
       .update({
         status: "accepted",
         accepted_at: new Date().toISOString(),
-      } as never)
-      .eq("id" as never, invitation.id);
+      })
+      .eq("id", invitation.id);
 
     if (updateErr) {
       console.error(
@@ -186,7 +164,7 @@ export async function POST(
         link: "/angler",
         metadata: {
           club_id: clubId,
-          membership_id: (membership as unknown as { id: string }).id,
+          membership_id: membership.id,
         },
       });
     }

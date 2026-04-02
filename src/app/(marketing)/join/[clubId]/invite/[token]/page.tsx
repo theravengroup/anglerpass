@@ -4,63 +4,37 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import EmployeeJoinCta from "./EmployeeJoinCta";
 
-// ─── Types (columns from migration 00030, not yet in generated types) ───
-
-interface InvitationData {
-  id: string;
-  email: string;
-  status: string;
-  token: string;
-  club_id: string;
-  corporate_member_id: string;
-  invited_at: string;
-  accepted_at: string | null;
-}
-
-interface ClubData {
-  id: string;
-  name: string;
-  description: string | null;
-  location: string | null;
-  annual_dues: number | null;
-}
-
-interface CorporateMemberData {
-  company_name: string | null;
-  sponsor_name: string | null;
-}
-
 // ─── Data fetchers ──────────────────────────────────────────────────
 
-async function getInvitation(token: string): Promise<InvitationData | null> {
+async function getInvitation(token: string) {
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
-      .from("corporate_invitations" as never)
+      .from("corporate_invitations")
       .select(
-        "id, email, status, token, club_id, corporate_member_id, invited_at, accepted_at" as never
+        "id, email, status, token, club_id, corporate_member_id, invited_at, accepted_at"
       )
-      .eq("token" as never, token)
+      .eq("token", token)
       .single();
 
     if (error || !data) return null;
-    return data as unknown as InvitationData;
+    return data;
   } catch {
     return null;
   }
 }
 
-async function getClub(clubId: string): Promise<ClubData | null> {
+async function getClub(clubId: string) {
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
       .from("clubs")
-      .select("id, name, description, location, annual_dues" as never)
+      .select("id, name, description, location, annual_dues")
       .eq("id", clubId)
       .single();
 
     if (error || !data) return null;
-    return data as unknown as ClubData;
+    return data;
   } catch {
     return null;
   }
@@ -68,21 +42,16 @@ async function getClub(clubId: string): Promise<ClubData | null> {
 
 async function getCorporateMember(
   membershipId: string
-): Promise<CorporateMemberData | null> {
+): Promise<{ company_name: string | null; sponsor_name: string | null } | null> {
   try {
     const admin = createAdminClient();
-    const { data: rawMembership, error } = await admin
+    const { data: membership, error } = await admin
       .from("club_memberships")
-      .select("company_name, user_id" as never)
+      .select("company_name, user_id")
       .eq("id", membershipId)
       .single();
 
-    if (error || !rawMembership) return null;
-
-    const membership = rawMembership as unknown as {
-      company_name: string | null;
-      user_id: string | null;
-    };
+    if (error || !membership) return null;
 
     let sponsorName: string | null = null;
     if (membership.user_id) {

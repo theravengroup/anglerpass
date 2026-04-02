@@ -55,8 +55,7 @@ export default async function PropertiesPage() {
   }[] = [];
 
   if (user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (supabase as any)
+    const { data } = await supabase
       .from("properties")
       .select("id, name, status, location_description, water_type, species, capacity, max_rods, max_guests, updated_at")
       .eq("owner_id", user.id)

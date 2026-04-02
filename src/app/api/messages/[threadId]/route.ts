@@ -21,11 +21,11 @@ export async function GET(
     const admin = createAdminClient();
 
     // Verify user is a participant
-    const { data: thread } = await (admin
-      .from("message_threads" as never)
+    const { data: thread } = await admin
+      .from("message_threads")
       .select("id, participant_a, participant_b, booking_id")
-      .eq("id" as never, threadId)
-      .single()) as unknown as { data: { id: string; participant_a: string; participant_b: string; booking_id: string | null } | null };
+      .eq("id", threadId)
+      .single();
 
     if (!thread) {
       return NextResponse.json(
@@ -43,10 +43,10 @@ export async function GET(
     const offset = parseInt(searchParams.get("offset") ?? "0", 10);
 
     const { data: messages, error } = await admin
-      .from("messages" as never)
+      .from("messages")
       .select("id, sender_id, recipient_id, body, read_at, created_at")
-      .eq("thread_id" as never, threadId)
-      .order("created_at" as never, { ascending: true })
+      .eq("thread_id", threadId)
+      .order("created_at", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -59,11 +59,11 @@ export async function GET(
 
     // Mark unread messages as read
     await admin
-      .from("messages" as never)
-      .update({ read_at: new Date().toISOString() } as never)
-      .eq("thread_id" as never, threadId)
-      .eq("recipient_id" as never, user.id)
-      .is("read_at" as never, null);
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .eq("thread_id", threadId)
+      .eq("recipient_id", user.id)
+      .is("read_at", null);
 
     return NextResponse.json({
       messages: messages ?? [],
@@ -97,11 +97,11 @@ export async function POST(
     const admin = createAdminClient();
 
     // Verify user is a participant
-    const { data: thread } = await (admin
-      .from("message_threads" as never)
+    const { data: thread } = await admin
+      .from("message_threads")
       .select("id, participant_a, participant_b, booking_id")
-      .eq("id" as never, threadId)
-      .single()) as unknown as { data: { id: string; participant_a: string; participant_b: string; booking_id: string | null } | null };
+      .eq("id", threadId)
+      .single();
 
     if (!thread) {
       return NextResponse.json(
@@ -131,14 +131,14 @@ export async function POST(
 
     // Create message
     const { data: message, error: msgError } = await admin
-      .from("messages" as never)
+      .from("messages")
       .insert({
         thread_id: threadId,
         sender_id: user.id,
         recipient_id: recipientId,
         body: messageBody,
         booking_id: thread.booking_id,
-      } as never)
+      })
       .select()
       .single();
 
@@ -152,9 +152,9 @@ export async function POST(
 
     // Update thread last_message_at
     await admin
-      .from("message_threads" as never)
-      .update({ last_message_at: new Date().toISOString() } as never)
-      .eq("id" as never, threadId);
+      .from("message_threads")
+      .update({ last_message_at: new Date().toISOString() })
+      .eq("id", threadId);
 
     return NextResponse.json({ message }, { status: 201 });
   } catch (err) {

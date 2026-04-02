@@ -4,21 +4,6 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-// Table not yet in generated Supabase types — will be after migration 00024 is run
-// and types are regenerated. Using explicit types until then.
-interface AnglerClubInvitation {
-  id: string;
-  angler_id: string;
-  club_name: string;
-  admin_email: string;
-  admin_name: string | null;
-  token: string;
-  status: string;
-  club_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
@@ -54,14 +39,13 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Check for duplicate invitation (same angler + same email)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (admin as any)
+    const { data: existing } = await admin
       .from("angler_club_invitations")
       .select("id, status")
       .eq("angler_id", user.id)
       .eq("admin_email", admin_email)
       .in("status", ["sent", "accepted"])
-      .maybeSingle() as { data: Pick<AnglerClubInvitation, "id" | "status"> | null };
+      .maybeSingle();
 
     if (existing) {
       return NextResponse.json(
@@ -85,8 +69,7 @@ export async function POST(request: Request) {
     const anglerName = profile?.display_name ?? "One of your members";
 
     // Create the invitation
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: invitation, error: insertError } = await (admin as any)
+    const { data: invitation, error: insertError } = await admin
       .from("angler_club_invitations")
       .insert({
         angler_id: user.id,
@@ -95,7 +78,7 @@ export async function POST(request: Request) {
         admin_name: admin_name || null,
       })
       .select()
-      .single() as { data: AnglerClubInvitation | null; error: { message: string } | null };
+      .single();
 
     if (insertError || !invitation) {
       console.error("[anglers/invite-club] Insert error:", insertError);
@@ -209,12 +192,11 @@ export async function GET() {
 
     const admin = createAdminClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: invitations, error } = await (admin as any)
+    const { data: invitations, error } = await admin
       .from("angler_club_invitations")
       .select("id, club_name, admin_email, admin_name, status, created_at")
       .eq("angler_id", user.id)
-      .order("created_at", { ascending: false }) as { data: AnglerClubInvitation[] | null; error: { message: string } | null };
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("[anglers/invite-club] Fetch error:", error);

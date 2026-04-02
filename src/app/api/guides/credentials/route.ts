@@ -55,11 +55,11 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
 
     // Verify user has a guide profile
-    const { data: guideProfile } = await (admin
-      .from("guide_profiles" as never)
+    const { data: guideProfile } = await admin
+      .from("guide_profiles")
       .select("id")
-      .eq("user_id" as never, user.id)
-      .single()) as unknown as { data: { id: string } | null };
+      .eq("user_id", user.id)
+      .single();
 
     if (!guideProfile) {
       return NextResponse.json(
@@ -97,12 +97,12 @@ export async function POST(request: Request) {
     // Update the guide profile with the credential URL
     const urlField = `${type}_url`;
     await admin
-      .from("guide_profiles" as never)
+      .from("guide_profiles")
       .update({
         [urlField]: url,
         updated_at: new Date().toISOString(),
-      } as never)
-      .eq("id" as never, guideProfile.id);
+      })
+      .eq("id", guideProfile.id);
 
     return NextResponse.json({ url, type, path }, { status: 201 });
   } catch (err) {

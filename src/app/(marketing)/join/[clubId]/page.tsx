@@ -4,18 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import JoinCta from "./JoinCta";
 
-interface ClubPublicData {
-  id: string;
-  name: string;
-  description: string | null;
-  location: string | null;
-  initiation_fee: number | null;
-  annual_dues: number | null;
-  membership_application_required: boolean;
-  corporate_memberships_enabled: boolean;
-}
-
-async function getClub(clubId: string): Promise<ClubPublicData | null> {
+async function getClub(clubId: string) {
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
@@ -27,7 +16,7 @@ async function getClub(clubId: string): Promise<ClubPublicData | null> {
       .single();
 
     if (error || !data) return null;
-    return data as unknown as ClubPublicData;
+    return data;
   } catch {
     return null;
   }
@@ -101,9 +90,6 @@ export default async function JoinClubPage({
 
   const initiationDisplay = formatCurrency(club.initiation_fee);
   const duesDisplay = formatCurrency(club.annual_dues);
-  // TODO: initiation_fee and annual_dues exist in DB (migration 00022) but may not be
-  // in the generated Supabase TypeScript types yet. The query works via admin client
-  // and the values are cast through `as unknown as ClubPublicData`.
 
   return (
     <>

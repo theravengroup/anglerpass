@@ -29,20 +29,13 @@ export async function POST(
     const admin = createAdminClient();
 
     // Check club exists and has corporate memberships enabled
-    const { data: rawClub } = await admin
+    const { data: club } = await admin
       .from("clubs")
       .select(
-        "id, name, corporate_memberships_enabled, membership_application_required" as never
+        "id, name, corporate_memberships_enabled, membership_application_required"
       )
       .eq("id", clubId)
       .single();
-
-    const club = rawClub as unknown as {
-      id: string;
-      name: string;
-      corporate_memberships_enabled: boolean;
-      membership_application_required: boolean;
-    } | null;
 
     if (!club) {
       return jsonError("Club not found", 404);
@@ -63,12 +56,10 @@ export async function POST(
       .in("status", ["active", "pending"]);
 
     const activeClub = (allMemberships ?? []).find(
-      (m: { id: string; club_id: string; status: string }) =>
-        m.status === "active"
+      (m) => m.status === "active"
     );
     const pendingClub = (allMemberships ?? []).find(
-      (m: { id: string; club_id: string; status: string }) =>
-        m.status === "pending"
+      (m) => m.status === "pending"
     );
 
     if (activeClub && activeClub.club_id !== clubId) {
@@ -109,7 +100,7 @@ export async function POST(
           membership_type: "corporate",
           company_name,
           updated_at: new Date().toISOString(),
-        } as never)
+        })
         .eq("id", existing.id)
         .select()
         .single();
@@ -135,7 +126,7 @@ export async function POST(
         company_name,
         invited_email: auth.user.email,
         joined_at: status === "active" ? new Date().toISOString() : null,
-      } as never)
+      })
       .select()
       .single();
 

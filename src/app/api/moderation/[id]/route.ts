@@ -1,5 +1,6 @@
 import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
 import { moderationActionSchema } from "@/lib/validations/moderation";
+import type { Json } from "@/types/supabase";
 
 const ACTION_TO_STATUS: Record<string, string> = {
   approved: "published",
@@ -83,8 +84,8 @@ export async function POST(
         action: `moderation.${action}`,
         entity_type: "property",
         entity_id: id,
-        old_data: { status: oldStatus },
-        new_data: { status: newStatus, notes },
+        old_data: { status: oldStatus } as Json,
+        new_data: { status: newStatus, notes } as Json,
       });
 
     if (auditError) {

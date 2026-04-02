@@ -62,22 +62,20 @@ export async function POST(request: Request) {
       const { createAdminClient } = await import("@/lib/supabase/admin");
       const supabase = createAdminClient();
 
-      const { error } = await (
-        supabase.from("migration_inquiries" as never) as unknown as {
-          insert: (row: Record<string, unknown>) => Promise<{ error: { message: string; code: string } | null }>;
-        }
-      ).insert({
-        club_name: data.clubName,
-        contact_name: data.contactName,
-        email: data.email,
-        member_count: data.memberCount,
-        data_source: data.dataSource,
-        website_platform: data.websitePlatform ?? null,
-        multiyear_interest: data.multiyearInterest ?? null,
-        target_launch: data.targetLaunch || null,
-        loom_url: data.loomUrl,
-        notes: data.notes ?? null,
-      });
+      const { error } = await supabase
+        .from("migration_inquiries")
+        .insert({
+          club_name: data.clubName,
+          contact_name: data.contactName,
+          email: data.email,
+          member_count: data.memberCount,
+          data_source: data.dataSource,
+          website_platform: data.websitePlatform ?? null,
+          multiyear_interest: data.multiyearInterest ?? null,
+          target_launch: data.targetLaunch || null,
+          loom_url: data.loomUrl,
+          notes: data.notes ?? null,
+        });
 
       if (error) {
         console.error("[migration-inquiry] Insert error:", error);

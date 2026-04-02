@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_PHOTOS } from "@/lib/validations/properties";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB server-side limit
@@ -35,8 +36,8 @@ export async function POST(request: Request) {
     }
 
     // Verify property ownership and check current photo count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: property } = await (supabase as any)
+    const admin = createAdminClient();
+    const { data: property } = await admin
       .from("properties")
       .select("id, owner_id, photos")
       .eq("id", propertyId)

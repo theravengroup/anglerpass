@@ -16,8 +16,7 @@ export default async function ModerationPage() {
   const supabase = await createClient();
 
   // Fetch all pending_review properties with owner info
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: properties } = await (supabase as any)
+  const { data: properties } = await supabase
     .from("properties")
     .select("id, name, status, location_description, photos, capacity, created_at, updated_at, owner_id")
     .eq("status", "pending_review")
@@ -28,8 +27,7 @@ export default async function ModerationPage() {
   let owners: Record<string, string> = {};
 
   if (ownerIds.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: profiles } = await (supabase as any)
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("id, display_name")
       .in("id", ownerIds);
