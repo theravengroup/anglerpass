@@ -179,7 +179,7 @@ nav.scrolled .nav-login-link:hover{color:var(--bronze)}
 .cinematic-divider-content .eyebrow{color:var(--sand)}
 .cinematic-divider-content h2{font-family:var(--heading);font-size:clamp(30px,4vw,44px);font-weight:400;font-style:italic;line-height:1.25;margin-top:12px;color:rgba(255,255,255,.9);letter-spacing:-.3px}
 .divider-line{width:50px;height:2px;background:var(--bronze);margin:0 auto 16px}
-.cinematic-divider-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--offwhite) 0%,transparent 18%,transparent 82%,var(--offwhite) 100%);pointer-events:none}
+.cinematic-divider-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--offwhite) 0%,color-mix(in srgb,var(--offwhite) 80%,transparent) 6%,color-mix(in srgb,var(--offwhite) 50%,transparent) 12%,color-mix(in srgb,var(--offwhite) 25%,transparent) 18%,transparent 28%,transparent 72%,color-mix(in srgb,var(--offwhite) 25%,transparent) 82%,color-mix(in srgb,var(--offwhite) 50%,transparent) 88%,color-mix(in srgb,var(--offwhite) 80%,transparent) 94%,var(--offwhite) 100%);pointer-events:none}
 
 /* ═══ HOW IT WORKS ═══ */
 .how-it-works{padding:var(--section-pad) 0;background:var(--offwhite)}
