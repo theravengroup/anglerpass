@@ -184,7 +184,7 @@ export default function GuidesPage() {
               href="#features"
               className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
             >
-              Learn More
+              See How It Works
             </Link>
           </div>
         </div>
