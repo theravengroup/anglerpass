@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import type { Json } from "@/types/supabase";
 
 // ─── GET: Fetch all platform settings ──────────────────────────────
@@ -33,7 +33,7 @@ export async function GET() {
       };
     }
 
-    return jsonSuccess({ settings });
+    return jsonOk({ settings });
   } catch (err) {
     console.error("[admin/settings] GET error:", err);
     return jsonError("Internal server error", 500);
@@ -109,7 +109,7 @@ export async function PATCH(request: NextRequest) {
         }
       });
 
-    return jsonSuccess({
+    return jsonOk({
       setting: {
         key: updated.key,
         value: updated.value,

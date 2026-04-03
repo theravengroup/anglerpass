@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
 
 const PAGE_SIZE = 50;
 
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
       })
     );
 
-    return jsonSuccess({
+    return jsonOk({
       entries: enriched,
       total: count ?? 0,
       page,

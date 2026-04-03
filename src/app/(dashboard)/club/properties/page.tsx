@@ -11,7 +11,7 @@ import {
   XCircle,
   Droplets,
 } from "lucide-react";
-import { WATER_TYPE_LABELS } from "@/lib/constants/status";
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 import { FetchError } from "@/components/shared/FetchError";
 
 interface PropertyAccess {

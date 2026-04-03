@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { moderationActionSchema } from "@/lib/validations/moderation";
 import type { Json } from "@/types/supabase";
 
@@ -92,7 +92,7 @@ export async function POST(
       console.error("[moderation] Audit log error:", auditError);
     }
 
-    return jsonSuccess({ property: { id, status: newStatus } });
+    return jsonOk({ property: { id, status: newStatus } });
   } catch (err) {
     console.error("[moderation] Unexpected error:", err);
     return jsonError("Internal server error", 500);
@@ -120,7 +120,7 @@ export async function GET(
       return jsonError("Failed to fetch moderation history", 500);
     }
 
-    return jsonSuccess({ notes: data ?? [] });
+    return jsonOk({ notes: data ?? [] });
   } catch (err) {
     console.error("[moderation] Unexpected error:", err);
     return jsonError("Internal server error", 500);

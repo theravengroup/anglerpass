@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { z } from "zod";
 import type { Json } from "@/types/supabase";
 
@@ -157,7 +157,7 @@ export async function GET(
       })
     );
 
-    return jsonSuccess({
+    return jsonOk({
       club: {
         ...club,
         owner_name: ownerName,
@@ -239,7 +239,7 @@ export async function PATCH(
       new_data: updates as Json,
     });
 
-    return jsonSuccess({ club: updated });
+    return jsonOk({ club: updated });
   } catch (err) {
     console.error("[admin/clubs] Error:", err);
     return jsonError("Internal server error", 500);

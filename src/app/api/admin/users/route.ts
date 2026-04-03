@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk, parsePositiveInt, escapeIlike } from "@/lib/api/helpers";
 import { VALID_ROLES } from "@/lib/constants/status";
 import type { Json } from "@/types/supabase";
 
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
       })
     );
 
-    return jsonSuccess({
+    return jsonOk({
       users: enriched,
       total: count ?? 0,
       page,
@@ -144,7 +144,7 @@ export async function PATCH(request: Request) {
           new_data: { role } as Json,
         });
 
-        return jsonSuccess({ success: true, role });
+        return jsonOk({ success: true, role });
       }
 
       case "suspend": {
@@ -174,7 +174,7 @@ export async function PATCH(request: Request) {
           new_data: { suspended_at: now, reason: suspendReason } as Json,
         });
 
-        return jsonSuccess({ success: true, suspended: true });
+        return jsonOk({ success: true, suspended: true });
       }
 
       case "unsuspend": {
@@ -201,7 +201,7 @@ export async function PATCH(request: Request) {
           new_data: { suspended_at: null } as Json,
         });
 
-        return jsonSuccess({ success: true, suspended: false });
+        return jsonOk({ success: true, suspended: false });
       }
 
       default:

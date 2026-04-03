@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Resend } from "resend";
-import { requireAdmin, jsonError, jsonSuccess } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import type { Json } from "@/types/supabase";
 
 const resend = process.env.RESEND_API_KEY
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         } as Json,
       });
 
-      return jsonSuccess({
+      return jsonOk({
         message: "User has been promoted to admin",
         promoted: true,
       });
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     // Send invitation email
     await sendInviteEmail(email, inviterName, false);
 
-    return jsonSuccess(
+    return jsonOk(
       { message: "Invitation sent", invited: true },
       201
     );
@@ -186,7 +186,7 @@ export async function GET() {
       return jsonError("Failed to fetch invitations", 500);
     }
 
-    return jsonSuccess({ admins, recentInvites: recentInvites ?? [] });
+    return jsonOk({ admins, recentInvites: recentInvites ?? [] });
   } catch (err) {
     console.error("[admin/invite] Unexpected error:", err);
     return jsonError("Internal server error", 500);

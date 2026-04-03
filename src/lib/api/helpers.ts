@@ -18,11 +18,6 @@ export function jsonError(message: string, status = 500) {
   return Response.json({ error: message }, { status });
 }
 
-/** @deprecated Use jsonOk instead */
-export function jsonSuccess<T>(data: T, status = 200) {
-  return Response.json(data, { status });
-}
-
 // ─── Authentication Helpers ─────────────────────────────────────────
 
 interface AuthResult {

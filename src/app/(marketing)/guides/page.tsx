@@ -176,10 +176,10 @@ export default function GuidesPage() {
           </p>
           <div className="flex gap-[14px] justify-center flex-wrap">
             <Link
-              href="/signup"
+              href="/#waitlist"
               className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
             >
-              Apply as a Guide &rarr;
+              Join the Waitlist &rarr;
             </Link>
             <Link
               href="#features"
@@ -359,10 +359,10 @@ export default function GuidesPage() {
             </div>
 
             <Link
-              href="/signup"
+              href="/#waitlist"
               className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-[14px] font-medium tracking-[0.3px] no-underline bg-charcoal text-white transition-all duration-[400ms]"
             >
-              Apply as a Guide &rarr;
+              Join the Waitlist &rarr;
             </Link>
           </div>
         </div>
@@ -398,10 +398,10 @@ export default function GuidesPage() {
             across the country. Your next client is already looking.
           </p>
           <Link
-            href="/signup"
+            href="/#waitlist"
             className="inline-flex items-center gap-2 px-10 py-[18px] rounded-md text-[15px] font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
           >
-            Apply as a Guide &rarr;
+            Join the Waitlist &rarr;
           </Link>
         </div>
       </section>

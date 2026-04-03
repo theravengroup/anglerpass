@@ -123,8 +123,7 @@ export default function Nav() {
           </li>
         </ul>
         <div className="nav-cta">
-          <a href="/login" className="nav-login-link">Log In</a>
-          <a href="/signup" className="btn btn-primary">Sign Up</a>
+          <a href="/login" className="btn btn-login">Log In</a>
         </div>
         <button
           className="mobile-toggle"
@@ -147,7 +146,7 @@ export default function Nav() {
             gap: '4px',
           }}
         >
-          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/login', label: 'Log In' }, { anchor: '/signup', label: 'Sign Up' }].map((item) =>
+          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/login', label: 'Log In' }].map((item) =>
             isHomepage ? (
               <a
                 key={item.anchor}

@@ -18,6 +18,7 @@ import {
 import BookingForm from "@/components/angler/BookingForm";
 import PropertyReviewSection from "@/components/reviews/PropertyReviewSection";
 import PropertyWeather from "@/components/properties/PropertyWeather";
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 
 interface PropertyDetail {
   id: string;
@@ -46,16 +47,6 @@ interface PropertyDetail {
     club_name: string;
   }[];
 }
-
-const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
 
 export default function PropertyDetailPage() {
   const { id } = useParams();

@@ -23,10 +23,8 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
-import {
-  STATUS_BADGE_COLORS,
-  WATER_TYPE_LABELS,
-} from "@/lib/constants/status";
+import { STATUS_BADGE_COLORS } from "@/lib/constants/status";
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 import { downloadCSV } from "@/lib/csv";
 import InviteClubCard from "@/components/angler/InviteClubCard";
 import CorporateInviteSection from "@/components/angler/CorporateInviteSection";

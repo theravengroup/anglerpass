@@ -288,22 +288,6 @@ function escapeHtml(str: string): string {
 
 // ─── Convenience Helpers ────────────────────────────────────────────
 
-/** @deprecated Use notifyBookingCreated instead (instant-book) */
-export async function notifyBookingRequested(
-  admin: SupabaseClient,
-  opts: {
-    landownerId: string;
-    anglerName: string;
-    propertyName: string;
-    bookingDate: string;
-    duration: string;
-    partySize: number;
-    bookingId: string;
-  }
-) {
-  return notifyBookingCreated(admin, opts);
-}
-
 /** Notify landowner that a new booking was made on their property (informational, not action-required) */
 export async function notifyBookingCreated(
   admin: SupabaseClient,

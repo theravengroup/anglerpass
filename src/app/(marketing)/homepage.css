@@ -76,6 +76,10 @@ nav.scrolled .mobile-toggle span{background:var(--text-primary)}
 .nav-login-link:hover{color:#fff}
 nav.scrolled .nav-login-link{color:var(--text-primary)}
 nav.scrolled .nav-login-link:hover{color:var(--bronze)}
+.nav-cta .btn-login{background:transparent;color:rgba(255,255,255,.9);border:1.5px solid rgba(255,255,255,.3);padding:10px 22px;font-size:13px}
+.nav-cta .btn-login:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5);color:#fff;transform:translateY(-2px)}
+nav.scrolled .nav-cta .btn-login{color:var(--forest);border-color:var(--forest)}
+nav.scrolled .nav-cta .btn-login:hover{background:var(--forest);color:#fff}
 
 /* ═══ HERO ═══ */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 100px;overflow:hidden}

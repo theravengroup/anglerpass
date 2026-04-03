@@ -171,16 +171,8 @@ export const PROPERTY_STATUS: Record<string, StatusConfig> = {
 };
 
 // ─── Water Types ────────────────────────────────────────────────────
-
-export const WATER_TYPE_LABELS: Record<string, string> = {
-  river: "River",
-  stream: "Stream",
-  lake: "Lake",
-  pond: "Pond",
-  spring_creek: "Spring Creek",
-  tailwater: "Tailwater",
-  reservoir: "Reservoir",
-};
+// Canonical source: @/lib/constants/water-types
+export { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 
 // ─── Roles ──────────────────────────────────────────────────────────
 
@@ -189,6 +181,7 @@ export const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
   club_admin: "Club Admin",
   admin: "Admin",
+  guide: "Guide",
 };
 
 export const ROLE_BADGE_COLORS: Record<string, string> = {
@@ -196,9 +189,11 @@ export const ROLE_BADGE_COLORS: Record<string, string> = {
   landowner: "text-forest bg-forest/10",
   club_admin: "text-river bg-river/10",
   admin: "text-charcoal bg-charcoal/10",
+  guide: "text-charcoal bg-charcoal/10",
 };
 
-export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin"] as const;
+export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin", "guide"] as const;
+// Canonical UserRole is in @/types/roles. This re-derives from VALID_ROLES for consistency.
 export type UserRole = (typeof VALID_ROLES)[number];
 
 // ─── Staff Discount Rates ────────────────────────────────────────────

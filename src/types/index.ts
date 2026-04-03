@@ -1,4 +1,6 @@
-export type UserRole = "landowner" | "club_admin" | "angler" | "admin";
+// Canonical UserRole is defined in @/types/roles (includes "guide")
+import type { UserRole } from "./roles";
+export type { UserRole };
 
 export type InterestType = "landowner" | "club" | "angler" | "investor" | "other";
 

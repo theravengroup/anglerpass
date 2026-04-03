@@ -155,13 +155,14 @@ function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
-        Don&apos;t have an account?{" "}
+        Early Access account creation is coming soon.{" "}
         <Link
-          href="/signup"
+          href="/#waitlist"
           className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
         >
-          Create one
-        </Link>
+          Join the waitlist
+        </Link>{" "}
+        to be first in line.
       </p>
     </div>
   );

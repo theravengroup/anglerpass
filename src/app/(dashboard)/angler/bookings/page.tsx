@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   X,
 } from "lucide-react";
-import { BOOKING_STATUS, WATER_TYPE_LABELS } from "@/lib/constants/status";
+import { BOOKING_STATUS } from "@/lib/constants/status";
+import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 
 interface Booking {
   id: string;

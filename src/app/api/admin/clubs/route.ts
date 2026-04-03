@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk, parsePositiveInt } from "@/lib/api/helpers";
 
 const PAGE_SIZE = 25;
 const VALID_SORT_FIELDS = ["created_at", "name", "location", "subscription_tier"];
@@ -142,7 +142,7 @@ export async function GET(request: Request) {
       })
     );
 
-    return jsonSuccess({
+    return jsonOk({
       clubs: enriched,
       total: count ?? 0,
       page,

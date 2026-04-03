@@ -1,4 +1,4 @@
-import { requireAdmin, jsonError, jsonSuccess, parsePositiveInt } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk, parsePositiveInt } from "@/lib/api/helpers";
 
 const PAGE_SIZE = 25;
 const VALID_SORT_FIELDS = ["created_at", "updated_at", "name", "status"];
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
       })
     );
 
-    return jsonSuccess({
+    return jsonOk({
       properties: enriched,
       total: count ?? 0,
       page,
