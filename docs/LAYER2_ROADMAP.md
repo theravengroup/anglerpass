@@ -471,6 +471,38 @@ The following review enhancements are planned for a future phase. None are sched
 
 ---
 
+## Member Communication Module — Phase 2 Features
+
+The following member communication features are planned for post-launch. At launch, clubs have basic email notifications (booking confirmations, membership approvals, referral invites). The full communication module will be built once clubs are active and we have real usage patterns to inform the design.
+
+**Planned:**
+
+- **Club-wide announcements**
+  Club admins can compose and send announcements to their entire membership. Simple rich-text editor (bold, italic, links). Announcements are delivered via email and stored in an in-app announcement feed visible on the club dashboard.
+
+- **Targeted messaging by tier or status**
+  Send messages to specific segments: active members only, pending members, members by tier (if tiered membership is configured), or members who haven't booked in X days. Built on top of club membership data and booking history.
+
+- **Event & season notices**
+  Pre-built templates for common club communications: season opener, hatch reports, property closures, tournament announcements, annual meeting notices. Club admins fill in the details and send.
+
+- **Scheduled announcements**
+  Queue announcements for future delivery. Useful for season openers, renewal reminders, and holiday schedules.
+
+- **Newsletter system**
+  Recurring digest email summarizing recent club activity: new properties added, upcoming availability, recent member achievements, club news. Configurable frequency (weekly, biweekly, monthly). Auto-generated from platform data with optional custom content block.
+
+- **Custom member groups**
+  Club admins can create named groups (e.g., "Tournament Team," "Board Members," "New Members 2026") and send targeted messages to those groups. Groups are manually managed — no auto-segmentation in v1.
+
+- **Member communication preferences**
+  Per-member opt-in/opt-out for announcement emails, newsletters, and event notices. Required for CAN-SPAM compliance. Preferences managed in the member's club dashboard settings.
+
+- **Communication history & analytics**
+  Club admins can view a log of all sent communications with delivery stats (sent, opened, bounced). Powered by Resend webhooks for open/bounce tracking.
+
+---
+
 ## Phase Dependency Graph
 
 ```

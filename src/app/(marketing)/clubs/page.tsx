@@ -65,7 +65,7 @@ const features = [
   {
     title: 'Member Communication',
     description:
-      'Send announcements, event notices, and updates to your membership. Targeted messaging by tier, activity, or custom groups.',
+      'Keep your members informed with announcements, event notices, and club updates delivered straight to their inbox.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -186,7 +186,7 @@ export default function ClubsPage() {
                 name: 'Standard',
                 price: '$199',
                 description: 'For established clubs managing active rosters.',
-                features: ['Up to 500 members', 'Up to 50 properties', 'Advanced scheduling & rotation', 'Member communication tools', 'Financial reporting', 'Priority support'],
+                features: ['Up to 500 members', 'Up to 50 properties', 'Advanced scheduling & rotation', 'Member email notifications', 'Financial reporting', 'Priority support'],
                 highlight: true,
               },
               {
