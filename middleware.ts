@@ -14,7 +14,7 @@ const PROTECTED_PREFIXES = [
 ];
 
 /** Public marketing pages whose paths happen to start with protected prefixes */
-const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers", "/guides", "/anglerpassroadmap"]);
+const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers", "/guides"]);
 
 const AUTH_ROUTES = new Set([
   "/login",
