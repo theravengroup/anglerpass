@@ -6,7 +6,7 @@ const DASHBOARDS = [
   {
     key: 'landowner',
     label: 'Landowner Dashboard',
-    description: 'Manage your properties, track bookings, and control access to your private waters.',
+    description: 'Manage your properties, track bookings and revenue, and see who\u2019s on your water.',
   },
   {
     key: 'club',
@@ -58,15 +58,15 @@ function LandownerPreview() {
         </div>
       </div>
 
-      {/* Pending requests */}
+      {/* Upcoming bookings */}
       <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>
-        Pending Booking Requests
+        Upcoming Bookings
       </div>
       <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
         {[
-          { name: 'M. Thompson', club: 'Trout Unlimited #412', property: 'East Fork', date: 'Apr 4-5', rods: 2 },
-          { name: 'R. Chen', club: 'Madison River Club', property: 'East Fork', date: 'Apr 12', rods: 1 },
-          { name: 'S. Williams', club: 'Big Sky Anglers', property: 'Elk Meadow', date: 'Apr 18-19', rods: 3 },
+          { name: 'M. Thompson', club: 'Trout Unlimited #412', property: 'East Fork', date: 'Apr 4-5', rods: 2, payout: '$450' },
+          { name: 'R. Chen', club: 'Madison River Club', property: 'East Fork', date: 'Apr 12', rods: 1, payout: '$225' },
+          { name: 'S. Williams', club: 'Big Sky Anglers', property: 'Elk Meadow', date: 'Apr 18-19', rods: 3, payout: '$900' },
         ].map((req, i) => (
           <div
             key={i}
@@ -88,10 +88,8 @@ function LandownerPreview() {
               <span style={{ color: 'var(--text-secondary)' }}>{req.property}</span>
               <span style={{ color: 'var(--text-light)' }}>{req.date}</span>
               <span style={{ color: 'var(--text-light)' }}>{req.rods} rod{req.rods > 1 ? 's' : ''}</span>
-              <div style={{ display: 'flex', gap: 4 }}>
-                <span style={{ padding: '3px 10px', borderRadius: 4, background: accent, color: '#fff', fontSize: 10, fontWeight: 600, cursor: 'default' }}>Approve</span>
-                <span style={{ padding: '3px 10px', borderRadius: 4, background: 'var(--offwhite)', color: 'var(--text-light)', fontSize: 10, fontWeight: 600, cursor: 'default' }}>Decline</span>
-              </div>
+              <span style={{ fontWeight: 600, color: accent }}>{req.payout}</span>
+              <span style={{ padding: '3px 10px', borderRadius: 4, background: '#4a8c5c12', color: '#4a8c5c', fontSize: 10, fontWeight: 600 }}>Confirmed</span>
             </div>
           </div>
         ))}

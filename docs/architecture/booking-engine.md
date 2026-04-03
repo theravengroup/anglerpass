@@ -6,58 +6,40 @@ The booking engine is the core transactional system of AnglerPass. It handles av
 
 ---
 
-## Booking Types
+## Booking Model
 
-### Instant Book
-The angler selects a date and number of rods, pays immediately, and receives a confirmed booking. No landowner approval step. Suitable for high-volume properties where the landowner trusts the platform to manage access.
+### Instant Book (Default)
+The angler selects a date and number of rods, pays immediately, and receives a confirmed booking. No landowner approval step. This is the default for all properties.
 
-Enabled per-property via `properties.instant_book = true`.
-
-### Request to Book
-The angler submits a booking request. The landowner receives a notification and has 48 hours to confirm or decline. If no response, the request expires automatically.
-
-This is the default for all properties. Most private water landowners want to vet each booking.
+The core trust model: clubs vet their members, so landowners don't need to approve or decline individual bookings. Landowners receive informational notifications when bookings are made on their properties, but the booking is confirmed immediately. This reduces friction for anglers and removes operational burden from landowners — which is a key part of the value proposition.
 
 ---
 
 ## Booking State Machine
 
 ```
-                                  +---> Completed ---> Reviewed
-                                  |
-Requested ---> Confirmed ---> [fishing day passes]
-    |              |
-    |              +---> Cancelled (by angler or landowner)
+Confirmed ---> [fishing day passes] ---> Completed ---> Reviewed
     |
-    +---> Declined (by landowner)
-    |
-    +---> Expired (48h no response)
+    +---> Cancelled (by angler)
 ```
 
 ### States
 
 | State       | Description                                                     |
 |-------------|-----------------------------------------------------------------|
-| `requested` | Angler submitted request. Awaiting landowner response.          |
-| `confirmed` | Landowner approved (or instant book). Payment captured.         |
+| `pending`   | Booking created, awaiting payment processing.                   |
+| `confirmed` | Payment captured. Booking is live. Landowner notified.          |
 | `completed` | Fishing day has passed. Eligible for review.                    |
 | `reviewed`  | Angler submitted a review. Terminal state.                      |
-| `cancelled` | Cancelled by angler or landowner before the fishing day.        |
-| `declined`  | Landowner declined the request.                                 |
-| `expired`   | Landowner did not respond within 48 hours.                      |
+| `cancelled` | Cancelled by angler before the fishing day.                     |
 
 ### Transition Rules
 
 | From        | To          | Actor         | Side Effects                                |
 |-------------|-------------|---------------|---------------------------------------------|
-| requested   | confirmed   | Landowner     | Payment captured, GPS revealed, notification|
-| requested   | confirmed   | System        | Instant book: immediate on creation         |
-| requested   | declined    | Landowner     | Notification to angler, hold released       |
-| requested   | expired     | System (cron) | After 48h, notification to both parties     |
-| requested   | cancelled   | Angler        | Hold released                               |
+| pending     | confirmed   | System        | Payment captured, GPS revealed, notification|
 | confirmed   | completed   | System (cron) | Day after fishing date                      |
 | confirmed   | cancelled   | Angler        | Refund policy applies                       |
-| confirmed   | cancelled   | Landowner     | Full refund to angler, penalty possible      |
 | completed   | reviewed    | Angler        | Review submitted                            |
 
 ---

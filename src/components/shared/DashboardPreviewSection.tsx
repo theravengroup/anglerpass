@@ -89,12 +89,12 @@ function LandownerDashboard() {
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Pending Booking Requests</div>
+      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Upcoming Bookings</div>
       <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
         {[
-          { name: 'M. Thompson', club: 'Trout Unlimited #412', property: 'East Fork', date: 'Apr 4–5', rods: 2 },
-          { name: 'R. Chen', club: 'Madison River Club', property: 'East Fork', date: 'Apr 12', rods: 1 },
-          { name: 'S. Williams', club: 'Big Sky Anglers', property: 'Elk Meadow', date: 'Apr 18–19', rods: 3 },
+          { name: 'M. Thompson', club: 'Trout Unlimited #412', property: 'East Fork', date: 'Apr 4–5', rods: 2, payout: '$450' },
+          { name: 'R. Chen', club: 'Madison River Club', property: 'East Fork', date: 'Apr 12', rods: 1, payout: '$225' },
+          { name: 'S. Williams', club: 'Big Sky Anglers', property: 'Elk Meadow', date: 'Apr 18–19', rods: 3, payout: '$900' },
         ].map((req, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 12, borderBottom: i < 2 ? '1px solid var(--border)' : 'none', background: i === 0 ? 'rgba(26,58,42,.03)' : 'transparent' }}>
             <div style={{ flex: 1 }}>
@@ -105,10 +105,8 @@ function LandownerDashboard() {
               <span style={{ color: 'var(--text-secondary)' }}>{req.property}</span>
               <span style={{ color: 'var(--text-light)' }}>{req.date}</span>
               <span style={{ color: 'var(--text-light)' }}>{req.rods} rod{req.rods > 1 ? 's' : ''}</span>
-              <div style={{ display: 'flex', gap: 4 }}>
-                <span style={{ padding: '3px 10px', borderRadius: 4, background: accent, color: '#fff', fontSize: 10, fontWeight: 600 }}>Approve</span>
-                <span style={{ padding: '3px 10px', borderRadius: 4, background: 'var(--offwhite)', color: 'var(--text-light)', fontSize: 10, fontWeight: 600 }}>Decline</span>
-              </div>
+              <span style={{ fontWeight: 600, color: accent }}>{req.payout}</span>
+              <span style={{ padding: '3px 10px', borderRadius: 4, background: '#4a8c5c12', color: '#4a8c5c', fontSize: 10, fontWeight: 600 }}>Confirmed</span>
             </div>
           </div>
         ))}
@@ -338,7 +336,7 @@ const CONFIG: Record<Role, { url: string; accentColor: string; description: stri
   landowner: {
     url: 'app.anglerpass.com/landowner',
     accentColor: 'forest',
-    description: 'Manage your properties, track bookings, and control access to your private waters — all from one dashboard.',
+    description: 'Manage your properties, track bookings and revenue, and see who\u2019s on your water — all from one dashboard.',
     Component: LandownerDashboard,
   },
   club: {
