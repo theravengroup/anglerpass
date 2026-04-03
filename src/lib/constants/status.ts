@@ -192,9 +192,8 @@ export const ROLE_BADGE_COLORS: Record<string, string> = {
   guide: "text-charcoal bg-charcoal/10",
 };
 
+export { type UserRole } from "@/types/roles";
 export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin", "guide"] as const;
-// Canonical UserRole is in @/types/roles. This re-derives from VALID_ROLES for consistency.
-export type UserRole = (typeof VALID_ROLES)[number];
 
 // ─── Staff Discount Rates ────────────────────────────────────────────
 // Re-exported for backward compatibility. Canonical source: @/lib/constants/fees
