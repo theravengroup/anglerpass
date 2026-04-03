@@ -334,87 +334,6 @@ export type Database = {
           },
         ]
       }
-      cross_club_agreements: {
-        Row: {
-          id: string
-          club_a_id: string
-          club_b_id: string
-          status: string
-          proposed_by: string
-          accepted_by: string | null
-          proposed_at: string
-          accepted_at: string | null
-          revoked_at: string | null
-          revoked_by: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          club_a_id: string
-          club_b_id: string
-          status?: string
-          proposed_by: string
-          accepted_by?: string | null
-          proposed_at?: string
-          accepted_at?: string | null
-          revoked_at?: string | null
-          revoked_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          club_a_id?: string
-          club_b_id?: string
-          status?: string
-          proposed_by?: string
-          accepted_by?: string | null
-          proposed_at?: string
-          accepted_at?: string | null
-          revoked_at?: string | null
-          revoked_by?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cross_club_agreements_club_a_id_fkey"
-            columns: ["club_a_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_club_agreements_club_b_id_fkey"
-            columns: ["club_b_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_club_agreements_proposed_by_fkey"
-            columns: ["proposed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_club_agreements_accepted_by_fkey"
-            columns: ["accepted_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cross_club_agreements_revoked_by_fkey"
-            columns: ["revoked_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       club_memberships: {
         Row: {
           cancellation_effective_date: string | null
@@ -714,6 +633,87 @@ export type Database = {
             columns: ["corporate_member_id"]
             isOneToOne: false
             referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cross_club_agreements: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          club_a_id: string
+          club_b_id: string
+          created_at: string
+          id: string
+          proposed_at: string
+          proposed_by: string
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          club_a_id: string
+          club_b_id: string
+          created_at?: string
+          id?: string
+          proposed_at?: string
+          proposed_by: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          club_a_id?: string
+          club_b_id?: string
+          created_at?: string
+          id?: string
+          proposed_at?: string
+          proposed_by?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_club_agreements_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_club_agreements_club_a_id_fkey"
+            columns: ["club_a_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_club_agreements_club_b_id_fkey"
+            columns: ["club_b_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_club_agreements_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_club_agreements_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2375,7 +2375,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      is_cross_club_eligible: { Args: { p_club_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
