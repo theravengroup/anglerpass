@@ -432,7 +432,7 @@ export default function DashboardPreviewModal({
           </p>
 
           <p style={{ marginTop: 12, fontSize: 12, color: 'var(--text-light)', fontStyle: 'italic' }}>
-            Dashboards are under active development. Sign up to get early access.
+            Dashboards are under active development. Join the waitlist for early access.
           </p>
         </div>
       </div>

@@ -54,7 +54,7 @@ const faqs = [
   {
     value: "getting-started",
     q: "How do I get my club set up on AnglerPass?",
-    a: "Sign up, choose your subscription tier, and fill out your club profile with a name, description, location, and rules. From there you can start inviting members, requesting property access, and customizing your initiation fees and dues. Most clubs are fully operational within a day or two of signing up.",
+    a: "Once AnglerPass launches, you\u2019ll choose your subscription tier and fill out your club profile with a name, description, location, and rules. From there you can start inviting members, requesting property access, and customizing your initiation fees and dues. Most clubs will be fully operational within a day or two.",
   },
 ];
 

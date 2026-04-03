@@ -14,18 +14,18 @@ export default function CorporateJoinCta({
   return (
     <div className="space-y-4 text-center">
       <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-forest">
-        Ready to join {clubName} as a corporate member?
+        Interested in joining {clubName} as a corporate member?
       </h2>
       <p className="text-sm text-text-secondary">
-        Create your AnglerPass account to apply for a corporate membership.
-        Already have an account? Sign in and we&rsquo;ll link you to this club.
+        AnglerPass is currently in Early Access. Join the waitlist and
+        we&rsquo;ll notify you when corporate memberships open for {clubName}.
       </p>
       <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
-          href={`/signup?role=angler&clubId=${clubId}&membership=corporate`}
+          href="/#waitlist"
           className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-forest px-8 py-3.5 text-sm font-medium tracking-wide text-white transition-colors hover:bg-forest-deep sm:w-auto"
         >
-          Create Account &amp; Join as Corporate Member
+          Join the Waitlist
         </Link>
         <Link
           href={`/login?clubId=${clubId}`}

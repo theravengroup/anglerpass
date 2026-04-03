@@ -87,7 +87,7 @@ const howItWorks = [
   {
     step: '01',
     title: 'Create Your Profile',
-    description: 'Sign up, add your techniques, species specialties, location, and set your rates. Upload your guide license, insurance, and first aid certification.',
+    description: 'Create your profile, add your techniques, species specialties, location, and set your rates. Upload your guide license, insurance, and first aid certification.',
   },
   {
     step: '02',
