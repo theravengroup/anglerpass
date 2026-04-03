@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const joinSchema = z.object({
   club_id: z.uuid(),
+  referral_code: z.string().max(20).optional(),
 });
 
 // POST: Request to join a club
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { club_id } = parsed.data;
+    const { club_id, referral_code } = parsed.data;
     const admin = createAdminClient();
 
     // Check club exists
@@ -113,23 +114,147 @@ export async function POST(request: Request) {
       });
     }
 
+    // Resolve referral code if provided
+    // Uses raw PostgREST because referral_code column is added by migration 00041
+    let referredBy: string | null = null;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (referral_code && supabaseUrl && serviceKey) {
+      try {
+        const refUrl = new URL(`${supabaseUrl}/rest/v1/club_memberships`);
+        refUrl.searchParams.set("select", "id,user_id");
+        refUrl.searchParams.set("referral_code", `eq.${referral_code}`);
+        refUrl.searchParams.set("club_id", `eq.${club_id}`);
+        refUrl.searchParams.set("status", "eq.active");
+        refUrl.searchParams.set("limit", "1");
+
+        const refRes = await fetch(refUrl.toString(), {
+          headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+          },
+        });
+
+        if (refRes.ok) {
+          const rows = await refRes.json();
+          const referrer = rows?.[0];
+          if (referrer && referrer.user_id !== user.id) {
+            referredBy = referrer.id;
+          }
+        }
+      } catch (err) {
+        console.error("[clubs/join] Referral lookup error:", err);
+      }
+    }
+
     // Create new membership request
-    const { error: insertError } = await admin
-      .from("club_memberships")
-      .insert({
-        club_id,
-        user_id: user.id,
-        role: "member",
-        status: "pending",
-        invited_email: user.email,
+    const insertPayload: Record<string, unknown> = {
+      club_id,
+      user_id: user.id,
+      role: "member",
+      status: "pending",
+      invited_email: user.email,
+    };
+
+    // Add referred_by if resolved (column added by migration 00041)
+    if (referredBy) {
+      insertPayload.referred_by = referredBy;
+    }
+
+    // Insert via raw PostgREST to include referred_by column
+    let newMembershipId: string | null = null;
+
+    if (referredBy && supabaseUrl && serviceKey) {
+      // Use raw insert when we have referral data (to include referred_by column)
+      const insertRes = await fetch(`${supabaseUrl}/rest/v1/club_memberships`, {
+        method: "POST",
+        headers: {
+          apikey: serviceKey,
+          Authorization: `Bearer ${serviceKey}`,
+          "Content-Type": "application/json",
+          Prefer: "return=representation",
+        },
+        body: JSON.stringify(insertPayload),
       });
 
-    if (insertError) {
-      console.error("[clubs/join] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to submit join request" },
-        { status: 500 }
-      );
+      if (!insertRes.ok) {
+        console.error("[clubs/join] Insert error:", await insertRes.text());
+        return NextResponse.json(
+          { error: "Failed to submit join request" },
+          { status: 500 }
+        );
+      }
+
+      const inserted = await insertRes.json();
+      newMembershipId = inserted?.[0]?.id ?? null;
+    } else {
+      // Standard typed insert when no referral
+      const { data: newMembership, error: insertError } = await admin
+        .from("club_memberships")
+        .insert({
+          club_id,
+          user_id: user.id,
+          role: "member",
+          status: "pending",
+          invited_email: user.email,
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        console.error("[clubs/join] Insert error:", insertError);
+        return NextResponse.json(
+          { error: "Failed to submit join request" },
+          { status: 500 }
+        );
+      }
+
+      newMembershipId = newMembership?.id ?? null;
+    }
+
+    // Create pending referral credit if referred
+    if (referredBy && newMembershipId && supabaseUrl && serviceKey) {
+      try {
+        // Look up club referral settings
+        const settingsUrl = new URL(`${supabaseUrl}/rest/v1/clubs`);
+        settingsUrl.searchParams.set("select", "referral_program_enabled,referral_reward");
+        settingsUrl.searchParams.set("id", `eq.${club_id}`);
+        settingsUrl.searchParams.set("limit", "1");
+
+        const settingsRes = await fetch(settingsUrl.toString(), {
+          headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+          },
+        });
+
+        if (settingsRes.ok) {
+          const clubs = await settingsRes.json();
+          const clubSettings = clubs?.[0];
+
+          if (clubSettings?.referral_program_enabled && Number(clubSettings.referral_reward) > 0) {
+            await fetch(`${supabaseUrl}/rest/v1/referral_credits`, {
+              method: "POST",
+              headers: {
+                apikey: serviceKey,
+                Authorization: `Bearer ${serviceKey}`,
+                "Content-Type": "application/json",
+                Prefer: "return=minimal",
+              },
+              body: JSON.stringify({
+                club_id,
+                referrer_membership_id: referredBy,
+                referred_membership_id: newMembershipId,
+                amount: Number(clubSettings.referral_reward),
+                status: "pending",
+              }),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("[clubs/join] Referral credit creation error:", err);
+      }
     }
 
     return NextResponse.json({

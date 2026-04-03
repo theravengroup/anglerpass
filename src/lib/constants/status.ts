@@ -246,6 +246,35 @@ export const TRIP_REVIEW_STATUS: Record<string, StatusConfig> = {
   },
 };
 
+// ─── Referral Credit Status ─────────────────────────────────────────
+
+export const REFERRAL_CREDIT_STATUS: Record<string, StatusConfig> = {
+  pending: {
+    label: "Pending",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  earned: {
+    label: "Earned",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  paid_out: {
+    label: "Paid Out",
+    icon: CheckCircle2,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  voided: {
+    label: "Voided",
+    icon: XCircle,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+};
+
 // ─── Period Options (analytics dashboards) ──────────────────────────
 
 export interface PeriodOption {

@@ -39,7 +39,9 @@ export type NotificationType =
   | "guide_review_received"
   | "guide_credential_expiring"
   | "guide_message_received"
-  | "angler_review_received";
+  | "angler_review_received"
+  | "referral_credit_earned"
+  | "referral_invite_sent";
 
 interface NotificationPayload {
   userId: string;

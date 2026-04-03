@@ -84,3 +84,22 @@ export const agreementActionSchema = z.object({
 });
 
 export type AgreementActionData = z.infer<typeof agreementActionSchema>;
+
+// ─── Referral Program Settings ──────────────────────────────────────
+export const referralSettingsSchema = z.object({
+  referral_program_enabled: z.boolean(),
+  referral_reward: z
+    .number()
+    .min(0, "Reward must be $0 or more")
+    .max(10000, "Reward cannot exceed $10,000"),
+});
+
+export type ReferralSettingsData = z.infer<typeof referralSettingsSchema>;
+
+// ─── Referral Invite ────────────────────────────────────────────────
+export const referralInviteSchema = z.object({
+  email: z.email("Valid email is required"),
+  message: z.string().max(500).optional().or(z.literal("")),
+});
+
+export type ReferralInviteData = z.infer<typeof referralInviteSchema>;

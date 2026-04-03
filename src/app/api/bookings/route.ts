@@ -359,6 +359,7 @@ export async function POST(request: Request) {
       base_rate: idx === 0 ? fees.baseRate : 0,
       platform_fee: idx === 0 ? fees.platformFee : 0,
       cross_club_fee: idx === 0 ? fees.crossClubFee : 0,
+      home_club_referral: idx === 0 ? fees.homeClubReferral : 0,
       club_commission: idx === 0 ? fees.clubCommission : 0,
       landowner_payout: idx === 0 ? fees.landownerPayout : 0,
       total_amount: idx === 0 ? fees.totalAmount : 0,

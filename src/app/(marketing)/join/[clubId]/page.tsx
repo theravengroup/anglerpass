@@ -22,6 +22,48 @@ async function getClub(clubId: string) {
   }
 }
 
+/**
+ * Look up the referrer's display name by referral code.
+ * Uses raw SQL via Supabase's PostgREST to query the referral_code column
+ * (added by migration 00041). Returns null gracefully if the column
+ * doesn't exist yet or the code is invalid.
+ */
+async function getReferrer(clubId: string, referralCode: string) {
+  if (!referralCode) return null;
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) return null;
+
+    // Query club_memberships for the referral_code, joined with profiles
+    const url = new URL(`${supabaseUrl}/rest/v1/club_memberships`);
+    url.searchParams.set("select", "id,profiles!club_memberships_user_id_fkey(display_name)");
+    url.searchParams.set("referral_code", `eq.${referralCode}`);
+    url.searchParams.set("club_id", `eq.${clubId}`);
+    url.searchParams.set("status", `eq.active`);
+    url.searchParams.set("limit", "1");
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+      },
+    });
+
+    if (!res.ok) return null;
+
+    const rows = await res.json();
+    if (!rows?.length) return null;
+
+    const profile = rows[0]?.profiles;
+    return {
+      name: profile?.display_name ?? "A member",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -58,11 +100,15 @@ function formatCurrency(amount: number | null): string {
 
 export default async function JoinClubPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ clubId: string }>;
+  searchParams: Promise<{ ref?: string }>;
 }) {
   const { clubId } = await params;
+  const { ref: referralCode } = await searchParams;
   const club = await getClub(clubId);
+  const referrer = referralCode ? await getReferrer(clubId, referralCode) : null;
 
   if (!club) {
     return (
@@ -109,6 +155,27 @@ export default async function JoinClubPage({
           <p className="text-lg leading-relaxed text-parchment/60">
             Join {club.name} on AnglerPass
           </p>
+          {referrer && (
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-parchment/10 px-4 py-1.5 text-sm text-parchment/70">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-bronze-light"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" y1="8" x2="19" y2="14" />
+                <line x1="22" y1="11" x2="16" y2="11" />
+              </svg>
+              Referred by {referrer.name}
+            </p>
+          )}
         </div>
       </section>
 
@@ -164,7 +231,7 @@ export default async function JoinClubPage({
           </div>
 
           {/* Join CTA */}
-          <JoinCta clubId={club.id} clubName={club.name} />
+          <JoinCta clubId={club.id} clubName={club.name} referralCode={referralCode} />
 
           {/* Corporate membership link */}
           {club.corporate_memberships_enabled && (

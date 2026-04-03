@@ -141,7 +141,7 @@ export default function CompassSection() {
         {/* Header */}
         <div className="compass-header reveal">
           <span className="eyebrow" style={{ color: 'var(--sand)' }}>
-            Introducing AnglerPass Compass™ &middot; The First AI-Powered Private Water Platform
+            Introducing AnglerPass Compass &middot; The First AI-Powered Private Water Platform
           </span>
           <h2 className="compass-headline">
             You don&apos;t search.
@@ -149,7 +149,7 @@ export default function CompassSection() {
             <em>You ask.</em>
           </h2>
           <p className="compass-subhead">
-            AnglerPass Compass™ is the intelligent matching engine built into the
+            AnglerPass Compass is the intelligent matching engine built into the
             platform. Tell it what you&apos;re looking for — it handles the rest.
             Conditions, availability, species, timing, guide fit — evaluated in
             real time, ranked for you.
@@ -181,7 +181,7 @@ export default function CompassSection() {
                   <span className="compass-dot compass-dot-yellow" />
                   <span className="compass-dot compass-dot-green" />
                 </div>
-                <span className="compass-topbar-title">AnglerPass Compass™</span>
+                <span className="compass-topbar-title">AnglerPass Compass</span>
                 <span className="compass-topbar-badge">AI · Beta</span>
               </div>
 
@@ -263,7 +263,7 @@ export default function CompassSection() {
 
         {/* Bottom tagline */}
         <p className="compass-tagline reveal">
-          Powered by AnglerPass Compass™ — Intelligent trip matching for modern anglers.
+          Powered by AnglerPass Compass — Intelligent trip matching for modern anglers.
         </p>
       </div>
     </section>

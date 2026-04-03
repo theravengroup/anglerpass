@@ -1,13 +1,26 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 
 interface JoinCtaProps {
   clubId: string;
   clubName: string;
+  referralCode?: string;
 }
 
-export default function JoinCta({ clubId, clubName }: JoinCtaProps) {
+export default function JoinCta({ clubId, clubName, referralCode }: JoinCtaProps) {
+  // Persist referral code in sessionStorage so it survives auth redirects
+  useEffect(() => {
+    if (referralCode) {
+      sessionStorage.setItem(`ref_${clubId}`, referralCode);
+    }
+  }, [clubId, referralCode]);
+
+  const loginUrl = referralCode
+    ? `/login?clubId=${clubId}&ref=${referralCode}`
+    : `/login?clubId=${clubId}`;
+
   return (
     <div className="space-y-4 text-center">
       <h2 className="font-[family-name:var(--font-heading)] text-xl font-semibold text-forest">
@@ -25,7 +38,7 @@ export default function JoinCta({ clubId, clubName }: JoinCtaProps) {
           Join the Waitlist
         </Link>
         <Link
-          href={`/login?clubId=${clubId}`}
+          href={loginUrl}
           className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-stone-light/30 bg-white px-8 py-3.5 text-sm font-medium text-text-primary transition-colors hover:bg-offwhite sm:w-auto"
         >
           Sign In

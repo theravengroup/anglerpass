@@ -157,6 +157,28 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
+
+          {/* Cross-Club Network Revenue */}
+          <div className="reveal mt-8 bg-white border border-parchment rounded-[14px] py-8 px-7">
+            <h3 className="font-heading text-[22px] font-semibold text-forest mb-4 tracking-[-0.2px]">
+              Cross-Club Network revenue
+            </h3>
+            <p className="text-[14px] text-text-secondary leading-[1.65] mb-5">
+              When your members fish at another club&rsquo;s properties through the Cross-Club
+              Network, your club earns a <strong className="text-river">$5/rod/day referral fee</strong> on
+              every booking. This rewards clubs for participating in the network and maintaining
+              an active membership.
+            </p>
+            <div className="py-5 px-6 bg-offwhite rounded-[10px] border border-parchment">
+              <p className="text-[13px] font-semibold text-forest mb-2">
+                Example: A member books 2 rods for 3 days at a partner club&rsquo;s water
+              </p>
+              <p className="text-[13px] text-text-secondary m-0">
+                Your club earns: $5 x 2 rods x 3 days = <strong className="text-river">$30 referral</strong><br />
+                The $15/rod cross-club access fee is split: $10 to AnglerPass, $5 to your club.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -209,7 +231,7 @@ export default function PricingPage() {
                 {[
                   { label: 'Rod fee', detail: 'Per rod, per day, set by the property' },
                   { label: 'Platform fee', detail: '15% of rod fees' },
-                  { label: 'Cross-club fee', detail: '$10/rod (only when fishing outside your home club)' },
+                  { label: 'Cross-club access fee', detail: '$15/rod (only when fishing outside your home club)' },
                   { label: 'Guide service fee', detail: '10% of guide rate (only when adding a guide)' },
                 ].map((item) => (
                   <li key={item.label} className="py-2 border-b border-parchment">
@@ -220,6 +242,8 @@ export default function PricingPage() {
               </ul>
               <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
                 Non-fishing guests are free. Only anglers with rods pay the rod fee.
+                The $15 cross-club fee is split: $10 to AnglerPass, $5 to your home
+                club for maintaining the network.
               </p>
             </div>
           </div>
@@ -266,8 +290,8 @@ export default function PricingPage() {
               ))}
             </div>
             <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
-              Platform fees and cross-club fees are paid by the angler and do not reduce
-              your payout. The $5/rod club commission is the only deduction from your rate.
+              Platform fees and cross-club access fees are paid by the angler and do not
+              reduce your payout. The $5/rod club commission is the only deduction from your rate.
             </p>
           </div>
         </div>

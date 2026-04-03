@@ -116,7 +116,7 @@ export default function AdminFinancialsPage() {
       ["═══ REVENUE SUMMARY ═══"],
       ["Platform Revenue (Total)", data.platform_revenue_total.toFixed(2)],
       ["  Platform Fees (15%)", data.platform_fee_total.toFixed(2)],
-      ["  Cross-Club Fees ($10/rod)", data.cross_club_fee_total.toFixed(2)],
+      ["  Cross-Club Fees ($15/rod)", data.cross_club_fee_total.toFixed(2)],
       ["  Guide Service Fees (10%)", data.guide_service_fee_total.toFixed(2)],
       [],
       ["═══ GMV ═══"],
@@ -224,7 +224,7 @@ export default function AdminFinancialsPage() {
   // Revenue breakdown
   const revenueStreams = [
     { label: "Platform Fees (15%)", amount: data?.platform_fee_total ?? 0, color: "bg-forest" },
-    { label: "Cross-Club Fees ($10/rod)", amount: data?.cross_club_fee_total ?? 0, color: "bg-river" },
+    { label: "Cross-Club Fees ($15/rod)", amount: data?.cross_club_fee_total ?? 0, color: "bg-river" },
     { label: "Guide Service Fees (10%)", amount: data?.guide_service_fee_total ?? 0, color: "bg-charcoal" },
   ].filter((s) => s.amount > 0);
 
@@ -677,7 +677,7 @@ export default function AdminFinancialsPage() {
               <strong className="text-text-secondary">Revenue streams:</strong>
               <ul className="mt-1 list-inside list-disc space-y-0.5">
                 <li>15% platform fee on rod bookings (paid by angler)</li>
-                <li>$10/rod cross-club network fee (paid by angler)</li>
+                <li>$15/rod cross-club access fee ($10 AP + $5 home club referral)</li>
                 <li>10% guide service fee (paid by angler)</li>
                 <li>3.5% payment processing markup on membership payments</li>
               </ul>
@@ -686,7 +686,7 @@ export default function AdminFinancialsPage() {
               <strong className="text-text-secondary">Payout splits:</strong>
               <ul className="mt-1 list-inside list-disc space-y-0.5">
                 <li>Landowners receive base rod fee minus $5/rod club commission</li>
-                <li>Clubs receive $5/rod commission + membership fees</li>
+                <li>Clubs receive $5/rod commission + membership fees + $5/rod home club referral on cross-club bookings</li>
                 <li>Guides receive 100% of their listed day rate</li>
                 <li>All payouts processed via Stripe Connect</li>
               </ul>

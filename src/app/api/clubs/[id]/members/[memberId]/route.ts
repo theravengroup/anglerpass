@@ -146,6 +146,32 @@ export async function PATCH(
       }).catch((err) =>
         console.error("[clubs/members] Notification error:", err)
       );
+
+      // Transition referral credit from pending → earned
+      // Uses raw PostgREST to avoid type issues (table added by migration 00041)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (supabaseUrl && serviceKey) {
+        fetch(
+          `${supabaseUrl}/rest/v1/referral_credits?referred_membership_id=eq.${memberId}&status=eq.pending`,
+          {
+            method: "PATCH",
+            headers: {
+              apikey: serviceKey,
+              Authorization: `Bearer ${serviceKey}`,
+              "Content-Type": "application/json",
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              status: "earned",
+              earned_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }),
+          }
+        ).catch((err) =>
+          console.error("[clubs/members] Referral credit update error:", err)
+        );
+      }
     }
 
     return NextResponse.json({ membership: updated });

@@ -1,7 +1,11 @@
 "use client";
 
 import type { FeeBreakdown as FeeBreakdownType } from "@/lib/constants/fees";
-import { CROSS_CLUB_FEE_PER_ROD } from "@/lib/constants/fees";
+import {
+  CROSS_CLUB_FEE_PER_ROD,
+  HOME_CLUB_REFERRAL_PER_ROD,
+  ANGLERPASS_CROSS_CLUB_SHARE_PER_ROD,
+} from "@/lib/constants/fees";
 
 interface FeeBreakdownProps {
   ratePerRod: number;
@@ -39,7 +43,7 @@ export default function FeeBreakdown({
       {fees.crossClubFee > 0 && (
         <div className="flex justify-between text-text-secondary">
           <span>
-            Cross-club fee (${CROSS_CLUB_FEE_PER_ROD}/rod x {partySize} {rodLabel}
+            Cross-club access fee (${CROSS_CLUB_FEE_PER_ROD}/rod x {partySize} {rodLabel}
             {isMultiDay ? ` x ${numberOfDays} days` : ""})
           </span>
           <span>${fees.crossClubFee.toFixed(2)}</span>
