@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { FetchError } from "@/components/shared/FetchError";
 import PayoutSetup from "@/components/shared/PayoutSetup";
+import ProfilePhotoUpload from "@/components/shared/ProfilePhotoUpload";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -298,13 +299,22 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          {/* Avatar placeholder */}
-          <div className="flex items-center gap-4">
-            <div className="flex size-16 items-center justify-center rounded-full bg-forest/10 text-xl font-semibold text-forest">
-              {displayName
-                ? displayName.charAt(0).toUpperCase()
-                : profile?.email?.charAt(0).toUpperCase() ?? "?"}
-            </div>
+          {/* Profile photo */}
+          <div className="flex items-center gap-6">
+            <ProfilePhotoUpload
+              currentUrl={profile?.avatar_url ?? null}
+              fallback={
+                displayName
+                  ? displayName.charAt(0).toUpperCase()
+                  : profile?.email?.charAt(0).toUpperCase() ?? "?"
+              }
+              onUploaded={(url) => {
+                if (profile) {
+                  setProfile({ ...profile, avatar_url: url || null });
+                }
+              }}
+              accentColor={profile?.role === "landowner" ? "forest" : "bronze"}
+            />
             <div>
               <p className="text-sm font-medium text-text-primary">
                 {profile?.email}
