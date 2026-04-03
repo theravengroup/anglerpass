@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Fetch public club data by ID (no auth required)
 export async function GET(request: NextRequest) {
+  const limited = rateLimit("clubs-public", getClientIp(request), 30, 60_000);
+  if (limited) return limited;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");

@@ -5,11 +5,15 @@ import {
   escapeIlike,
   parsePositiveInt,
 } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const PAGE_SIZE = 12;
 
 // GET: Public browse/search for approved guides
 export async function GET(request: Request) {
+  const limited = rateLimit("guides-browse", getClientIp(request), 30, 60_000);
+  if (limited) return limited;
+
   try {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() ?? "";

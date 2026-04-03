@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Public-facing guide profile
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit("guide-profile", getClientIp(_request), 30, 60_000);
+  if (limited) return limited;
+
   try {
     const { id } = await params;
     const admin = createAdminClient();

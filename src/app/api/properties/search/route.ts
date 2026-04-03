@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Public search endpoint — returns published properties (no auth required)
 // Does NOT include sensitive fields (gate code, access notes, owner info)
 export async function GET(request: Request) {
+  const limited = rateLimit("properties-search", getClientIp(request), 30, 60_000);
+  if (limited) return limited;
+
   try {
     const admin = createAdminClient();
     const { searchParams } = new URL(request.url);
