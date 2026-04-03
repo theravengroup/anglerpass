@@ -13,6 +13,7 @@ interface ClubData {
   location: string | null;
   rules: string | null;
   website: string | null;
+  logo_url: string | null;
   subscription_tier: string;
   corporate_memberships_enabled: boolean;
   corporate_initiation_fee: number | null;
@@ -170,6 +171,7 @@ export default function ClubSettingsPage() {
           location: club.location ?? "",
           rules: club.rules ?? "",
           website: club.website ?? "",
+          logo_url: club.logo_url,
         }}
         onSuccess={() => {
           setSaved(true);

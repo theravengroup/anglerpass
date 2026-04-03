@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Save } from "lucide-react";
 import { clubSchema, type ClubFormData } from "@/lib/validations/clubs";
+import ClubLogoUpload from "@/components/clubs/ClubLogoUpload";
 
 interface ClubProfileFormProps {
   mode: "create" | "edit";
-  initialData?: Partial<ClubFormData> & { id?: string };
+  initialData?: Partial<ClubFormData> & { id?: string; logo_url?: string | null };
   invitationToken?: string | null;
   onSuccess?: (club: { id: string; name: string }) => void;
 }
@@ -25,7 +26,8 @@ export default function ClubProfileForm({
 }: ClubProfileFormProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [clubId, setClubId] = useState<string | null>(null);
+  const [clubId, setClubId] = useState<string | null>(initialData?.id ?? null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialData?.logo_url ?? null);
 
   const {
     register,
@@ -104,6 +106,17 @@ export default function ClubProfileForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* Club Logo — only in edit mode (needs club ID for storage path) */}
+          {mode === "edit" && clubId && (
+            <ClubLogoUpload
+              currentUrl={logoUrl}
+              clubId={clubId}
+              fallback={initialData?.name?.charAt(0).toUpperCase() ?? "C"}
+              onUploaded={(url) => setLogoUrl(url || null)}
+              disabled={saving}
+            />
+          )}
+
           {/* Club Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
