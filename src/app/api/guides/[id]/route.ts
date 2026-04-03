@@ -20,7 +20,7 @@ export async function GET(
         "id, user_id, display_name, bio, profile_photo_url, photos, techniques, species, skill_levels, max_anglers, gear_included, gear_details, languages, base_location, service_region, closest_airports, rate_full_day, rate_half_day, rate_description, rating_avg, rating_count, trips_completed, status"
       )
       .eq("id", id)
-      .eq("status", "approved")
+      .eq("status", "live")
       .single();
 
     if (error || !guide) {
@@ -49,7 +49,7 @@ export async function GET(
         "id, property_id, properties(name, location_description, water_type)"
       )
       .eq("guide_id", id)
-      .eq("status", "approved");
+      .eq("status", "live");
 
     return NextResponse.json({
       guide,

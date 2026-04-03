@@ -32,8 +32,9 @@ interface GuideProfile {
 }
 
 interface Counts {
-  pending_review: number;
-  approved: number;
+  pending: number;
+  verified: number;
+  live: number;
   suspended: number;
   rejected: number;
   draft: number;
@@ -41,9 +42,9 @@ interface Counts {
 
 export default function AdminGuidesPage() {
   const [guides, setGuides] = useState<GuideProfile[]>([]);
-  const [counts, setCounts] = useState<Counts>({ pending_review: 0, approved: 0, suspended: 0, rejected: 0, draft: 0 });
+  const [counts, setCounts] = useState<Counts>({ pending: 0, verified: 0, live: 0, suspended: 0, rejected: 0, draft: 0 });
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string | null>("pending_review");
+  const [filterStatus, setFilterStatus] = useState<string | null>("pending");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reason, setReason] = useState("");
 
@@ -68,8 +69,8 @@ export default function AdminGuidesPage() {
     load();
   }, [load]);
 
-  const handleAction = async (guideId: string, action: "approve" | "reject" | "suspend") => {
-    if ((action === "reject" || action === "suspend") && !reason.trim()) {
+  const handleAction = async (guideId: string, action: "make_live" | "reject" | "suspend" | "request_info") => {
+    if ((action === "reject" || action === "suspend" || action === "request_info") && !reason.trim()) {
       alert("Please provide a reason");
       return;
     }
@@ -101,8 +102,9 @@ export default function AdminGuidesPage() {
   };
 
   const statusFilters = [
-    { value: "pending_review", label: "Pending", count: counts.pending_review },
-    { value: "approved", label: "Approved", count: counts.approved },
+    { value: "pending", label: "Pending", count: counts.pending },
+    { value: "verified", label: "Verified", count: counts.verified },
+    { value: "live", label: "Live", count: counts.live },
     { value: "rejected", label: "Rejected", count: counts.rejected },
     { value: "suspended", label: "Suspended", count: counts.suspended },
     { value: null, label: "All", count: Object.values(counts).reduce((a, b) => a + b, 0) },
@@ -212,12 +214,21 @@ export default function AdminGuidesPage() {
                   </div>
                 )}
 
-                {/* Actions */}
-                {guide.status === "pending_review" && (
+                {/* Actions — Pending: waiting on background check */}
+                {guide.status === "pending" && (
+                  <div className="border-t border-stone-light/15 pt-3">
+                    <p className="text-xs text-text-light">
+                      Background check in progress. No admin action needed until verification completes.
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions — Verified: ready for admin to make live or reject */}
+                {guide.status === "verified" && (
                   <div className="space-y-3 border-t border-stone-light/15 pt-3">
                     <textarea
                       className="flex min-h-[40px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      placeholder="Reason (required for reject/suspend)"
+                      placeholder="Reason (required for reject / request info)"
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                     />
@@ -225,7 +236,7 @@ export default function AdminGuidesPage() {
                       <Button
                         size="sm"
                         className="bg-forest text-white hover:bg-forest/90"
-                        onClick={() => handleAction(guide.id, "approve")}
+                        onClick={() => handleAction(guide.id, "make_live")}
                         disabled={actionLoading === guide.id}
                       >
                         {actionLoading === guide.id ? (
@@ -233,7 +244,7 @@ export default function AdminGuidesPage() {
                         ) : (
                           <CheckCircle2 className="size-3.5" />
                         )}
-                        Approve
+                        Make Live
                       </Button>
                       <Button
                         size="sm"
@@ -245,11 +256,22 @@ export default function AdminGuidesPage() {
                         <XCircle className="size-3.5" />
                         Reject
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-bronze/30 text-bronze hover:bg-bronze/5"
+                        onClick={() => handleAction(guide.id, "request_info")}
+                        disabled={actionLoading === guide.id}
+                      >
+                        <AlertTriangle className="size-3.5" />
+                        Request Info
+                      </Button>
                     </div>
                   </div>
                 )}
 
-                {guide.status === "approved" && (
+                {/* Actions — Live: can suspend */}
+                {guide.status === "live" && (
                   <div className="border-t border-stone-light/15 pt-3">
                     <div className="flex gap-2">
                       <textarea
@@ -282,8 +304,9 @@ export default function AdminGuidesPage() {
 function GuideStatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
     draft: { label: "Draft", color: "text-text-light", bg: "bg-offwhite", icon: Clock },
-    pending_review: { label: "Pending Review", color: "text-bronze", bg: "bg-bronze/10", icon: Clock },
-    approved: { label: "Approved", color: "text-forest", bg: "bg-forest/10", icon: CheckCircle2 },
+    pending: { label: "Pending", color: "text-bronze", bg: "bg-bronze/10", icon: Clock },
+    verified: { label: "Verified", color: "text-river", bg: "bg-river/10", icon: CheckCircle2 },
+    live: { label: "Live", color: "text-forest", bg: "bg-forest/10", icon: CheckCircle2 },
     suspended: { label: "Suspended", color: "text-red-600", bg: "bg-red-50", icon: AlertTriangle },
     rejected: { label: "Rejected", color: "text-red-600", bg: "bg-red-50", icon: XCircle },
   };

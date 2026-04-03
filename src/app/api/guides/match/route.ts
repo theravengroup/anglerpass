@@ -36,7 +36,7 @@ export async function GET(request: Request) {
       .from("guide_water_approvals")
       .select("guide_id")
       .eq("property_id", propertyId)
-      .eq("status", "approved");
+      .eq("status", "live");
 
     if (!approvals?.length) {
       return NextResponse.json({ guides: [] });
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
         "id, user_id, display_name, bio, profile_photo_url, techniques, species, skill_levels, max_anglers, gear_included, rate_full_day, rate_half_day, rating_avg, rating_count, trips_completed, response_time_hours"
       )
       .in("id", guideIds)
-      .eq("status", "approved")
+      .eq("status", "live")
       .gte("max_anglers", partySize)
       .order("rating_avg", { ascending: false });
 

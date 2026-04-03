@@ -576,6 +576,77 @@ export async function notifyGuideWaterDeclined(
   });
 }
 
+// ─── Credential Expiry Notifications ────────────────────────────────
+
+/** Notify guide that a credential is expiring soon */
+export async function notifyGuideCredentialExpiring(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    credential: string;
+    daysLeft: number;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_credential_expiring",
+    title: `${opts.credential} expiring in ${opts.daysLeft} days`,
+    body: `Your ${opts.credential} expires in ${opts.daysLeft} days. Please update it to keep your guide profile active.`,
+    link: "/guide/profile",
+  });
+}
+
+/** Notify guide that a credential has expired */
+export async function notifyGuideCredentialExpired(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    credential: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_credential_expiring",
+    title: `${opts.credential} has expired`,
+    body: `Your ${opts.credential} has expired. Your guide profile has been suspended until you upload a current document.`,
+    link: "/guide/profile",
+  });
+}
+
+/** Notify guide that their profile was auto-suspended due to credential expiry */
+export async function notifyGuideAutoSuspended(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    expiredCredentials: string[];
+  }
+) {
+  const credList = opts.expiredCredentials.join(", ");
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_credential_expiring",
+    title: "Guide profile suspended \u2014 expired credentials",
+    body: `Your guide profile has been suspended because the following credentials have expired: ${credList}. Upload renewed documents to be automatically reinstated.`,
+    link: "/guide/profile",
+  });
+}
+
+/** Notify guide that their profile was auto-reinstated after credential renewal */
+export async function notifyGuideAutoReinstated(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_profile_approved",
+    title: "Guide profile reinstated!",
+    body: "Your credentials have been renewed and your guide profile is live again. You can now accept bookings.",
+    link: "/guide",
+  });
+}
+
 // ─── Utilities ──────────────────────────────────────────────────────
 
 function formatDate(dateStr: string): string {

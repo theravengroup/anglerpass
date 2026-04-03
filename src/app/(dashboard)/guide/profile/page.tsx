@@ -16,12 +16,12 @@ import {
 } from "@/lib/validations/guides";
 import GuideProfileForm from "@/components/guide/GuideProfileForm";
 import GuideCredentials from "@/components/guide/GuideCredentials";
+import ProfilePhotoUpload from "@/components/shared/ProfilePhotoUpload";
 
 export default function GuideProfilePage() {
   const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
 
@@ -116,29 +116,8 @@ export default function GuideProfilePage() {
     }
   };
 
-  const handleSubmitForReview = async () => {
-    setSubmitting(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/guides/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "pending_review" }),
-      });
-
-      if (res.ok) {
-        const result = await res.json();
-        setProfile(result.profile);
-        setMessage({ type: "success", text: "Profile submitted for review!" });
-      } else {
-        const err = await res.json().catch(() => null);
-        setMessage({ type: "error", text: err?.error ?? "Failed to submit for review" });
-      }
-    } catch {
-      setMessage({ type: "error", text: "An error occurred." });
-    } finally {
-      setSubmitting(false);
-    }
+  const handleStartVerification = () => {
+    window.location.href = "/guide/verification";
   };
 
   const handleCredentialUpload = async (type: string, file: File) => {
@@ -191,6 +170,27 @@ export default function GuideProfilePage() {
         </p>
       </div>
 
+      {/* Profile Photo */}
+      <Card className="border-stone-light/20">
+        <CardContent className="flex flex-col items-center py-6">
+          <ProfilePhotoUpload
+            currentUrl={(profile as Record<string, unknown>)?.profile_photo_url as string ?? null}
+            fallback={
+              form.getValues("display_name")
+                ? form.getValues("display_name").charAt(0).toUpperCase()
+                : "G"
+            }
+            onUploaded={(url) => {
+              if (profile) {
+                setProfile({ ...profile, profile_photo_url: url || null });
+              }
+            }}
+            disabled={!isEditable}
+            accentColor="charcoal"
+          />
+        </CardContent>
+      </Card>
+
       {message && (
         <div
           className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm ${
@@ -242,16 +242,14 @@ export default function GuideProfilePage() {
                 {profile ? "Save Changes" : "Create Profile"}
               </Button>
 
-              {profile && (profileStatus as string) !== "pending_review" && (
+              {profile && profileStatus === "draft" && (
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleSubmitForReview}
-                  disabled={submitting}
+                  onClick={handleStartVerification}
                   className="border-forest/30 text-forest hover:bg-forest/5"
                 >
-                  {submitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-                  Submit for Review
+                  Start Verification
                 </Button>
               )}
             </>

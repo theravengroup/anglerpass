@@ -13,6 +13,7 @@ import {
   MessageSquare,
   AlertCircle,
   ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 
 interface GuideProfile {
@@ -117,8 +118,9 @@ export default function GuideDashboardPage() {
 
   const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
     draft: { label: "Draft", color: "text-text-light", bg: "bg-offwhite" },
-    pending_review: { label: "Pending Review", color: "text-bronze", bg: "bg-bronze/10" },
-    approved: { label: "Approved", color: "text-forest", bg: "bg-forest/10" },
+    pending: { label: "Pending Verification", color: "text-bronze", bg: "bg-bronze/10" },
+    verified: { label: "Verified", color: "text-river", bg: "bg-river/10" },
+    live: { label: "Live", color: "text-forest", bg: "bg-forest/10" },
     suspended: { label: "Suspended", color: "text-red-600", bg: "bg-red-50" },
     rejected: { label: "Rejected", color: "text-red-600", bg: "bg-red-50" },
   };
@@ -161,14 +163,28 @@ export default function GuideDashboardPage() {
         </Card>
       )}
 
-      {profile.status === "pending_review" && (
+      {profile.status === "pending" && (
+        <Card className="border-bronze/20 bg-bronze/5">
+          <CardContent className="flex items-start gap-3 py-4">
+            <Loader2 className="size-5 shrink-0 animate-spin text-bronze" />
+            <div>
+              <p className="text-sm font-medium text-text-primary">Verification in progress</p>
+              <p className="text-sm text-text-secondary">
+                Your background check is being processed. You&apos;ll be notified once complete.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {profile.status === "verified" && (
         <Card className="border-river/20 bg-river/5">
           <CardContent className="flex items-start gap-3 py-4">
-            <Loader2 className="size-5 shrink-0 animate-spin text-river" />
+            <AlertCircle className="size-5 shrink-0 text-river" />
             <div>
-              <p className="text-sm font-medium text-text-primary">Profile under review</p>
+              <p className="text-sm font-medium text-text-primary">Verified — awaiting final approval</p>
               <p className="text-sm text-text-secondary">
-                Our team is reviewing your credentials. You&apos;ll be notified once approved.
+                Your background check cleared. Our team will make your profile live shortly.
               </p>
             </div>
           </CardContent>
@@ -236,6 +252,7 @@ export default function GuideDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         {[
           { label: "Edit Profile", href: "/guide/profile", icon: UserCircle },
+          { label: "Verification", href: "/guide/verification", icon: ShieldCheck },
           { label: "Set Availability", href: "/guide/availability", icon: CalendarDays },
           { label: "View Bookings", href: "/guide/bookings", icon: CalendarDays },
           { label: "My Reviews", href: "/guide/reviews", icon: Star },

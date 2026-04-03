@@ -19,8 +19,9 @@ export const SKILL_LEVELS = ["beginner", "intermediate", "advanced"] as const;
 
 export const GUIDE_STATUSES = [
   "draft",
-  "pending_review",
-  "approved",
+  "pending",
+  "verified",
+  "live",
   "suspended",
   "rejected",
 ] as const;
@@ -68,6 +69,7 @@ export const CREDENTIAL_TYPES = [
   "insurance",
   "first_aid",
   "uscg_license",
+  "guide_license",
 ] as const;
 
 export const guideCredentialSchema = z.object({
@@ -116,7 +118,7 @@ export type MessageFormData = z.infer<typeof messageSchema>;
 // ─── Admin Guide Review ─────────────────────────────────────────────
 
 export const adminGuideReviewSchema = z.object({
-  action: z.enum(["approve", "reject", "suspend"]),
+  action: z.enum(["make_live", "reject", "suspend", "request_info"]),
   reason: z.string().max(2000).optional().or(z.literal("")),
 });
 

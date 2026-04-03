@@ -42,6 +42,15 @@ export const STAFF_DISCOUNT_OWN_CLUB = 50;
 /** Club staff get 25% off rod fees at Cross-Club Network properties. */
 export const STAFF_DISCOUNT_CROSS_CLUB = 25;
 
+// ─── Guide Verification Fee ────────────────────────────────────────
+/**
+ * One-time fee charged to guides for background check verification.
+ * Covers Checkr background check cost. Collected via Stripe Checkout
+ * before initiating the background check.
+ */
+export const GUIDE_VERIFICATION_FEE_CENTS = 4900;
+export const GUIDE_VERIFICATION_FEE_DISPLAY = "$49";
+
 // ─── Fee Calculation ────────────────────────────────────────────────
 
 export interface FeeBreakdown {

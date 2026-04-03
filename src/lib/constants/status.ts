@@ -109,14 +109,20 @@ export const GUIDE_STATUS: Record<string, StatusConfig> = {
     color: "text-text-light",
     bg: "bg-offwhite",
   },
-  pending_review: {
-    label: "Pending Review",
+  pending: {
+    label: "Pending Verification",
     icon: Clock,
     color: "text-bronze",
     bg: "bg-bronze/10",
   },
-  approved: {
-    label: "Approved",
+  verified: {
+    label: "Verified",
+    icon: CheckCircle2,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  live: {
+    label: "Live",
     icon: CheckCircle2,
     color: "text-forest",
     bg: "bg-forest/10",

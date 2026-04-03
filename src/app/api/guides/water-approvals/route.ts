@@ -95,9 +95,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (profile.status !== "approved") {
+    if (profile.status !== "live") {
       return NextResponse.json(
-        { error: "Your guide profile must be approved before requesting water access" },
+        { error: "Your guide profile must be live before requesting water access" },
         { status: 400 }
       );
     }

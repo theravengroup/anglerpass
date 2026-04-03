@@ -58,8 +58,9 @@ export async function GET(request: Request) {
 
     // Get counts per status
     const counts = {
-      pending_review: 0,
-      approved: 0,
+      pending: 0,
+      verified: 0,
+      live: 0,
       suspended: 0,
       rejected: 0,
       draft: 0,
@@ -82,7 +83,7 @@ export async function GET(request: Request) {
   }
 }
 
-// PATCH: Approve, reject, or suspend a guide
+// PATCH: Review guide — make_live, reject, suspend, or request_info
 export async function PATCH(request: Request) {
   try {
     const supabase = await createClient();
@@ -145,12 +146,19 @@ export async function PATCH(request: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    if (result.data.action === "approve") {
-      updates.status = "approved";
-      updates.approved_at = new Date().toISOString();
-      updates.approved_by = user.id;
+    if (result.data.action === "make_live") {
+      if (guideProfile.status !== "verified") {
+        return NextResponse.json(
+          { error: "Only verified guides can be made live" },
+          { status: 400 }
+        );
+      }
+      updates.status = "live";
+      updates.live_at = new Date().toISOString();
+      updates.verified_by = user.id;
       updates.rejection_reason = null;
       updates.suspended_reason = null;
+      updates.suspension_type = null;
     } else if (result.data.action === "reject") {
       if (!result.data.reason) {
         return NextResponse.json(
@@ -163,6 +171,10 @@ export async function PATCH(request: Request) {
     } else if (result.data.action === "suspend") {
       updates.status = "suspended";
       updates.suspended_reason = result.data.reason || "Suspended by admin";
+      updates.suspension_type = "admin";
+    } else if (result.data.action === "request_info") {
+      updates.status = "draft";
+      updates.rejection_reason = result.data.reason || "Additional information requested";
     }
 
     const { data: updated, error: updateError } = await admin
@@ -180,8 +192,18 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Log to verification events
+    await admin.from("guide_verification_events").insert({
+      guide_id,
+      event_type: "admin_review",
+      old_status: guideProfile.status,
+      new_status: updates.status,
+      metadata: { action: result.data.action, reason: result.data.reason },
+      actor_id: user.id,
+    });
+
     // Notify guide
-    if (result.data.action === "approve") {
+    if (result.data.action === "make_live") {
       notifyGuideProfileApproved(admin, {
         guideUserId: guideProfile.user_id,
       }).catch((err) =>

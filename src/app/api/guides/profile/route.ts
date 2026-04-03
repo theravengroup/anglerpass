@@ -209,12 +209,11 @@ export async function PATCH(request: Request) {
       }
     }
 
-    // Handle status change to pending_review (submit for review)
-    if (body.status === "pending_review" && existing.status === "draft") {
-      updates.status = "pending_review";
-    } else if (body.status === "pending_review" && existing.status === "rejected") {
-      // Allow resubmission after rejection
-      updates.status = "pending_review";
+    // Handle status transitions
+    // Note: draft → pending now happens via the verification flow (Stripe + Checkr),
+    // not via direct profile update. Resubmission after rejection resets to draft.
+    if (body.status === "draft" && existing.status === "rejected") {
+      updates.status = "draft";
       updates.rejection_reason = null;
     }
 

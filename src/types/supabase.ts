@@ -844,6 +844,10 @@ export type Database = {
           base_location: string | null
           bio: string | null
           cancellation_rate: number | null
+          checkr_candidate_id: string | null
+          checkr_completed_at: string | null
+          checkr_report_id: string | null
+          checkr_status: string | null
           closest_airports: string | null
           created_at: string
           display_name: string
@@ -851,6 +855,8 @@ export type Database = {
           first_aid_expiry: string | null
           gear_details: string | null
           gear_included: boolean
+          guide_license_expiry: string | null
+          guide_license_url: string | null
           has_motorized_vessel: boolean
           id: string
           insurance_amount: string | null
@@ -861,6 +867,7 @@ export type Database = {
           license_expiry: string | null
           license_state: string | null
           license_url: string | null
+          live_at: string | null
           max_anglers: number
           photos: string[] | null
           profile_photo_url: string | null
@@ -878,12 +885,18 @@ export type Database = {
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
           suspended_reason: string | null
+          suspension_type: string | null
           techniques: string[] | null
           trips_completed: number | null
           updated_at: string
           uscg_license_expiry: string | null
           uscg_license_url: string | null
           user_id: string
+          verification_fee_paid: boolean
+          verification_fee_paid_at: string | null
+          verification_fee_session_id: string | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -891,6 +904,10 @@ export type Database = {
           base_location?: string | null
           bio?: string | null
           cancellation_rate?: number | null
+          checkr_candidate_id?: string | null
+          checkr_completed_at?: string | null
+          checkr_report_id?: string | null
+          checkr_status?: string | null
           closest_airports?: string | null
           created_at?: string
           display_name: string
@@ -898,6 +915,8 @@ export type Database = {
           first_aid_expiry?: string | null
           gear_details?: string | null
           gear_included?: boolean
+          guide_license_expiry?: string | null
+          guide_license_url?: string | null
           has_motorized_vessel?: boolean
           id?: string
           insurance_amount?: string | null
@@ -908,6 +927,7 @@ export type Database = {
           license_expiry?: string | null
           license_state?: string | null
           license_url?: string | null
+          live_at?: string | null
           max_anglers?: number
           photos?: string[] | null
           profile_photo_url?: string | null
@@ -925,12 +945,18 @@ export type Database = {
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           suspended_reason?: string | null
+          suspension_type?: string | null
           techniques?: string[] | null
           trips_completed?: number | null
           updated_at?: string
           uscg_license_expiry?: string | null
           uscg_license_url?: string | null
           user_id: string
+          verification_fee_paid?: boolean
+          verification_fee_paid_at?: string | null
+          verification_fee_session_id?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -938,6 +964,10 @@ export type Database = {
           base_location?: string | null
           bio?: string | null
           cancellation_rate?: number | null
+          checkr_candidate_id?: string | null
+          checkr_completed_at?: string | null
+          checkr_report_id?: string | null
+          checkr_status?: string | null
           closest_airports?: string | null
           created_at?: string
           display_name?: string
@@ -945,6 +975,8 @@ export type Database = {
           first_aid_expiry?: string | null
           gear_details?: string | null
           gear_included?: boolean
+          guide_license_expiry?: string | null
+          guide_license_url?: string | null
           has_motorized_vessel?: boolean
           id?: string
           insurance_amount?: string | null
@@ -955,6 +987,7 @@ export type Database = {
           license_expiry?: string | null
           license_state?: string | null
           license_url?: string | null
+          live_at?: string | null
           max_anglers?: number
           photos?: string[] | null
           profile_photo_url?: string | null
@@ -972,12 +1005,18 @@ export type Database = {
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           suspended_reason?: string | null
+          suspension_type?: string | null
           techniques?: string[] | null
           trips_completed?: number | null
           updated_at?: string
           uscg_license_expiry?: string | null
           uscg_license_url?: string | null
           user_id?: string
+          verification_fee_paid?: boolean
+          verification_fee_paid_at?: string | null
+          verification_fee_session_id?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
           {
@@ -991,6 +1030,54 @@ export type Database = {
             foreignKeyName: "guide_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_verification_events: {
+        Row: {
+          id: string
+          guide_id: string
+          event_type: string
+          old_status: string | null
+          new_status: string | null
+          metadata: Json | null
+          actor_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          guide_id: string
+          event_type: string
+          old_status?: string | null
+          new_status?: string | null
+          metadata?: Json | null
+          actor_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          guide_id?: string
+          event_type?: string
+          old_status?: string | null
+          new_status?: string | null
+          metadata?: Json | null
+          actor_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_verification_events_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_verification_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

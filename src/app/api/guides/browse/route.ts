@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("guide_profiles")
       .select(selectFields, { count: "exact" })
-      .eq("status", "approved");
+      .eq("status", "live");
 
     // Text search across name, bio, location, service region
     if (q) {

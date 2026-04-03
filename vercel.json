@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/trip-reviews/prompt-cron",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/trip-reviews/publish-cron",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/guide-credential-expiry",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
