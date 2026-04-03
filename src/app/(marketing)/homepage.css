@@ -525,6 +525,10 @@ nav{padding:0 16px;max-width:100vw;box-sizing:border-box}
 .float-card{display:none}
 .scroll-indicator{display:none}
 .cinematic-divider{height:50vh}
+.hero-ctas{flex-direction:column}
+.hero-ctas .btn{width:100%;justify-content:center}
+.audience-hero-ctas{flex-direction:column;align-items:stretch}
+.audience-hero-ctas a{width:100%;justify-content:center}
 .investors-grid{grid-template-columns:1fr}
 .compass-results-grid{grid-template-columns:1fr}
 .nav-dropdown-menu{display:none}
