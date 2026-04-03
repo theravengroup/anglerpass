@@ -28,7 +28,7 @@ export default function HeroSection() {
   return (
     <section className="hero" id="hero">
       <div className="hero-bg">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img
           ref={heroBgImgRef}
           src="/images/hero.webp"

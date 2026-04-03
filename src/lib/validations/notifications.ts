@@ -4,8 +4,8 @@ import { z } from "zod";
 export const markReadSchema = z
   .object({
     mark_all_read: z.literal(true).optional(),
-    id: z.string().uuid().optional(),
-    ids: z.array(z.string().uuid()).max(100).optional(),
+    id: z.uuid().optional(),
+    ids: z.array(z.uuid()).max(100).optional(),
   })
   .refine(
     (data) => data.mark_all_read || data.id || (data.ids && data.ids.length > 0),

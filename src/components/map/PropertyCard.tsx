@@ -50,7 +50,7 @@ export default function PropertyCard({
         {/* Photo */}
         <div className="relative h-40 bg-stone-light/10">
           {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img
               src={photo}
               alt={property.name}

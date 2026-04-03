@@ -100,7 +100,7 @@ export const propertySchema = z
 
     // Lodging
     lodging_available: z.boolean().default(false),
-    lodging_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+    lodging_url: z.url("Please enter a valid URL").optional().or(z.literal("")),
 
     // Access (private — not displayed publicly)
     access_notes: z.string().max(2000).optional().or(z.literal("")),
@@ -148,7 +148,7 @@ export const propertySchema = z
     }
   );
 
-export type PropertyFormData = z.infer<typeof propertySchema>;
+export type PropertyFormData = z.input<typeof propertySchema>;
 
 export const propertyStatusTransition = z.object({
   status: z.enum(["pending_review", "draft"]),

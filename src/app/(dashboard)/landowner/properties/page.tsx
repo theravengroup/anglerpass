@@ -47,10 +47,10 @@ export default async function PropertiesPage() {
     status: string;
     location_description: string | null;
     water_type: string | null;
-    species: string[];
+    species: string[] | null;
     max_rods: number | null;
     max_guests: number | null;
-    updated_at: string;
+    updated_at: string | null;
   }[] = [];
 
   if (user) {
@@ -154,7 +154,7 @@ export default async function PropertiesPage() {
                     </div>
                     <span className="text-xs text-text-light">
                       Updated{" "}
-                      {new Date(property.updated_at).toLocaleDateString()}
+                      {property.updated_at ? new Date(property.updated_at).toLocaleDateString() : 'N/A'}
                     </span>
                   </CardContent>
                 </Card>

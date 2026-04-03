@@ -8,7 +8,7 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const inviteSchema = z.object({
-  email: z.string().email("A valid email is required"),
+  email: z.email("A valid email is required"),
   name: z.string().max(200).optional(),
 });
 

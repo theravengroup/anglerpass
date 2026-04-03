@@ -101,7 +101,7 @@ export type CategoryRating = z.infer<typeof categoryRatingSchema>;
 // ─── Create / Submit Review ──────────────────────────────────────────
 
 export const tripReviewCreateSchema = z.object({
-  booking_id: z.string().uuid("Invalid booking ID"),
+  booking_id: z.uuid("Invalid booking ID"),
   overall_rating: z.number().int().min(1).max(5),
   review_text: z.string().min(50, "Review must be at least 50 characters"),
   would_fish_again: z.boolean(),

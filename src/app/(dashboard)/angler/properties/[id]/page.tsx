@@ -117,7 +117,7 @@ export default function PropertyDetailPage() {
       {property.photos?.length > 0 && (
         <div className="space-y-2">
           <div className="aspect-[16/9] overflow-hidden rounded-xl bg-offwhite">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img
               src={property.photos[selectedPhoto] ?? property.photos[0]}
               alt={property.name}
@@ -136,7 +136,7 @@ export default function PropertyDetailPage() {
                       : "border-transparent"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img
                     src={photo}
                     alt=""

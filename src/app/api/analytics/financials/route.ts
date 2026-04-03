@@ -84,7 +84,7 @@ export async function GET(request: Request) {
    LANDOWNER FINANCIALS
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getLandownerFinancials(admin: any, userId: string, since: string) {
   const { data: properties } = await admin
     .from("properties")
@@ -177,7 +177,7 @@ function emptyLandownerFinancials() {
    CLUB FINANCIALS
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getClubFinancials(admin: any, userId: string, since: string) {
   // Find user's club
   const { data: clubs } = await admin
@@ -319,7 +319,7 @@ function emptyClubFinancials() {
    ANGLER FINANCIALS
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getAnglerFinancials(admin: any, userId: string, since: string) {
   const { data: allBookings } = await admin
     .from("bookings")
@@ -413,7 +413,7 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
    GUIDE FINANCIALS
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getGuideFinancials(admin: any, userId: string, since: string) {
   const { data: allBookings } = await admin
     .from("bookings")
@@ -481,7 +481,7 @@ async function getGuideFinancials(admin: any, userId: string, since: string) {
    ADMIN FINANCIALS
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getAdminFinancials(admin: any, since: string) {
   const { data: allBookings } = await admin
     .from("bookings")

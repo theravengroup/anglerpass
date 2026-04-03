@@ -230,7 +230,7 @@ export default function MigrationForm() {
                 type="number"
                 min={1}
                 placeholder="e.g. 150"
-                {...register("memberCount")}
+                {...register("memberCount", { valueAsNumber: true })}
                 disabled={saving}
               />
               {errors.memberCount && (

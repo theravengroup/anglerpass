@@ -81,10 +81,10 @@ export default async function ModerationPage() {
             id: string;
             name: string;
             location_description: string | null;
-            photos: string[];
+            photos: string[] | null;
             max_rods: number | null;
             owner_id: string;
-            updated_at: string;
+            updated_at: string | null;
           }) => (
             <Link
               key={property.id}
@@ -94,9 +94,9 @@ export default async function ModerationPage() {
                 <CardContent className="flex items-center justify-between py-4">
                   <div className="flex items-center gap-4">
                     {/* Thumbnail */}
-                    {property.photos?.length > 0 ? (
+                    {(property.photos?.length ?? 0) > 0 ? (
                       <img
-                        src={property.photos[0]}
+                        src={property.photos![0]}
                         alt=""
                         className="size-14 rounded-lg object-cover"
                       />
@@ -128,7 +128,7 @@ export default async function ModerationPage() {
 
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-text-light">
-                      Submitted {new Date(property.updated_at).toLocaleDateString()}
+                      Submitted {property.updated_at ? new Date(property.updated_at).toLocaleDateString() : 'N/A'}
                     </span>
                     <Button variant="outline" size="sm">
                       Review

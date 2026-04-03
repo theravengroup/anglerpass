@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
 
 const joinSchema = z.object({
-  club_id: z.string().uuid(),
+  club_id: z.uuid(),
 });
 
 // POST: Request to join a club

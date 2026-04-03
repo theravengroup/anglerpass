@@ -3,9 +3,9 @@ import { z } from "zod";
 export const migrationInquirySchema = z.object({
   clubName: z.string().min(1, "Club name is required"),
   contactName: z.string().min(1, "Your name is required"),
-  email: z.string().email("Please enter a valid email address"),
-  memberCount: z.coerce
-    .number({ required_error: "Number of members is required" })
+  email: z.email("Please enter a valid email address"),
+  memberCount: z
+    .number({ error: "Number of members is required" })
     .int()
     .min(1, "Must be at least 1"),
   dataSource: z.enum(
@@ -17,7 +17,7 @@ export const migrationInquirySchema = z.object({
       "legacy-dos",
       "other",
     ],
-    { required_error: "Please select where your data lives" }
+    { error: "Please select where your data lives" }
   ),
   websitePlatform: z
     .enum([
@@ -33,10 +33,7 @@ export const migrationInquirySchema = z.object({
     .enum(["yes", "possibly", "not-sure"])
     .optional(),
   targetLaunch: z.string().optional(),
-  loomUrl: z
-    .string()
-    .min(1, "Loom video link is required")
-    .url("Please enter a valid URL"),
+  loomUrl: z.url("Please enter a valid Loom video link"),
   notes: z.string().optional(),
 });
 

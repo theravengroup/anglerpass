@@ -190,7 +190,7 @@ export async function PATCH(
     const parsed = updateClubSchema.safeParse(body);
 
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0]?.message ?? "Invalid input", 400);
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const updates = parsed.data;

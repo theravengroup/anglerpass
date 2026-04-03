@@ -9,9 +9,9 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const inviteSchema = z.object({
-  property_id: z.string().uuid(),
+  property_id: z.uuid(),
   club_name: z.string().min(1, "Club name is required").max(200),
-  admin_email: z.string().email("Valid email is required"),
+  admin_email: z.email("Valid email is required"),
 });
 
 export async function POST(request: Request) {

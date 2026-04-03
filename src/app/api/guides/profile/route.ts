@@ -187,7 +187,7 @@ export async function PATCH(request: Request) {
     }
 
     // Build update object from allowed fields
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const updates: Record<string, any> = {
       updated_at: new Date().toISOString(),
     };

@@ -173,7 +173,7 @@ export default function NotificationsPage() {
               <Bell className="size-6 text-forest" />
             </div>
             <p className="text-sm text-text-secondary">
-              No notifications yet. They'll appear here when you get booking
+              No notifications yet. They&apos;ll appear here when you get booking
               requests, confirmations, and other updates.
             </p>
           </CardContent>

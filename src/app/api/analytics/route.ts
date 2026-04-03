@@ -66,7 +66,7 @@ export async function GET(request: Request) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getLandownerAnalytics(admin: any, userId: string, since: string) {
   // Properties
   const { data: properties } = await admin
@@ -167,7 +167,7 @@ async function getLandownerAnalytics(admin: any, userId: string, since: string) 
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getAnglerAnalytics(admin: any, userId: string, since: string) {
   const { data: bookings } = await admin
     .from("bookings")
@@ -235,7 +235,7 @@ async function getAnglerAnalytics(admin: any, userId: string, since: string) {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function getAdminAnalytics(admin: any, since: string) {
   // Counts in parallel
   const [

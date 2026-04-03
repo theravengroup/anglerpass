@@ -8,7 +8,7 @@ import { z } from 'zod';
 const schema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().optional(),
-  email: z.string().email('Invalid email'),
+  email: z.email('Invalid email'),
   role: z.string().min(1, 'Required'),
   message: z.string().optional(),
 });

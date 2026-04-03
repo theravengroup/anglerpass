@@ -20,7 +20,6 @@ export const clubSchema = z.object({
   location: z.string().max(500).optional().or(z.literal("")),
   rules: z.string().max(5000).optional().or(z.literal("")),
   website: z
-    .string()
     .url("Please enter a valid URL")
     .optional()
     .or(z.literal("")),
@@ -30,11 +29,11 @@ export type ClubFormData = z.infer<typeof clubSchema>;
 
 // ─── Member Invite ─────────────────────────────────────────────────
 export const clubMemberInviteSchema = z.object({
-  email: z.string().email("Valid email is required"),
+  email: z.email("Valid email is required"),
   role: z.enum(MEMBERSHIP_ROLES).default("member"),
 });
 
-export type ClubMemberInviteData = z.infer<typeof clubMemberInviteSchema>;
+export type ClubMemberInviteData = z.input<typeof clubMemberInviteSchema>;
 
 // ─── Member Status Update ──────────────────────────────────────────
 export const clubMemberStatusSchema = z.object({
@@ -67,7 +66,7 @@ export type CorporateSettingsData = z.infer<typeof corporateSettingsSchema>;
 
 // ─── Corporate Invitation ─────────────────────────────────────────
 export const corporateInviteSchema = z.object({
-  emails: z.array(z.string().email("Invalid email")).min(1, "At least one email required"),
+  emails: z.array(z.email("Invalid email")).min(1, "At least one email required"),
 });
 
 export type CorporateInviteData = z.infer<typeof corporateInviteSchema>;
@@ -75,7 +74,7 @@ export type CorporateInviteData = z.infer<typeof corporateInviteSchema>;
 // ─── Cross-Club Agreements ───────────────────────────────────────
 
 export const proposeAgreementSchema = z.object({
-  partner_club_id: z.string().uuid("Invalid club ID"),
+  partner_club_id: z.uuid("Invalid club ID"),
 });
 
 export type ProposeAgreementData = z.infer<typeof proposeAgreementSchema>;

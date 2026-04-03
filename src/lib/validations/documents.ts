@@ -14,19 +14,17 @@ export const documentTemplateSchema = z.object({
   sort_order: z.number().int().min(0).default(0),
 });
 
-export type DocumentTemplateData = z.infer<typeof documentTemplateSchema>;
+export type DocumentTemplateData = z.input<typeof documentTemplateSchema>;
 
 export const signDocumentSchema = z.object({
-  template_id: z.string().uuid("Invalid template ID"),
-  booking_id: z.string().uuid("Invalid booking ID"),
+  template_id: z.uuid("Invalid template ID"),
+  booking_id: z.uuid("Invalid booking ID"),
   signer_name: z
     .string()
     .min(2, "Please enter your full name")
     .max(200, "Name is too long"),
   agreed: z.literal(true, {
-    errorMap: () => ({
-      message: "You must agree to the terms to continue",
-    }),
+    error: "You must agree to the terms to continue",
   }),
 });
 

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 export default function BuiltForSection() {
   return (
     <section className="built-for" id="built-for">

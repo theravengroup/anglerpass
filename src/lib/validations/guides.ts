@@ -29,8 +29,8 @@ export const GUIDE_STATUSES = [
 export const guideProfileSchema = z.object({
   display_name: z.string().min(2, "Display name is required").max(100),
   bio: z.string().max(5000).optional().or(z.literal("")),
-  profile_photo_url: z.string().url().optional().or(z.literal("")),
-  photos: z.array(z.string().url()).max(10).optional(),
+  profile_photo_url: z.url().optional().or(z.literal("")),
+  photos: z.array(z.url()).max(10).optional(),
 
   techniques: z.array(z.enum(TECHNIQUES)).optional(),
   species: z.array(z.string().max(50)).max(20).optional(),
@@ -60,7 +60,7 @@ export const guideProfileSchema = z.object({
   uscg_license_expiry: z.string().optional().or(z.literal("")),
 });
 
-export type GuideProfileFormData = z.infer<typeof guideProfileSchema>;
+export type GuideProfileFormData = z.input<typeof guideProfileSchema>;
 
 // ─── Guide Credential Upload ────────────────────────────────────────
 
@@ -79,8 +79,8 @@ export const guideCredentialSchema = z.object({
 // ─── Guide Water Approval Request ───────────────────────────────────
 
 export const guideWaterApprovalSchema = z.object({
-  property_id: z.string().uuid(),
-  club_id: z.string().uuid(),
+  property_id: z.uuid(),
+  club_id: z.uuid(),
 });
 
 export type GuideWaterApprovalData = z.infer<typeof guideWaterApprovalSchema>;
@@ -97,7 +97,7 @@ export type GuideAvailabilityData = z.infer<typeof guideAvailabilitySchema>;
 // ─── Review ─────────────────────────────────────────────────────────
 
 export const reviewSchema = z.object({
-  booking_id: z.string().uuid(),
+  booking_id: z.uuid(),
   rating: z.number().int().min(1).max(5),
   title: z.string().max(100).optional().or(z.literal("")),
   body: z.string().max(2000).optional().or(z.literal("")),
@@ -108,9 +108,9 @@ export type ReviewFormData = z.infer<typeof reviewSchema>;
 // ─── Message ────────────────────────────────────────────────────────
 
 export const messageSchema = z.object({
-  recipient_id: z.string().uuid(),
+  recipient_id: z.uuid(),
   body: z.string().min(1, "Message cannot be empty").max(5000),
-  booking_id: z.string().uuid().optional(),
+  booking_id: z.uuid().optional(),
 });
 
 export type MessageFormData = z.infer<typeof messageSchema>;

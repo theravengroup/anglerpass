@@ -9,7 +9,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
-/* eslint-disable @next/next/no-img-element */
+ 
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/lib/auth/get-profile";
 import { useUnreadCount } from "@/hooks/use-unread-count";

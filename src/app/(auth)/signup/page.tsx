@@ -20,10 +20,10 @@ import {
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().optional(),
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["landowner", "club_admin", "angler", "guide"], {
-    required_error: "Please select your role",
+    error: "Please select your role",
   }),
 });
 

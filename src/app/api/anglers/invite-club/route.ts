@@ -10,7 +10,7 @@ const resend = process.env.RESEND_API_KEY
 
 const inviteSchema = z.object({
   club_name: z.string().min(1, "Club name is required").max(200),
-  admin_email: z.string().email("Valid email is required"),
+  admin_email: z.email("Valid email is required"),
   admin_name: z.string().max(200).optional(),
 });
 

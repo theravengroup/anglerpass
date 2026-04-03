@@ -388,7 +388,7 @@ function BookingCard({
         {/* Photo */}
         <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-offwhite">
           {property?.photos?.[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img
               src={property.photos[0]}
               alt={property?.name ?? ""}
