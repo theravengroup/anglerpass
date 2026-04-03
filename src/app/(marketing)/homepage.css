@@ -13,8 +13,8 @@
 --heading:'Cormorant Garamond',Georgia,serif;--body:'DM Sans',-apple-system,sans-serif;--mono:'DM Mono',monospace;
 --max-width:1200px;--section-pad:140px;
 }
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:clip}
 
 .container{max-width:var(--max-width);margin:0 auto;padding:0 32px}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--bronze);font-weight:500;display:inline-block;text-wrap:balance}
