@@ -3,9 +3,6 @@
 /**
  * Inline dashboard preview sections for audience marketing pages.
  * Each role gets a contextual preview showing what their dashboard looks like.
- *
- * Uses inline styles inside the browser-chrome mockup to match the existing
- * DashboardPreviewModal pattern (homepage components use bespoke CSS).
  */
 
 /* ──────────────────── Browser Chrome Wrapper ──────────────────── */
@@ -36,92 +33,112 @@ function BrowserChrome({
   );
 }
 
+/* ──────────────────── Stat Card ──────────────────── */
+
+function StatCard({
+  label,
+  value,
+  sub,
+  subColor,
+  accentColor,
+  bgClass,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  subColor?: string;
+  accentColor: string;
+  bgClass: string;
+}) {
+  return (
+    <div className={`p-3 ${bgClass} rounded-lg`}>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-light mb-1.5">
+        {label}
+      </div>
+      <div className={`text-2xl font-bold font-heading ${accentColor}`}>
+        {value}
+      </div>
+      <div className={`text-[11px] mt-0.5 ${subColor ?? 'text-text-light'}`}>
+        {sub}
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────── Section Label ──────────────────── */
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-xs font-semibold uppercase tracking-[0.08em] text-text-light mb-2.5">
+      {children}
+    </div>
+  );
+}
+
 /* ──────────────────── Landowner Preview ──────────────────── */
 
 function LandownerDashboard() {
-  const accent = '#1a3a2a';
-  const accentLight = 'rgba(26,58,42,.07)';
   return (
-    <div style={{ padding: 24, minWidth: 580 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+    <div className="p-6 min-w-[580px]">
+      <div className="flex justify-between items-center mb-5">
         <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>Welcome back, James</div>
-          <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Silver Creek Ranch</div>
+          <div className="text-base font-semibold text-text-primary font-heading">Welcome back, James</div>
+          <div className="text-xs text-text-light">Silver Creek Ranch</div>
         </div>
-        <div style={{ position: 'relative' }}>
-          <select
-            disabled
-            defaultValue="all"
-            style={{
-              appearance: 'none',
-              padding: '6px 28px 6px 10px',
-              borderRadius: 6,
-              border: '1px solid var(--border)',
-              background: '#fff',
-              fontSize: 12,
-              fontWeight: 600,
-              fontFamily: 'var(--body)',
-              color: accent,
-              cursor: 'default',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b6b60' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 8px center',
-            }}
-          >
-            <option value="all">All Properties</option>
-            <option value="east-fork">Silver Creek — East Fork</option>
-            <option value="elk-meadow">Elk Meadow Spring</option>
-          </select>
-        </div>
+        <select
+          disabled
+          defaultValue="all"
+          className="appearance-none py-1.5 pl-2.5 pr-7 rounded-md border border-parchment bg-white text-xs font-semibold font-body text-forest cursor-default bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2710%27%20height%3D%2710%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%236b6b60%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M6%209l6%206%206-6%27%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_8px_center]"
+        >
+          <option value="all">All Properties</option>
+          <option value="east-fork">Silver Creek — East Fork</option>
+          <option value="elk-meadow">Elk Meadow Spring</option>
+        </select>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+      <div className="grid grid-cols-3 gap-2.5 mb-5">
         {[
-          { label: 'Revenue (Mar)', value: '$4,280', sub: '+18% vs Feb', subColor: '#4a8c5c' },
-          { label: 'Active Bookings', value: '7', sub: '3 this week', subColor: 'var(--text-light)' },
-          { label: 'Occupancy', value: '62%', sub: 'Apr: 85%', subColor: 'var(--text-light)' },
+          { label: 'Revenue (Mar)', value: '$4,280', sub: '+18% vs Feb', subColor: 'text-[#4a8c5c]' },
+          { label: 'Active Bookings', value: '7', sub: '3 this week' },
+          { label: 'Occupancy', value: '62%', sub: 'Apr: 85%' },
         ].map((s) => (
-          <div key={s.label} style={{ padding: '14px 12px', background: accentLight, borderRadius: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 6 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: accent, fontFamily: 'var(--heading)' }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: s.subColor, marginTop: 2 }}>{s.sub}</div>
-          </div>
+          <StatCard key={s.label} {...s} accentColor="text-forest" bgClass="bg-forest/[0.07]" />
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Upcoming Bookings</div>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+      <SectionLabel>Upcoming Bookings</SectionLabel>
+      <div className="border border-parchment rounded-lg overflow-hidden">
         {[
           { name: 'M. Thompson', club: 'Trout Unlimited #412', property: 'East Fork', date: 'Apr 4–5', rods: 2, payout: '$450' },
           { name: 'R. Chen', club: 'Madison River Club', property: 'East Fork', date: 'Apr 12', rods: 1, payout: '$225' },
           { name: 'S. Williams', club: 'Big Sky Anglers', property: 'Elk Meadow', date: 'Apr 18–19', rods: 3, payout: '$900' },
         ].map((req, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 12, borderBottom: i < 2 ? '1px solid var(--border)' : 'none', background: i === 0 ? 'rgba(26,58,42,.03)' : 'transparent' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{req.name}</span>
-              <span style={{ color: 'var(--text-light)', marginLeft: 6 }}>{req.club}</span>
+          <div key={i} className={`flex items-center justify-between px-3.5 py-2.5 text-xs ${i < 2 ? 'border-b border-parchment' : ''} ${i === 0 ? 'bg-forest/[0.03]' : ''}`}>
+            <div className="flex-1">
+              <span className="font-semibold text-text-primary">{req.name}</span>
+              <span className="text-text-light ml-1.5">{req.club}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-              <span style={{ color: 'var(--text-secondary)' }}>{req.property}</span>
-              <span style={{ color: 'var(--text-light)' }}>{req.date}</span>
-              <span style={{ color: 'var(--text-light)' }}>{req.rods} rod{req.rods > 1 ? 's' : ''}</span>
-              <span style={{ fontWeight: 600, color: accent }}>{req.payout}</span>
-              <span style={{ padding: '3px 10px', borderRadius: 4, background: '#4a8c5c12', color: '#4a8c5c', fontSize: 10, fontWeight: 600 }}>Confirmed</span>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-text-secondary">{req.property}</span>
+              <span className="text-text-light">{req.date}</span>
+              <span className="text-text-light">{req.rods} rod{req.rods > 1 ? 's' : ''}</span>
+              <span className="font-semibold text-forest">{req.payout}</span>
+              <span className="px-2.5 py-0.5 rounded bg-[#4a8c5c]/[0.07] text-[#4a8c5c] text-[10px] font-semibold">Confirmed</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div className="mt-4 grid grid-cols-2 gap-2.5">
         {[
           { name: 'Silver Creek — East Fork', type: 'River', status: 'Active', next: 'Apr 4' },
           { name: 'Elk Meadow Spring', type: 'Spring Creek', status: 'Active', next: 'Apr 18' },
         ].map((p, i) => (
-          <div key={i} style={{ padding: '14px 14px', border: '1px solid var(--border)', borderRadius: 8 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{p.name}</div>
-            <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'var(--text-light)' }}>
+          <div key={i} className="p-3.5 border border-parchment rounded-lg">
+            <div className="text-[13px] font-semibold text-text-primary mb-1">{p.name}</div>
+            <div className="flex gap-2 text-[11px] text-text-light">
               <span>{p.type}</span>
-              <span style={{ color: '#4a8c5c' }}>{p.status}</span>
+              <span className="text-[#4a8c5c]">{p.status}</span>
               <span>Next: {p.next}</span>
             </div>
           </div>
@@ -134,61 +151,64 @@ function LandownerDashboard() {
 /* ──────────────────── Club Preview ──────────────────── */
 
 function ClubDashboard() {
-  const accent = '#3a6b7c';
-  const accentLight = 'rgba(58,107,124,.07)';
   return (
-    <div style={{ padding: 24, minWidth: 580 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+    <div className="p-6 min-w-[580px]">
+      <div className="flex justify-between items-center mb-5">
         <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>Madison River Club</div>
-          <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Standard Plan · Cross-club access enabled</div>
+          <div className="text-base font-semibold text-text-primary font-heading">Madison River Club</div>
+          <div className="text-xs text-text-light">Standard Plan · Cross-club access enabled</div>
         </div>
-        <div style={{ padding: '5px 12px', borderRadius: 6, background: accentLight, fontSize: 11, fontWeight: 600, color: accent }}>48 members</div>
+        <div className="py-1 px-3 rounded-md bg-river/[0.07] text-[11px] font-semibold text-river">48 members</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+      <div className="grid grid-cols-3 gap-2.5 mb-5">
         {[
-          { label: 'Active Members', value: '48', sub: '3 pending', subColor: accent },
-          { label: 'Waters Access', value: '5', sub: '+2 cross-club', subColor: 'var(--text-light)' },
-          { label: 'This Month', value: '23', sub: 'fishing days booked', subColor: 'var(--text-light)' },
+          { label: 'Active Members', value: '48', sub: '3 pending', subColor: 'text-river' },
+          { label: 'Waters Access', value: '5', sub: '+2 cross-club' },
+          { label: 'This Month', value: '23', sub: 'fishing days booked' },
         ].map((s) => (
-          <div key={s.label} style={{ padding: '14px 12px', background: accentLight, borderRadius: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 6 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: accent, fontFamily: 'var(--heading)' }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: s.subColor, marginTop: 2 }}>{s.sub}</div>
-          </div>
+          <StatCard key={s.label} {...s} accentColor="text-river" bgClass="bg-river/[0.07]" />
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Member Applications</div>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+      <SectionLabel>Member Applications</SectionLabel>
+      <div className="border border-parchment rounded-lg overflow-hidden mb-4">
         {[
           { name: 'David Park', ref: 'Referred by J. Adams', exp: '8 yrs fly fishing', applied: 'Mar 25' },
           { name: 'Lisa Moreno', ref: 'Referred by T. Wells', exp: '12 yrs fly fishing', applied: 'Mar 22' },
           { name: 'Kevin O\u2019Brien', ref: 'Direct application', exp: '3 yrs fly fishing', applied: 'Mar 20' },
         ].map((app, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 12, borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{app.name}</span>
-              <span style={{ color: 'var(--text-light)', marginLeft: 6 }}>{app.ref}</span>
+          <div key={i} className={`flex items-center justify-between px-3.5 py-2.5 text-xs ${i < 2 ? 'border-b border-parchment' : ''}`}>
+            <div className="flex-1">
+              <span className="font-semibold text-text-primary">{app.name}</span>
+              <span className="text-text-light ml-1.5">{app.ref}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-              <span style={{ color: 'var(--text-light)' }}>{app.exp}</span>
-              <span style={{ padding: '3px 10px', borderRadius: 4, background: accent, color: '#fff', fontSize: 10, fontWeight: 600 }}>Review</span>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <span className="text-text-light">{app.exp}</span>
+              <span className="px-2.5 py-0.5 rounded bg-river text-white text-[10px] font-semibold">Review</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>This Week&rsquo;s Schedule</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+      <SectionLabel>This Week&rsquo;s Schedule</SectionLabel>
+      <div className="grid grid-cols-7 gap-1">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-          <div key={day} style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: 'var(--text-light)', marginBottom: 4 }}>{day}</div>
+          <div key={day} className="text-center text-[10px] font-semibold text-text-light mb-1">{day}</div>
         ))}
         {[2, 0, 4, 1, 3, 6, 5].map((count, i) => (
-          <div key={i} style={{ textAlign: 'center', padding: '8px 0', borderRadius: 6, background: count > 0 ? `rgba(58,107,124,${0.05 + count * 0.025})` : 'var(--offwhite)', border: `1px solid ${count > 0 ? 'rgba(58,107,124,.15)' : 'var(--border)'}` }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: count > 0 ? accent : 'var(--text-light)', fontFamily: 'var(--heading)' }}>{count || '\u2014'}</div>
-            <div style={{ fontSize: 9, color: 'var(--text-light)' }}>{count > 0 ? 'anglers' : ''}</div>
+          <div
+            key={i}
+            className={`text-center py-2 rounded-md border ${
+              count > 0
+                ? 'bg-river/[0.07] border-river/15'
+                : 'bg-offwhite border-parchment'
+            }`}
+          >
+            <div className={`text-base font-semibold font-heading ${count > 0 ? 'text-river' : 'text-text-light'}`}>
+              {count || '\u2014'}
+            </div>
+            <div className="text-[9px] text-text-light">{count > 0 ? 'anglers' : ''}</div>
           </div>
         ))}
       </div>
@@ -199,50 +219,55 @@ function ClubDashboard() {
 /* ──────────────────── Angler Preview ──────────────────── */
 
 function AnglerDashboard() {
-  const accent = '#9a7340';
   return (
-    <div style={{ padding: 24, minWidth: 580 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+    <div className="p-6 min-w-[580px]">
+      <div className="flex justify-between items-center mb-5">
         <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>Welcome back, Sarah</div>
-          <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Madison River Club · Member since 2024</div>
+          <div className="text-base font-semibold text-text-primary font-heading">Welcome back, Sarah</div>
+          <div className="text-xs text-text-light">Madison River Club · Member since 2024</div>
         </div>
-        <div style={{ padding: '5px 12px', borderRadius: 6, background: 'rgba(154,115,64,.07)', fontSize: 11, fontWeight: 600, color: accent }}>3 upcoming trips</div>
+        <div className="py-1 px-3 rounded-md bg-bronze/[0.07] text-[11px] font-semibold text-bronze">3 upcoming trips</div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Upcoming Trips</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+      <SectionLabel>Upcoming Trips</SectionLabel>
+      <div className="flex flex-col gap-2 mb-5">
         {[
-          { property: 'Silver Creek — East Fork', date: 'Apr 4–5', rods: 2, status: 'Confirmed', statusColor: '#4a8c5c' },
-          { property: 'Yellowstone Spring', date: 'Apr 18', rods: 1, status: 'Confirmed', statusColor: '#4a8c5c' },
-          { property: 'Gallatin Bend (cross-club)', date: 'May 2–3', rods: 2, status: 'Pending', statusColor: accent },
+          { property: 'Silver Creek — East Fork', date: 'Apr 4–5', rods: 2, status: 'Confirmed', confirmed: true },
+          { property: 'Yellowstone Spring', date: 'Apr 18', rods: 1, status: 'Confirmed', confirmed: true },
+          { property: 'Gallatin Bend (cross-club)', date: 'May 2–3', rods: 2, status: 'Pending', confirmed: false },
         ].map((trip, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', border: '1px solid var(--border)', borderRadius: 8, background: i === 0 ? 'rgba(154,115,64,.03)' : 'transparent' }}>
+          <div key={i} className={`flex items-center justify-between p-3.5 border border-parchment rounded-lg ${i === 0 ? 'bg-bronze/[0.03]' : ''}`}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{trip.property}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-light)', marginTop: 2 }}>{trip.date} · {trip.rods} rod{trip.rods > 1 ? 's' : ''}</div>
+              <div className="text-[13px] font-semibold text-text-primary">{trip.property}</div>
+              <div className="text-[11px] text-text-light mt-0.5">{trip.date} · {trip.rods} rod{trip.rods > 1 ? 's' : ''}</div>
             </div>
-            <span style={{ padding: '3px 10px', borderRadius: 4, background: trip.statusColor + '12', color: trip.statusColor, fontSize: 10, fontWeight: 600 }}>{trip.status}</span>
+            <span className={`px-2.5 py-0.5 rounded text-[10px] font-semibold ${
+              trip.confirmed
+                ? 'bg-[#4a8c5c]/[0.07] text-[#4a8c5c]'
+                : 'bg-bronze/[0.07] text-bronze'
+            }`}>
+              {trip.status}
+            </span>
           </div>
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Available Waters</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+      <SectionLabel>Available Waters</SectionLabel>
+      <div className="grid grid-cols-2 gap-2">
         {[
           { name: 'Elk Meadow Spring', type: 'Spring Creek', rate: '$225/day', species: 'Brown, Brook', avail: '12 dates in Apr' },
           { name: 'Ruby River — North', type: 'River', rate: '$300/day', species: 'Rainbow, Brown', avail: '8 dates in Apr' },
           { name: 'Columbine Reservoir', type: 'Stillwater', rate: '$175/day', species: 'Rainbow, Cutthroat', avail: '18 dates in Apr' },
           { name: 'Gallatin Bend', type: 'River · Cross-club', rate: '$350/day', species: 'Brown, Rainbow', avail: '5 dates in Apr' },
         ].map((w, i) => (
-          <div key={i} style={{ padding: '12px 14px', border: '1px solid var(--border)', borderRadius: 8 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{w.name}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-light)', marginBottom: 6 }}>{w.type}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: accent }}>{w.rate}</span>
-              <span style={{ fontSize: 10, color: 'var(--text-light)' }}>{w.species}</span>
+          <div key={i} className="p-3.5 border border-parchment rounded-lg">
+            <div className="text-[13px] font-semibold text-text-primary mb-0.5">{w.name}</div>
+            <div className="text-[11px] text-text-light mb-1.5">{w.type}</div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-semibold text-bronze">{w.rate}</span>
+              <span className="text-[10px] text-text-light">{w.species}</span>
             </div>
-            <div style={{ fontSize: 10, color: accent, marginTop: 4 }}>{w.avail}</div>
+            <div className="text-[10px] text-bronze mt-1">{w.avail}</div>
           </div>
         ))}
       </div>
@@ -253,74 +278,68 @@ function AnglerDashboard() {
 /* ──────────────────── Guide Preview ──────────────────── */
 
 function GuideDashboard() {
-  const accent = '#4a4a42';
-  const accentLight = 'rgba(74,74,66,.07)';
   return (
-    <div style={{ padding: 24, minWidth: 580 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+    <div className="p-6 min-w-[580px]">
+      <div className="flex justify-between items-center mb-5">
         <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>Welcome back, Tom</div>
-          <div style={{ fontSize: 12, color: 'var(--text-light)' }}>Licensed Guide · Montana #4821</div>
+          <div className="text-base font-semibold text-text-primary font-heading">Welcome back, Tom</div>
+          <div className="text-xs text-text-light">Licensed Guide · Montana #4821</div>
         </div>
-        <div style={{ padding: '5px 12px', borderRadius: 6, background: accentLight, fontSize: 11, fontWeight: 600, color: accent }}>Approved</div>
+        <div className="py-1 px-3 rounded-md bg-charcoal/[0.07] text-[11px] font-semibold text-charcoal">Approved</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+      <div className="grid grid-cols-3 gap-2.5 mb-5">
         {[
-          { label: 'Earnings (Mar)', value: '$3,150', sub: '9 trips completed', subColor: '#4a8c5c' },
-          { label: 'Upcoming Trips', value: '4', sub: 'Next: Apr 4', subColor: 'var(--text-light)' },
-          { label: 'Rating', value: '4.9', sub: '37 reviews', subColor: 'var(--text-light)' },
+          { label: 'Earnings (Mar)', value: '$3,150', sub: '9 trips completed', subColor: 'text-[#4a8c5c]' },
+          { label: 'Upcoming Trips', value: '4', sub: 'Next: Apr 4' },
+          { label: 'Rating', value: '4.9', sub: '37 reviews' },
         ].map((s) => (
-          <div key={s.label} style={{ padding: '14px 12px', background: accentLight, borderRadius: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 6 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: accent, fontFamily: 'var(--heading)' }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: s.subColor, marginTop: 2 }}>{s.sub}</div>
-          </div>
+          <StatCard key={s.label} {...s} accentColor="text-charcoal" bgClass="bg-charcoal/[0.07]" />
         ))}
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 10 }}>Upcoming Schedule</div>
-      <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+      <SectionLabel>Upcoming Schedule</SectionLabel>
+      <div className="border border-parchment rounded-lg overflow-hidden mb-4">
         {[
           { angler: 'M. Thompson', property: 'Silver Creek — East Fork', date: 'Apr 4–5', party: 2, rate: '$350/day' },
           { angler: 'J. Adams', property: 'Elk Meadow Spring', date: 'Apr 12', party: 1, rate: '$400/day' },
           { angler: 'K. Rivera', property: 'Ruby River — North', date: 'Apr 18', party: 3, rate: '$350/day' },
           { angler: 'S. Williams', property: 'Gallatin Bend', date: 'Apr 22–23', party: 2, rate: '$375/day' },
         ].map((trip, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 12, borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{trip.angler}</span>
-              <span style={{ color: 'var(--text-light)', marginLeft: 6 }}>{trip.property}</span>
+          <div key={i} className={`flex items-center justify-between px-3.5 py-2.5 text-xs ${i < 3 ? 'border-b border-parchment' : ''}`}>
+            <div className="flex-1">
+              <span className="font-semibold text-text-primary">{trip.angler}</span>
+              <span className="text-text-light ml-1.5">{trip.property}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-              <span style={{ color: 'var(--text-light)' }}>{trip.date}</span>
-              <span style={{ color: 'var(--text-light)' }}>{trip.party} angler{trip.party > 1 ? 's' : ''}</span>
-              <span style={{ fontWeight: 600, color: accent }}>{trip.rate}</span>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-text-light">{trip.date}</span>
+              <span className="text-text-light">{trip.party} angler{trip.party > 1 ? 's' : ''}</span>
+              <span className="font-semibold text-charcoal">{trip.rate}</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div style={{ padding: '14px', border: '1px solid var(--border)', borderRadius: 8 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 8 }}>Approved Waters</div>
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="p-3.5 border border-parchment rounded-lg">
+          <div className="text-xs font-semibold uppercase tracking-[0.08em] text-text-light mb-2">Approved Waters</div>
           {['Silver Creek — East Fork', 'Elk Meadow Spring', 'Ruby River — North', 'Gallatin Bend'].map((w) => (
-            <div key={w} style={{ fontSize: 12, color: 'var(--text-primary)', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>{w}</div>
+            <div key={w} className="text-xs text-text-primary py-1 border-b border-parchment last:border-b-0">{w}</div>
           ))}
         </div>
-        <div style={{ padding: '14px', border: '1px solid var(--border)', borderRadius: 8 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--text-light)', marginBottom: 8 }}>Your Rates</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Full day</span>
-            <span style={{ fontWeight: 600, color: accent }}>$350–400</span>
+        <div className="p-3.5 border border-parchment rounded-lg">
+          <div className="text-xs font-semibold uppercase tracking-[0.08em] text-text-light mb-2">Your Rates</div>
+          <div className="flex justify-between py-1.5 border-b border-parchment text-xs">
+            <span className="text-text-secondary">Full day</span>
+            <span className="font-semibold text-charcoal">$350–400</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Half day</span>
-            <span style={{ fontWeight: 600, color: accent }}>$225</span>
+          <div className="flex justify-between py-1.5 border-b border-parchment text-xs">
+            <span className="text-text-secondary">Half day</span>
+            <span className="font-semibold text-charcoal">$225</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: 12 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Service fee</span>
-            <span style={{ color: 'var(--text-light)' }}>10% (paid by angler)</span>
+          <div className="flex justify-between py-1.5 text-xs">
+            <span className="text-text-secondary">Service fee</span>
+            <span className="text-text-light">10% (paid by angler)</span>
           </div>
         </div>
       </div>

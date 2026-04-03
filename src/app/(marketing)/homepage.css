@@ -431,11 +431,6 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .modal-contact-row{padding:16px 20px;background:rgba(0,0,0,.02);border:1px solid var(--border);border-radius:10px}
 .modal-contact-row .modal-heading{margin:0 0 4px;font-size:14px}
 .modal-contact-row .modal-text{margin:0;font-size:14px}
-.contact-form-error{display:block;font-size:12px;color:#c53030;margin-top:4px}
-.contact-form-submit{margin-top:8px}
-.contact-form-submit .btn{width:100%}
-.contact-form-success{padding:24px 0;text-align:center}
-.contact-form-success-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 auto;border-radius:50%;background:rgba(42,107,58,.1);color:var(--forest)}
 @keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes modalSlideIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 

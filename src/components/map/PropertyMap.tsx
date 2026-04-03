@@ -213,8 +213,7 @@ export default function PropertyMap({
   if (!token) {
     return (
       <div
-        className={`flex items-center justify-center bg-stone-light/10 rounded-lg ${className}`}
-        style={{ minHeight: 400 }}
+        className={`flex items-center justify-center bg-stone-light/10 rounded-lg min-h-[400px] ${className}`}
       >
         <p className="text-sm text-text-light">
           Map unavailable — Mapbox token not configured.
@@ -223,5 +222,5 @@ export default function PropertyMap({
     );
   }
 
-  return <div ref={containerRef} className={`rounded-lg ${className}`} style={{ minHeight: 400 }} />;
+  return <div ref={containerRef} className={`rounded-lg min-h-[400px] ${className}`} />;
 }
