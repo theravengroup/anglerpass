@@ -253,8 +253,8 @@ export default function AnglersPage() {
       {/* Corporate access callout */}
       <section className="py-20 bg-offwhite">
         <div className="reveal max-w-[700px] mx-auto px-8">
-          <div className="bg-bronze/5 border border-bronze/15 rounded-xl p-6 text-center">
-            <h3 className="font-heading text-[20px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+          <div className="bg-bronze/5 border border-bronze/15 rounded-xl px-8 py-10 text-center">
+            <h3 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
               Corporate Access Available
             </h3>
             <p className="text-[15px] leading-[1.65] text-text-secondary m-0">

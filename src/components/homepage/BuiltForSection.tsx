@@ -17,7 +17,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Landowners</span>
               <h3>Private Landowners</h3>
               <p>You own the water. AnglerPass gives you a professional way to register your properties, manage who has access, control availability, and present your waters in a way that attracts the right anglers — not just anyone with a rod.</p>
-              <a href="#waitlist" className="btn btn-primary">Register Your Property</a>
+              <a href="/landowners" className="btn btn-primary">Register Your Property</a>
             </div>
           </div>
           <div className="built-for-row reveal">
@@ -28,7 +28,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Clubs</span>
               <h3>Clubs &amp; Associations</h3>
               <p>Managing memberships, scheduling water access, and keeping track of participation shouldn&apos;t require a full-time administrator. AnglerPass gives your club the operational backbone to run smoothly so members can focus on fishing.</p>
-              <a href="#waitlist" className="btn btn-river">Streamline Your Club</a>
+              <a href="/clubs" className="btn btn-river">Streamline Your Club</a>
             </div>
           </div>
           <div className="built-for-row reveal">
@@ -39,7 +39,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Anglers</span>
               <h3>Independent Anglers</h3>
               <p>You know the quality of private water is unmatched. Join a club on AnglerPass and get access to vetted private waters you won&apos;t find anywhere else — with real availability, transparent rod fees, and a booking system that respects the resource.</p>
-              <a href="#waitlist" className="btn btn-bronze">Find Private Water</a>
+              <a href="/anglers" className="btn btn-bronze">Find Private Water</a>
             </div>
           </div>
           <div className="built-for-row reveal">
@@ -50,7 +50,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Guides</span>
               <h3>Professional Guides</h3>
               <p>Your skills deserve private water. AnglerPass lets verified guides request access to club and landowner properties, set their own rates, and get booked directly by anglers. No cold calls, no middlemen — just more days on the water doing what you do best.</p>
-              <a href="#waitlist" className="btn btn-dark-outline">Join as a Guide</a>
+              <a href="/guides" className="btn btn-dark-outline">Join as a Guide</a>
             </div>
           </div>
         </div>
