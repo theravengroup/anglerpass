@@ -51,11 +51,11 @@ export default function PoliciesPage() {
       {/* Content with sidebar TOC */}
       <section className="py-16 bg-offwhite lg:py-20">
         <div className="max-w-[1100px] mx-auto px-8">
-          <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-16">
+          <div className="lg:grid lg:grid-cols-[220px_1fr] lg:gap-14">
 
-            {/* Sidebar TOC — sticky on desktop */}
+            {/* Sidebar TOC — uses div not nav to avoid homepage.css nav{} styles */}
             <aside className="hidden lg:block">
-              <nav className="sticky top-28">
+              <div className="sticky top-[96px]" role="navigation" aria-label="Table of contents">
                 <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-light mb-4">
                   On this page
                 </h2>
@@ -71,7 +71,7 @@ export default function PoliciesPage() {
                     </li>
                   ))}
                 </ul>
-              </nav>
+              </div>
             </aside>
 
             {/* Main content */}
