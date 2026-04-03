@@ -17,7 +17,7 @@ html{scroll-behavior:smooth;overflow-x:hidden}
 body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
 .container{max-width:var(--max-width);margin:0 auto;padding:0 32px}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--bronze);font-weight:500;display:inline-block}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--bronze);font-weight:500;display:inline-block;text-wrap:balance}
 .section-heading{font-family:var(--heading);font-size:clamp(38px,5vw,56px);font-weight:500;line-height:1.1;color:var(--text-primary);letter-spacing:-0.5px}
 .section-subhead{font-size:17px;color:var(--text-secondary);max-width:600px;line-height:1.7}
 
