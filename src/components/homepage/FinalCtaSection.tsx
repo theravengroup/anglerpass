@@ -34,7 +34,7 @@ export default function FinalCtaSection() {
         <p className="reveal d2">We&rsquo;re building AnglerPass for the people who understand this space best. Join the waitlist, get early access, and help us get it right from the start.</p>
         <div className="final-cta-buttons reveal d3">
           <a href="#waitlist" className="btn btn-white">Join the Waitlist <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></a>
-          <a href="mailto:hello@anglerpass.com" className="btn btn-ghost">Contact Us Directly</a>
+          <a href="#" className="btn btn-ghost" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-contact-modal')); }}>Contact Us Directly</a>
         </div>
       </div>
     </section>

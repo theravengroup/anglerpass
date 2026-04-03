@@ -50,7 +50,7 @@ export default function BuiltForSection() {
               <span className="built-for-label">For Guides</span>
               <h3>Professional Guides</h3>
               <p>Your skills deserve private water. AnglerPass lets verified guides request access to club and landowner properties, set their own rates, and get booked directly by anglers. No cold calls, no middlemen — just more days on the water doing what you do best.</p>
-              <a href="/guides" className="btn btn-dark-outline">Join as a Guide</a>
+              <a href="/guides" className="btn btn-charcoal">Join as a Guide</a>
             </div>
           </div>
         </div>

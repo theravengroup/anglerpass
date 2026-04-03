@@ -49,8 +49,8 @@ export default function FaqSection() {
     <section className="faq" id="faq">
       <div className="container">
         <div className="faq-header reveal">
-          <span className="eyebrow">Questions</span>
-          <h2 className="section-heading">Frequently Asked</h2>
+          <span className="eyebrow">FAQ</span>
+          <h2 className="section-heading">Common questions</h2>
         </div>
         <div className="faq-list reveal d1">
           {faqItems.map((item, i) => (

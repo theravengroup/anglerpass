@@ -1,14 +1,29 @@
 'use client';
 
- 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import FooterModal from '@/components/homepage/FooterModal';
+import {
+  contactSchema,
+  CONTACT_DEPARTMENTS,
+  type ContactFormData,
+} from '@/lib/validations/contact';
 
 export default function MarketingFooter() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const pathname = usePathname();
+
+  // Listen for custom event from FinalCtaSection (or anywhere else)
+  useEffect(() => {
+    function handleOpenContact() {
+      setActiveModal('contact');
+    }
+    window.addEventListener('open-contact-modal', handleOpenContact);
+    return () => window.removeEventListener('open-contact-modal', handleOpenContact);
+  }, []);
 
   return (
     <>
@@ -151,51 +166,170 @@ export default function MarketingFooter() {
         </div>
       </footer>
 
-      {/* Contact Modal */}
+      {/* Contact Form Modal */}
       <FooterModal
         isOpen={activeModal === 'contact'}
         onClose={() => setActiveModal(null)}
         title="Contact AnglerPass"
       >
-        <p className="modal-text">
-          Have a question, partnership opportunity, or feedback? We&rsquo;d love to hear from you.
+        <ContactForm onSuccess={() => setActiveModal(null)} />
+      </FooterModal>
+    </>
+  );
+}
+
+function ContactForm({ onSuccess }: { onSuccess: () => void }) {
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  });
+
+  const onSubmit = async (data: ContactFormData) => {
+    setStatus('submitting');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        setStatus('error');
+        return;
+      }
+
+      setStatus('success');
+      reset();
+      setTimeout(() => onSuccess(), 2500);
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  if (status === 'success') {
+    return (
+      <div className="contact-form-success">
+        <div className="contact-form-success-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+        </div>
+        <p className="modal-text" style={{ textAlign: 'center', marginTop: '12px' }}>
+          Message sent! We&rsquo;ll get back to you within 24&ndash;48 hours.
         </p>
+      </div>
+    );
+  }
 
-        <div className="modal-contact-info">
-          <div className="modal-contact-row">
-            <h3 className="modal-heading">General Inquiries</h3>
-            <p className="modal-text">
-              <a href="mailto:hello@anglerpass.com">hello@anglerpass.com</a>
-            </p>
-          </div>
-
-          <div className="modal-contact-row">
-            <h3 className="modal-heading">Investor Relations</h3>
-            <p className="modal-text">
-              <a href="mailto:investors@anglerpass.com">investors@anglerpass.com</a>
-            </p>
-          </div>
-
-          <div className="modal-contact-row">
-            <h3 className="modal-heading">Landowners &amp; Clubs</h3>
-            <p className="modal-text">
-              Interested in listing your property or club on AnglerPass?{' '}
-              <a href="mailto:partners@anglerpass.com">partners@anglerpass.com</a>
-            </p>
-          </div>
-
-          <div className="modal-contact-row">
-            <h3 className="modal-heading">Press &amp; Media</h3>
-            <p className="modal-text">
-              <a href="mailto:press@anglerpass.com">press@anglerpass.com</a>
-            </p>
-          </div>
+  return (
+    <>
+      <p className="modal-text">
+        Send us a message and we&rsquo;ll route it to the right team. We typically respond within 24&ndash;48 hours.
+      </p>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="form-group">
+          <label htmlFor="contact-name">Name</label>
+          <input
+            type="text"
+            id="contact-name"
+            placeholder="Your full name"
+            {...register('name')}
+          />
+          {errors.name && (
+            <span className="contact-form-error" role="alert" aria-live="polite">
+              {errors.name.message}
+            </span>
+          )}
         </div>
 
-        <p className="modal-text mt-6 text-[13px] opacity-60">
-          We typically respond within 24&ndash;48 hours.
-        </p>
-      </FooterModal>
+        <div className="form-group">
+          <label htmlFor="contact-email">Email</label>
+          <input
+            type="email"
+            id="contact-email"
+            placeholder="you@example.com"
+            {...register('email')}
+          />
+          {errors.email && (
+            <span className="contact-form-error" role="alert" aria-live="polite">
+              {errors.email.message}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="contact-department">Department</label>
+          <select
+            id="contact-department"
+            defaultValue=""
+            {...register('department')}
+          >
+            <option value="" disabled>Select a department</option>
+            {CONTACT_DEPARTMENTS.map((dept) => (
+              <option key={dept.value} value={dept.value}>
+                {dept.label}
+              </option>
+            ))}
+          </select>
+          {errors.department && (
+            <span className="contact-form-error" role="alert" aria-live="polite">
+              {errors.department.message}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="contact-message">Message</label>
+          <textarea
+            id="contact-message"
+            placeholder="How can we help?"
+            rows={4}
+            {...register('message')}
+          />
+          {errors.message && (
+            <span className="contact-form-error" role="alert" aria-live="polite">
+              {errors.message.message}
+            </span>
+          )}
+        </div>
+
+        {status === 'error' && (
+          <p className="contact-form-error" role="alert" aria-live="polite" style={{ marginBottom: '12px' }}>
+            Something went wrong. Please try again or email us directly.
+          </p>
+        )}
+
+        <div className="contact-form-submit">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={status === 'submitting'}
+          >
+            {status === 'submitting' ? (
+              <>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: 'spin .6s linear infinite' }}>
+                  <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="2" strokeDasharray="32" strokeDashoffset="8" />
+                </svg>{' '}
+                Sending...
+              </>
+            ) : (
+              <>
+                Send Message{' '}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </>
   );
 }

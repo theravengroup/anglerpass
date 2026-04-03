@@ -48,7 +48,7 @@ export default function FeaturesSection() {
               <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
             </div>
             <h4>Guest Management</h4>
-            <p>Handle member guests, day-pass visitors, and inquiry forms. Track who's on the water and when, with clear records for every visit.</p>
+            <p>Manage fishing guests and non-fishing companions for every booking. Track who&rsquo;s on the water and when, with clear records for every visit.</p>
           </div>
           <div className="feature-item reveal">
             <div className="feature-icon">
