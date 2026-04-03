@@ -270,6 +270,7 @@ nav.scrolled .nav-cta .btn-login:hover{background:var(--forest);color:#fff}
 .built-for-row:nth-child(1) .built-for-label{color:var(--forest)}
 .built-for-row:nth-child(2) .built-for-label{color:var(--river)}
 .built-for-row:nth-child(3) .built-for-label{color:var(--bronze)}
+.built-for-row:nth-child(4) .built-for-label{color:var(--charcoal)}
 .built-for-text h3{font-family:var(--heading);font-size:clamp(28px,3.5vw,36px);font-weight:600;margin-bottom:16px;line-height:1.15;letter-spacing:-.3px}
 .built-for-text p{font-size:16px;color:var(--text-secondary);line-height:1.75;margin-bottom:20px}
 .built-for-text .btn{margin-top:8px;padding:12px 24px;font-size:13px}
