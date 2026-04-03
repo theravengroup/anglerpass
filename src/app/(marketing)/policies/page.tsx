@@ -21,9 +21,11 @@ const TOC_ITEMS = [
   { href: '#rejoining', label: 'Rejoining a Club' },
   { href: '#payments', label: 'Payment Processing' },
   { href: '#bookings', label: 'Booking Cancellations & Refunds' },
+  { href: '#payouts', label: 'Payout Schedules' },
   { href: '#guide-services', label: 'Guide Services' },
   { href: '#guest-policy', label: 'Guest Policy' },
   { href: '#club-subscriptions', label: 'Club Subscriptions' },
+  { href: '#review-moderation', label: 'Review Moderation' },
 ];
 
 export default function PoliciesPage() {
@@ -41,7 +43,7 @@ export default function PoliciesPage() {
           </h1>
           <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto">
             Clear rules for memberships, bookings, cancellations, and payments.
-            Last updated March 2026.
+            Last updated April 2026.
           </p>
         </div>
       </section>
@@ -111,11 +113,14 @@ export default function PoliciesPage() {
                   <Link href="/pricing" className="text-river underline">
                     pricing page
                   </Link>.
-                  For legal terms, see our{' '}
-                  <Link href="/" className="text-river underline">
-                    terms of service
+                  See also our{' '}
+                  <Link href="/terms" className="text-river underline">
+                    Terms of Service
                   </Link>{' '}
-                  in the site footer.
+                  and{' '}
+                  <Link href="/privacy" className="text-river underline">
+                    Privacy Policy
+                  </Link>.
                 </p>
               </div>
             </div>

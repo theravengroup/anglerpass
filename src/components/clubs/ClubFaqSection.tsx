@@ -47,6 +47,11 @@ const faqs = [
     a: "AnglerPass offers three tiers: Starter, Standard, and Pro. Higher tiers unlock features like cross-club access agreements, corporate memberships, priority support, and higher member limits. All tiers include the core club management tools, member vetting, and property access requests. You can upgrade your tier at any time as your club grows.",
   },
   {
+    value: "payouts",
+    q: "When does our club get paid?",
+    a: "Club commissions ($5 per rod per booking) are paid out monthly on the 1st via Stripe Connect, after a 7-day post-trip hold period. This aligns with how most clubs already handle their accounting. Membership dues and initiation fees are transferred to your club\u2019s Stripe account as they are collected, minus the 3.5% processing fee.",
+  },
+  {
     value: "guides",
     q: "How do guides work with our club?",
     a: "Guides on AnglerPass are independent professionals who request access to specific properties. You can approve or deny guide access to any water your club manages. When your members book a trip, they can optionally add an approved guide. Guides set their own rates and are paid directly \u2014 the club is not involved in guide compensation.",

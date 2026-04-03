@@ -92,7 +92,7 @@ const howItWorks = [
   {
     step: '02',
     title: 'Get Verified',
-    description: 'Our team reviews your credentials. Once approved, your profile is visible to anglers across the platform.',
+    description: 'Pay a one-time $49 verification fee, complete a background check through our partner Checkr, and our team reviews your credentials. Once approved, your profile goes live.',
   },
   {
     step: '03',
@@ -116,7 +116,7 @@ const requirements = [
 const faqs = [
   {
     q: 'How much does it cost to join as a guide?',
-    a: 'There is no upfront cost or subscription fee. AnglerPass adds a 10% service fee on top of your guide rate, paid by the angler. You receive 100% of your stated rate.',
+    a: 'There is a one-time $49 verification fee that covers your mandatory background check. After that, there are no subscription or listing fees. AnglerPass adds a 10% service fee on top of your guide rate, paid by the angler. You receive 100% of your stated rate.',
   },
   {
     q: 'How do I get approved for specific waters?',
@@ -128,7 +128,7 @@ const faqs = [
   },
   {
     q: 'How do I get paid?',
-    a: 'Payouts are processed through Stripe Connect. After each completed trip, your guide rate is deposited directly to your bank account.',
+    a: 'Payouts are processed through Stripe Connect directly to your bank account. Your guide rate is paid out 24\u201348 hours after the trip date, following a 7-day hold period for dispute resolution. For example, if you guide on Saturday, your payout initiates the following Saturday and typically arrives within 2 business days.',
   },
   {
     q: 'What if an angler cancels?',
@@ -140,7 +140,7 @@ const faqs = [
   },
   {
     q: 'How long does the verification process take?',
-    a: 'Most guide profiles are reviewed within 48 hours of submitting all required documents. Make sure your guide license, insurance, and first aid certification are current and clearly readable to avoid delays.',
+    a: 'After uploading your credentials and paying the one-time $49 verification fee, your background check typically completes within 2\u20135 business days. Admin review follows shortly after. Most guides are live within a week of submitting all documents.',
   },
   {
     q: 'Can I guide on multiple properties and for multiple clubs?',
@@ -315,10 +315,11 @@ export default function GuidesPage() {
 
           <div className="reveal bg-white border-2 border-charcoal rounded-[14px] py-12 px-10 max-w-[560px] mx-auto text-center">
             <h3 className="font-heading text-[28px] font-semibold text-forest mb-2">
-              Free to join
+              No subscription fees
             </h3>
             <p className="text-[15px] text-text-secondary leading-[1.65] mb-8">
-              No monthly fee, no listing fee, no hidden costs.
+              One-time $49 verification fee covers your background check.
+              No monthly fees, no listing fees after that.
             </p>
 
             <div className="marketing-features-grid grid grid-cols-2 gap-5 mb-8 text-left">

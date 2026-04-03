@@ -215,9 +215,10 @@ export default function PolicyContent() {
 
         <h3 className={subHeadingClass}>Payouts</h3>
         <p className={textClass}>
-          Clubs and landowners receive payouts through Stripe Connect. Payout timing
-          follows Stripe&rsquo;s standard schedule (typically 2&ndash;7 business days
-          depending on your country and account setup).
+          All payouts are processed through Stripe Connect directly to each
+          participant&rsquo;s bank account. Payout schedules vary by role &mdash;
+          see <a href="#payouts" className="text-river underline">Payout Schedules</a> for
+          full details.
         </p>
       </div>
 
@@ -263,6 +264,113 @@ export default function PolicyContent() {
         <p className={textClass}>
           Refunds are processed back to the original payment method. Platform fees
           are refunded proportionally to the booking refund amount.
+        </p>
+      </div>
+
+      {/* Payout Schedules */}
+      <div id="payouts" className={sectionClass}>
+        <h2 className={headingClass}>Payout Schedules</h2>
+        <p className={textClass}>
+          All payouts are processed through Stripe Connect directly to your bank
+          account. Each role on AnglerPass has a payout schedule designed for how
+          that role operates. All booking-related payouts are subject to a
+          <strong> 7-day hold period</strong> after the trip date for dispute
+          resolution before entering the payout cycle.
+        </p>
+
+        <div className="rounded-lg border border-parchment overflow-hidden mt-4 mb-6">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-parchment-light">
+                <th className="text-left p-3 px-5 text-[13px] font-semibold text-forest">
+                  Role
+                </th>
+                <th className="text-left p-3 px-5 text-[13px] font-semibold text-forest">
+                  Payout schedule
+                </th>
+                <th className="text-left p-3 px-5 text-[13px] font-semibold text-forest">
+                  What&rsquo;s included
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-t border-parchment">
+                <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
+                  Guides
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  24&ndash;48 hours after trip date + 7-day hold
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  100% of your stated guide rate
+                </td>
+              </tr>
+              <tr className="border-t border-parchment">
+                <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
+                  Landowners
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  Weekly (every Monday) after 7-day hold
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  100% of rod fees, minus $5/rod club commission
+                </td>
+              </tr>
+              <tr className="border-t border-parchment">
+                <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
+                  Clubs
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  Monthly (1st of each month) after 7-day hold
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  $5/rod booking commission
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className={subHeadingClass}>7-day hold period</h3>
+        <p className={textClass}>
+          After each trip, there is a 7-day hold period before funds enter the
+          payout cycle. This hold allows time for dispute resolution between
+          anglers and service providers. If no dispute is raised within the
+          7-day window, funds are released to the next scheduled payout.
+        </p>
+
+        <h3 className={subHeadingClass}>Guide payouts</h3>
+        <p className={textClass}>
+          Guides receive the fastest payouts on the platform. After the 7-day
+          hold clears, your guide rate is paid out within 24&ndash;48 hours.
+          For example, if you guide a trip on Saturday April 5, the 7-day hold
+          clears on Saturday April 12, and your payout initiates by Monday April
+          14 &mdash; typically arriving in your bank account within 2 business days.
+        </p>
+
+        <h3 className={subHeadingClass}>Landowner payouts</h3>
+        <p className={textClass}>
+          Landowner rod fees are aggregated into a single weekly payout every
+          Monday. This batching reduces transaction overhead and simplifies
+          accounting. Once the 7-day hold clears for each booking, the rod fees
+          are included in the next Monday payout.
+        </p>
+
+        <h3 className={subHeadingClass}>Club payouts</h3>
+        <p className={textClass}>
+          Club commissions ($5 per rod per booking) are paid out monthly on the
+          1st of each month. Monthly batching aligns with how most clubs handle
+          their accounting and reduces noise from small individual commission
+          amounts. Membership dues and initiation fees are transferred separately
+          as they are collected.
+        </p>
+
+        <h3 className={subHeadingClass}>Stripe Connect setup</h3>
+        <p className={textClass}>
+          To receive payouts, you must complete Stripe Connect onboarding through
+          your dashboard. This is a one-time process that links your bank account
+          for direct deposits. AnglerPass does not hold funds &mdash; all payouts
+          flow through Stripe.
         </p>
       </div>
 
@@ -354,6 +462,88 @@ export default function PolicyContent() {
         <p className={textClass}>
           Clubs can upgrade or downgrade their plan at any time. Downgrades take effect
           at the end of the current billing period.
+        </p>
+      </div>
+
+      {/* Review Moderation */}
+      <div id="review-moderation" className={sectionClass}>
+        <h2 className={headingClass}>Review Moderation</h2>
+        <p className={textClass}>
+          Verified trip reviews are the foundation of trust on AnglerPass.
+          Our moderation policy exists to protect the integrity of that
+          system&nbsp;&mdash; not to manage anyone&rsquo;s reputation.
+        </p>
+
+        <h3 className={subHeadingClass}>What gets removed</h3>
+        <p className={textClass}>We remove reviews that contain:</p>
+        <ul className={listClass}>
+          <li className={listItemClass}>
+            Threats or threatening language directed at any individual or property
+          </li>
+          <li className={listItemClass}>Hate speech of any kind</li>
+          <li className={listItemClass}>
+            Personal identifying information about any individual (doxxing)
+          </li>
+          <li className={listItemClass}>
+            Admissions of trespass, poaching, or illegal conduct on the property
+          </li>
+          <li className={listItemClass}>
+            Content that is purely political or entirely unrelated to the trip or property
+          </li>
+          <li className={listItemClass}>
+            Extortion attempts, including implied threats to post negative reviews unless
+            a refund is issued
+          </li>
+          <li className={listItemClass}>
+            Content that is factually impossible based on the verified booking record
+          </li>
+        </ul>
+
+        <h3 className={subHeadingClass}>What we do not remove</h3>
+        <p className={textClass}>We do not remove reviews because:</p>
+        <ul className={listClass}>
+          <li className={listItemClass}>
+            A landowner or club finds the review unflattering
+          </li>
+          <li className={listItemClass}>
+            A review is negative but honest and relevant
+          </li>
+          <li className={listItemClass}>
+            A review is critical of access, water conditions, or communication from the
+            property
+          </li>
+        </ul>
+        <p className={textClass}>
+          Negative reviews that reflect real experiences are exactly what the system is for.
+        </p>
+
+        <h3 className={subHeadingClass}>Who can flag a review</h3>
+        <p className={textClass}>
+          Landowners and club administrators associated with a property may flag any review
+          on that property. Flagging places a review in our moderation queue. It does not
+          suppress or remove the review.
+        </p>
+
+        <h3 className={subHeadingClass}>Our response commitment</h3>
+        <p className={textClass}>
+          Every flagged review will be acknowledged within 24 hours. A final decision will
+          be issued within 72 hours of the flag being submitted.
+        </p>
+
+        <h3 className={subHeadingClass}>Landowner &amp; club responses</h3>
+        <p className={textClass}>
+          Landowners and club administrators may post one public response to any review on
+          their property. Responses may be edited for up to 24 hours after posting. After
+          that, they are locked.
+        </p>
+
+        <h3 className={subHeadingClass}>Appeals</h3>
+        <p className={textClass}>
+          If you believe a moderation decision was made in error, contact{' '}
+          <a href="mailto:support@anglerpass.com" className="text-river underline">
+            support@anglerpass.com
+          </a>{' '}
+          with the subject line: <strong>Review Moderation Appeal</strong>.
         </p>
       </div>
     </div>

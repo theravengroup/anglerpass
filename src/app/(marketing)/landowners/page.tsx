@@ -255,7 +255,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'What does it cost me as a landowner?',
-                a: 'There is no cost to list your property on AnglerPass. You set your own rod fees and receive 100% of those fees. A 15% platform fee is added on top and paid by the angler at checkout.',
+                a: 'There is no cost to list your property on AnglerPass. You set your own rod fees and receive 100% of those fees. A 15% platform fee is added on top and paid by the angler at checkout. Your rod fees are paid out weekly every Monday via Stripe Connect, after a 7-day post-trip hold period.',
               },
               {
                 q: 'How do I control who accesses my property?',
@@ -271,7 +271,11 @@ export default function LandownersPage() {
               },
               {
                 q: 'How are rod fees and pricing determined?',
-                a: 'You set your own rod fee per angler per day. You can price based on season, water type, or however you see fit. AnglerPass does not dictate pricing — you decide what your water is worth.',
+                a: 'You set your own rod fee per angler per day. You can price based on season, water type, or however you see fit. AnglerPass does not dictate pricing \u2014 you decide what your water is worth.',
+              },
+              {
+                q: 'When do I get paid?',
+                a: 'Payouts are processed weekly every Monday via Stripe Connect. After each trip, there is a 7-day hold period for dispute resolution. Once the hold clears, your rod fees are included in the next weekly payout and deposited directly to your bank account, typically arriving within 2 business days.',
               },
               {
                 q: 'What kind of properties work on AnglerPass?',
