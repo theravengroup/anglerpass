@@ -8,6 +8,7 @@ const navLinks = [
   { anchor: '#problem', label: 'The Opportunity' },
   { anchor: '#how', label: 'How It Works' },
   { anchor: '#features', label: 'Features' },
+  { anchor: '#compass', label: 'Compass\u2122' },
   { anchor: '#why', label: 'Why It Matters' },
   { anchor: '#built-for', label: "Who It's For" },
   { anchor: '#faq', label: 'FAQ' },

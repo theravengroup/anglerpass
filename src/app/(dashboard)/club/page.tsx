@@ -27,6 +27,7 @@ import {
   Code,
   Network,
 } from "lucide-react";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 import Link from "next/link";
 
 interface ClubData {
@@ -221,6 +222,9 @@ export default function ClubPage() {
           </Link>
         ))}
       </div>
+
+      {/* Payout setup — required for processing bookings */}
+      <PayoutSetup type="club" />
 
       {/* Member Join Link */}
       <Card className="border-stone-light/20">

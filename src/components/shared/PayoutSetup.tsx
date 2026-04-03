@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -9,7 +10,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2, CreditCard, ExternalLink } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  CreditCard,
+  ExternalLink,
+  AlertCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PayoutSetupProps {
@@ -21,17 +28,20 @@ const TYPE_CONFIG = {
   guide: {
     color: "charcoal",
     label: "Guide",
-    description: "Set up payouts to receive earnings from guided trips.",
+    description:
+      "Connect your bank account to receive earnings from guided trips. This is required before you can accept bookings.",
   },
   landowner: {
     color: "forest",
     label: "Landowner",
-    description: "Set up payouts to receive rod fee earnings from bookings.",
+    description:
+      "Connect your bank account to receive rod fee earnings from bookings. This is required before your properties can accept paid bookings.",
   },
   club: {
     color: "river",
     label: "Club",
-    description: "Set up payouts to receive club commission earnings.",
+    description:
+      "Connect your bank account to receive club commission earnings. This is required before your club can process bookings.",
   },
 } as const;
 
@@ -75,9 +85,29 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
   const [hasAccount, setHasAccount] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
+  const [refreshNeeded, setRefreshNeeded] = useState(false);
 
+  const searchParams = useSearchParams();
   const config = TYPE_CONFIG[type];
   const colors = COLOR_CLASSES[type];
+
+  // Detect return from Stripe onboarding
+  useEffect(() => {
+    const stripeParam = searchParams.get("stripe_onboarding");
+    if (stripeParam === "complete") {
+      setJustCompleted(true);
+    } else if (stripeParam === "refresh") {
+      setRefreshNeeded(true);
+    }
+
+    // Clean up URL params without navigation
+    if (stripeParam) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("stripe_onboarding");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function checkStatus() {
@@ -147,8 +177,9 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
             Payouts Connected
           </CardTitle>
           <CardDescription>
-            Your {config.label.toLowerCase()} payout account is set up and ready
-            to receive payments via Stripe.
+            {justCompleted
+              ? "Stripe setup complete! Your account is now connected and ready to receive payouts."
+              : `Your ${config.label.toLowerCase()} payout account is set up and ready to receive payments via Stripe.`}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -156,32 +187,62 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
   }
 
   return (
-    <Card className={cn("border-stone-light/20", className)}>
+    <Card
+      className={cn(
+        "border-stone-light/20",
+        !onboarded && !hasAccount && "border-amber-500/30 bg-amber-50/30",
+        className
+      )}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <div
             className={cn(
               "flex size-8 items-center justify-center rounded-full",
-              colors.iconBg
+              !hasAccount ? "bg-amber-100" : colors.iconBg
             )}
           >
-            <CreditCard className={cn("size-5", colors.icon)} />
+            {!hasAccount ? (
+              <AlertCircle className="size-5 text-amber-600" />
+            ) : (
+              <CreditCard className={cn("size-5", colors.icon)} />
+            )}
           </div>
-          Payout Setup
+          {!hasAccount ? "Payout Setup Required" : "Payout Setup"}
         </CardTitle>
         <CardDescription>{config.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {refreshNeeded && (
+          <div className="rounded-lg border border-amber-500/20 bg-amber-50 p-3">
+            <p className="text-sm text-amber-800">
+              Your Stripe session expired or was interrupted. Click below to
+              continue where you left off.
+            </p>
+          </div>
+        )}
+
+        {justCompleted && !onboarded && (
+          <div className="rounded-lg border border-amber-500/20 bg-amber-50 p-3">
+            <p className="text-sm text-amber-800">
+              It looks like Stripe onboarding isn&apos;t fully complete yet.
+              Please click below to finish any remaining steps.
+            </p>
+          </div>
+        )}
+
         <div className={cn("rounded-lg border p-4", colors.border, colors.bg)}>
           <p className="text-sm text-text-secondary">
             {hasAccount
               ? "Your Stripe account was started but onboarding is not complete. Click below to finish setup."
-              : "Connect a Stripe account to receive payouts directly to your bank. Setup takes about 5 minutes."}
+              : "Connect a Stripe account to receive payouts directly to your bank. Setup takes about 5 minutes and requires your bank details and identity verification."}
           </p>
         </div>
 
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600" role="alert" aria-live="polite">
+            {error}
+          </p>
         )}
 
         <Button

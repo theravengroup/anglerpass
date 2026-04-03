@@ -9,10 +9,11 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
 // Return paths after Stripe onboarding, keyed by entity type
+// Return to main dashboard after onboarding so the PayoutSetup card updates
 const RETURN_PATHS: Record<string, string> = {
-  guide: "/guide/earnings",
-  landowner: "/dashboard/settings",
-  club: "/club/settings",
+  guide: "/guide",
+  landowner: "/landowner",
+  club: "/club",
 };
 
 // ─── Helpers: raw Stripe API via fetch ──────────────────────────────

@@ -15,6 +15,7 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 
 interface GuideProfile {
   id: string;
@@ -190,6 +191,9 @@ export default function GuideDashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Payout setup — required for accepting bookings */}
+      <PayoutSetup type="guide" />
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-4">

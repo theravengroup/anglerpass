@@ -23,6 +23,7 @@ import {
   Clock,
   Download,
 } from "lucide-react";
+import PayoutSetup from "@/components/shared/PayoutSetup";
 import { PERIOD_OPTIONS, STATUS_BADGE_COLORS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 
@@ -229,6 +230,9 @@ export default function LandownerPage() {
           </Card>
         ))}
       </div>
+
+      {/* Payout setup — required for receiving booking revenue */}
+      <PayoutSetup type="landowner" />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Revenue by Property */}
