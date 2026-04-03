@@ -524,7 +524,7 @@ nav{padding:0 16px;max-width:100vw;box-sizing:border-box}
 .form-row{grid-template-columns:1fr}
 .float-card{display:none}
 .scroll-indicator{display:none}
-.cinematic-divider{height:35vh}
+.cinematic-divider{height:50vh}
 .investors-grid{grid-template-columns:1fr}
 .compass-results-grid{grid-template-columns:1fr}
 .nav-dropdown-menu{display:none}
