@@ -18,7 +18,7 @@ export default async function ModerationPage() {
   // Fetch all pending_review properties with owner info
   const { data: properties } = await supabase
     .from("properties")
-    .select("id, name, status, location_description, photos, capacity, created_at, updated_at, owner_id")
+    .select("id, name, status, location_description, photos, max_rods, created_at, updated_at, owner_id")
     .eq("status", "pending_review")
     .order("updated_at", { ascending: true });
 
@@ -82,7 +82,7 @@ export default async function ModerationPage() {
             name: string;
             location_description: string | null;
             photos: string[];
-            capacity: number | null;
+            max_rods: number | null;
             owner_id: string;
             updated_at: string;
           }) => (
@@ -119,8 +119,8 @@ export default async function ModerationPage() {
                               : property.location_description}
                           </span>
                         )}
-                        {property.capacity && (
-                          <span>{property.capacity} anglers</span>
+                        {property.max_rods && (
+                          <span>{property.max_rods} rods</span>
                         )}
                       </div>
                     </div>

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     const { data: property, error: propError } = await admin
       .from("properties")
       .select(
-        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, capacity, max_rods, max_guests, owner_id"
+        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id"
       )
       .eq("id", property_id)
       .single();
@@ -177,8 +177,8 @@ export async function POST(request: Request) {
     const isMultiDay = numberOfDays > 1;
 
     // Check rod limit (max_rods) and total guest limit (max_guests)
-    const maxRods = property.max_rods ?? property.capacity;
-    const maxGuests = property.max_guests ?? property.capacity;
+    const maxRods = property.max_rods;
+    const maxGuests = property.max_guests;
 
     // Validate party_size against max_rods
     if (maxRods && party_size > maxRods) {

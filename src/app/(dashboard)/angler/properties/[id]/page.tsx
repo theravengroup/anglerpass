@@ -28,7 +28,6 @@ interface PropertyDetail {
   water_type: string | null;
   species: string[];
   photos: string[];
-  capacity: number | null;
   max_rods: number | null;
   max_guests: number | null;
   rate_adult_full_day: number | null;
@@ -185,10 +184,10 @@ export default function PropertyDetailPage() {
                 {property.water_miles} miles of water
               </div>
             )}
-            {(property.max_rods ?? property.capacity) && (
+            {property.max_rods && (
               <div className="flex items-center gap-1.5 rounded-full bg-bronze/10 px-3 py-1.5 text-xs font-medium text-bronze">
                 <Users className="size-3.5" />
-                Max {property.max_rods ?? property.capacity} rods/day
+                Max {property.max_rods} rods/day
               </div>
             )}
             {property.max_guests && (

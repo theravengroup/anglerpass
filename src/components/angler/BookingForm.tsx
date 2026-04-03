@@ -47,7 +47,6 @@ interface BookingFormProps {
     rate_adult_half_day: number | null;
     half_day_allowed: boolean;
     max_rods: number | null;
-    capacity: number | null;
     max_guests: number | null;
     is_cross_club?: boolean;
     accessible_through: {
@@ -286,9 +285,9 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         <div className="space-y-2">
           <Label htmlFor="party_size">
             Anglers (Rods)
-            {(property.max_rods ?? property.capacity) && (
+            {property.max_rods && (
               <span className="ml-1 font-normal text-text-light">
-                max {property.max_rods ?? property.capacity}
+                max {property.max_rods}
               </span>
             )}
           </Label>
@@ -296,7 +295,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
             id="party_size"
             type="number"
             min={1}
-            max={property.max_rods ?? property.capacity ?? 20}
+            max={property.max_rods ?? 20}
             value={partySize}
             onChange={(e) => setPartySize(parseInt(e.target.value) || 1)}
             disabled={submitting}

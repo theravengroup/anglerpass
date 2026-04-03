@@ -41,7 +41,8 @@ interface Property {
   water_type: string | null;
   species: string[];
   water_miles: number | null;
-  capacity: number | null;
+  max_rods: number | null;
+  max_guests: number | null;
   regulations: string | null;
   photos: string[];
   rate_adult_full_day: number | null;
@@ -409,11 +410,20 @@ export default function ModerationDetailPage() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
                 <Users className="size-4 text-text-light" />
-                <span className="text-text-light">Capacity:</span>
+                <span className="text-text-light">Max Rods:</span>
                 <span className="text-text-secondary">
-                  {property.capacity ? `${property.capacity} anglers` : "Not set"}
+                  {property.max_rods ? `${property.max_rods} per day` : "Not set"}
                 </span>
               </div>
+              {property.max_guests && (
+                <div className="flex items-center gap-2">
+                  <Users className="size-4 text-text-light" />
+                  <span className="text-text-light">Max Guests:</span>
+                  <span className="text-text-secondary">
+                    {property.max_guests} per day
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Clock className="size-4 text-text-light" />
                 <span className="text-text-light">Created:</span>

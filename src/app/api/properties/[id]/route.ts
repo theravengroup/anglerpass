@@ -124,9 +124,9 @@ export async function PATCH(
           );
         }
 
-        if (existing.capacity == null) {
+        if (existing.max_rods == null) {
           return NextResponse.json(
-            { error: "Capacity is required to submit for review" },
+            { error: "Max rods per day is required to submit for review" },
             { status: 400 }
           );
         }

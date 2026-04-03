@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, capacity, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
+        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
       .eq("status", "published")
       .order("name")

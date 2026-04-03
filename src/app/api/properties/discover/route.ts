@@ -109,7 +109,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, capacity, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, lodging_available, lodging_url"
+        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, lodging_available, lodging_url"
       )
       .in("id", allPropertyIds)
       .eq("status", "published")

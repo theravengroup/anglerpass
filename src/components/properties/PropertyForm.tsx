@@ -59,7 +59,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       water_type: "",
       species: [],
       water_miles: null,
-      capacity: null,
       max_rods: null,
       max_guests: null,
       regulations: "",

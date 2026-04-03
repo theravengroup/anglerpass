@@ -20,7 +20,8 @@ interface DiscoverProperty {
   water_type: string | null;
   species: string[];
   photos: string[];
-  capacity: number | null;
+  max_rods: number | null;
+  max_guests: number | null;
   rate_adult_full_day: number | null;
   rate_adult_half_day: number | null;
   half_day_allowed: boolean;

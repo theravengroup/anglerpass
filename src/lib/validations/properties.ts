@@ -69,10 +69,7 @@ export const propertySchema = z
     species: z.array(z.string()).default([]),
     water_miles: z.number().min(0).optional().nullable(),
 
-    // Capacity — legacy field kept for migration compatibility
-    capacity: z.number().int().min(1).optional().nullable(),
-
-    // Guest capacity — the new required fields
+    // Guest capacity
     max_rods: z
       .number()
       .int()
