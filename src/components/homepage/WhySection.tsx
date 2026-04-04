@@ -28,7 +28,7 @@ export default function WhySection() {
       <div className="why-grain"></div>
       <div className="container">
         <div className="why-content reveal-left">
-          <span className="eyebrow">Why This Matters</span>
+          <span className="eyebrow">Our Approach</span>
           <h2>Bringing Structure to the Waters That Matter Most</h2>
           <p className="why-text">Private waters represent some of the best fly fishing on the planet. But the systems around them — scheduling, memberships, access management — haven't kept up with the quality of the experience.</p>
           <p className="why-text">AnglerPass exists to close that gap. By giving landowners, clubs, and anglers the tools they've been missing, we make private water access more organized, more sustainable, and more accessible to the right people.</p>
@@ -65,8 +65,8 @@ export default function WhySection() {
         <div className="why-visual reveal-right d2">
           <div className="why-visual-card">
             <div className="why-quote-line"></div>
-            <div className="why-quote">Private water access has always run on relationships. We're building the platform that makes those relationships scale.</div>
-            <div className="why-quote-attr">The AnglerPass Mission</div>
+            <div className="why-quote">The best fishing isn&apos;t about finding any water. It&apos;s about finding the right water — and earning access to it.</div>
+            <div className="why-quote-attr">The AnglerPass Philosophy</div>
           </div>
         </div>
       </div>

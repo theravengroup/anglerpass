@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navLinks = [
-  { anchor: '#problem', label: 'The Opportunity' },
+  { anchor: '#problem', label: 'The Problem' },
   { anchor: '#how', label: 'How It Works' },
-  { anchor: '#ai', label: 'AnglerPass AI' },
   { anchor: '#features', label: 'Features' },
-  { anchor: '#why', label: 'Why It Matters' },
+  { anchor: '#ai', label: 'AnglerPass AI' },
+  { anchor: '#why', label: 'Our Approach' },
   { anchor: '#built-for', label: "Who It's For" },
   { anchor: '#faq', label: 'FAQ' },
 ];

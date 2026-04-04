@@ -1,10 +1,9 @@
 import HeroSection from '@/components/homepage/HeroSection';
 import ProblemSection from '@/components/homepage/ProblemSection';
-import CinematicDivider from '@/components/homepage/CinematicDivider';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
+import FeaturesSection from '@/components/homepage/FeaturesSection';
 import CompassSection from '@/components/homepage/CompassSection';
 import ConciergeSection from '@/components/homepage/ConciergeSection';
-import FeaturesSection from '@/components/homepage/FeaturesSection';
 import WhySection from '@/components/homepage/WhySection';
 import BuiltForSection from '@/components/homepage/BuiltForSection';
 import WaitlistSection from '@/components/homepage/WaitlistSection';
@@ -18,11 +17,10 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ProblemSection />
-      <CinematicDivider />
       <HowItWorksSection />
+      <FeaturesSection />
       <CompassSection />
       <ConciergeSection />
-      <FeaturesSection />
       <WhySection />
       <BuiltForSection />
       <WaitlistSection />
