@@ -451,8 +451,27 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .ai-headline em{font-style:italic;color:var(--bronze-light)}
 .ai-subhead{font-size:18px;color:rgba(255,255,255,.55);max-width:620px;line-height:1.7;margin:0 auto}
 
+/* AI nav buttons */
+.ai-nav-buttons{display:flex;gap:20px;justify-content:center;margin-top:48px}
+.ai-nav-btn{display:flex;align-items:center;gap:16px;padding:16px 28px 16px 20px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);text-decoration:none;transition:all .5s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;cursor:pointer}
+.ai-nav-btn::before{content:'';position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity .5s;pointer-events:none}
+.ai-nav-btn-compass::before{background:radial-gradient(ellipse at 30% 50%,rgba(58,107,124,.15) 0%,transparent 70%)}
+.ai-nav-btn-concierge::before{background:radial-gradient(ellipse at 30% 50%,rgba(154,115,64,.15) 0%,transparent 70%)}
+.ai-nav-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
+.ai-nav-btn:hover::before{opacity:1}
+.ai-nav-btn-compass:hover{box-shadow:0 8px 32px rgba(58,107,124,.15),0 0 0 1px rgba(58,107,124,.1)}
+.ai-nav-btn-concierge:hover{box-shadow:0 8px 32px rgba(154,115,64,.15),0 0 0 1px rgba(154,115,64,.1)}
+.ai-nav-btn-icon{width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:all .5s cubic-bezier(.22,1,.36,1)}
+.ai-nav-btn:hover .ai-nav-btn-icon{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.ai-nav-btn-icon svg{width:30px;height:30px}
+.ai-nav-btn-text{display:flex;flex-direction:column;gap:1px}
+.ai-nav-btn-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.ai-nav-btn-name{font-family:var(--heading);font-size:22px;font-weight:600;color:#fff;letter-spacing:-.3px;line-height:1.1}
+.ai-nav-btn-arrow{font-size:16px;color:rgba(255,255,255,.25);margin-left:8px;transition:all .4s;align-self:center}
+.ai-nav-btn:hover .ai-nav-btn-arrow{color:rgba(255,255,255,.5);transform:translateY(3px)}
+
 /* AI offering border */
-.ai-offering{border:1px solid rgba(154,115,64,.2);border-radius:24px;padding:56px 48px;position:relative;box-shadow:0 0 20px rgba(154,115,64,.06),0 0 60px rgba(154,115,64,.03);background:rgba(255,255,255,.015)}
+.ai-offering{border:1px solid rgba(154,115,64,.2);border-radius:24px;padding:56px 48px;position:relative;box-shadow:0 0 20px rgba(154,115,64,.06),0 0 60px rgba(154,115,64,.03);background:rgba(255,255,255,.015);scroll-margin-top:24px}
 
 /* ═══ COMPASS ═══ */
 .compass-section{padding:var(--section-pad) 0;background:var(--forest-deep);position:relative;overflow:hidden}
@@ -629,6 +648,8 @@ nav{padding:0 16px;max-width:100vw;box-sizing:border-box}
 .audience-hero-ctas{flex-direction:column;align-items:stretch}
 .audience-hero-ctas a{width:100%;justify-content:center}
 .investors-grid{grid-template-columns:1fr}
+.ai-nav-buttons{flex-direction:column;gap:14px;align-items:stretch;margin-top:36px}
+.ai-nav-btn{justify-content:center}
 .ai-offering{padding:32px 20px;border-radius:18px}
 .compass-results-grid{grid-template-columns:1fr}
 .concierge-context-sources{grid-template-columns:repeat(2,1fr)}

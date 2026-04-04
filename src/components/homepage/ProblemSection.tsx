@@ -3,7 +3,7 @@ export default function ProblemSection() {
     <section className="problem" id="problem">
       <div className="container">
         <div className="problem-header reveal">
-          <span className="eyebrow">The Opportunity</span>
+          <span className="eyebrow">The Problem</span>
           <h2 className="section-heading">A Premier Ecosystem,<br /> Running on Manual Systems</h2>
           <p className="section-subhead" style={{ margin: '0 auto' }}>Private fly fishing has an access problem. Not a lack of interest — a lack of infrastructure.</p>
         </div>

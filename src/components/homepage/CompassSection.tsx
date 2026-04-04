@@ -153,10 +153,61 @@ export default function CompassSection() {
             with the right water, one to make sure you&apos;re ready when you
             get there.
           </p>
+          <div className="ai-nav-buttons">
+            <a href="#compass" className="ai-nav-btn ai-nav-btn-compass">
+              <span className="ai-nav-btn-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="16" cy="16" r="14" stroke="url(#compass-grad)" strokeWidth="1.5" opacity=".4" />
+                  <circle cx="16" cy="16" r="10" stroke="url(#compass-grad)" strokeWidth="1" opacity=".2" />
+                  <path d="M20.5 11.5l-3 6.5-6.5 3 3-6.5 6.5-3z" fill="url(#compass-grad)" opacity=".9" />
+                  <circle cx="16" cy="16" r="1.5" fill="#fff" opacity=".8" />
+                  <line x1="16" y1="4" x2="16" y2="7" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+                  <line x1="16" y1="25" x2="16" y2="28" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+                  <line x1="4" y1="16" x2="7" y2="16" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+                  <line x1="25" y1="16" x2="28" y2="16" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+                  <defs>
+                    <linearGradient id="compass-grad" x1="4" y1="4" x2="28" y2="28">
+                      <stop stopColor="#7AB8D0" />
+                      <stop offset="1" stopColor="#3A6B7C" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
+              <span className="ai-nav-btn-text">
+                <span className="ai-nav-btn-label">AnglerPass</span>
+                <span className="ai-nav-btn-name">Compass</span>
+              </span>
+              <span className="ai-nav-btn-arrow">&darr;</span>
+            </a>
+            <a href="#concierge" className="ai-nav-btn ai-nav-btn-concierge">
+              <span className="ai-nav-btn-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="6" width="24" height="17" rx="4" stroke="url(#concierge-grad)" strokeWidth="1.5" opacity=".4" />
+                  <path d="M12 27l2-4h4l2 4" stroke="url(#concierge-grad)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity=".4" />
+                  <circle cx="11" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".6" />
+                  <circle cx="16" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".8" />
+                  <circle cx="21" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".6" />
+                  <path d="M9 11h14" stroke="url(#concierge-grad)" strokeWidth=".75" strokeLinecap="round" opacity=".25" />
+                  <path d="M9 18h14" stroke="url(#concierge-grad)" strokeWidth=".75" strokeLinecap="round" opacity=".25" />
+                  <defs>
+                    <linearGradient id="concierge-grad" x1="4" y1="6" x2="28" y2="27">
+                      <stop stopColor="#C4965A" />
+                      <stop offset="1" stopColor="#9A7340" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </span>
+              <span className="ai-nav-btn-text">
+                <span className="ai-nav-btn-label">AnglerPass</span>
+                <span className="ai-nav-btn-name">Concierge</span>
+              </span>
+              <span className="ai-nav-btn-arrow">&darr;</span>
+            </a>
+          </div>
         </div>
 
         {/* Compass Offering */}
-        <div className="ai-offering">
+        <div className="ai-offering" id="compass">
         <div className="compass-header reveal">
           <span className="eyebrow" style={{ color: 'var(--sand)' }}>
             Introducing AnglerPass Compass &middot; The First AI-Powered Private Water Platform

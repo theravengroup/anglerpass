@@ -38,7 +38,7 @@ export default function ConciergeSection() {
       <div className="concierge-overlay" />
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Concierge Offering */}
-        <div className="ai-offering">
+        <div className="ai-offering" id="concierge">
         <div className="concierge-header reveal">
           <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
             Introducing AnglerPass Concierge &middot; Your Context-Aware Trip
