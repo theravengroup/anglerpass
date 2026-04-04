@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +48,7 @@ export default function MembersPage() {
   // Action state
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchMembers = useCallback(async (cid: string) => {
+  async function fetchMembers(cid: string) {
     try {
       const res = await fetch(`/api/clubs/${cid}/members`);
       if (res.ok) {
@@ -58,9 +58,9 @@ export default function MembersPage() {
     } catch {
       // Silent fail
     }
-  }, []);
+  }
 
-  const init = useCallback(async () => {
+  async function init() {
     setError(false);
     setLoading(true);
     try {
@@ -87,11 +87,11 @@ export default function MembersPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchMembers]);
+  }
 
   useEffect(() => {
     init();
-  }, [init]);
+  }, []);
 
   async function handleInvite() {
     if (!clubId || !inviteEmail.trim()) return;

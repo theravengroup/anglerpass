@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, lazy, Suspense } from "react";
+import { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Compass } from "lucide-react";
 import SearchFilters, {
@@ -51,7 +51,7 @@ export default function DiscoverPage() {
     lodging: false,
   });
 
-  const fetchProperties = useCallback(async () => {
+  async function fetchProperties() {
     try {
       const params = new URLSearchParams();
       if (filters.water_type) params.set("water_type", filters.water_type);
@@ -71,11 +71,11 @@ export default function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters.water_type, filters.species, filters.min_price, filters.max_price, filters.lodging]);
+  }
 
   useEffect(() => {
     fetchProperties();
-  }, [fetchProperties]);
+  }, [filters.water_type, filters.species, filters.min_price, filters.max_price, filters.lodging]);
 
   // Client-side text search filter (q filter)
   const filteredProperties = useMemo(() => {

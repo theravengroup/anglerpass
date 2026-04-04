@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,7 +50,7 @@ export default function GuideProfilePage() {
     },
   });
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const res = await fetch("/api/guides/profile");
       if (res.ok) {
@@ -84,11 +84,11 @@ export default function GuideProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [form]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [form]);
 
   const onSave = async (data: GuideProfileFormData) => {
     setSaving(true);

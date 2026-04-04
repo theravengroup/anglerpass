@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Loader2, Send } from "lucide-react";
@@ -88,7 +88,7 @@ export default function ReviewSubmitPage() {
 
   // ─── Load booking data ──────────────────────────────────────────
 
-  const loadBooking = useCallback(async () => {
+  async function loadBooking() {
     setLoading(true);
     setError(null);
 
@@ -134,11 +134,11 @@ export default function ReviewSubmitPage() {
     } finally {
       setLoading(false);
     }
-  }, [bookingId]);
+  }
 
   useEffect(() => {
     loadBooking();
-  }, [loadBooking]);
+  }, [bookingId]);
 
   // ─── Validation per step ────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Star } from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function GuideReviewsPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] });
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       // Get guide profile for user_id
       const profileRes = await fetch("/api/guides/profile");
@@ -51,11 +51,11 @@ export default function GuideReviewsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   if (loading) {
     return (

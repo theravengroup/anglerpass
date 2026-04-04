@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,7 +56,7 @@ export default function ClubAssociation({
   const [associations, setAssociations] = useState<ClubAccess[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  async function fetchData() {
     if (!propertyId) return;
     setLoading(true);
     try {
@@ -80,11 +80,11 @@ export default function ClubAssociation({
     } finally {
       setLoading(false);
     }
-  }, [propertyId]);
+  }
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [propertyId]);
 
   async function handleSendInvite() {
     setError(null);

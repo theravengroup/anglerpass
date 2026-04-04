@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   CalendarDays,
@@ -45,7 +45,7 @@ export default function LandownerBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setError(false);
     setLoading(true);
     try {
@@ -61,11 +61,11 @@ export default function LandownerBookingsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   const upcoming = bookings.filter(
     (b) =>

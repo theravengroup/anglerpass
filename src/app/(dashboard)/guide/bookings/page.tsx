@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CalendarDays, MapPin, Users } from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function GuideBookingsPage() {
   const [bookings, setBookings] = useState<GuideBooking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       // Fetch guide profile first
       const profileRes = await fetch("/api/guides/profile");
@@ -37,11 +37,11 @@ export default function GuideBookingsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   const today = new Date().toISOString().split("T")[0];
   const upcoming = bookings.filter(

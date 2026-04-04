@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search, X, Users } from "lucide-react";
@@ -65,7 +65,7 @@ export default function GuideBrowsePage() {
     return () => clearTimeout(timer);
   }, [locationText]);
 
-  const fetchGuides = useCallback(async () => {
+  async function fetchGuides() {
     setLoading(true);
     setError(null);
     try {
@@ -89,11 +89,11 @@ export default function GuideBrowsePage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, selectedSpecies, debouncedLocation, page]);
+  }
 
   useEffect(() => {
     fetchGuides();
-  }, [fetchGuides]);
+  }, [debouncedSearch, selectedSpecies, debouncedLocation, page]);
 
   // Reset page when filters change
   useEffect(() => {

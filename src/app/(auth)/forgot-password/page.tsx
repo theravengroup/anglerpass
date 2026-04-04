@@ -77,8 +77,7 @@ export default function ForgotPasswordPage() {
           </svg>
         </div>
         <h1
-          className="mb-2 text-2xl font-semibold text-[var(--color-forest)]"
-          style={{ fontFamily: "var(--font-heading)" }}
+          className="mb-2 font-heading text-2xl font-semibold text-[var(--color-forest)]"
         >
           Check Your Email
         </h1>
@@ -99,8 +98,7 @@ export default function ForgotPasswordPage() {
   return (
     <div>
       <h1
-        className="mb-1 text-center text-2xl font-semibold text-[var(--color-forest)]"
-        style={{ fontFamily: "var(--font-heading)" }}
+        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
       >
         Reset Your Password
       </h1>

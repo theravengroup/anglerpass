@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Loader2, Settings } from "lucide-react";
 import ClubProfileForm from "@/components/clubs/ClubProfileForm";
@@ -58,7 +58,7 @@ export default function ClubSettingsPage() {
     load();
   }, []);
 
-  const handleCorporateSave = useCallback(async () => {
+  async function handleCorporateSave() {
     if (!club) return;
     setCorporateSaving(true);
     setCorporateError(null);
@@ -111,7 +111,7 @@ export default function ClubSettingsPage() {
     } finally {
       setCorporateSaving(false);
     }
-  }, [club, corporateEnabled, corporateFee]);
+  }
 
   if (loading) {
     return (

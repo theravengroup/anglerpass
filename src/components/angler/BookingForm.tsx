@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   const [loadingGuides, setLoadingGuides] = useState(false);
 
   // Fetch available guides when date/duration/party changes
-  const fetchGuides = useCallback(async () => {
+  async function fetchGuides() {
     if (!startDate) {
       setAvailableGuides([]);
       return;
@@ -99,12 +99,12 @@ export default function BookingForm({ property, initialMembership }: BookingForm
     } finally {
       setLoadingGuides(false);
     }
-  }, [property.id, startDate, partySize, duration]);
+  }
 
   useEffect(() => {
     fetchGuides();
     setSelectedGuideId(null);
-  }, [fetchGuides]);
+  }, [property.id, startDate, partySize, duration]);
 
   const selectedGuide = availableGuides.find((g) => g.id === selectedGuideId);
   const guideRate = selectedGuide ? (selectedGuide.rate ?? 0) : 0;

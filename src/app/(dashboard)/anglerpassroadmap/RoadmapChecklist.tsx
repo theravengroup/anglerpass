@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 // ─── Data ──────────────────────────────────────────────────────────
 
@@ -534,22 +534,19 @@ export default function RoadmapChecklist() {
     setMounted(true);
   }, []);
 
-  const toggle = useCallback((id: string, defaultDone: boolean) => {
+  function toggle(id: string, defaultDone: boolean) {
     setChecked((prev) => {
       const currentVal = prev[id] ?? defaultDone;
       const next = { ...prev, [id]: !currentVal };
       saveChecked(next);
       return next;
     });
-  }, []);
+  }
 
-  const isChecked = useCallback(
-    (id: string, defaultDone: boolean) => {
-      if (!mounted) return defaultDone;
-      return checked[id] ?? defaultDone;
-    },
-    [checked, mounted]
-  );
+  function isChecked(id: string, defaultDone: boolean) {
+    if (!mounted) return defaultDone;
+    return checked[id] ?? defaultDone;
+  }
 
   // Stats
   const allItems = PHASES.flatMap((p) => p.sections.flatMap((s) => s.items));

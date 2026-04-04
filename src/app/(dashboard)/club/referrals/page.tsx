@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -73,7 +73,7 @@ export default function ClubReferralsPage() {
   // Copy state
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       // First get the club ID
       const clubRes = await fetch("/api/clubs");
@@ -120,11 +120,11 @@ export default function ClubReferralsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   async function saveSettings() {
     if (!clubId) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -159,7 +159,7 @@ export default function SettingsPage() {
   const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
   const [savedKeys, setSavedKeys] = useState<Set<string>>(new Set());
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     setError(null);
     try {
@@ -181,11 +181,11 @@ export default function SettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   function handleLocalChange(key: string, value: string | number | boolean) {
     setLocalValues((prev) => ({ ...prev, [key]: value }));

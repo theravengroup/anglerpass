@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -58,7 +58,7 @@ export default function ClubsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -74,12 +74,12 @@ export default function ClubsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }
 
   useEffect(() => {
     const debounce = setTimeout(load, 300);
     return () => clearTimeout(debounce);
-  }, [load]);
+  }, [page, search]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

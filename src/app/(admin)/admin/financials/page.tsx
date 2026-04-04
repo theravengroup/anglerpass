@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -84,7 +84,7 @@ export default function AdminFinancialsPage() {
   const [error, setError] = useState(false);
   const [days, setDays] = useState(30);
 
-  const load = useCallback(async () => {
+  async function load() {
     setError(false);
     try {
       const res = await fetch(
@@ -100,12 +100,12 @@ export default function AdminFinancialsPage() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [load]);
+  }, [days]);
 
   function exportCSV() {
     if (!data) return;

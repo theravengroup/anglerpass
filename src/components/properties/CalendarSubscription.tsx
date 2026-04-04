@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -33,7 +33,7 @@ export default function CalendarSubscription({
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  const fetchToken = useCallback(async () => {
+  async function fetchToken() {
     setLoading(true);
     setError(null);
     try {
@@ -51,7 +51,7 @@ export default function CalendarSubscription({
     } finally {
       setLoading(false);
     }
-  }, [propertyId]);
+  }
 
   const regenerateToken = async () => {
     setRegenerating(true);

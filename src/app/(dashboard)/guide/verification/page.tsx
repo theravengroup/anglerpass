@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,7 +46,7 @@ export default function GuideVerificationPage() {
 
   const paymentStatus = searchParams.get("payment");
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const res = await fetch("/api/guides/verification");
       if (res.ok) {
@@ -57,11 +57,11 @@ export default function GuideVerificationPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   useEffect(() => {
     if (paymentStatus === "success") {

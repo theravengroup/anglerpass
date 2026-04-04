@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -66,7 +66,7 @@ export default function AuditLogPage() {
   const [entityType, setEntityType] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -82,11 +82,11 @@ export default function AuditLogPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, entityType]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [page, entityType]);
 
   function formatAction(action: string): { label: string; color: string } {
     if (ACTION_LABELS[action]) return ACTION_LABELS[action];

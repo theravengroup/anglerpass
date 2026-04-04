@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, X, Loader2, AlertCircle } from "lucide-react";
 import { MIN_PHOTOS, MAX_PHOTOS } from "@/lib/validations/properties";
@@ -96,85 +96,82 @@ export default function PhotoUpload({
 
   const remaining = MAX_PHOTOS - photos.length;
 
-  const handleFiles = useCallback(
-    async (files: FileList) => {
-      let resolvedId = propertyId;
+  async function handleFiles(files: FileList) {
+    let resolvedId = propertyId;
 
-      // Auto-save draft if property hasn't been saved yet
-      if (!resolvedId && onEnsureSaved) {
-        setUploading(true);
-        resolvedId = (await onEnsureSaved()) ?? undefined;
-        if (!resolvedId) {
-          setError("Please enter a property name before uploading photos.");
-          setUploading(false);
-          return;
-        }
-      }
-
+    // Auto-save draft if property hasn't been saved yet
+    if (!resolvedId && onEnsureSaved) {
+      setUploading(true);
+      resolvedId = (await onEnsureSaved()) ?? undefined;
       if (!resolvedId) {
         setError("Please enter a property name before uploading photos.");
+        setUploading(false);
         return;
       }
+    }
 
-      const fileArray = Array.from(files).slice(0, remaining);
-      if (fileArray.length === 0) return;
+    if (!resolvedId) {
+      setError("Please enter a property name before uploading photos.");
+      return;
+    }
 
-      // Validate file types
-      const validTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-      ];
-      const invalidFiles = fileArray.filter(
-        (f) => !validTypes.includes(f.type)
-      );
-      if (invalidFiles.length > 0) {
-        setError("Only JPEG, PNG, and WebP images are accepted.");
-        return;
-      }
+    const fileArray = Array.from(files).slice(0, remaining);
+    if (fileArray.length === 0) return;
 
-      setUploading(true);
-      setError(null);
+    // Validate file types
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+    const invalidFiles = fileArray.filter(
+      (f) => !validTypes.includes(f.type)
+    );
+    if (invalidFiles.length > 0) {
+      setError("Only JPEG, PNG, and WebP images are accepted.");
+      return;
+    }
 
-      const newUrls: string[] = [];
+    setUploading(true);
+    setError(null);
 
-      for (const file of fileArray) {
-        try {
-          // Compress and convert to WebP
-          const webpBlob = await compressAndConvertToWebP(file);
+    const newUrls: string[] = [];
 
-          // Upload to API
-          const formData = new FormData();
-          formData.append("file", webpBlob, `photo-${Date.now()}.webp`);
-          formData.append("propertyId", resolvedId);
+    for (const file of fileArray) {
+      try {
+        // Compress and convert to WebP
+        const webpBlob = await compressAndConvertToWebP(file);
 
-          const res = await fetch("/api/properties/photos", {
-            method: "POST",
-            body: formData,
-          });
+        // Upload to API
+        const formData = new FormData();
+        formData.append("file", webpBlob, `photo-${Date.now()}.webp`);
+        formData.append("propertyId", resolvedId);
 
-          if (!res.ok) {
-            const result = await res.json();
-            throw new Error(result.error ?? "Upload failed");
-          }
+        const res = await fetch("/api/properties/photos", {
+          method: "POST",
+          body: formData,
+        });
 
-          const { url } = await res.json();
-          newUrls.push(url);
-        } catch (err) {
-          setError(
-            err instanceof Error ? err.message : "Failed to upload photo"
-          );
-          break;
+        if (!res.ok) {
+          const result = await res.json();
+          throw new Error(result.error ?? "Upload failed");
         }
-      }
 
-      if (newUrls.length > 0) {
-        onChange([...photos, ...newUrls]);
+        const { url } = await res.json();
+        newUrls.push(url);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to upload photo"
+        );
+        break;
       }
-      setUploading(false);
-    },
-    [photos, onChange, propertyId, onEnsureSaved, remaining]
-  );
+    }
+
+    if (newUrls.length > 0) {
+      onChange([...photos, ...newUrls]);
+    }
+    setUploading(false);
+  }
 
   function removePhoto(index: number) {
     onChange(photos.filter((_, i) => i !== index));

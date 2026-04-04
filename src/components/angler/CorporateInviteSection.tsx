@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -164,7 +164,7 @@ export default function CorporateInviteSection({
 
   // ─── Fetch invitations ──────────────────────────────────────────
 
-  const fetchInvitations = useCallback(async () => {
+  async function fetchInvitations() {
     try {
       const res = await fetch(
         `/api/corporate-invitations?membership_id=${membershipId}`
@@ -178,11 +178,11 @@ export default function CorporateInviteSection({
     } finally {
       setLoading(false);
     }
-  }, [membershipId]);
+  }
 
   useEffect(() => {
     fetchInvitations();
-  }, [fetchInvitations]);
+  }, [membershipId]);
 
   // ─── Email input handling ───────────────────────────────────────
 

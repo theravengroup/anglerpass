@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ export default function NetworkPage() {
     setTimeout(() => setFeedbackMsg(null), 4000);
   };
 
-  const fetchAgreements = useCallback(async (clubId: string) => {
+  async function fetchAgreements(clubId: string) {
     try {
       const res = await fetch(`/api/clubs/${clubId}/agreements`);
       if (res.ok) {
@@ -52,9 +52,9 @@ export default function NetworkPage() {
     } catch {
       // Silent fail — agreements section will be empty
     }
-  }, []);
+  }
 
-  const init = useCallback(async () => {
+  async function init() {
     setError(false);
     setLoading(true);
     try {
@@ -78,11 +78,11 @@ export default function NetworkPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchAgreements]);
+  }
 
   useEffect(() => {
     init();
-  }, [init]);
+  }, []);
 
   async function handleSearch() {
     if (!searchQuery.trim()) return;

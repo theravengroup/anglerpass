@@ -1,7 +1,7 @@
 // TODO: Convert to server component with async data fetching
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -58,7 +58,7 @@ export default function ClubPage() {
   const [codeCopied, setCodeCopied] = useState(false);
   const [hasClub, setHasClub] = useState<boolean | null>(null);
 
-  const loadClub = useCallback(async () => {
+  async function loadClub() {
     try {
       const res = await fetch("/api/clubs");
       if (!res.ok) return;
@@ -87,11 +87,11 @@ export default function ClubPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     loadClub();
-  }, [loadClub]);
+  }, []);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, UserPlus, Loader2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   CLUB_ROLE_LABELS,
@@ -40,7 +40,7 @@ export default function ClubStaffManager({ clubId, isOwner }: ClubStaffManagerPr
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const fetchStaff = useCallback(async () => {
+  async function fetchStaff() {
     try {
       const res = await fetch(`/api/clubs/${clubId}/staff`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -52,11 +52,11 @@ export default function ClubStaffManager({ clubId, isOwner }: ClubStaffManagerPr
     } finally {
       setLoading(false);
     }
-  }, [clubId]);
+  }
 
   useEffect(() => {
     fetchStaff();
-  }, [fetchStaff]);
+  }, [clubId]);
 
   async function handlePromote(e: React.FormEvent) {
     e.preventDefault();

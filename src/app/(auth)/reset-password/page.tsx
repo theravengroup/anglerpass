@@ -64,8 +64,7 @@ export default function ResetPasswordPage() {
   return (
     <div>
       <h1
-        className="mb-1 text-center text-2xl font-semibold text-[var(--color-forest)]"
-        style={{ fontFamily: "var(--font-heading)" }}
+        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
       >
         Set New Password
       </h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -66,7 +66,7 @@ export default function GuideEarningsPage() {
   const [error, setError] = useState(false);
   const [days, setDays] = useState(30);
 
-  const load = useCallback(async () => {
+  async function load() {
     setError(false);
     try {
       const res = await fetch(
@@ -82,12 +82,12 @@ export default function GuideEarningsPage() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [load]);
+  }, [days]);
 
   function exportCSV() {
     if (!data) return;

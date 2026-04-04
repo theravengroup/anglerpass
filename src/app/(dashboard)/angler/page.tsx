@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -86,7 +86,7 @@ export default function AnglerPage() {
   const [corporateMembership, setCorporateMembership] =
     useState<CorporateMembership | null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const [analyticsRes, invitationsRes, corpRes] = await Promise.all([
         fetch(`/api/analytics?view=angler&days=${days}`),
@@ -111,12 +111,12 @@ export default function AnglerPage() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [load]);
+  }, [days]);
 
   function exportCSV() {
     if (!data) return;

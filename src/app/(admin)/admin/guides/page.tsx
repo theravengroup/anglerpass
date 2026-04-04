@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +48,7 @@ export default function AdminGuidesPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reason, setReason] = useState("");
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = filterStatus ? `?status=${filterStatus}` : "";
@@ -63,11 +63,11 @@ export default function AdminGuidesPage() {
     } finally {
       setLoading(false);
     }
-  }, [filterStatus]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [filterStatus]);
 
   const handleAction = async (guideId: string, action: "make_live" | "reject" | "suspend" | "request_info") => {
     if ((action === "reject" || action === "suspend" || action === "request_info") && !reason.trim()) {

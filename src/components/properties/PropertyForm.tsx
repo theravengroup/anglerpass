@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -79,7 +79,7 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
   });
 
   // Check for existing club invitations/associations
-  const checkClubAssociation = useCallback(async () => {
+  async function checkClubAssociation() {
     const pid = savedPropertyId ?? initialData?.id;
     if (!pid) return;
     try {
@@ -105,11 +105,11 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
     } catch {
       // Silent fail
     }
-  }, [savedPropertyId, initialData?.id]);
+  }
 
   useEffect(() => {
     checkClubAssociation();
-  }, [checkClubAssociation]);
+  }, [savedPropertyId, initialData?.id]);
 
   const species = watch("species");
   const waterType = watch("water_type");

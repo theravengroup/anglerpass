@@ -15,7 +15,7 @@ function BrowserChrome({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-parchment overflow-hidden bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+    <div className="rounded-xl border border-parchment overflow-hidden bg-white shadow-lg">
       {/* Browser bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-parchment-light/60 border-b border-parchment">
         <div className="flex gap-[6px]">
@@ -98,7 +98,7 @@ function LandownerDashboard() {
 
       <div className="grid grid-cols-3 gap-2.5 mb-5">
         {[
-          { label: 'Revenue (Mar)', value: '$4,280', sub: '+18% vs Feb', subColor: 'text-[#4a8c5c]' },
+          { label: 'Revenue (Mar)', value: '$4,280', sub: '+18% vs Feb', subColor: 'text-forest' },
           { label: 'Active Bookings', value: '7', sub: '3 this week' },
           { label: 'Occupancy', value: '62%', sub: 'Apr: 85%' },
         ].map((s) => (
@@ -123,7 +123,7 @@ function LandownerDashboard() {
               <span className="text-text-light">{req.date}</span>
               <span className="text-text-light">{req.rods} rod{req.rods > 1 ? 's' : ''}</span>
               <span className="font-semibold text-forest">{req.payout}</span>
-              <span className="px-2.5 py-0.5 rounded bg-[#4a8c5c]/[0.07] text-[#4a8c5c] text-[10px] font-semibold">Confirmed</span>
+              <span className="px-2.5 py-0.5 rounded bg-forest/[0.07] text-forest text-[10px] font-semibold">Confirmed</span>
             </div>
           </div>
         ))}
@@ -138,7 +138,7 @@ function LandownerDashboard() {
             <div className="text-[13px] font-semibold text-text-primary mb-1">{p.name}</div>
             <div className="flex gap-2 text-[11px] text-text-light">
               <span>{p.type}</span>
-              <span className="text-[#4a8c5c]">{p.status}</span>
+              <span className="text-forest">{p.status}</span>
               <span>Next: {p.next}</span>
             </div>
           </div>
@@ -243,7 +243,7 @@ function AnglerDashboard() {
             </div>
             <span className={`px-2.5 py-0.5 rounded text-[10px] font-semibold ${
               trip.confirmed
-                ? 'bg-[#4a8c5c]/[0.07] text-[#4a8c5c]'
+                ? 'bg-forest/[0.07] text-forest'
                 : 'bg-bronze/[0.07] text-bronze'
             }`}>
               {trip.status}
@@ -290,7 +290,7 @@ function GuideDashboard() {
 
       <div className="grid grid-cols-3 gap-2.5 mb-5">
         {[
-          { label: 'Earnings (Mar)', value: '$3,150', sub: '9 trips completed', subColor: 'text-[#4a8c5c]' },
+          { label: 'Earnings (Mar)', value: '$3,150', sub: '9 trips completed', subColor: 'text-forest' },
           { label: 'Upcoming Trips', value: '4', sub: 'Next: Apr 4' },
           { label: 'Rating', value: '4.9', sub: '37 reviews' },
         ].map((s) => (

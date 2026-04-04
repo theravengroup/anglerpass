@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,7 +60,7 @@ export default function ClubPropertiesPage() {
   const [clubId, setClubId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchProperties = useCallback(async (cid: string) => {
+  async function fetchProperties(cid: string) {
     try {
       const res = await fetch(`/api/clubs/${cid}/properties`);
       if (res.ok) {
@@ -70,9 +70,9 @@ export default function ClubPropertiesPage() {
     } catch {
       // Silent fail
     }
-  }, []);
+  }
 
-  const init = useCallback(async () => {
+  async function init() {
     setError(false);
     setLoading(true);
     try {
@@ -93,11 +93,11 @@ export default function ClubPropertiesPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchProperties]);
+  }
 
   useEffect(() => {
     init();
-  }, [init]);
+  }, []);
 
   async function handleAction(accessId: string, status: "approved" | "declined") {
     if (!clubId) return;

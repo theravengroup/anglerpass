@@ -1,7 +1,7 @@
 // TODO: Convert to server component with async data fetching
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -62,7 +62,7 @@ export default function LandownerPage() {
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const res = await fetch(`/api/analytics?view=landowner&days=${days}`);
       if (res.ok) {
@@ -73,12 +73,12 @@ export default function LandownerPage() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [load]);
+  }, [days]);
 
   function exportCSV() {
     if (!data) return;

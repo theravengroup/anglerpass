@@ -1,7 +1,7 @@
 // TODO: Convert to server component with async data fetching
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -42,7 +42,7 @@ export default function GuideDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const [profileRes, threadsRes] = await Promise.all([
         fetch("/api/guides/profile"),
@@ -67,11 +67,11 @@ export default function GuideDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import {
   Card,
   CardContent,
@@ -47,7 +47,7 @@ export default function TeamPage() {
     text: string;
   } | null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     try {
       const res = await fetch("/api/admin/invite");
       if (res.ok) {
@@ -60,11 +60,11 @@ export default function TeamPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   async function handleInvite(e: FormEvent) {
     e.preventDefault();

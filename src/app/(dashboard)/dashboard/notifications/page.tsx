@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -87,7 +87,7 @@ export default function NotificationsPage() {
   const [markingAll, setMarkingAll] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const fetchNotifications = useCallback(async () => {
+  async function fetchNotifications() {
     try {
       const res = await fetch("/api/notifications?limit=50");
       if (res.ok) {
@@ -100,11 +100,11 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     fetchNotifications();
-  }, [fetchNotifications]);
+  }, []);
 
   const markAsRead = async (id: string) => {
     setNotifications((prev) =>

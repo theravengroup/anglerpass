@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, MessageSquare, Send } from "lucide-react";
@@ -45,7 +45,7 @@ export function MessagesView({
   const [sending, setSending] = useState(false);
   const [newMessage, setNewMessage] = useState("");
 
-  const loadThreads = useCallback(async () => {
+  async function loadThreads() {
     try {
       const res = await fetch("/api/messages");
       if (res.ok) {
@@ -57,11 +57,11 @@ export function MessagesView({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     loadThreads();
-  }, [loadThreads]);
+  }, []);
 
   const loadMessages = async (threadId: string) => {
     setSelectedThread(threadId);

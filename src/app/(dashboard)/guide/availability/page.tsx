@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
@@ -23,7 +23,7 @@ export default function GuideAvailabilityPage() {
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState<string | null>(null);
 
-  const fetchAvailability = useCallback(async () => {
+  async function fetchAvailability() {
     setLoading(true);
     try {
       const start = new Date(currentMonth);
@@ -44,11 +44,11 @@ export default function GuideAvailabilityPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentMonth]);
+  }
 
   useEffect(() => {
     fetchAvailability();
-  }, [fetchAvailability]);
+  }, [currentMonth]);
 
   const handleSave = async (status: "blocked" | "available") => {
     if (selectedDates.size === 0) return;

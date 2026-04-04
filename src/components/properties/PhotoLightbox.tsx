@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PhotoLightboxProps {
@@ -16,13 +16,13 @@ export default function PhotoLightbox({
 }: PhotoLightboxProps) {
   const [index, setIndex] = useState(initialIndex);
 
-  const goNext = useCallback(() => {
+  function goNext() {
     setIndex((i) => (i + 1) % photos.length);
-  }, [photos.length]);
+  }
 
-  const goPrev = useCallback(() => {
+  function goPrev() {
     setIndex((i) => (i - 1 + photos.length) % photos.length);
-  }, [photos.length]);
+  }
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -38,7 +38,7 @@ export default function PhotoLightbox({
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [onClose, goNext, goPrev]);
+  }, [onClose, photos.length]);
 
   return (
     <div

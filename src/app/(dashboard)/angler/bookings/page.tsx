@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ export default function AnglerBookingsPage() {
   }, []);
 
   // Open cancellation dialog and fetch refund preview
-  const openCancelDialog = useCallback(async (booking: Booking) => {
+  async function openCancelDialog(booking: Booking) {
     setCancelDialogBooking(booking);
     setRefundPreview(null);
     setCancelReason("");
@@ -99,7 +99,7 @@ export default function AnglerBookingsPage() {
     } finally {
       setPreviewLoading(false);
     }
-  }, []);
+  }
 
   const closeCancelDialog = () => {
     setCancelDialogBooking(null);

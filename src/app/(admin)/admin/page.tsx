@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -72,7 +72,7 @@ export default function AdminPage() {
   const [error, setError] = useState(false);
   const [days, setDays] = useState(30);
 
-  const load = useCallback(async () => {
+  async function load() {
     setError(false);
     try {
       const res = await fetch(`/api/analytics?view=admin&days=${days}`);
@@ -86,12 +86,12 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }
 
   useEffect(() => {
     setLoading(true);
     load();
-  }, [load]);
+  }, [days]);
 
   function handleExport() {
     if (!data) return;

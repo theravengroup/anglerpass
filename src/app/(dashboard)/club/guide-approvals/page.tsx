@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,7 +43,7 @@ export default function ClubGuideApprovalsPage() {
   const [filterStatus, setFilterStatus] = useState<string>("pending");
   const [declineReason, setDeclineReason] = useState("");
 
-  const loadClub = useCallback(async () => {
+  async function loadClub() {
     try {
       // Get user's club
       const res = await fetch("/api/clubs/mine");
@@ -56,13 +56,13 @@ export default function ClubGuideApprovalsPage() {
     } catch {
       // silent
     }
-  }, []);
+  }
 
   useEffect(() => {
     loadClub();
-  }, [loadClub]);
+  }, []);
 
-  const loadApprovals = useCallback(async () => {
+  async function loadApprovals() {
     if (!clubId) return;
     setLoading(true);
     try {
@@ -77,11 +77,11 @@ export default function ClubGuideApprovalsPage() {
     } finally {
       setLoading(false);
     }
-  }, [clubId, filterStatus]);
+  }
 
   useEffect(() => {
     loadApprovals();
-  }, [loadApprovals]);
+  }, [clubId, filterStatus]);
 
   const handleAction = async (approvalId: string, action: "approve" | "decline" | "revoke") => {
     if (!clubId) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -57,7 +57,7 @@ export default function UsersPage() {
   const [actionUser, setActionUser] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -75,12 +75,12 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, roleFilter, statusFilter]);
+  }
 
   useEffect(() => {
     const debounce = setTimeout(load, 300);
     return () => clearTimeout(debounce);
-  }, [load]);
+  }, [page, search, roleFilter, statusFilter]);
 
   async function handleAction(
     userId: string,

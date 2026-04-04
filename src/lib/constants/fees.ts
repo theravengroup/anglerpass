@@ -17,6 +17,10 @@ export const PLATFORM_FEE_RATE = 0.15;
 /** 10% service fee on guide rates, paid by the angler to AnglerPass. */
 export const GUIDE_SERVICE_FEE_RATE = 0.10;
 
+// ─── Membership Processing Fee ─────────────────────────────────────
+/** 3.5% processing fee on membership payments (initiation + dues), paid by the member. */
+export const MEMBERSHIP_PROCESSING_FEE_RATE = 0.035;
+
 // ─── Cross-Club Network Fee ─────────────────────────────────────────
 /**
  * Total cross-club access fee per rod/day, paid by the angler when booking
