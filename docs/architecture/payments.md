@@ -46,7 +46,7 @@ Landowner/club receives payout to their bank
 | Transaction Type     | Platform Fee | Notes                                          |
 |----------------------|-------------|-------------------------------------------------|
 | Booking (all)        | 15%         | Added on top of rod fee, paid by angler          |
-| Cross-club access fee| $30/rod     | $20 to AnglerPass + $5 home club + $5 hosting club |
+| Cross-club access fee| $25/rod     | $20 to AnglerPass + $5 home club referral            |
 | Club membership      | 3.5%        | Processing fee on initiation fees and annual dues |
 
 The platform fee is a markup on the landowner's rod fee — it does not reduce the landowner or club's share. Rod fees flow through to the existing landowner/club split ($5/rod to club, remainder to landowner).

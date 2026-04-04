@@ -203,8 +203,8 @@ export default function PolicyContent() {
         <h3 className={subHeadingClass}>Booking fees</h3>
         <p className={textClass}>
           Fishing access bookings have a separate fee structure: a 15% platform fee on
-          rod fees, plus a $30/rod cross-club access fee when booking outside your home club
-          ($20 to AnglerPass, $5 to your home club, $5 to the hosting club).
+          rod fees, plus a $25/rod cross-club access fee when booking outside your home club
+          ($20 to AnglerPass, $5 to your home club).
           When a guide is added to a booking, a 10% service fee is applied to the guide&rsquo;s
           rate, paid by the angler. The guide receives 100% of their stated rate.
           See our{' '}

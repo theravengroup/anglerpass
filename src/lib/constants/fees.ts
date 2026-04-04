@@ -25,21 +25,20 @@ export const GUIDE_SERVICE_FEE_RATE = 0.10;
  * Split:
  *   $20 → AnglerPass (platform revenue)
  *   $5  → Home club (referral / network maintenance)
- *   $5  → Hosting club (property access / network participation)
+ *
+ * The hosting club is already compensated via the $5/rod club commission
+ * built into the landowner's rod fee (same as any booking).
  *
  * This premium reflects the value of reciprocal access — a feature unique
  * to AnglerPass that lets club members fish waters they'd otherwise never reach.
  */
-export const CROSS_CLUB_FEE_PER_ROD = 30;
+export const CROSS_CLUB_FEE_PER_ROD = 25;
 
 /** AnglerPass's share of the cross-club fee. */
 export const ANGLERPASS_CROSS_CLUB_SHARE_PER_ROD = 20;
 
 /** Home club referral paid from the cross-club fee for facilitating network access. */
 export const HOME_CLUB_REFERRAL_PER_ROD = 5;
-
-/** Hosting club share paid from the cross-club fee for providing property access. */
-export const HOSTING_CLUB_SHARE_PER_ROD = 5;
 
 // ─── Club Commission ────────────────────────────────────────────────
 /**
@@ -87,12 +86,10 @@ export interface FeeBreakdown {
   baseRate: number;
   /** Platform fee (15% of baseRate), paid by angler to AnglerPass */
   platformFee: number;
-  /** Cross-club fee ($30/rod/day), $0 if home-club booking */
+  /** Cross-club fee ($25/rod/day), $0 if home-club booking */
   crossClubFee: number;
   /** Home club referral ($5/rod/day from cross-club fee), $0 if home-club booking */
   homeClubReferral: number;
-  /** Hosting club share ($5/rod/day from cross-club fee), $0 if home-club booking */
-  hostingClubShare: number;
   /** Total charged to the angler */
   totalAmount: number;
   /** Whether this is a cross-club booking */
@@ -111,7 +108,7 @@ export interface FeeBreakdown {
   clubCommission: number;
   /** Landowner net payout (baseRate - clubCommission) */
   landownerPayout: number;
-  /** Total AnglerPass revenue (platformFee + crossClubFee + guideServiceFee) */
+  /** Total AnglerPass revenue (platformFee + AP cross-club share + guideServiceFee) */
   anglerpassRevenue: number;
 }
 
@@ -140,9 +137,6 @@ export function calculateFeeBreakdown(
   const homeClubReferral = isCrossClub
     ? round(HOME_CLUB_REFERRAL_PER_ROD * rodCount * days)
     : 0;
-  const hostingClubShare = isCrossClub
-    ? round(HOSTING_CLUB_SHARE_PER_ROD * rodCount * days)
-    : 0;
 
   // Guide fees (multiplied by days)
   const totalGuideRate = round(guideRate * days);
@@ -156,8 +150,8 @@ export function calculateFeeBreakdown(
   // Payout splits
   const clubCommission = round(CLUB_COMMISSION_PER_ROD * rodCount * days);
   const landownerPayout = round(baseRate - clubCommission);
-  // AP keeps cross-club fee minus home club referral and hosting club share
-  const anglerpassCrossClubShare = round(crossClubFee - homeClubReferral - hostingClubShare);
+  // AP keeps cross-club fee minus home club referral
+  const anglerpassCrossClubShare = round(crossClubFee - homeClubReferral);
   const anglerpassRevenue = round(platformFee + anglerpassCrossClubShare + guideServiceFee);
 
   return {
@@ -168,7 +162,6 @@ export function calculateFeeBreakdown(
     platformFee,
     crossClubFee,
     homeClubReferral,
-    hostingClubShare,
     totalAmount,
     isCrossClub,
     guideRate: totalGuideRate,

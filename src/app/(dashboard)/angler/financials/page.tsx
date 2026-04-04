@@ -509,8 +509,8 @@ export default function AnglerFinancialsPage() {
             Rod fees are set by the landowner. A 15% platform fee is applied to
             cover payment processing and platform operation. If you book through
             the Cross-Club Network (a property outside your home club), a
-            $30/rod cross-club access fee applies ($20 to AnglerPass, $5 to your
-            home club, $5 to the hosting club). Guide fees include a 10% service fee. Your
+            $25/rod cross-club access fee applies ($20 to AnglerPass, $5 to your
+            home club). Guide fees include a 10% service fee. Your
             club membership dues are set by your club and collected separately.
           </p>
         </CardContent>
