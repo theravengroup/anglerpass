@@ -124,6 +124,7 @@ export default function Nav() {
           </li>
         </ul>
         <div className="nav-cta">
+          <Link href="/explore" className="btn btn-login">Explore Waters</Link>
           <a href="/login" className="btn btn-login">Log In</a>
         </div>
         <button
@@ -147,7 +148,7 @@ export default function Nav() {
             gap: '4px',
           }}
         >
-          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/login', label: 'Log In' }].map((item) =>
+          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/explore', label: 'Explore Waters' }, { anchor: '/login', label: 'Log In' }].map((item) =>
             isHomepage ? (
               <a
                 key={item.anchor}
