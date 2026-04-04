@@ -37,7 +37,8 @@ export default function ConciergeSection() {
     <section className="concierge-section">
       <div className="concierge-overlay" />
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        {/* Header */}
+        {/* Concierge Offering */}
+        <div className="ai-offering">
         <div className="concierge-header reveal">
           <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
             Introducing AnglerPass Concierge &middot; Your Context-Aware Trip
@@ -169,6 +170,7 @@ export default function ConciergeSection() {
         <p className="concierge-tagline reveal">
           Less guesswork. Better days on the water. Just ask.
         </p>
+        </div>
       </div>
     </section>
   );

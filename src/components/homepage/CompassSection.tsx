@@ -155,7 +155,8 @@ export default function CompassSection() {
           </p>
         </div>
 
-        {/* Compass Header */}
+        {/* Compass Offering */}
+        <div className="ai-offering">
         <div className="compass-header reveal">
           <span className="eyebrow" style={{ color: 'var(--sand)' }}>
             Introducing AnglerPass Compass &middot; The First AI-Powered Private Water Platform
@@ -282,6 +283,7 @@ export default function CompassSection() {
         <p className="compass-tagline reveal">
           Powered by AnglerPass Compass — Intelligent trip matching for modern anglers.
         </p>
+        </div>
       </div>
     </section>
   );
