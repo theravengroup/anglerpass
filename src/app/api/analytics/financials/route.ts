@@ -193,7 +193,7 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
 
   // Get properties associated with this club
   const { data: clubProperties } = await admin
-    .from("club_properties")
+    .from("club_property_access")
     .select("property_id, properties(name)")
     .eq("club_id", clubId)
     .eq("status", "approved");
