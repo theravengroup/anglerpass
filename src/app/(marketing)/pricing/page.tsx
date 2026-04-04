@@ -186,7 +186,7 @@ export default function PricingPage() {
                   <p className="text-[11px] text-text-light m-0 mt-0.5">Member referral</p>
                 </div>
               </div>
-              <p className="text-[11px] text-text-light mt-2">
+              <p className="text-[13px] text-text-secondary mt-2">
                 The hosting club already receives its $5/rod commission from the rod fee &mdash; same as any booking.
               </p>
             </div>
