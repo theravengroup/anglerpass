@@ -381,6 +381,14 @@ export default function MarketingFooter() {
                     Policies
                   </Link>
                 </li>
+                <li className="mb-2.5">
+                  <Link
+                    href="/conservation"
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
+                  >
+                    Conservation
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
