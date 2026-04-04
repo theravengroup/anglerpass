@@ -200,7 +200,7 @@ export default function LandownersPage() {
               <span className="inline-flex items-center justify-center size-8 rounded-lg bg-forest/8 text-forest font-heading text-[15px] font-bold mb-3">2</span>
               <h3 className="text-[14px] font-semibold text-forest mb-1.5">Choose a club</h3>
               <p className="text-[13px] leading-[1.6] text-text-secondary m-0">
-                We match you with clubs in your area based on your property&rsquo;s location. You pick the ones you trust.
+                Browse clubs on the platform or invite a club you already work with. You choose who to affiliate with.
               </p>
             </div>
             <div className="bg-white border border-parchment rounded-xl px-5 py-5">
@@ -291,7 +291,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'How do I get started?',
-                a: 'There are two paths. If you already work with a fly fishing club, ask them about getting your property listed on AnglerPass \u2014 your club can walk you through the process and the affiliation is already in place. If you\u2019re exploring on your own, join the waitlist or contact us directly. When you register a property, you enter its GPS coordinates and we automatically match you with clubs operating in your area. Either way, you own your listing, set your rod rate, and control which clubs\u2019 members can see and book your water. Most landowners are fully set up within a week.',
+                a: 'There are two paths. If you already work with a fly fishing club, ask them about getting your property listed on AnglerPass \u2014 your club can walk you through the process and the affiliation is already in place. If you\u2019re exploring on your own, join the waitlist or contact us directly. When you register a property, you choose which club to affiliate with, and only their vetted members can see and book your water. Either way, you own your listing, set your rod rate, and control access. Most landowners are fully set up within a week.',
               },
             ]}
           />
