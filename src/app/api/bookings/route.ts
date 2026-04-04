@@ -84,6 +84,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!property.owner_id) {
+      return NextResponse.json(
+        { error: "This property has not been claimed by a landowner yet" },
+        { status: 400 }
+      );
+    }
+
     if (duration === "half_day" && !property.half_day_allowed) {
       return NextResponse.json(
         { error: "This property does not offer half-day bookings" },

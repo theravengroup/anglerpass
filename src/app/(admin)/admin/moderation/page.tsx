@@ -23,7 +23,7 @@ export default async function ModerationPage() {
     .order("updated_at", { ascending: true });
 
   // Fetch owner display names
-  const ownerIds = [...new Set((properties ?? []).map((p: { owner_id: string }) => p.owner_id))];
+  const ownerIds = [...new Set((properties ?? []).map((p) => p.owner_id).filter((id): id is string => id != null))];
   let owners: Record<string, string> = {};
 
   if (ownerIds.length > 0) {
@@ -77,15 +77,7 @@ export default async function ModerationPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {queue.map((property: {
-            id: string;
-            name: string;
-            location_description: string | null;
-            photos: string[] | null;
-            max_rods: number | null;
-            owner_id: string;
-            updated_at: string | null;
-          }) => (
+          {queue.map((property) => (
             <Link
               key={property.id}
               href={`/admin/moderation/${property.id}`}
@@ -111,7 +103,7 @@ export default async function ModerationPage() {
                         {property.name}
                       </h3>
                       <div className="flex items-center gap-3 text-sm text-text-light">
-                        <span>by {owners[property.owner_id] ?? "Unknown"}</span>
+                        <span>by {property.owner_id ? (owners[property.owner_id] ?? "Unknown") : "Unclaimed"}</span>
                         {property.location_description && (
                           <span>
                             {property.location_description.length > 40

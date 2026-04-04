@@ -305,7 +305,7 @@ export default function MarketingFooter() {
                   { href: '/explore', label: 'Explore Waters' },
                   { href: '/pricing', label: 'Pricing' },
                 ].map((link) => (
-                  <li key={link.href} className="mb-2.5">
+                  <li key={link.href} className="mb-1.5">
                     <Link
                       href={link.href}
                       className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -323,7 +323,7 @@ export default function MarketingFooter() {
                 Company
               </h4>
               <ul className="list-none m-0 p-0">
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/#faq"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -331,7 +331,7 @@ export default function MarketingFooter() {
                     FAQ
                   </Link>
                 </li>
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); setActiveModal('contact'); }}
@@ -340,7 +340,7 @@ export default function MarketingFooter() {
                     Contact
                   </a>
                 </li>
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/#investors"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -357,7 +357,7 @@ export default function MarketingFooter() {
                 Legal
               </h4>
               <ul className="list-none m-0 p-0">
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/privacy"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -365,7 +365,7 @@ export default function MarketingFooter() {
                     Privacy Policy
                   </Link>
                 </li>
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/terms"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -373,7 +373,7 @@ export default function MarketingFooter() {
                     Terms of Service
                   </Link>
                 </li>
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/policies"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
@@ -381,7 +381,7 @@ export default function MarketingFooter() {
                     Policies
                   </Link>
                 </li>
-                <li className="mb-2.5">
+                <li className="mb-1.5">
                   <Link
                     href="/conservation"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"

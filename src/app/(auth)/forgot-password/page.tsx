@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -61,9 +62,9 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-[var(--color-parchment)]">
+        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-parchment">
           <svg
-            className="size-6 text-[var(--color-forest)]"
+            className="size-6 text-forest"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
@@ -77,17 +78,17 @@ export default function ForgotPasswordPage() {
           </svg>
         </div>
         <h1
-          className="mb-2 font-heading text-2xl font-semibold text-[var(--color-forest)]"
+          className="mb-2 font-heading text-2xl font-semibold text-forest"
         >
           Check Your Email
         </h1>
-        <p className="mb-6 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-6 text-sm text-text-secondary">
           If an account exists with that email, we&apos;ve sent a password reset
           link. Please check your inbox and spam folder.
         </p>
         <Link
           href="/login"
-          className="text-sm font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+          className="text-sm font-medium text-forest hover:text-forest-deep"
         >
           Back to sign in
         </Link>
@@ -98,16 +99,16 @@ export default function ForgotPasswordPage() {
   return (
     <div>
       <h1
-        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
+        className="mb-1 text-center font-heading text-2xl font-semibold text-forest"
       >
         Reset Your Password
       </h1>
-      <p className="mb-8 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mb-8 text-center text-sm text-text-secondary">
         Enter your email and we&apos;ll send you a reset link
       </p>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" aria-live="polite" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -131,17 +132,24 @@ export default function ForgotPasswordPage() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-10 w-full bg-[var(--color-forest)] text-white hover:bg-[var(--color-forest-deep)]"
+          className="h-11 w-full"
         >
-          {isLoading ? "Sending..." : "Send Reset Link"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            "Send Reset Link"
+          )}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mt-6 text-center text-sm text-text-secondary">
         Remember your password?{" "}
         <Link
           href="/login"
-          className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+          className="font-medium text-forest hover:text-forest-deep"
         >
           Sign in
         </Link>

@@ -60,8 +60,8 @@ export async function GET(request: Request) {
     const ownerIds = [
       ...new Set(
         (properties ?? [])
-          .map((p: { owner_id: string }) => p.owner_id)
-          .filter((id): id is string => id !== null)
+          .map((p) => p.owner_id)
+          .filter((id): id is string => id != null)
       ),
     ];
 
@@ -97,8 +97,8 @@ export async function GET(request: Request) {
         location_description: p.location_description,
         status: p.status,
         water_type: p.water_type,
-        owner_name: ownerProfileMap[p.owner_id] ?? null,
-        owner_email: ownerEmailMap[p.owner_id] ?? null,
+        owner_name: p.owner_id ? (ownerProfileMap[p.owner_id] ?? null) : null,
+        owner_email: p.owner_id ? (ownerEmailMap[p.owner_id] ?? null) : null,
         created_at: p.created_at,
         updated_at: p.updated_at,
       })

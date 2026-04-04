@@ -349,6 +349,45 @@ export type Database = {
           },
         ]
       }
+      consultation_requests: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          organization: string
+          property_count: number | null
+          preferred_dates: string | null
+          notes: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          organization: string
+          property_count?: number | null
+          preferred_dates?: string | null
+          notes?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          organization?: string
+          property_count?: number | null
+          preferred_dates?: string | null
+          notes?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       club_invitations: {
         Row: {
           admin_email: string
@@ -1889,11 +1928,69 @@ export type Database = {
         }
         Relationships: []
       }
+      property_claim_invitations: {
+        Row: {
+          id: string
+          property_id: string
+          club_id: string
+          landowner_email: string
+          token: string
+          status: string
+          reminder_count: number
+          last_reminded_at: string | null
+          created_at: string
+          claimed_at: string | null
+          claimed_by: string | null
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          club_id: string
+          landowner_email: string
+          token?: string
+          status?: string
+          reminder_count?: number
+          last_reminded_at?: string | null
+          created_at?: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          club_id?: string
+          landowner_email?: string
+          token?: string
+          status?: string
+          reminder_count?: number
+          last_reminded_at?: string | null
+          created_at?: string
+          claimed_at?: string | null
+          claimed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_claim_invitations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_claim_invitations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       properties: {
         Row: {
           access_notes: string | null
           coordinates: string | null
           created_at: string | null
+          created_by_club_id: string | null
           description: string | null
           gate_code: string | null
           gate_code_required: boolean | null
@@ -1907,7 +2004,7 @@ export type Database = {
           max_guests: number | null
           max_rods: number | null
           name: string
-          owner_id: string
+          owner_id: string | null
           photos: string[] | null
           rate_adult_full_day: number | null
           rate_adult_half_day: number | null
@@ -1940,7 +2037,8 @@ export type Database = {
           max_guests?: number | null
           max_rods?: number | null
           name: string
-          owner_id: string
+          created_by_club_id?: string | null
+          owner_id?: string | null
           photos?: string[] | null
           rate_adult_full_day?: number | null
           rate_adult_half_day?: number | null
@@ -1960,6 +2058,7 @@ export type Database = {
           access_notes?: string | null
           coordinates?: string | null
           created_at?: string | null
+          created_by_club_id?: string | null
           description?: string | null
           gate_code?: string | null
           gate_code_required?: boolean | null
@@ -1973,7 +2072,7 @@ export type Database = {
           max_guests?: number | null
           max_rods?: number | null
           name?: string
-          owner_id?: string
+          owner_id?: string | null
           photos?: string[] | null
           rate_adult_full_day?: number | null
           rate_adult_half_day?: number | null

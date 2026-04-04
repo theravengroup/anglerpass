@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 const sectionClass = 'mb-12 scroll-mt-28';
 const headingClass = 'font-heading text-[clamp(20px,2.5vw,24px)] font-semibold leading-[1.2] text-forest mb-4 tracking-[-0.2px]';
 const textClass = 'text-[14.5px] leading-[1.8] text-text-secondary mb-3';
-const listClass = `${textClass} pl-5`;
-const listItemClass = 'mb-2';
+const listClass = `${textClass} ap-list`;
+const listItemClass = 'mb-2.5';
 
 export default function PrivacyPage() {
   return (
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
       <section className="bg-offwhite py-16 lg:py-20">
         <div className="mx-auto max-w-[760px] px-8">
           <p className={textClass}>
-            AnglerPass is operated by The Raven Group LLC (&ldquo;we,&rdquo;
+            AnglerPass is operated by Angler Pass, LLC (&ldquo;we,&rdquo;
             &ldquo;us,&rdquo; &ldquo;our&rdquo;). We take your privacy
             seriously. This policy explains what data we collect, how we use
             it, and your rights regarding that data.

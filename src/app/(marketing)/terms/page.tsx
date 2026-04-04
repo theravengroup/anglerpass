@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 const sectionClass = 'mb-12 scroll-mt-28';
 const headingClass = 'font-heading text-[clamp(20px,2.5vw,24px)] font-semibold leading-[1.2] text-forest mb-4 tracking-[-0.2px]';
 const textClass = 'text-[14.5px] leading-[1.8] text-text-secondary mb-3';
-const listClass = `${textClass} pl-5`;
-const listItemClass = 'mb-2';
+const listClass = `${textClass} ap-list`;
+const listItemClass = 'mb-2.5';
 
 export default function TermsPage() {
   return (
@@ -45,7 +45,7 @@ export default function TermsPage() {
           <div className={sectionClass}>
             <h2 className={headingClass}>1. Overview</h2>
             <p className={textClass}>
-              AnglerPass is a platform operated by The Raven Group LLC that
+              AnglerPass is a platform operated by Angler Pass, LLC that
               connects private water landowners, fishing clubs, professional
               guides, and anglers. We provide tools for managing property access,
               club memberships, guide verification, bookings, and payments on
@@ -159,31 +159,63 @@ export default function TermsPage() {
           <div className={sectionClass}>
             <h2 className={headingClass}>8. Payments &amp; fees</h2>
             <p className={textClass}>
-              All payment processing is handled through Stripe. The following fees
-              apply:
+              All payment processing is handled through Stripe. Fees vary by
+              transaction type as described below. For current amounts and
+              examples, see our{' '}
+              <a href="/pricing" className="text-river underline">
+                Pricing
+              </a>{' '}
+              page.
             </p>
-            <ul className={listClass}>
-              <li className={listItemClass}>
-                <strong>Payment processing:</strong> 3.5% on all transactions
-                (covers Stripe fees and platform costs)
-              </li>
-              <li className={listItemClass}>
-                <strong>Booking commission:</strong> $5 per rod per day on
-                property bookings, paid to the managing club
-              </li>
-              <li className={listItemClass}>
-                <strong>Guide verification:</strong> One-time $49 fee,
-                non-refundable
-              </li>
-              <li className={listItemClass}>
-                <strong>Club subscriptions:</strong> Monthly fees based on tier
-                (Starter $79/mo, Standard $199/mo, Pro $499/mo)
-              </li>
-            </ul>
+
             <p className={textClass}>
-              AnglerPass does not mark up guide rates, rod fees, or club dues.
-              Landowners receive 100% of rod fees minus the $5/rod club
-              commission. Guides receive 100% of their stated rate.
+              <strong>Club membership payments.</strong> Clubs set their own
+              initiation fees and annual dues. A 3.5% processing fee is added
+              at checkout and paid by the member. Clubs receive 100% of their
+              stated fees.
+            </p>
+
+            <p className={textClass}>
+              <strong>Club subscriptions.</strong> Clubs pay a monthly
+              subscription based on their tier (Starter $79/mo, Standard
+              $199/mo, Pro $499/mo). Subscription tiers determine member
+              limits, property limits, and access to features such as
+              cross-club agreements and corporate memberships.
+            </p>
+
+            <p className={textClass}>
+              <strong>Property bookings.</strong> Anglers pay the
+              landowner&rsquo;s rod fee plus a 15% platform fee on each
+              booking. A $5 per rod per day commission is deducted from the
+              rod fee and paid to the managing club. Landowners receive 100%
+              of their stated rod fee minus the $5/rod club commission. The
+              15% platform fee is paid by the angler and does not reduce the
+              landowner&rsquo;s payout.
+            </p>
+
+            <p className={textClass}>
+              <strong>Cross-club access.</strong> When an angler books water
+              managed by a club other than their home club, a $25 per rod
+              cross-club access fee applies. Of this fee, $20 goes to
+              AnglerPass and $5 goes to the angler&rsquo;s home club as a
+              referral commission. The hosting club still receives its
+              standard $5/rod commission from the rod fee.
+            </p>
+
+            <p className={textClass}>
+              <strong>Guide services.</strong> Guide rates are set by the
+              guide. When an angler adds a guide to their booking, a 10%
+              service fee is added to the angler&rsquo;s checkout total.
+              Guides receive 100% of their stated rate &mdash; the service
+              fee is never deducted from the guide&rsquo;s payout.
+            </p>
+
+            <p className={textClass}>
+              <strong>Guide verification.</strong> Guides pay a one-time $49
+              verification fee to complete the mandatory background check and
+              profile review process. This fee is non-refundable, including
+              if the background check returns an unfavorable result or the
+              application is rejected.
             </p>
           </div>
 
@@ -307,7 +339,7 @@ export default function TermsPage() {
             <p className={textClass}>
               AnglerPass is provided &ldquo;as is&rdquo; without warranties of
               any kind, express or implied. To the maximum extent permitted by
-              law, The Raven Group LLC is not liable for any indirect, incidental,
+              law, Angler Pass, LLC is not liable for any indirect, incidental,
               special, consequential, or punitive damages arising from your use of
               the platform, interactions with other users, or experiences on
               listed properties. Our total liability for any claim shall not
@@ -321,7 +353,7 @@ export default function TermsPage() {
             <h2 className={headingClass}>16. Intellectual property</h2>
             <p className={textClass}>
               All AnglerPass branding, design, and platform code are the property
-              of The Raven Group LLC. User-submitted content (property
+              of Angler Pass, LLC. User-submitted content (property
               descriptions, photos, reviews, profile information) remains the
               property of the submitter, with a non-exclusive, worldwide license
               granted to AnglerPass to display, reproduce, and process it on the

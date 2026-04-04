@@ -115,7 +115,7 @@ export async function POST(request: Request) {
         // Notification to team
         await resend.emails.send({
           from: "AnglerPass <hello@anglerpass.com>",
-          to: "migration@anglerpass.com",
+          to: "onboarding@anglerpass.com",
           subject: `New migration inquiry: ${data.clubName} (${data.memberCount} members)`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; color: #1e1e1a;">

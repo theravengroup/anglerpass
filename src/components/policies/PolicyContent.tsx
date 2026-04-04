@@ -4,8 +4,9 @@ const sectionClass = 'mb-16 scroll-mt-28';
 const headingClass = 'font-heading text-[clamp(22px,3vw,28px)] font-semibold leading-[1.15] text-forest mb-5 tracking-[-0.2px] pb-3 border-b border-parchment';
 const subHeadingClass = 'text-[15px] font-semibold text-forest mb-2 mt-7';
 const textClass = 'text-[14.5px] leading-[1.8] text-text-secondary mb-3';
-const listClass = `${textClass} pl-5`;
-const listItemClass = 'mb-2';
+const listClass = `${textClass} ap-list`;
+const listItemClass = 'mb-2.5';
+const orderedListClass = `${textClass} ap-list-ordered`;
 
 export default function PolicyContent() {
   return (
@@ -21,7 +22,7 @@ export default function PolicyContent() {
         </p>
 
         <h3 className={subHeadingClass}>Application process</h3>
-        <ol className={listClass}>
+        <ol className={orderedListClass}>
           <li className={listItemClass}>Angler submits a membership application through AnglerPass.</li>
           <li className={listItemClass}>Club administrators review the application and may request additional information.</li>
           <li className={listItemClass}>Club approves or declines the application.</li>

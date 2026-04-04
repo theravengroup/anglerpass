@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -90,17 +91,19 @@ function LoginForm() {
 
   return (
     <div>
-      <h1
-        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
-      >
+      <h1 className="mb-1 text-center font-heading text-2xl font-semibold text-forest">
         Welcome Back
       </h1>
-      <p className="mb-8 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mb-8 text-center text-sm text-text-secondary">
         Sign in to your AnglerPass account
       </p>
 
       {error && (
-        <div role="alert" aria-live="polite" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </div>
       )}
@@ -117,7 +120,9 @@ function LoginForm() {
             aria-invalid={!!errors.email}
           />
           {errors.email && (
-            <p className="text-xs text-red-600">{errors.email.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
@@ -126,7 +131,7 @@ function LoginForm() {
             <Label htmlFor="password">Password</Label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-[var(--color-river)] hover:text-[var(--color-river-light)]"
+              className="text-xs font-medium text-river hover:text-river-light"
             >
               Forgot password?
             </Link>
@@ -140,24 +145,33 @@ function LoginForm() {
             aria-invalid={!!errors.password}
           />
           {errors.password && (
-            <p className="text-xs text-red-600">{errors.password.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-10 w-full bg-[var(--color-forest)] text-white hover:bg-[var(--color-forest-deep)]"
+          className="h-11 w-full"
         >
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mt-6 text-center text-sm text-text-secondary">
         Early Access account creation is coming soon.{" "}
         <Link
           href="/#waitlist"
-          className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+          className="font-medium text-forest hover:text-forest-deep"
         >
           Join the waitlist
         </Link>{" "}

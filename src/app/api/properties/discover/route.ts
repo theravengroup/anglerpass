@@ -158,10 +158,27 @@ export async function GET(request: Request) {
       );
     }
 
+    // Fetch active lodging data for these properties
+    const propertyIds = (properties ?? []).map((p) => p.id);
+    const { data: lodgingRows } = propertyIds.length > 0
+      ? await admin
+          .from("property_lodging")
+          .select("*")
+          .in("property_id", propertyIds)
+          .eq("is_active", true)
+      : { data: [] };
+
+    const lodgingMap: Record<string, typeof lodgingRows extends (infer T)[] | null ? T : never> = {};
+    for (const row of lodgingRows ?? []) {
+      lodgingMap[row.property_id] = row;
+    }
+
     // Enrich properties with club access info and cross-club flag
     const enriched = (properties ?? []).map((prop) => {
       const crossClubInfo = crossClubMap[prop.id];
       const isCrossClub = !!crossClubInfo;
+
+      const lodging = lodgingMap[prop.id] ?? null;
 
       if (isCrossClub) {
         // Cross-club property: route through the angler's club that has the agreement
@@ -171,6 +188,7 @@ export async function GET(request: Request) {
         return {
           ...prop,
           is_cross_club: true,
+          lodging,
           accessible_through: anglerMembership
             ? [
                 {
@@ -199,6 +217,7 @@ export async function GET(request: Request) {
       return {
         ...prop,
         is_cross_club: false,
+        lodging,
         accessible_through: accessibleClubs,
       };
     });

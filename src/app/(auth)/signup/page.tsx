@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -135,20 +136,20 @@ function SignupForm() {
     return (
       <div>
         <h1
-          className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
+          className="mb-1 text-center font-heading text-2xl font-semibold text-forest"
         >
           Check Your Email
         </h1>
-        <p className="mb-6 text-center text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-6 text-center text-sm text-text-secondary">
           We sent a confirmation link to your email address. Please click the
           link to verify your account and get started.
         </p>
-        <p className="text-center text-sm text-[var(--color-text-secondary)]">
+        <p className="text-center text-sm text-text-secondary">
           Didn&apos;t receive it?{" "}
           <button
             type="button"
             onClick={() => setConfirmationSent(false)}
-            className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+            className="font-medium text-forest hover:text-forest-deep"
           >
             Try again
           </button>
@@ -160,11 +161,11 @@ function SignupForm() {
   return (
     <div>
       <h1
-        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
+        className="mb-1 text-center font-heading text-2xl font-semibold text-forest"
       >
         Create Your Account
       </h1>
-      <p className="mb-8 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mb-8 text-center text-sm text-text-secondary">
         Join AnglerPass and access private water
       </p>
 
@@ -255,17 +256,24 @@ function SignupForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-10 w-full bg-[var(--color-forest)] text-white hover:bg-[var(--color-forest-deep)]"
+          className="h-11 w-full"
         >
-          {isLoading ? "Creating account..." : "Create Account"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating account...
+            </>
+          ) : (
+            "Create Account"
+          )}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mt-6 text-center text-sm text-text-secondary">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-medium text-[var(--color-forest)] hover:text-[var(--color-forest-deep)]"
+          className="font-medium text-forest hover:text-forest-deep"
         >
           Sign in
         </Link>

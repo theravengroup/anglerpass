@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const resetPasswordSchema = z
   .object({
@@ -64,16 +65,16 @@ export default function ResetPasswordPage() {
   return (
     <div>
       <h1
-        className="mb-1 text-center font-heading text-2xl font-semibold text-[var(--color-forest)]"
+        className="mb-1 text-center font-heading text-2xl font-semibold text-forest"
       >
         Set New Password
       </h1>
-      <p className="mb-8 text-center text-sm text-[var(--color-text-secondary)]">
+      <p className="mb-8 text-center text-sm text-text-secondary">
         Choose a strong password for your account
       </p>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" aria-live="polite" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -114,9 +115,16 @@ export default function ResetPasswordPage() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-10 w-full bg-[var(--color-forest)] text-white hover:bg-[var(--color-forest-deep)]"
+          className="h-11 w-full"
         >
-          {isLoading ? "Updating..." : "Update Password"}
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Updating...
+            </>
+          ) : (
+            "Update Password"
+          )}
         </Button>
       </form>
     </div>

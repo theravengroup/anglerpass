@@ -134,27 +134,27 @@ export default function ConservationPage() {
                   </h3>
                   <ul className="list-none m-0 p-0 space-y-2.5">
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Barbless hooks to minimize handling injury
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Rubber mesh nets to protect slime coats and scales
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Wet hands before handling fish
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Minimize time out of water &mdash; especially for photos
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Revive fish fully before release, facing upstream in current
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       Avoid fishing during extreme heat when water temperatures
                       stress fish
                     </li>
@@ -185,7 +185,7 @@ export default function ConservationPage() {
                 <div className="bg-white border border-parchment rounded-xl p-6">
                   <ul className="list-none m-0 p-0 space-y-2.5">
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       <span>
                         <strong className="text-text-primary">Controlled access.</strong>{' '}
                         Rod limits, time slots, and seasonal closures protect waters
@@ -193,7 +193,7 @@ export default function ConservationPage() {
                       </span>
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       <span>
                         <strong className="text-text-primary">Club vetting.</strong>{' '}
                         Clubs screen anglers before granting access, ensuring only
@@ -201,7 +201,7 @@ export default function ConservationPage() {
                       </span>
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       <span>
                         <strong className="text-text-primary">Revenue for landowners.</strong>{' '}
                         Access fees give landowners a financial reason to invest in
@@ -209,7 +209,7 @@ export default function ConservationPage() {
                       </span>
                     </li>
                     <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                      <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                      <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                       <span>
                         <strong className="text-text-primary">Seasonal awareness.</strong>{' '}
                         Property listings include seasonal conditions, helping anglers
@@ -237,19 +237,19 @@ export default function ConservationPage() {
                 </p>
                 <ul className="list-none m-0 p-0 space-y-2 mb-4">
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Respect property boundaries and posted rules
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Follow all property-specific conservation guidelines
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Leave the property in better condition than they found it
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Report any environmental concerns to the landowner or club
                   </li>
                 </ul>
@@ -297,21 +297,21 @@ export default function ConservationPage() {
                 </p>
                 <ul className="list-none m-0 p-0 space-y-2 mb-4">
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Property listings include conservation practices and expectations
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Trip reviews can highlight positive or concerning conservation
                     behavior
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Guides on the platform are verified professionals who model
                     responsible practices
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Clubs set and enforce their own conservation standards for members
                   </li>
                 </ul>
@@ -335,20 +335,20 @@ export default function ConservationPage() {
                 </p>
                 <ul className="list-none m-0 p-0 space-y-2 mb-4">
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Partnerships with conservation organizations like Trout Unlimited
                     and local watershed groups
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     A conservation fund supported by a portion of platform fees
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Water quality and fish population tracking tools for landowners
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
-                    <span className="mt-1 size-1.5 rounded-full bg-forest shrink-0" />
+                    <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
                     Educational resources for anglers new to private water etiquette
                   </li>
                 </ul>

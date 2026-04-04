@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/guide-credential-expiry",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/nudge-landowners",
+      "schedule": "0 10 * * *"
     }
   ]
 }

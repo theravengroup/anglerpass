@@ -45,7 +45,7 @@ export default function Nav() {
   );
 
   return (
-    <nav id="mainNav" className={scrolled ? 'scrolled' : ''}>
+    <nav id="mainNav" className={scrolled || !isHomepage ? 'scrolled' : ''}>
       <div className="nav-inner">
         {isHomepage ? (
           <a

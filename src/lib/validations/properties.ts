@@ -135,18 +135,7 @@ export const propertySchema = z
       path: ["max_rods"],
     }
   )
-  .refine(
-    (data) => {
-      if (data.lodging_available) {
-        return !!data.lodging_url && data.lodging_url.length > 0;
-      }
-      return true;
-    },
-    {
-      message: "A lodging URL is required when lodging is available",
-      path: ["lodging_url"],
-    }
-  );
+;
 
 export type PropertyFormData = z.input<typeof propertySchema>;
 

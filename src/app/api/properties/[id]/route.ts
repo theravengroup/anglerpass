@@ -75,7 +75,14 @@ export async function PATCH(
       );
     }
 
-    if (existing.owner_id !== user.id) {
+    // Allow owner OR club staff who created the property
+    let hasAccess = existing.owner_id === user.id;
+    if (!hasAccess && existing.created_by_club_id) {
+      const { requireClubRole } = await import("@/lib/api/helpers");
+      const role = await requireClubRole(user.id, existing.created_by_club_id, "club.manage_properties");
+      if (role?.allowed) hasAccess = true;
+    }
+    if (!hasAccess) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

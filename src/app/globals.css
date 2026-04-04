@@ -70,6 +70,56 @@ p, li, figcaption, blockquote, dd, dt, label, caption {
   text-wrap: pretty;
 }
 
+/* ═══ BRANDED LIST MARKERS ═══
+   Diamond marker (compass-inspired) for unordered content lists.
+   Numbered circle marker for ordered/step lists. */
+.ap-list {
+  list-style: none;
+  padding-left: 0;
+}
+.ap-list > li {
+  position: relative;
+  padding-left: 1.35rem;
+}
+.ap-list > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  background: var(--color-forest);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  opacity: 0.5;
+}
+
+.ap-list-ordered {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: ap-step;
+}
+.ap-list-ordered > li {
+  position: relative;
+  padding-left: 2rem;
+  counter-increment: ap-step;
+}
+.ap-list-ordered > li::before {
+  content: counter(ap-step);
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.35rem;
+  height: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-forest);
+  background: color-mix(in srgb, var(--color-forest) 8%, transparent);
+  border-radius: 50%;
+}
+
 /* Marketing responsive — !important overrides are needed because marketing pages
    use Tailwind grid-cols-* utilities (e.g. grid-cols-3) that set
    grid-template-columns inline. These media queries force single/two-column

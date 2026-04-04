@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { ChevronDown } from "lucide-react";
 import MigrationForm from "./MigrationForm";
+import ConsultationModal from "@/components/shared/ConsultationModal";
+import { Button } from "@/components/ui/button";
 
 const faqs = [
   {
@@ -112,18 +114,28 @@ export default function ClubFaqSection() {
                 migration if their data meets certain criteria.
               </p>
 
-              <button
-                type="button"
-                onClick={() => setMigrationOpen((prev) => !prev)}
-                className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-river transition-colors hover:text-river-light"
-              >
-                Learn more about migration
-                <ChevronDown
-                  className={`size-4 transition-transform duration-200 ${
-                    migrationOpen ? "rotate-180" : ""
-                  }`}
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMigrationOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-river transition-colors hover:text-river-light"
+                >
+                  Self-service migration inquiry
+                  <ChevronDown
+                    className={`size-4 transition-transform duration-200 ${
+                      migrationOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <span className="text-text-light text-xs">or</span>
+                <ConsultationModal
+                  trigger={
+                    <Button variant="outline" size="sm" className="text-xs">
+                      Book a White-Glove Consultation
+                    </Button>
+                  }
                 />
-              </button>
+              </div>
 
               {migrationOpen && <MigrationForm />}
             </AccordionContent>
