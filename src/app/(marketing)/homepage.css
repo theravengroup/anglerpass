@@ -333,7 +333,7 @@ nav.scrolled .nav-cta .btn-login:hover{background:var(--forest);color:#fff}
 .faq-list{max-width:760px;margin:0 auto}
 .faq-item{border-bottom:1px solid var(--border)}
 .faq-item:first-child{border-top:1px solid var(--border)}
-.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 0;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--heading);font-size:20px;font-weight:600;color:var(--text-primary);transition:color .3s}
+.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 0;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--heading);font-size:20px;font-weight:600;color:var(--forest);transition:color .3s}
 .faq-question:hover{color:var(--river)}
 .faq-chevron{width:20px;height:20px;stroke:var(--text-light);fill:none;stroke-width:2;transition:transform .4s cubic-bezier(.22,1,.36,1);flex-shrink:0;margin-left:16px}
 .faq-item.open .faq-chevron{transform:rotate(180deg)}
