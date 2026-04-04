@@ -28,8 +28,6 @@ export default function ClubSearchResult({
   proposing,
   onPropose,
 }: ClubSearchResultProps) {
-  const isEligible = ["standard", "pro"].includes(club.subscription_tier);
-
   return (
     <Card className="border-stone-light/20">
       <CardContent className="flex items-center justify-between py-4">
@@ -49,27 +47,21 @@ export default function ClubSearchResult({
         </div>
 
         <div className="shrink-0">
-          {isEligible ? (
-            <Button
-              size="sm"
-              className="bg-river text-white hover:bg-river/90"
-              disabled={proposing}
-              onClick={() => onPropose(club.id)}
-            >
-              {proposing ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Proposing...
-                </>
-              ) : (
-                "Propose Partnership"
-              )}
-            </Button>
-          ) : (
-            <span className="text-xs text-text-light">
-              Starter tier (ineligible)
-            </span>
-          )}
+          <Button
+            size="sm"
+            className="bg-river text-white hover:bg-river/90"
+            disabled={proposing}
+            onClick={() => onPropose(club.id)}
+          >
+            {proposing ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Proposing...
+              </>
+            ) : (
+              "Propose Partnership"
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>

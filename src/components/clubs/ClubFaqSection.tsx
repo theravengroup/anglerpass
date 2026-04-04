@@ -31,7 +31,7 @@ const faqs = [
   {
     value: "cross-club",
     q: "What is cross-club access and how does it work?",
-    a: "Clubs on the Standard or Pro tier can opt in to reciprocal access agreements with other clubs. When two clubs agree, their members can book water managed by either club. This expands your members\u2019 options without you needing to negotiate directly with additional landowners. You choose which clubs to partner with and can revoke agreements at any time.",
+    a: "All clubs can opt in to reciprocal access agreements with other clubs. When two clubs agree, their members can book water managed by either club. This expands your members\u2019 options without you needing to negotiate directly with additional landowners. You choose which clubs to partner with and can revoke agreements at any time. Starter clubs can hold up to 2 partner agreements, Standard up to 10, and Pro clubs get unlimited agreements.",
   },
   {
     value: "corporate",
@@ -46,7 +46,7 @@ const faqs = [
   {
     value: "tiers",
     q: "What are the differences between subscription tiers?",
-    a: "AnglerPass offers three tiers: Starter, Standard, and Pro. Higher tiers unlock features like cross-club access agreements, corporate memberships, priority support, and higher member limits. All tiers include the core club management tools, member vetting, and property access requests. You can upgrade your tier at any time as your club grows.",
+    a: "AnglerPass offers three tiers: Starter, Standard, and Pro. All tiers include cross-club network access, core club management tools, member vetting, and property access requests. Higher tiers unlock more cross-club partner agreements (Starter: 2, Standard: 10, Pro: unlimited), corporate memberships, priority support, and higher member and property limits. You can upgrade your tier at any time as your club grows.",
   },
   {
     value: "payouts",

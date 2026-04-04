@@ -7,7 +7,10 @@
  * Cross-club: angler's club does NOT have direct access, but has an active
  *             cross_club_agreement with a club that does.
  *
- * Both clubs must be on Standard or Pro tier for cross-club to work.
+ * All tiers are eligible for cross-club access with graduated limits:
+ *   Starter: up to 2 partner agreements
+ *   Standard: up to 10 partner agreements
+ *   Pro: unlimited partner agreements
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";

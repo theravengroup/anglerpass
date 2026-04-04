@@ -201,7 +201,7 @@ The following features shipped since the initial roadmap was written. They span 
   - Dashboard indicator on landowner properties: "Associate a club to make this property bookable"
 - Basic scheduling: assign members to properties on specific dates
 - Club subscription billing (Starter $149/mo, Standard $349/mo, Pro $699/mo) — can defer to Phase 7
-- Cross-club access opt-in (Standard and Pro tiers only)
+- Cross-club access opt-in (all tiers — graduated: Starter 2 partners, Standard 10, Pro unlimited)
 
 **Major Files/Systems:**
 - `supabase/migrations/00007_clubs.sql` (clubs, club_memberships, club_property_access, club_invitations tables, subscription_tier column)

@@ -163,10 +163,14 @@ export default function PricingPage() {
             <h3 className="font-heading text-[22px] font-semibold text-forest mb-4 tracking-[-0.2px]">
               Cross-Club Network revenue
             </h3>
-            <p className="text-[14px] text-text-secondary leading-[1.65] mb-5">
+            <p className="text-[14px] text-text-secondary leading-[1.65] mb-3">
               When your members fish at another club&rsquo;s properties, the angler pays
               a <strong className="text-forest">$25/rod cross-club access fee</strong>. Your club
               earns a $5 referral on every rod &mdash; passive revenue just for being in the network.
+            </p>
+            <p className="text-[13px] text-text-light leading-[1.6] mb-5">
+              All tiers include cross-club access: Starter clubs can hold up to 2 partner
+              agreements, Standard up to 10, and Pro clubs get unlimited agreements.
             </p>
 
             {/* Fee split visual */}
