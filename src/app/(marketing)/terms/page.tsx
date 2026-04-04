@@ -169,14 +169,14 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Club membership payments.</strong> Clubs set their own
+              <strong>Club membership payments.</strong>{' '}Clubs set their own
               initiation fees and annual dues. A 3.5% processing fee is added
               at checkout and paid by the member. Clubs receive 100% of their
               stated fees.
             </p>
 
             <p className={textClass}>
-              <strong>Club subscriptions.</strong> Clubs pay a monthly
+              <strong>Club subscriptions.</strong>{' '}Clubs pay a monthly
               subscription based on their tier (Starter $79/mo, Standard
               $199/mo, Pro $499/mo). Subscription tiers determine member
               limits, property limits, and access to features such as
@@ -184,7 +184,7 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Property bookings.</strong> Anglers pay the
+              <strong>Property bookings.</strong>{' '}Anglers pay the
               landowner&rsquo;s rod fee plus a 15% platform fee on each
               booking. A $5 per rod per day commission is deducted from the
               rod fee and paid to the managing club. Landowners receive 100%
@@ -194,7 +194,7 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Cross-club access.</strong> When an angler books water
+              <strong>Cross-club access.</strong>{' '}When an angler books water
               managed by a club other than their home club, a $25 per rod
               cross-club access fee applies. Of this fee, $20 goes to
               AnglerPass and $5 goes to the angler&rsquo;s home club as a
@@ -203,7 +203,7 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Guide services.</strong> Guide rates are set by the
+              <strong>Guide services.</strong>{' '}Guide rates are set by the
               guide. When an angler adds a guide to their booking, a 10%
               service fee is added to the angler&rsquo;s checkout total.
               Guides receive 100% of their stated rate &mdash; the service
@@ -211,7 +211,7 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Guide verification.</strong> Guides pay a one-time $49
+              <strong>Guide verification.</strong>{' '}Guides pay a one-time $49
               verification fee to complete the mandatory background check and
               profile review process. This fee is non-refundable, including
               if the background check returns an unfavorable result or the
@@ -229,14 +229,14 @@ export default function TermsPage() {
             </p>
             <ul className={listClass}>
               <li className={listItemClass}>
-                <strong>Guides:</strong> 24&ndash;48 hours after the 7-day hold
+                <strong>Guides:</strong>{' '}24&ndash;48 hours after the 7-day hold
                 clears
               </li>
               <li className={listItemClass}>
-                <strong>Landowners:</strong> Weekly, processed every Monday
+                <strong>Landowners:</strong>{' '}Weekly, processed every Monday
               </li>
               <li className={listItemClass}>
-                <strong>Clubs:</strong> Monthly, processed on the 1st of each
+                <strong>Clubs:</strong>{' '}Monthly, processed on the 1st of each
                 month
               </li>
             </ul>

@@ -242,7 +242,7 @@ export default function ClubsPage() {
             </p>
             <div className="bg-river/6 border border-river/12 rounded-[10px] px-6 py-5 mt-5">
               <p className="text-[13.5px] text-text-secondary leading-[1.7] m-0">
-                <strong className="text-forest">Membership payments:</strong> You set your
+                <strong className="text-forest">Membership payments:</strong>{' '}You set your
                 initiation fees and annual dues. When members pay, we add a 3.5% processing fee at
                 checkout to cover credit card processing &mdash; paid by the member, not by your club.
                 Your club receives 100% of your stated fees. See our{' '}

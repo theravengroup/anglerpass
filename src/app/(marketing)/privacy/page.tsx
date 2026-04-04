@@ -52,21 +52,21 @@ export default function PrivacyPage() {
             <h2 className={headingClass}>Information we collect</h2>
 
             <p className={textClass}>
-              <strong>Account information.</strong> When you create an account,
+              <strong>Account information.</strong>{' '}When you create an account,
               we collect your name, email address, password, and role (angler,
               landowner, club manager, or guide). You may also provide a display
               name, bio, location, fishing experience level, and favorite species.
             </p>
 
             <p className={textClass}>
-              <strong>Profile photos and media.</strong> You may upload a profile
+              <strong>Profile photos and media.</strong>{' '}You may upload a profile
               photo, club logo, or property photos. Uploaded images are
               automatically resized and converted to WebP format for performance.
               Images are stored in our cloud infrastructure.
             </p>
 
             <p className={textClass}>
-              <strong>Guide verification data.</strong> Guides who apply for
+              <strong>Guide verification data.</strong>{' '}Guides who apply for
               verification provide professional credentials including state guide
               licenses, liability insurance certificates, first aid
               certifications, and USCG licenses where applicable. As part of the
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Financial information.</strong> Payment processing and
+              <strong>Financial information.</strong>{' '}Payment processing and
               payouts are handled entirely by Stripe. When you pay a verification
               fee, booking fee, club dues, or any other charge, your payment
               details are collected directly by Stripe. Landowners, clubs, and
@@ -90,14 +90,14 @@ export default function PrivacyPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Booking and trip data.</strong> We collect information about
+              <strong>Booking and trip data.</strong>{' '}We collect information about
               bookings you make or receive, including dates, locations,
               participants, rod fees, and guide rates. After a trip, anglers may
               submit reviews that are stored and displayed on the platform.
             </p>
 
             <p className={textClass}>
-              <strong>Property and listing data.</strong> Landowners provide
+              <strong>Property and listing data.</strong>{' '}Landowners provide
               property details including name, description, location, water types,
               photos, availability calendars, and pricing. Clubs provide club
               profiles, membership rules, dues structures, and property access
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Communications and preferences.</strong> We store your
+              <strong>Communications and preferences.</strong>{' '}We store your
               notification preferences (which email notifications you opt into or
               out of) and any messages sent through the platform.
             </p>
