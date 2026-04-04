@@ -229,8 +229,8 @@ export default function TermsPage() {
             </p>
             <ul className={listClass}>
               <li className={listItemClass}>
-                <strong>Guides:</strong>{' '}24&ndash;48 hours after the 7-day hold
-                clears
+                <strong>Guides:</strong>{' '}
+                24&ndash;48 hours after the 7-day hold clears
               </li>
               <li className={listItemClass}>
                 <strong>Landowners:</strong>{' '}Weekly, processed every Monday
