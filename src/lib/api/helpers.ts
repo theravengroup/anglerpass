@@ -3,6 +3,9 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { authorize, type AuthorizationResult } from "@/lib/permissions/authorize";
+import type { PermissionId } from "@/lib/permissions/constants";
+import { CLUB_STAFF_ROLES, type ClubRole } from "@/lib/permissions/constants";
 
 // ─── Standard API Responses ─────────────────────────────────────────
 
@@ -120,4 +123,70 @@ export function parsePositiveInt(
  */
 export function escapeIlike(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
+}
+
+// ─── Permission-Based Helpers ───────────────────────────────────────
+
+/**
+ * Verify the current user has a specific permission.
+ * Returns auth + authorization context, or null (caller should return 403).
+ */
+export async function requirePermission(permission: PermissionId, opts?: { clubId?: string; anglerId?: string }) {
+  const auth = await requireAuth();
+  if (!auth) return null;
+
+  const result = await authorize({
+    permission,
+    userId: auth.user.id,
+    clubId: opts?.clubId,
+    anglerId: opts?.anglerId,
+  });
+
+  if (!result.allowed) return null;
+
+  return { ...auth, authorization: result, admin: createAdminClient() };
+}
+
+/**
+ * Verify a user has a specific club role with the required permission.
+ * Replaces the pattern of `requireClubManager()` + manual staff checks.
+ */
+export async function requireClubRole(
+  userId: string,
+  clubId: string,
+  permission: PermissionId
+): Promise<{
+  allowed: boolean;
+  membership: { id: string; role: ClubRole; status: string } | null;
+  isOwner: boolean;
+  isStaff: boolean;
+} | null> {
+  const admin = createAdminClient();
+
+  // Check authorization
+  const authResult = await authorize({ permission, userId, clubId });
+
+  // Get membership info
+  const { data: membership } = await admin
+    .from("club_memberships")
+    .select("id, role, status")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .single();
+
+  if (!authResult.allowed && !membership) return null;
+
+  const clubRole = membership?.role as ClubRole | undefined;
+
+  return {
+    allowed: authResult.allowed,
+    membership: membership ? {
+      id: membership.id,
+      role: clubRole ?? "member",
+      status: membership.status,
+    } : null,
+    isOwner: clubRole === "owner" || clubRole === "admin",
+    isStaff: clubRole != null && CLUB_STAFF_ROLES.includes(clubRole),
+  };
 }

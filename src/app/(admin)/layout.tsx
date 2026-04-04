@@ -10,6 +10,7 @@ import {
   Building2,
   Compass,
   DollarSign,
+  Shield,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -57,6 +58,11 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <UserPlus />,
   },
   {
+    label: "Platform Staff",
+    href: "/admin/platform-staff",
+    icon: <Shield />,
+  },
+  {
     label: "Settings",
     href: "/admin/settings",
     icon: <Settings />,
@@ -76,6 +82,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/clubs": "Club Oversight",
   "/admin/financials": "Platform Financials",
   "/admin/team": "Team Management",
+  "/admin/platform-staff": "Platform Staff Roles",
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
 };

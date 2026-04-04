@@ -1,31 +1,26 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { bookingSchema } from "@/lib/validations/bookings";
+import { onBehalfBookingSchema } from "@/lib/validations/permissions";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
-import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated } from "@/lib/notifications";
+import {
+  notifyBookingCreated,
+  notifyBookingConfirmed,
+  notifyGuideBookingCreated,
+} from "@/lib/notifications";
 import { detectCrossClubRouting } from "@/lib/cross-club";
-import { auditBookingAction, AuditAction } from "@/lib/permissions";
+import { authorize, P, auditBookingAction, AuditAction } from "@/lib/permissions";
+import { jsonError } from "@/lib/api/helpers";
 
 /**
- * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
- * Single-day bookings (no booking_group_id) pass through unchanged.
+ * POST /api/bookings/on-behalf
+ *
+ * Create a booking on behalf of a club member.
+ * Requires: booking.create_on_behalf permission in the member's club context.
+ *
+ * The booking is owned by the angler (angler_id), but created_by_user_id
+ * records the staff member who performed the action.
  */
-function deduplicateMultiDayBookings<T extends { booking_group_id: string | null; booking_date: string; booking_start_date: string | null }>(
-  bookings: T[]
-): T[] {
-  const seen = new Set<string>();
-  return bookings.filter((b) => {
-    if (!b.booking_group_id) return true;
-    if (seen.has(b.booking_group_id)) return false;
-    // Only keep the primary record (first day)
-    if (b.booking_start_date && b.booking_date !== b.booking_start_date) return false;
-    seen.add(b.booking_group_id);
-    return true;
-  });
-}
-
-// POST: Create a booking request
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -38,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const result = bookingSchema.safeParse(body);
+    const result = onBehalfBookingSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -48,6 +43,7 @@ export async function POST(request: Request) {
     }
 
     const {
+      angler_id,
       property_id,
       club_membership_id,
       booking_date,
@@ -61,6 +57,42 @@ export async function POST(request: Request) {
 
     const admin = createAdminClient();
 
+    // Verify the membership exists and belongs to the target angler
+    const { data: membership, error: memError } = await admin
+      .from("club_memberships")
+      .select("id, club_id, user_id, status")
+      .eq("id", club_membership_id)
+      .eq("user_id", angler_id)
+      .single();
+
+    if (memError || !membership) {
+      return NextResponse.json(
+        { error: "Invalid club membership for this angler" },
+        { status: 400 }
+      );
+    }
+
+    if (membership.status !== "active") {
+      return NextResponse.json(
+        { error: "The angler's club membership is not active" },
+        { status: 400 }
+      );
+    }
+
+    // Authorize: does the acting user have booking.create_on_behalf in this club?
+    const authResult = await authorize({
+      permission: P.BOOKING_CREATE_ON_BEHALF,
+      userId: user.id,
+      clubId: membership.club_id,
+    });
+
+    if (!authResult.allowed) {
+      return NextResponse.json(
+        { error: "You do not have permission to create bookings on behalf of members in this club" },
+        { status: 403 }
+      );
+    }
+
     // Verify the property is published
     const { data: property, error: propError } = await admin
       .from("properties")
@@ -71,10 +103,7 @@ export async function POST(request: Request) {
       .single();
 
     if (propError || !property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Property not found" }, { status: 404 });
     }
 
     if (property.status !== "published") {
@@ -91,46 +120,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify the membership belongs to this user and is active
-    const { data: membership, error: memError } = await admin
-      .from("club_memberships")
-      .select("id, club_id, status")
-      .eq("id", club_membership_id)
-      .eq("user_id", user.id)
-      .single();
-
-    if (memError || !membership) {
-      return NextResponse.json(
-        { error: "Invalid club membership" },
-        { status: 400 }
-      );
-    }
-
-    if (membership.status !== "active") {
-      return NextResponse.json(
-        { error: "Your club membership is not active" },
-        { status: 400 }
-      );
-    }
-
-    // Determine access route: direct (home-club) or cross-club
-    const routing = await detectCrossClubRouting(
-      admin,
-      membership.club_id,
-      property_id
-    );
+    // Determine access route
+    const routing = await detectCrossClubRouting(admin, membership.club_id, property_id);
 
     if (!routing) {
       return NextResponse.json(
-        {
-          error:
-            "Your club does not have access to this property",
-        },
+        { error: "This club does not have access to this property" },
         { status: 403 }
       );
     }
 
-    // ── Date range validation ─────────────────────────────────────
+    // Date range validation
     const startDate = booking_date;
     const endDate = booking_end_date && booking_end_date !== booking_date
       ? booking_end_date
@@ -155,11 +155,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculate number of days (inclusive)
     const msPerDay = 24 * 60 * 60 * 1000;
-    const numberOfDays = Math.round(
-      (endDateObj.getTime() - startDateObj.getTime()) / msPerDay
-    ) + 1;
+    const numberOfDays =
+      Math.round((endDateObj.getTime() - startDateObj.getTime()) / msPerDay) + 1;
 
     if (numberOfDays > 14) {
       return NextResponse.json(
@@ -168,7 +166,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Build array of all dates in the range
     const allDates: string[] = [];
     for (let i = 0; i < numberOfDays; i++) {
       const d = new Date(startDateObj.getTime() + i * msPerDay);
@@ -177,32 +174,25 @@ export async function POST(request: Request) {
 
     const isMultiDay = numberOfDays > 1;
 
-    // Check rod limit (max_rods) and total guest limit (max_guests)
+    // Capacity checks
     const maxRods = property.max_rods;
     const maxGuests = property.max_guests;
 
-    // Validate party_size against max_rods
     if (maxRods && party_size > maxRods) {
       return NextResponse.json(
-        {
-          error: `This property allows a maximum of ${maxRods} anglers (rods). You requested ${party_size}.`,
-        },
+        { error: `This property allows a maximum of ${maxRods} anglers (rods).` },
         { status: 400 }
       );
     }
 
-    // Validate total people against max_guests
     const totalPeople = party_size + non_fishing_guests;
     if (maxGuests && totalPeople > maxGuests) {
       return NextResponse.json(
-        {
-          error: `This property allows a maximum of ${maxGuests} total people. Your party of ${totalPeople} (${party_size} anglers + ${non_fishing_guests} non-fishing guests) exceeds this limit.`,
-        },
+        { error: `This property allows a maximum of ${maxGuests} total people.` },
         { status: 400 }
       );
     }
 
-    // Check existing bookings don't exceed capacity for ALL dates in range
     if (maxRods || maxGuests) {
       const { data: existingBookings } = await admin
         .from("bookings")
@@ -211,7 +201,6 @@ export async function POST(request: Request) {
         .in("booking_date", allDates)
         .in("status", ["pending", "confirmed"]);
 
-      // Check each date individually
       for (const date of allDates) {
         const dayBookings = (existingBookings ?? []).filter(
           (b) => b.booking_date === date
@@ -227,18 +216,13 @@ export async function POST(request: Request) {
 
         if (maxRods && existingRods + party_size > maxRods) {
           return NextResponse.json(
-            {
-              error: `This property has reached its rod limit for ${date}.`,
-            },
+            { error: `This property has reached its rod limit for ${date}.` },
             { status: 409 }
           );
         }
-
         if (maxGuests && existingTotal + totalPeople > maxGuests) {
           return NextResponse.json(
-            {
-              error: `This property has reached its guest capacity for ${date}.`,
-            },
+            { error: `This property has reached its guest capacity for ${date}.` },
             { status: 409 }
           );
         }
@@ -247,13 +231,12 @@ export async function POST(request: Request) {
 
     const isCrossClub = routing.isCrossClub;
 
-    // ── Guide validation (optional add-on) ──────────────────────
+    // Guide validation (same as regular booking)
     let guideRate = 0;
     let guideUserId: string | null = null;
     let guideName: string | null = null;
 
     if (guide_id) {
-      // Verify guide exists and is approved
       const { data: guideProfile } = await admin
         .from("guide_profiles")
         .select("id, user_id, display_name, status, rate_full_day, rate_half_day, max_anglers")
@@ -261,13 +244,9 @@ export async function POST(request: Request) {
         .single();
 
       if (!guideProfile || guideProfile.status !== "approved") {
-        return NextResponse.json(
-          { error: "Selected guide is not available" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Selected guide is not available" }, { status: 400 });
       }
 
-      // Verify guide has water approval for this property
       const { data: waterApproval } = await admin
         .from("guide_water_approvals")
         .select("id")
@@ -283,7 +262,6 @@ export async function POST(request: Request) {
         );
       }
 
-      // Verify guide is available on ALL dates in the range
       const { data: blockedDates } = await admin
         .from("guide_availability")
         .select("id, date")
@@ -292,14 +270,12 @@ export async function POST(request: Request) {
         .in("status", ["blocked", "booked"]);
 
       if (blockedDates && blockedDates.length > 0) {
-        const unavailableDate = blockedDates[0].date;
         return NextResponse.json(
-          { error: `Selected guide is not available on ${unavailableDate}` },
+          { error: `Selected guide is not available on ${blockedDates[0].date}` },
           { status: 400 }
         );
       }
 
-      // Check party size fits guide capacity
       if (guideProfile.max_anglers && party_size > guideProfile.max_anglers) {
         return NextResponse.json(
           { error: `Guide can accommodate up to ${guideProfile.max_anglers} anglers` },
@@ -315,7 +291,7 @@ export async function POST(request: Request) {
       guideName = guideProfile.display_name;
     }
 
-    // Calculate full fee breakdown
+    // Calculate fees
     const ratePerRod =
       duration === "full_day"
         ? (property.rate_adult_full_day ?? 0)
@@ -323,13 +299,13 @@ export async function POST(request: Request) {
 
     const fees = calculateFeeBreakdown(ratePerRod, party_size, isCrossClub, guideRate, numberOfDays);
 
-    // ── Create booking record(s) ──────────────────────────────────
+    // Create booking records — key difference: on_behalf_of = true, created_by_user_id = staff
     const bookingGroupId = isMultiDay ? crypto.randomUUID() : null;
     const confirmedAt = new Date().toISOString();
 
     const sharedFields = {
       property_id,
-      angler_id: user.id,
+      angler_id,
       club_membership_id,
       duration,
       party_size,
@@ -343,7 +319,7 @@ export async function POST(request: Request) {
       booking_end_date: endDate,
       booking_group_id: bookingGroupId,
       created_by_user_id: user.id,
-      on_behalf_of: false,
+      on_behalf_of: true,
       ...(guide_id
         ? {
             guide_id,
@@ -354,11 +330,9 @@ export async function POST(request: Request) {
         : {}),
     };
 
-    // Build insert rows: one per day
     const insertRows = allDates.map((date, idx) => ({
       ...sharedFields,
       booking_date: date,
-      // Store full totals on the primary record (first day), zero on others
       base_rate: idx === 0 ? fees.baseRate : 0,
       platform_fee: idx === 0 ? fees.platformFee : 0,
       cross_club_fee: idx === 0 ? fees.crossClubFee : 0,
@@ -375,27 +349,19 @@ export async function POST(request: Request) {
       .order("booking_date", { ascending: true });
 
     if (insertError) {
-      // Check for unique constraint violation (double booking)
       if (insertError.code === "23505") {
         return NextResponse.json(
-          {
-            error:
-              "A booking already exists for this property on one of the selected dates",
-          },
+          { error: "A booking already exists for this property on one of the selected dates" },
           { status: 409 }
         );
       }
-      console.error("[bookings] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create booking" },
-        { status: 500 }
-      );
+      console.error("[bookings/on-behalf] Insert error:", insertError);
+      return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
     }
 
-    // Primary booking is the first day's record
     const booking = bookings[0];
 
-    // Mark guide availability as booked for ALL dates
+    // Mark guide availability
     if (guide_id) {
       const guideAvailRows = allDates.map((date, idx) => ({
         guide_id,
@@ -406,39 +372,40 @@ export async function POST(request: Request) {
       await admin.from("guide_availability").upsert(guideAvailRows);
     }
 
-    // Notify landowner (informational — booking is already confirmed)
-    const { data: anglerProfile } = await admin
-      .from("profiles")
-      .select("display_name")
-      .eq("id", user.id)
-      .single();
+    // Get names for notifications
+    const [anglerProfile, staffProfile] = await Promise.all([
+      admin.from("profiles").select("display_name").eq("id", angler_id).single(),
+      admin.from("profiles").select("display_name").eq("id", user.id).single(),
+    ]);
 
-    const anglerName = anglerProfile?.display_name ?? "An angler";
+    const anglerName = anglerProfile.data?.display_name ?? "An angler";
+    const staffName = staffProfile.data?.display_name ?? "Club staff";
 
     const dateLabel = isMultiDay
       ? `${startDate} to ${endDate} (${numberOfDays} days)`
       : startDate;
 
+    // Notify landowner
     notifyBookingCreated(admin, {
       landownerId: property.owner_id,
-      anglerName,
+      anglerName: `${anglerName} (booked by ${staffName})`,
       propertyName: property.name,
       bookingDate: dateLabel,
       duration,
       partySize: party_size,
       bookingId: booking.id,
-    }).catch((err) => console.error("[bookings] Notification error:", err));
+    }).catch((err) => console.error("[bookings/on-behalf] Landowner notification error:", err));
 
-    // Notify angler of instant confirmation
+    // Notify angler that a booking was created for them
     notifyBookingConfirmed(admin, {
-      anglerId: user.id,
+      anglerId: angler_id,
       propertyName: property.name,
       bookingDate: dateLabel,
       bookingId: booking.id,
       guideName: guideName ?? undefined,
-    }).catch((err) => console.error("[bookings] Confirmation notification error:", err));
+    }).catch((err) => console.error("[bookings/on-behalf] Angler notification error:", err));
 
-    // Notify guide of new booking (if guide was selected)
+    // Notify guide if selected
     if (guideUserId && guide_id) {
       notifyGuideBookingCreated(admin, {
         guideUserId,
@@ -446,110 +413,41 @@ export async function POST(request: Request) {
         propertyName: property.name,
         bookingDate: dateLabel,
         bookingId: booking.id,
-      }).catch((err) => console.error("[bookings] Guide notification error:", err));
+      }).catch((err) => console.error("[bookings/on-behalf] Guide notification error:", err));
     }
 
     // Audit log
     auditBookingAction({
       actorId: user.id,
-      action: AuditAction.BOOKING_CREATED,
+      action: AuditAction.BOOKING_CREATED_ON_BEHALF,
       bookingId: booking.id,
+      representedUserId: angler_id,
       clubId: membership.club_id,
       newData: {
+        angler_id,
         property_id,
         booking_date: startDate,
         booking_end_date: endDate,
         party_size,
         duration,
         total_amount: fees.totalAmount,
+        staff_name: staffName,
       },
-    }).catch((err) => console.error("[bookings] Audit error:", err));
+    }).catch((err) => console.error("[bookings/on-behalf] Audit error:", err));
 
-    return NextResponse.json({
-      booking,
-      booking_days: numberOfDays,
-      booking_start_date: startDate,
-      booking_end_date: endDate,
-    }, { status: 201 });
-  } catch (err) {
-    console.error("[bookings] Unexpected error:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      {
+        booking,
+        booking_days: numberOfDays,
+        booking_start_date: startDate,
+        booking_end_date: endDate,
+        created_by: staffName,
+        on_behalf_of: anglerName,
+      },
+      { status: 201 }
     );
-  }
-}
-
-// GET: List bookings for the current user
-export async function GET(request: Request) {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const role = searchParams.get("role"); // "angler" or "landowner"
-    const propertyId = searchParams.get("property_id");
-
-    const admin = createAdminClient();
-
-    if (role === "landowner" || propertyId) {
-      // Landowner view: bookings for their properties
-      let query = admin
-        .from("bookings")
-        .select(
-          "*, properties!inner(id, name, owner_id), profiles!bookings_angler_id_fkey(display_name)"
-        )
-        .eq("properties.owner_id", user.id)
-        .order("booking_date", { ascending: true });
-
-      if (propertyId) {
-        query = query.eq("property_id", propertyId);
-      }
-
-      const { data: rawBookings, error } = await query;
-
-      if (error) {
-        console.error("[bookings] Landowner fetch error:", error);
-        return NextResponse.json(
-          { error: "Failed to fetch bookings" },
-          { status: 500 }
-        );
-      }
-
-      const bookings = deduplicateMultiDayBookings(rawBookings ?? []);
-      return NextResponse.json({ bookings });
-    }
-
-    // Angler view: their own bookings
-    const { data: rawBookings, error } = await admin
-      .from("bookings")
-      .select(
-        "*, properties(id, name, location_description, photos, water_type)"
-      )
-      .eq("angler_id", user.id)
-      .order("booking_date", { ascending: true });
-
-    if (error) {
-      console.error("[bookings] Angler fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch bookings" },
-        { status: 500 }
-      );
-    }
-
-    const bookings = deduplicateMultiDayBookings(rawBookings ?? []);
-    return NextResponse.json({ bookings });
   } catch (err) {
-    console.error("[bookings] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("[bookings/on-behalf] Unexpected error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

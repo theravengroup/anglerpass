@@ -27,6 +27,7 @@ import {
   Code,
   Network,
   Gift,
+  Shield,
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import Link from "next/link";
@@ -398,6 +399,23 @@ export default function ClubPage() {
                 </p>
                 <p className="text-xs text-text-light">
                   View and approve property associations
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/club/staff">
+          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
+            <CardContent className="flex items-center gap-4 py-5">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-river/10">
+                <Shield className="size-5 text-river" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  Manage Staff
+                </p>
+                <p className="text-xs text-text-light">
+                  Assign roles and permissions to members
                 </p>
               </div>
             </CardContent>

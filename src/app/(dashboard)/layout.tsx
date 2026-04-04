@@ -13,6 +13,8 @@ import {
   DollarSign,
   UserCircle,
   Calendar,
+  Shield,
+  UserPlus,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -66,6 +68,16 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <Users />,
     },
     {
+      label: "Staff",
+      href: "/club/staff",
+      icon: <Shield />,
+    },
+    {
+      label: "Book for Member",
+      href: "/club/book-for-member",
+      icon: <UserPlus />,
+    },
+    {
       label: "Properties",
       href: "/club/properties",
       icon: <MapPin />,
@@ -106,6 +118,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       label: "Find Guides",
       href: "/angler/guides",
       icon: <Users />,
+    },
+    {
+      label: "Delegates",
+      href: "/angler/delegates",
+      icon: <Shield />,
     },
   ],
   guide: [
@@ -158,11 +175,14 @@ const PAGE_TITLES: Record<string, string> = {
   "/club/financials": "Club Financials",
   "/club/settings": "Club Settings",
   "/club/guide-approvals": "Guide Approvals",
+  "/club/staff": "Staff Management",
+  "/club/book-for-member": "Book for Member",
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/financials": "Spending & Fees",
   "/angler/discover": "Discover",
   "/angler/guides": "Find Guides",
+  "/angler/delegates": "Trusted Delegates",
   "/guide": "Guide Dashboard",
   "/guide/profile": "Guide Profile",
   "/guide/availability": "Availability",

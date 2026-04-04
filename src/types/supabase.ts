@@ -68,6 +68,57 @@ export type Database = {
           },
         ]
       }
+      angler_delegates: {
+        Row: {
+          accepted_at: string | null
+          access_level: string
+          angler_id: string
+          delegate_email: string | null
+          delegate_id: string | null
+          granted_at: string
+          id: string
+          revoked_at: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          access_level: string
+          angler_id: string
+          delegate_email?: string | null
+          delegate_id?: string | null
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          access_level?: string
+          angler_id?: string
+          delegate_email?: string | null
+          delegate_id?: string | null
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "angler_delegates_angler_id_fkey"
+            columns: ["angler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "angler_delegates_delegate_id_fkey"
+            columns: ["delegate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -78,6 +129,10 @@ export type Database = {
           id: number
           new_data: Json | null
           old_data: Json | null
+          organization_id: string | null
+          reason: string | null
+          represented_user_id: string | null
+          scope: string | null
         }
         Insert: {
           action: string
@@ -88,6 +143,10 @@ export type Database = {
           id?: number
           new_data?: Json | null
           old_data?: Json | null
+          organization_id?: string | null
+          reason?: string | null
+          represented_user_id?: string | null
+          scope?: string | null
         }
         Update: {
           action?: string
@@ -98,6 +157,10 @@ export type Database = {
           id?: number
           new_data?: Json | null
           old_data?: Json | null
+          organization_id?: string | null
+          reason?: string | null
+          represented_user_id?: string | null
+          scope?: string | null
         }
         Relationships: []
       }
@@ -117,6 +180,7 @@ export type Database = {
           club_membership_id: string
           confirmed_at: string | null
           created_at: string
+          created_by_user_id: string | null
           cross_club_fee: number
           duration: string
           guide_id: string | null
@@ -130,6 +194,7 @@ export type Database = {
           landowner_payout: number
           message: string | null
           non_fishing_guests: number
+          on_behalf_of: boolean
           party_size: number
           platform_fee: number
           property_id: string
@@ -154,6 +219,7 @@ export type Database = {
           club_membership_id: string
           confirmed_at?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           cross_club_fee?: number
           duration?: string
           guide_id?: string | null
@@ -167,6 +233,7 @@ export type Database = {
           landowner_payout?: number
           message?: string | null
           non_fishing_guests?: number
+          on_behalf_of?: boolean
           party_size?: number
           platform_fee?: number
           property_id: string
@@ -191,6 +258,7 @@ export type Database = {
           club_membership_id?: string
           confirmed_at?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           cross_club_fee?: number
           duration?: string
           guide_id?: string | null
@@ -204,6 +272,7 @@ export type Database = {
           landowner_payout?: number
           message?: string | null
           non_fishing_guests?: number
+          on_behalf_of?: boolean
           party_size?: number
           platform_fee?: number
           property_id?: string
@@ -226,6 +295,13 @@ export type Database = {
             columns: ["club_membership_id"]
             isOneToOne: false
             referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1664,6 +1740,27 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          category: string
+          description: string | null
+          id: string
+          scope_type: string
+        }
+        Insert: {
+          category: string
+          description?: string | null
+          id: string
+          scope_type: string
+        }
+        Update: {
+          category?: string
+          description?: string | null
+          id?: string
+          scope_type?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           description: string | null
@@ -1691,6 +1788,48 @@ export type Database = {
             foreignKeyName: "platform_settings_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_staff: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          id: string
+          revoked_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          revoked_at?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          revoked_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_staff_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_staff_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2188,6 +2327,35 @@ export type Database = {
             columns: ["subject_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_permissions: {
+        Row: {
+          id: string
+          permission: string
+          role: string
+          scope_type: string
+        }
+        Insert: {
+          id?: string
+          permission: string
+          role: string
+          scope_type: string
+        }
+        Update: {
+          id?: string
+          permission?: string
+          role?: string
+          scope_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_fkey"
+            columns: ["permission"]
+            isOneToOne: false
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
