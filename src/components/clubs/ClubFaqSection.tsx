@@ -24,7 +24,7 @@ const faqs = [
   {
     value: "property-access",
     q: "How do we get access to private water for our members?",
-    a: "Landowners list their properties on AnglerPass and choose which clubs can offer their water. You can browse available properties and request access on behalf of your club. Once a landowner approves your club, your members can view and book fishing days on that property. The more properties you secure, the more value your membership offers.",
+    a: "There are two ways. If you already have relationships with landowners, invite them to list their properties on AnglerPass \u2014 the affiliation with your club is already established, and your members get immediate access once the property is live. You can also browse properties listed by other landowners and request access on behalf of your club. Either way, the landowner approves which clubs can offer their water, and only your vetted members can see and book it. The more properties you secure, the more value your membership offers.",
   },
   {
     value: "cross-club",

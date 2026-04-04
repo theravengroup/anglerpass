@@ -291,7 +291,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'How do I get started?',
-                a: 'Join the waitlist or contact us directly. When you register a property, you enter its GPS coordinates and we automatically match you with fly fishing clubs operating in your area. You choose which clubs to affiliate with, and only their vetted members can see and book your water. Most landowners are fully set up within a week.',
+                a: 'There are two paths. If you already work with a fly fishing club, ask them about getting your property listed on AnglerPass \u2014 your club can walk you through the process and the affiliation is already in place. If you\u2019re exploring on your own, join the waitlist or contact us directly. When you register a property, you enter its GPS coordinates and we automatically match you with clubs operating in your area. Either way, you own your listing, set your rod rate, and control which clubs\u2019 members can see and book your water. Most landowners are fully set up within a week.',
               },
             ]}
           />
