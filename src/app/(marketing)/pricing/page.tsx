@@ -164,19 +164,56 @@ export default function PricingPage() {
               Cross-Club Network revenue
             </h3>
             <p className="text-[14px] text-text-secondary leading-[1.65] mb-5">
-              When your members fish at another club&rsquo;s properties through the Cross-Club
-              Network, your club earns a <strong className="text-river">$5/rod/day referral fee</strong> on
-              every booking. This rewards clubs for participating in the network and maintaining
-              an active membership.
+              When your members book fishing at another club&rsquo;s properties, the angler
+              pays a <strong className="text-forest">$15/rod cross-club access fee</strong>. A portion
+              of that fee comes back to your club as a network reward.
             </p>
+
+            {/* Fee split visual */}
+            <div className="mb-6">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-text-light mb-3">
+                How the $15 cross-club fee is split
+              </p>
+              <div className="flex rounded-[10px] overflow-hidden border border-parchment">
+                <div className="flex-[2] bg-forest/5 px-5 py-4 border-r border-parchment">
+                  <p className="text-[22px] font-heading font-semibold text-forest mb-0.5">$10</p>
+                  <p className="text-[12px] text-text-secondary m-0">to AnglerPass</p>
+                  <p className="text-[11px] text-text-light m-0 mt-0.5">Platform &amp; network operations</p>
+                </div>
+                <div className="flex-[1] bg-river/5 px-5 py-4">
+                  <p className="text-[22px] font-heading font-semibold text-river mb-0.5">$5</p>
+                  <p className="text-[12px] text-text-secondary m-0">to your club</p>
+                  <p className="text-[11px] text-text-light m-0 mt-0.5">Network participation reward</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Example */}
             <div className="py-5 px-6 bg-offwhite rounded-[10px] border border-parchment">
-              <p className="text-[13px] font-semibold text-forest mb-2">
-                Example: A member books 2 rods for 3 days at a partner club&rsquo;s water
+              <p className="text-[13px] font-semibold text-forest mb-3">
+                Example
               </p>
-              <p className="text-[13px] text-text-secondary m-0">
-                Your club earns: $5 x 2 rods x 3 days = <strong className="text-river">$30 referral</strong><br />
-                The $15/rod cross-club access fee is split: $10 to AnglerPass, $5 to your club.
-              </p>
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-text-secondary">Your member books 2 rods for 3 days at a partner club&rsquo;s water</span>
+                </div>
+                <div className="flex justify-between text-[13px] pt-2 border-t border-parchment mt-2">
+                  <span className="text-text-secondary">Cross-club fee per rod/day</span>
+                  <span className="text-text-secondary">$15</span>
+                </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-text-secondary">2 rods &times; 3 days</span>
+                  <span className="text-text-secondary">&times; 6</span>
+                </div>
+                <div className="flex justify-between text-[13px] pt-2 border-t border-parchment mt-1">
+                  <span className="text-text-secondary">Total cross-club fees (paid by angler)</span>
+                  <span className="font-medium text-forest">$90</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-1">
+                  <span className="text-river font-medium">Your club&rsquo;s share ($5 &times; 6)</span>
+                  <span className="font-semibold text-river">$30</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
