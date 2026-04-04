@@ -389,6 +389,7 @@ const PHASES: RoadmapPhase[] = [
           { id: "p2-demand-signals", label: "Demand signals (view counts, search appearances, favorites)", done: false },
           { id: "p2-gate-codes", label: "Gate code delivery automation (time-limited, booking-day)", done: false },
           { id: "p2-request-book-v2", label: "Request-to-book approval queue with auto-confirm rules", done: false },
+          { id: "p2-geo-club-match", label: "Geo-based club matching (auto-suggest nearby clubs when listing a property)", done: false },
           { id: "p2-structured-rules", label: "Structured access rules (barbless, wade-only, check-in times)", done: false },
         ],
       },
