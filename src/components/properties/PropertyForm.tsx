@@ -4,29 +4,20 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   propertySchema,
   type PropertyFormData,
-  WATER_TYPES,
-  COMMON_SPECIES,
   MIN_PHOTOS,
 } from "@/lib/validations/properties";
-import { Loader2, Save, Send, Lock, Info, Home } from "lucide-react";
 import PhotoUpload from "@/components/properties/PhotoUpload";
 import ClubAssociation from "@/components/properties/ClubAssociation";
-import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
+import PropertyDetailsSection from "@/components/properties/PropertyDetailsSection";
+import WaterSpeciesSection from "@/components/properties/WaterSpeciesSection";
+import PricingSection from "@/components/properties/PricingSection";
+import AccessInfoSection from "@/components/properties/AccessInfoSection";
+import LodgingSection from "@/components/properties/LodgingSection";
+import PropertyFormActions from "@/components/properties/PropertyFormActions";
 
 interface PropertyFormProps {
   initialData?: PropertyFormData & { id?: string; status?: string };
@@ -83,7 +74,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
     const pid = savedPropertyId ?? initialData?.id;
     if (!pid) return;
     try {
-      // Check both invitations and actual club associations
       const [invRes, assocRes] = await Promise.all([
         fetch(`/api/clubs/invite?property_id=${pid}`),
         fetch(`/api/properties/${pid}/clubs`),
@@ -167,7 +157,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
         return null;
       }
 
-      // Store the ID for subsequent saves (create → edit flow)
       if (!savedPropertyId) {
         setSavedPropertyId(result.property.id);
       }
@@ -190,7 +179,6 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
   }
 
   async function onSubmitForReview(data: PropertyFormData) {
-    // Validate minimum photos
     if ((data.photos?.length ?? 0) < MIN_PHOTOS) {
       setError(
         `At least ${MIN_PHOTOS} photos are required to submit for review.`
@@ -198,30 +186,35 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
       return;
     }
 
-    // Validate required pricing
     if (
       data.rate_adult_full_day == null ||
       data.rate_youth_full_day == null ||
       data.rate_child_full_day == null
     ) {
-      setError("Full-day rates for Adult, Youth, and Child are required to submit for review.");
+      setError(
+        "Full-day rates for Adult, Youth, and Child are required to submit for review."
+      );
       return;
     }
 
-    // Validate guest capacity
     if (data.max_rods == null || data.max_guests == null) {
-      setError("Both Max Rods and Max Guests are required to submit for review.");
+      setError(
+        "Both Max Rods and Max Guests are required to submit for review."
+      );
       return;
     }
 
     if (data.max_rods > data.max_guests) {
-      setError("Max Rods cannot exceed Max Guests (total people on property).");
+      setError(
+        "Max Rods cannot exceed Max Guests (total people on property)."
+      );
       return;
     }
 
-    // Validate club association
     if (!hasClubInvitation) {
-      setError("At least one club must be invited or associated before submitting for review. Use the Club Association section below to invite your club.");
+      setError(
+        "At least one club must be invited or associated before submitting for review. Use the Club Association section below to invite your club."
+      );
       return;
     }
 
@@ -256,18 +249,11 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
     }
   }
 
-  function toggleSpecies(s: string) {
-    const current = species ?? [];
-    if (current.includes(s)) {
-      setValue("species", current.filter((x) => x !== s));
-    } else {
-      setValue("species", [...current, s]);
-    }
-  }
-
   const isDisabled = saving || submitting;
   const canSubmitForReview =
-    mode === "create" || initialData?.status === "draft" || initialData?.status === "changes_requested";
+    mode === "create" ||
+    initialData?.status === "draft" ||
+    initialData?.status === "changes_requested";
 
   return (
     <form className="mx-auto max-w-3xl space-y-8">
@@ -277,119 +263,11 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
         </div>
       )}
 
-      {/* Basic Info */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Property Details
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Property Name *</Label>
-            <Input
-              id="name"
-              placeholder="e.g. Fourmile Creek"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location_description">Location Description</Label>
-            <Textarea
-              id="location_description"
-              placeholder="e.g. The property is located 1.3 miles south of Fairplay and 2.1 miles west of the junction of Hwy. 285 and CR 18."
-              rows={3}
-              {...register("location_description")}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="coordinates">GPS Coordinates</Label>
-            <p className="text-xs text-text-light">
-              Enter as decimal degrees: latitude, longitude (e.g. 39.2242, -105.9731)
-            </p>
-            <Input
-              id="coordinates"
-              placeholder="e.g. 39.2242, -105.9731"
-              {...register("coordinates")}
-            />
-            {errors.coordinates && (
-              <p className="text-sm text-red-600">
-                {errors.coordinates.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description of Fishing Spot</Label>
-            <Textarea
-              id="description"
-              placeholder="e.g. This section of Fourmile Creek contains two stream miles of a creek dotted with beaver ponds. It offers fast action for a large population of wild browns and an occasional rainbow."
-              rows={5}
-              {...register("description")}
-            />
-            {errors.description && (
-              <p className="text-sm text-red-600">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-
-          {/* Guest Capacity */}
-          <div className="space-y-4 rounded-lg border border-stone-light/20 bg-offwhite/30 p-4">
-            <div>
-              <p className="text-sm font-medium text-text-primary">
-                Guest Capacity
-              </p>
-              <p className="mt-0.5 text-xs text-text-light">
-                Set limits for how many anglers (rods) and total people can be on
-                your property per day. Non-fishing guests (e.g. family members)
-                are not charged a rod fee but count toward the total.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="max_rods">Max Rods (Anglers) *</Label>
-                <Input
-                  id="max_rods"
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="e.g. 4"
-                  {...register("max_rods", { valueAsNumber: true })}
-                />
-                {errors.max_rods && (
-                  <p className="text-sm text-red-600">{errors.max_rods.message}</p>
-                )}
-                <p className="text-xs text-text-light">
-                  Maximum anglers fishing at the same time.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="max_guests">Max Total People *</Label>
-                <Input
-                  id="max_guests"
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="e.g. 10"
-                  {...register("max_guests", { valueAsNumber: true })}
-                />
-                {errors.max_guests && (
-                  <p className="text-sm text-red-600">{errors.max_guests.message}</p>
-                )}
-                <p className="text-xs text-text-light">
-                  Total people on property (anglers + non-fishing guests).
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <PropertyDetailsSection
+        register={register}
+        errors={errors}
+        disabled={isDisabled}
+      />
 
       {/* Photos */}
       <Card className="border-stone-light/20">
@@ -409,368 +287,56 @@ export default function PropertyForm({ initialData, mode }: PropertyFormProps) {
         </CardContent>
       </Card>
 
-      {/* Water & Species */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Water & Species
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Water Type</Label>
-            <Select
-              value={waterType ?? ""}
-              onValueChange={(val) =>
-                setValue("water_type", val as (typeof WATER_TYPES)[number])
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select water type" />
-              </SelectTrigger>
-              <SelectContent>
-                {WATER_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {WATER_TYPE_LABELS[type]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <WaterSpeciesSection
+        register={register}
+        errors={errors}
+        disabled={isDisabled}
+        species={species ?? []}
+        waterType={waterType ?? ""}
+        setValue={setValue}
+      />
 
-          <div className="space-y-2">
-            <Label htmlFor="water_miles">Miles of Fishable Water</Label>
-            <Input
-              id="water_miles"
-              type="number"
-              step="0.1"
-              placeholder="e.g. 2.5"
-              {...register("water_miles", { valueAsNumber: true })}
-            />
-          </div>
+      <PricingSection
+        register={register}
+        errors={errors}
+        disabled={isDisabled}
+        halfDayAllowed={halfDayAllowed ?? false}
+      />
 
-          <div className="space-y-2">
-            <Label>Species</Label>
-            <p className="text-xs text-text-light">
-              Select all species present on your property.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {COMMON_SPECIES.map((s) => {
-                const selected = (species ?? []).includes(s);
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => toggleSpecies(s)}
-                    className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                      selected
-                        ? "border-forest bg-forest text-white"
-                        : "border-stone-light/30 text-text-secondary hover:border-forest/50"
-                    }`}
-                  >
-                    {s}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      <AccessInfoSection
+        register={register}
+        errors={errors}
+        disabled={isDisabled}
+        gateCodeRequired={gateCodeRequired ?? false}
+      />
 
-          <div className="space-y-2">
-            <Label htmlFor="regulations">Regulations & Rules</Label>
-            <Textarea
-              id="regulations"
-              placeholder="e.g. Catch and release only, barbless hooks required, no wading in spawning areas."
-              rows={4}
-              {...register("regulations")}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <LodgingSection
+        register={register}
+        errors={errors}
+        disabled={isDisabled}
+        lodgingAvailable={lodgingAvailable ?? false}
+      />
 
-      {/* Pricing */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Pricing
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Full Day Rates */}
-          <div className="space-y-4">
-            <p className="text-sm font-medium text-text-primary">
-              Full Day Rates
-            </p>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="rate_adult_full_day">Adult ($)</Label>
-                <Input
-                  id="rate_adult_full_day"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="e.g. 250"
-                  {...register("rate_adult_full_day", { valueAsNumber: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="rate_youth_full_day">Youth ($)</Label>
-                <Input
-                  id="rate_youth_full_day"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="e.g. 150"
-                  {...register("rate_youth_full_day", { valueAsNumber: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="rate_child_full_day">Child ($)</Label>
-                <Input
-                  id="rate_child_full_day"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="e.g. 75"
-                  {...register("rate_child_full_day", { valueAsNumber: true })}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Half Day Toggle */}
-          <div className="border-t border-stone-light/20 pt-4">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-stone-light/30 accent-forest"
-                {...register("half_day_allowed")}
-              />
-              <span className="text-sm font-medium text-text-primary">
-                Allow half-day bookings
-              </span>
-            </label>
-          </div>
-
-          {/* Half Day Rates */}
-          {halfDayAllowed && (
-            <div className="space-y-4">
-              <p className="text-sm font-medium text-text-primary">
-                Half Day Rates
-              </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rate_adult_half_day">Adult ($)</Label>
-                  <Input
-                    id="rate_adult_half_day"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 150"
-                    {...register("rate_adult_half_day", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                  {errors.rate_adult_half_day && (
-                    <p className="text-sm text-red-600">
-                      {errors.rate_adult_half_day.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rate_youth_half_day">Youth ($)</Label>
-                  <Input
-                    id="rate_youth_half_day"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 100"
-                    {...register("rate_youth_half_day", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="rate_child_half_day">Child ($)</Label>
-                  <Input
-                    id="rate_child_half_day"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 50"
-                    {...register("rate_child_half_day", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-        </CardContent>
-      </Card>
-
-      {/* Access Notes (Private) */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <div className="flex items-start gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-charcoal/10">
-              <Lock className="size-4 text-charcoal" />
-            </div>
-            <div>
-              <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-                Access Information
-              </CardTitle>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-text-light">
-                <Info className="size-3" />
-                This information is private. It is never displayed on your public
-                listing. Access notes are sent only in the booking confirmation,
-                and gate codes are sent via SMS on the day of the booking.
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="access_notes">Access Notes</Label>
-            <Textarea
-              id="access_notes"
-              placeholder="e.g. Turn left at the red barn on CR 18, drive 0.4 miles to the locked gate. Park in the gravel lot on the right. Walk-in access only beyond the gate."
-              rows={4}
-              {...register("access_notes")}
-            />
-          </div>
-
-          <div className="border-t border-stone-light/20 pt-4">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-stone-light/30 accent-forest"
-                {...register("gate_code_required")}
-              />
-              <span className="text-sm font-medium text-text-primary">
-                Gate code required for access
-              </span>
-            </label>
-          </div>
-
-          {gateCodeRequired && (
-            <div className="space-y-2">
-              <Label htmlFor="gate_code">Gate Code</Label>
-              <p className="text-xs text-text-light">
-                Sent to the angler via SMS on the day of their booking.
-              </p>
-              <Input
-                id="gate_code"
-                placeholder="e.g. 4582"
-                {...register("gate_code")}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Lodging */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <div className="flex items-start gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-bronze/10">
-              <Home className="size-4 text-bronze" />
-            </div>
-            <div>
-              <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-                Lodging
-              </CardTitle>
-              <p className="mt-1 text-xs text-text-light">
-                If your property offers on-site lodging through Airbnb or VRBO,
-                enable this to display it on your listing.
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="border-t border-stone-light/20 pt-4">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                className="size-4 rounded border-stone-light/30 accent-forest"
-                {...register("lodging_available")}
-              />
-              <span className="text-sm font-medium text-text-primary">
-                Lodging available on this property
-              </span>
-            </label>
-          </div>
-
-          {lodgingAvailable && (
-            <div className="space-y-2">
-              <Label htmlFor="lodging_url">Airbnb or VRBO listing link</Label>
-              <Input
-                id="lodging_url"
-                type="url"
-                placeholder="Paste your Airbnb or VRBO URL here"
-                {...register("lodging_url")}
-              />
-              {errors.lodging_url && (
-                <p className="text-sm text-red-600">
-                  {errors.lodging_url.message}
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Club Association */}
       <ClubAssociation
         propertyId={savedPropertyId ?? initialData?.id}
         onEnsureSaved={ensureSaved}
         onInvitationSent={checkClubAssociation}
       />
 
-      {/* Actions */}
-      <div className="flex items-center justify-between border-t border-stone-light/20 pt-6">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/landowner/properties")}
-          disabled={isDisabled}
-        >
-          Cancel
-        </Button>
-
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSubmit(onSaveDraft)}
-            disabled={isDisabled}
-          >
-            {saving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Save className="size-4" />
-            )}
-            Save Draft
-          </Button>
-
-          {canSubmitForReview && (
-            <Button
-              type="button"
-              className="bg-forest text-white hover:bg-forest/90"
-              onClick={handleSubmit(onSubmitForReview)}
-              disabled={isDisabled}
-            >
-              {submitting ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Send className="size-4" />
-              )}
-              {initialData?.status === "changes_requested" ? "Resubmit for Review" : "Submit for Review"}
-            </Button>
-          )}
-        </div>
-      </div>
+      <PropertyFormActions
+        saving={saving}
+        submitting={submitting}
+        disabled={isDisabled}
+        canSubmitForReview={canSubmitForReview}
+        statusLabel={
+          initialData?.status === "changes_requested"
+            ? "Resubmit for Review"
+            : "Submit for Review"
+        }
+        onCancel={() => router.push("/landowner/properties")}
+        onSaveDraft={handleSubmit(onSaveDraft)}
+        onSubmitForReview={handleSubmit(onSubmitForReview)}
+      />
     </form>
   );
 }
