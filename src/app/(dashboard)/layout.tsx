@@ -15,6 +15,7 @@ import {
   Calendar,
   Shield,
   UserPlus,
+  Gift,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -91,6 +92,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       label: "Guide Approvals",
       href: "/club/guide-approvals",
       icon: <Compass />,
+    },
+    {
+      label: "Referrals",
+      href: "/club/referrals",
+      icon: <Gift />,
     },
     {
       label: "Settings",
@@ -176,6 +182,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/club/settings": "Club Settings",
   "/club/guide-approvals": "Guide Approvals",
   "/club/staff": "Staff Management",
+  "/club/referrals": "Member Referrals",
   "/club/book-for-member": "Book for Member",
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",

@@ -26,7 +26,7 @@ interface PropertyCardProps {
       membership_id: string;
     }[];
   };
-  href: string;
+  href?: string;
   selected?: boolean;
 }
 
@@ -37,8 +37,16 @@ export default function PropertyCard({
 }: PropertyCardProps) {
   const photo = property.photos?.[0];
 
+  const Wrapper = href
+    ? ({ children, className }: { children: React.ReactNode; className?: string }) => (
+        <Link href={href} className={className}>{children}</Link>
+      )
+    : ({ children, className }: { children: React.ReactNode; className?: string }) => (
+        <div className={className}>{children}</div>
+      );
+
   return (
-    <Link href={href}>
+    <Wrapper>
       <Card
         className={cn(
           "overflow-hidden transition-all hover:shadow-md",
@@ -127,6 +135,6 @@ export default function PropertyCard({
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </Wrapper>
   );
 }

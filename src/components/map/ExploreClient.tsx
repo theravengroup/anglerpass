@@ -145,7 +145,6 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
               <PropertyCard
                 key={p.id}
                 property={p}
-                href="/signup"
                 selected={p.id === selectedId}
               />
             ))}
@@ -157,7 +156,7 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
       {viewMode === "list" && filteredProperties.length > 0 && (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProperties.map((p) => (
-            <PropertyCard key={p.id} property={p} href="/signup" />
+            <PropertyCard key={p.id} property={p} />
           ))}
         </div>
       )}
@@ -170,11 +169,11 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
             Ready to fish these waters?
           </h2>
           <p className="mx-auto mt-2 max-w-lg text-sm text-text-secondary">
-            Join AnglerPass to book access through a member club. Landowners set
-            the rules, clubs vet the anglers, and you get on the water.
+            Book access through a member club. Landowners set the rules, clubs
+            vet the anglers, and you get on the water.
           </p>
           <Button asChild className="mt-6 bg-forest text-white hover:bg-forest/90">
-            <Link href="/signup">Join the Waitlist</Link>
+            <Link href="/login">Log In to Book</Link>
           </Button>
         </div>
       )}
