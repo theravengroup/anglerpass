@@ -166,9 +166,10 @@ export async function GET(request: Request) {
           .select("*")
           .in("property_id", propertyIds)
           .eq("is_active", true)
-      : { data: [] };
+      : { data: null };
 
-    const lodgingMap: Record<string, typeof lodgingRows extends (infer T)[] | null ? T : never> = {};
+    type LodgingRow = NonNullable<typeof lodgingRows>[number];
+    const lodgingMap: Record<string, LodgingRow> = {};
     for (const row of lodgingRows ?? []) {
       lodgingMap[row.property_id] = row;
     }

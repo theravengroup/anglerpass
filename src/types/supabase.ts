@@ -2098,6 +2098,95 @@ export type Database = {
           },
         ]
       }
+      property_lodging: {
+        Row: {
+          id: string
+          property_id: string
+          created_at: string
+          updated_at: string
+          is_active: boolean
+          lodging_name: string | null
+          lodging_type: string | null
+          lodging_type_other: string | null
+          lodging_description: string | null
+          sleeps: number | null
+          bedrooms: number | null
+          bathrooms: number | null
+          amenities: Json
+          nightly_rate_min: number | null
+          nightly_rate_max: number | null
+          min_nights: number
+          pet_policy: string
+          checkin_time: string | null
+          checkout_time: string | null
+          external_listing_url: string | null
+          hospitable_property_uuid: string | null
+          hospitable_last_synced_at: string | null
+          hospitable_sync_status: string | null
+          hospitable_listing_url: string | null
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          lodging_name?: string | null
+          lodging_type?: string | null
+          lodging_type_other?: string | null
+          lodging_description?: string | null
+          sleeps?: number | null
+          bedrooms?: number | null
+          bathrooms?: number | null
+          amenities?: Json
+          nightly_rate_min?: number | null
+          nightly_rate_max?: number | null
+          min_nights?: number
+          pet_policy?: string
+          checkin_time?: string | null
+          checkout_time?: string | null
+          external_listing_url?: string | null
+          hospitable_property_uuid?: string | null
+          hospitable_last_synced_at?: string | null
+          hospitable_sync_status?: string | null
+          hospitable_listing_url?: string | null
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          lodging_name?: string | null
+          lodging_type?: string | null
+          lodging_type_other?: string | null
+          lodging_description?: string | null
+          sleeps?: number | null
+          bedrooms?: number | null
+          bathrooms?: number | null
+          amenities?: Json
+          nightly_rate_min?: number | null
+          nightly_rate_max?: number | null
+          min_nights?: number
+          pet_policy?: string
+          checkin_time?: string | null
+          checkout_time?: string | null
+          external_listing_url?: string | null
+          hospitable_property_uuid?: string | null
+          hospitable_last_synced_at?: string | null
+          hospitable_sync_status?: string | null
+          hospitable_listing_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_lodging_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_credits: {
         Row: {
           amount: number
