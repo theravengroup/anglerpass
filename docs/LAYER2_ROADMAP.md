@@ -88,6 +88,37 @@ The verified trip review system shipped as a cross-cutting feature built on top 
 
 ---
 
+## Recent Completions (April 2026)
+
+The following features shipped since the initial roadmap was written. They span multiple phases and are now live in production.
+
+### Property Management
+- ✅ On-property lodging system (V1) — cabins, lodges, amenities, nightly rates, external listing links (Airbnb, VRBO, Hospitable)
+- ✅ Club-created properties — clubs can add properties on behalf of landowners
+- ✅ Landowner property claim flow — email invitation with token-based claim
+- ✅ Bulk property import from CSV — validation, preview, confirm workflow
+- ✅ Downloadable CSV template for property import
+
+### Club Management
+- ✅ Bulk member import via CSV upload or email paste (up to 200 at once)
+- ✅ Downloadable CSV template for member import
+- ✅ Staff permissions system with granular role-based access
+- ✅ Club consultation request form for onboarding assistance
+
+### Marketing Site
+- ✅ Conservation page (habitat preservation, catch-and-release values)
+- ✅ AnglerPass AI section (Compass trip matching, Concierge planning)
+- ✅ Public Explore Waters page (search properties without login)
+- ✅ Marketing copy audit — removed claims that don't match current product
+- ✅ Nav breakpoint raised to 1280px for better tablet/small-laptop display
+
+### Code Quality
+- ✅ Component splitting (PropertyForm, CorporateInviteSection, roadmap, admin financials, settings)
+- ✅ Legacy pattern removal and styling violations fixed
+- ✅ Supabase CLI migration sync (all 42 migrations tracked)
+
+---
+
 ## Phase 2: Landowner Property Management
 
 **Goal:** Landowners can create, edit, and manage property listings through a full CRUD interface.
@@ -156,10 +187,10 @@ The verified trip review system shipped as a cross-cutting feature built on top 
 
 **Key Features:**
 - Club profile creation (name, description, location, rules, membership tiers)
-- Member roster with invite system (invite by email)
+- Member roster with invite system (invite by email) — ✅ including bulk CSV import (up to 200)
 - Member vetting workflow (application → review → approve/reject)
 - Member status management (active, inactive, pending)
-- Club-property association (which properties the club has access to)
+- Club-property association (which properties the club has access to) — ✅ including club-created properties and landowner claim flow
 - **Property → club association flow on the landowner side:**
   - Properties cannot be published without at least one associated club
   - Property status flow: draft → pending_club (no club yet) → pending_review → published
