@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { anchor: '#problem', label: 'The Opportunity' },
   { anchor: '#how', label: 'How It Works' },
-  { anchor: '#compass', label: 'Compass' },
+  { anchor: '#ai', label: 'AnglerPass AI' },
   { anchor: '#features', label: 'Features' },
   { anchor: '#why', label: 'Why It Matters' },
   { anchor: '#built-for', label: "Who It's For" },

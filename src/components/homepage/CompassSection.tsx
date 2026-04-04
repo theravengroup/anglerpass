@@ -135,10 +135,27 @@ export default function CompassSection() {
   const typedText = useTypewriter(QUERIES);
 
   return (
-    <section className="compass-section" id="compass">
+    <section className="compass-section" id="ai">
       <div className="compass-overlay" />
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        {/* Header */}
+        {/* AI Section Intro */}
+        <div className="ai-intro reveal">
+          <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
+            AnglerPass AI
+          </span>
+          <h2 className="ai-headline">
+            Smarter tools.
+            <br />
+            <em>Better days on the water.</em>
+          </h2>
+          <p className="ai-subhead">
+            Two AI-powered tools built into the platform — one to match you
+            with the right water, one to make sure you&apos;re ready when you
+            get there.
+          </p>
+        </div>
+
+        {/* Compass Header */}
         <div className="compass-header reveal">
           <span className="eyebrow" style={{ color: 'var(--sand)' }}>
             Introducing AnglerPass Compass &middot; The First AI-Powered Private Water Platform

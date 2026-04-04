@@ -3,6 +3,7 @@ import ProblemSection from '@/components/homepage/ProblemSection';
 import CinematicDivider from '@/components/homepage/CinematicDivider';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
 import CompassSection from '@/components/homepage/CompassSection';
+import ConciergeSection from '@/components/homepage/ConciergeSection';
 import FeaturesSection from '@/components/homepage/FeaturesSection';
 import WhySection from '@/components/homepage/WhySection';
 import BuiltForSection from '@/components/homepage/BuiltForSection';
@@ -20,6 +21,7 @@ export default function HomePage() {
       <CinematicDivider />
       <HowItWorksSection />
       <CompassSection />
+      <ConciergeSection />
       <FeaturesSection />
       <WhySection />
       <BuiltForSection />
