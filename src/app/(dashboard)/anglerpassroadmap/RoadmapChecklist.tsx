@@ -97,7 +97,7 @@ const PHASES: RoadmapPhase[] = [
         title: "Booking System",
         items: [
           { id: "c-book-create", label: "Booking creation (instant-confirm, multi-day, multi-rod)", done: true },
-          { id: "c-book-crossclub", label: "Cross-club booking routing with $15/rod fee", done: true },
+          { id: "c-book-crossclub", label: "Cross-club booking routing with $30/rod fee", done: true },
           { id: "c-book-guide", label: "Guide add-on for bookings", done: true },
           { id: "c-book-cancel", label: "Booking cancellation with tiered refund policy", done: true },
           { id: "c-book-fees", label: "Fee calculation engine (platform, cross-club, guide, staff discounts)", done: true },

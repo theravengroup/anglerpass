@@ -164,26 +164,31 @@ export default function PricingPage() {
               Cross-Club Network revenue
             </h3>
             <p className="text-[14px] text-text-secondary leading-[1.65] mb-5">
-              When your members book fishing at another club&rsquo;s properties, the angler
-              pays a <strong className="text-forest">$15/rod cross-club access fee</strong>. A portion
-              of that fee comes back to your club as a network reward.
+              When your members fish at another club&rsquo;s properties, the angler pays
+              a <strong className="text-forest">$30/rod cross-club access fee</strong>. That fee is
+              split three ways &mdash; both clubs and AnglerPass all benefit from the network.
             </p>
 
             {/* Fee split visual */}
             <div className="mb-6">
               <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-text-light mb-3">
-                How the $15 cross-club fee is split
+                How the $30 cross-club fee is split
               </p>
               <div className="flex rounded-[10px] overflow-hidden border border-parchment">
-                <div className="flex-[2] bg-forest/5 px-5 py-4 border-r border-parchment">
-                  <p className="text-[22px] font-heading font-semibold text-forest mb-0.5">$10</p>
+                <div className="flex-[4] bg-forest/5 px-5 py-4 border-r border-parchment">
+                  <p className="text-[22px] font-heading font-semibold text-forest mb-0.5">$20</p>
                   <p className="text-[12px] text-text-secondary m-0">to AnglerPass</p>
                   <p className="text-[11px] text-text-light m-0 mt-0.5">Platform &amp; network operations</p>
                 </div>
-                <div className="flex-[1] bg-river/5 px-5 py-4">
+                <div className="flex-[1] bg-river/5 px-5 py-4 border-r border-parchment">
                   <p className="text-[22px] font-heading font-semibold text-river mb-0.5">$5</p>
-                  <p className="text-[12px] text-text-secondary m-0">to your club</p>
-                  <p className="text-[11px] text-text-light m-0 mt-0.5">Network participation reward</p>
+                  <p className="text-[12px] text-text-secondary m-0">to home club</p>
+                  <p className="text-[11px] text-text-light m-0 mt-0.5">Network participation</p>
+                </div>
+                <div className="flex-[1] bg-bronze/5 px-5 py-4">
+                  <p className="text-[22px] font-heading font-semibold text-bronze mb-0.5">$5</p>
+                  <p className="text-[12px] text-text-secondary m-0">to hosting club</p>
+                  <p className="text-[11px] text-text-light m-0 mt-0.5">Property access</p>
                 </div>
               </div>
             </div>
@@ -191,27 +196,24 @@ export default function PricingPage() {
             {/* Example */}
             <div className="py-5 px-6 bg-offwhite rounded-[10px] border border-parchment">
               <p className="text-[13px] font-semibold text-forest mb-3">
-                Example
+                Example: Your member books 2 rods for 3 days at a partner club&rsquo;s water
               </p>
               <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[13px] pb-2 border-b border-parchment">
+                  <span className="text-text-secondary">Cross-club fee: $30/rod &times; 2 rods &times; 3 days</span>
+                  <span className="font-medium text-forest">$180</span>
+                </div>
+                <div className="flex justify-between text-[13px] mt-2">
+                  <span className="text-forest">AnglerPass receives ($20 &times; 6)</span>
+                  <span className="text-text-secondary">$120</span>
+                </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-text-secondary">Your member books 2 rods for 3 days at a partner club&rsquo;s water</span>
-                </div>
-                <div className="flex justify-between text-[13px] pt-2 border-t border-parchment mt-2">
-                  <span className="text-text-secondary">Cross-club fee per rod/day</span>
-                  <span className="text-text-secondary">$15</span>
-                </div>
-                <div className="flex justify-between text-[13px]">
-                  <span className="text-text-secondary">2 rods &times; 3 days</span>
-                  <span className="text-text-secondary">&times; 6</span>
-                </div>
-                <div className="flex justify-between text-[13px] pt-2 border-t border-parchment mt-1">
-                  <span className="text-text-secondary">Total cross-club fees (paid by angler)</span>
-                  <span className="font-medium text-forest">$90</span>
-                </div>
-                <div className="flex justify-between text-[13px] mt-1">
-                  <span className="text-river font-medium">Your club&rsquo;s share ($5 &times; 6)</span>
+                  <span className="text-river font-medium">Your club receives ($5 &times; 6)</span>
                   <span className="font-semibold text-river">$30</span>
+                </div>
+                <div className="flex justify-between text-[13px]">
+                  <span className="text-bronze font-medium">Hosting club receives ($5 &times; 6)</span>
+                  <span className="font-semibold text-bronze">$30</span>
                 </div>
               </div>
             </div>
@@ -268,7 +270,7 @@ export default function PricingPage() {
                 {[
                   { label: 'Rod fee', detail: 'Per rod, per day, set by the property' },
                   { label: 'Platform fee', detail: '15% of rod fees' },
-                  { label: 'Cross-club access fee', detail: '$15/rod (only when fishing outside your home club)' },
+                  { label: 'Cross-club access fee', detail: '$30/rod (only when fishing outside your home club)' },
                   { label: 'Guide service fee', detail: '10% of guide rate (only when adding a guide)' },
                 ].map((item) => (
                   <li key={item.label} className="py-2 border-b border-parchment">
@@ -279,8 +281,8 @@ export default function PricingPage() {
               </ul>
               <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
                 Non-fishing guests are free. Only anglers with rods pay the rod fee.
-                The $15 cross-club fee is split: $10 to AnglerPass, $5 to your home
-                club for maintaining the network.
+                The $30 cross-club fee is split three ways: $20 to AnglerPass, $5 to
+                your home club, and $5 to the hosting club.
               </p>
             </div>
           </div>

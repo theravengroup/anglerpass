@@ -17,7 +17,7 @@
 - **Standard** — $349/month (up to 2,000 members, 100 properties, cross-club eligible)
 - **Pro** — $699/month (unlimited members, unlimited properties, cross-club eligible)
 
-**Angler booking fees:** 15% platform fee on each booking (paid by the angler on top of the property's base rate), plus a $15/rod cross-club access fee when booking outside the angler's home club ($10 to AnglerPass, $5 referral to home club). No subscription required for anglers.
+**Angler booking fees:** 15% platform fee on each booking (paid by the angler on top of the property's base rate), plus a $30/rod cross-club access fee when booking outside the angler's home club ($20 to AnglerPass, $5 referral to home club, $5 to hosting club). No subscription required for anglers.
 
 **Cross-club access:** Standard and Pro clubs can opt in to reciprocal access agreements, allowing members of one club to book water managed by another club in the network. This is the network effect that grows the platform.
 

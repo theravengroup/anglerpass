@@ -3,8 +3,6 @@
 import type { FeeBreakdown as FeeBreakdownType } from "@/lib/constants/fees";
 import {
   CROSS_CLUB_FEE_PER_ROD,
-  HOME_CLUB_REFERRAL_PER_ROD,
-  ANGLERPASS_CROSS_CLUB_SHARE_PER_ROD,
 } from "@/lib/constants/fees";
 
 interface FeeBreakdownProps {
