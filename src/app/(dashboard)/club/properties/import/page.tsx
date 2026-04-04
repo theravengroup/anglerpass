@@ -11,10 +11,12 @@ import {
   AlertCircle,
   FileText,
   ArrowLeft,
+  Download,
 } from "lucide-react";
 import Link from "next/link";
 import { FetchError } from "@/components/shared/FetchError";
 import { CSV_COLUMNS } from "@/lib/validations/property-import";
+import { downloadCSV } from "@/lib/csv";
 
 interface PreviewRow {
   row: number;
@@ -250,6 +252,38 @@ export default function ImportPropertiesPage() {
                   &quot;150&quot;)
                 </li>
               </ul>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadCSV(
+                    [
+                      [...CSV_COLUMNS],
+                      [
+                        "Blue River Ranch",
+                        "Premier private trout water with 2 miles of river access",
+                        "Blue River, CO",
+                        "39.4521, -106.0432",
+                        "river",
+                        "Rainbow Trout;Brown Trout",
+                        "2.1",
+                        "4",
+                        "2",
+                        "Catch and release only; barbless hooks required",
+                        "350",
+                        "250",
+                        "150",
+                        "Gate code provided 24h before arrival",
+                      ],
+                    ],
+                    "property-import-template.csv"
+                  )
+                }
+                className="mt-3"
+              >
+                <Download className="size-3.5" />
+                Download Template CSV
+              </Button>
             </CardContent>
           </Card>
         </div>

@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import {
   Users,
   UserPlus,
+  Upload,
   Loader2,
 } from "lucide-react";
 import { FetchError } from "@/components/shared/FetchError";
 import MemberCard from "@/components/clubs/MemberCard";
 import InviteForm from "@/components/clubs/InviteForm";
+import BulkInviteForm from "@/components/clubs/BulkInviteForm";
 
 interface Member {
   id: string;
@@ -39,6 +41,7 @@ export default function MembersPage() {
 
   // Invite form state
   const [showInvite, setShowInvite] = useState(false);
+  const [showBulkInvite, setShowBulkInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"member" | "staff">("member");
   const [inviting, setInviting] = useState(false);
@@ -213,17 +216,30 @@ export default function MembersPage() {
             {members.length} total member{members.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <Button
-          className="bg-river text-white hover:bg-river/90"
-          onClick={() => {
-            setShowInvite(!showInvite);
-            setInviteError(null);
-            setInviteSuccess(null);
-          }}
-        >
-          <UserPlus className="size-4" />
-          Invite Member
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowBulkInvite(!showBulkInvite);
+              if (!showBulkInvite) setShowInvite(false);
+            }}
+          >
+            <Upload className="size-4" />
+            Bulk Import
+          </Button>
+          <Button
+            className="bg-river text-white hover:bg-river/90"
+            onClick={() => {
+              setShowInvite(!showInvite);
+              if (!showInvite) setShowBulkInvite(false);
+              setInviteError(null);
+              setInviteSuccess(null);
+            }}
+          >
+            <UserPlus className="size-4" />
+            Invite Member
+          </Button>
+        </div>
       </div>
 
       {/* Invite form */}
@@ -238,6 +254,14 @@ export default function MembersPage() {
           inviteError={inviteError}
           inviteSuccess={inviteSuccess}
           onInvite={handleInvite}
+        />
+      )}
+
+      {/* Bulk invite form */}
+      {showBulkInvite && clubId && (
+        <BulkInviteForm
+          clubId={clubId}
+          onComplete={() => fetchMembers(clubId)}
         />
       )}
 
