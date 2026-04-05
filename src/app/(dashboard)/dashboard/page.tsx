@@ -46,7 +46,7 @@ interface StepItem {
 const ROLE_STATS: Record<string, StatItem[]> = {
   landowner: [
     { label: "Properties", value: "0", description: "Active listings", icon: MapPin, color: "text-forest", bg: "bg-forest/10" },
-    { label: "Bookings", value: "0", description: "Pending review", icon: CalendarDays, color: "text-bronze", bg: "bg-bronze/10" },
+    { label: "Bookings", value: "0", description: "Upcoming trips", icon: CalendarDays, color: "text-bronze", bg: "bg-bronze/10" },
     { label: "Connections", value: "0", description: "Club partnerships", icon: Users, color: "text-river", bg: "bg-river/10" },
   ],
   club_admin: [
@@ -70,7 +70,7 @@ const ROLE_STEPS: Record<string, StepItem[]> = {
   landowner: [
     { label: "Complete your profile", description: "Add your name and contact details", href: "/dashboard/settings", done: false },
     { label: "Add your first property", description: "List a property with photos, rates, and availability", href: "/landowner/properties/new", done: false },
-    { label: "Review bookings", description: "Manage incoming booking requests from anglers", href: "/landowner/bookings", done: false },
+    { label: "Track your bookings", description: "View upcoming trips and earnings from your waters", href: "/landowner/bookings", done: false },
     { label: "Upload documents", description: "Add waivers and agreements for your properties", href: "/landowner/documents", done: false },
   ],
   club_admin: [
