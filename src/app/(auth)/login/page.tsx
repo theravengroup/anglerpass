@@ -67,17 +67,25 @@ function LoginForm() {
         return;
       }
 
-      // Fetch profile to get role for redirect
+      // Redirect to the user's primary (signup) role dashboard
       const { getRoleHomePath } = await import("@/types/roles");
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
-        .returns<{ role: string }[]>()
+        .select("role, roles")
+        .returns<{ role: string; roles: string[] | null }[]>()
         .single();
 
-      const destination = profile?.role
-        ? getRoleHomePath(profile.role)
-        : "/dashboard";
+      const primaryRole = profile?.roles?.[0] ?? profile?.role ?? "angler";
+
+      // Reset active role to primary so dashboard/sidebar match
+      if (profile && profile.role !== primaryRole) {
+        await supabase
+          .from("profiles")
+          .update({ role: primaryRole })
+          .eq("id", (await supabase.auth.getUser()).data.user!.id);
+      }
+
+      const destination = getRoleHomePath(primaryRole);
       router.push(destination);
       router.refresh();
       // Keep spinner running until navigation completes
