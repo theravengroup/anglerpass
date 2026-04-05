@@ -3,23 +3,9 @@ import Link from 'next/link';
 import { Building2, DollarSign, Users } from 'lucide-react';
 import ClubFaqSection from '@/components/clubs/ClubFaqSection';
 import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
+import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'For Clubs — AnglerPass',
-  description:
-    'Run your fishing club with modern tools. Membership management, scheduling, roster tools, and reservation coordination with AnglerPass.',
-  openGraph: {
-    title: 'For Clubs — AnglerPass',
-    description:
-      'Run your fishing club with modern tools. Membership management, scheduling, and reservation coordination.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'For Clubs — AnglerPass',
-    description:
-      'Run your fishing club with modern tools. Membership management, scheduling, and reservation coordination.',
-  },
-};
+export const metadata: Metadata = PAGES_SEO.clubs;
 
 const features = [
   {
@@ -84,9 +70,44 @@ const features = [
   },
 ];
 
+const clubFaqJsonLd = buildJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does AnglerPass offer fly fishing clubs?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'AnglerPass gives clubs a full management platform including online membership enrollment, dues and initiation fee collection, corporate membership programs, private water property listings, and booking calendars.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does AnglerPass pricing work for clubs?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Clubs pay a flat monthly SaaS fee based on membership size. AnglerPass earns a small percentage on bookings. Clubs keep control of their membership fees and property rates.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: "Can clubs use AnglerPass even if they don't own land?",
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Clubs can manage leased or landowner-permitted properties. AnglerPass facilitates the access and booking layer; clubs handle the landowner relationship.',
+      },
+    },
+  ],
+});
+
 export default function ClubsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: clubFaqJsonLd }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
@@ -547,6 +568,21 @@ export default function ClubsPage() {
 
       {/* FAQ */}
       <ClubFaqSection />
+
+      {/* Learn more */}
+      <section className="py-12 bg-offwhite text-center">
+        <div className="max-w-[500px] mx-auto px-8">
+          <p className="text-[15px] text-text-secondary mb-3">
+            Thinking about starting a club?
+          </p>
+          <Link
+            href="/learn/how-to-start-a-fly-fishing-club"
+            className="text-river font-medium underline hover:text-forest transition-colors text-[15px]"
+          >
+            Read: How to Start a Fly Fishing Club &rarr;
+          </Link>
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="py-[120px] bg-forest-deep text-center">

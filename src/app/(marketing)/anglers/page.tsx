@@ -2,23 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
+import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'For Anglers — AnglerPass',
-  description:
-    'Discover private waters, book experiences, and access trusted properties. AnglerPass connects serious anglers with exceptional water.',
-  openGraph: {
-    title: 'For Anglers — AnglerPass',
-    description:
-      'Discover private waters, book experiences, and access trusted properties across the country.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'For Anglers — AnglerPass',
-    description:
-      'Discover private waters, book experiences, and access trusted properties across the country.',
-  },
-};
+export const metadata: Metadata = PAGES_SEO.anglers;
 
 const features = [
   {
@@ -83,9 +69,44 @@ const features = [
   },
 ];
 
+const anglerFaqJsonLd = buildJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do I join AnglerPass as an angler?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Find a participating fly fishing club near you on AnglerPass and apply for membership. Each club sets its own membership requirements, initiation fees, and annual dues.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What types of private water are available on AnglerPass?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'AnglerPass properties include private trout streams, spring creeks, rivers, ranch ponds, and stillwater lakes across the United States, all managed by member fly fishing clubs.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: "Can I fish properties managed by clubs I'm not a member of?",
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. AnglerPass enables cross-club access, meaning a member of any club on the network can book properties managed by other participating clubs, subject to availability and host club rules.',
+      },
+    },
+  ],
+});
+
 export default function AnglersPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: anglerFaqJsonLd }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
@@ -247,6 +268,48 @@ export default function AnglersPage() {
             other clubs in the network. The more clubs that join, the more water
             becomes available to you &mdash; without needing multiple memberships.
           </p>
+        </div>
+      </section>
+
+      {/* Find water in your state */}
+      <section className="py-20 bg-offwhite">
+        <div className="max-w-[900px] mx-auto px-8">
+          <div className="reveal text-center mb-10">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze">
+              By State
+            </span>
+            <h2 className="font-heading text-[clamp(24px,3vw,34px)] font-medium leading-[1.15] text-forest mb-3 tracking-[-0.3px]">
+              Find private water in your state
+            </h2>
+            <p className="text-[15px] text-text-secondary max-w-[480px] mx-auto">
+              AnglerPass connects anglers with private fly fishing water across
+              the country.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {[
+              { name: 'Montana', slug: 'montana' },
+              { name: 'Colorado', slug: 'colorado' },
+              { name: 'Wyoming', slug: 'wyoming' },
+              { name: 'Idaho', slug: 'idaho' },
+              { name: 'Oregon', slug: 'oregon' },
+              { name: 'Washington', slug: 'washington' },
+              { name: 'Virginia', slug: 'virginia' },
+              { name: 'Pennsylvania', slug: 'pennsylvania' },
+              { name: 'North Carolina', slug: 'north-carolina' },
+              { name: 'Tennessee', slug: 'tennessee' },
+              { name: 'Utah', slug: 'utah' },
+              { name: 'New York', slug: 'new-york' },
+            ].map((s) => (
+              <Link
+                key={s.slug}
+                href={`/fly-fishing/${s.slug}`}
+                className="bg-white border border-parchment rounded-lg px-4 py-3 text-center text-[14px] font-medium text-forest no-underline hover:border-bronze/30 hover:bg-bronze/5 transition-all"
+              >
+                {s.name}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

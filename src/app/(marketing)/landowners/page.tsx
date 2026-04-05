@@ -2,23 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
+import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'For Landowners — AnglerPass',
-  description:
-    'Manage private water access professionally. Property registration, access controls, booking management, and more with AnglerPass.',
-  openGraph: {
-    title: 'For Landowners — AnglerPass',
-    description:
-      'Manage private water access professionally. Property registration, access controls, and booking management.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'For Landowners — AnglerPass',
-    description:
-      'Manage private water access professionally. Property registration, access controls, and booking management.',
-  },
-};
+export const metadata: Metadata = PAGES_SEO.landowners;
 
 const features = [
   {
@@ -84,9 +70,44 @@ const features = [
   },
 ];
 
+const landownerFaqJsonLd = buildJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do landowners make money with AnglerPass?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Landowners partner with a member fly fishing club that lists and manages their property on AnglerPass. Anglers pay a booking fee for access, and the landowner receives a trespass fee negotiated directly with the managing club.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do I have to manage bookings myself as a landowner?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. The fly fishing club that manages your property handles all booking logistics, angler vetting, and calendar management through AnglerPass. You receive income without administrative burden.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is my property protected from damage or misuse?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'All anglers who access private water through AnglerPass are vetted club members. Clubs are responsible for establishing and enforcing conduct standards. AnglerPass provides verified trip records and a review system.',
+      },
+    },
+  ],
+});
+
 export default function LandownersPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: landownerFaqJsonLd }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(58,107,124,0.15),transparent_60%)]" />
@@ -295,6 +316,21 @@ export default function LandownersPage() {
               },
             ]}
           />
+        </div>
+      </section>
+
+      {/* Learn more */}
+      <section className="py-12 bg-offwhite text-center">
+        <div className="max-w-[500px] mx-auto px-8">
+          <p className="text-[15px] text-text-secondary mb-3">
+            Want to learn how other landowners earn from their water?
+          </p>
+          <Link
+            href="/learn/how-landowners-can-earn-income-from-fly-fishing-access"
+            className="text-forest font-medium underline hover:text-forest-deep transition-colors text-[15px]"
+          >
+            Read: How Landowners Earn Income from Fly Fishing Access &rarr;
+          </Link>
         </div>
       </section>
 

@@ -1,0 +1,110 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { getAllPosts } from '@/lib/posts';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Fly Fishing Guides & Resources | AnglerPass Learn',
+  description:
+    'Expert guides on private water fly fishing, club management, and access rights. Learn everything about fly fishing on private land.',
+  path: '/learn',
+  keywords: [
+    'fly fishing guides',
+    'private water fly fishing',
+    'fly fishing club resources',
+    'private water access guide',
+  ],
+});
+
+export default function LearnPage() {
+  const posts = getAllPosts();
+
+  return (
+    <>
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[80px]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
+        <div className="relative max-w-[800px] mx-auto px-8 text-center">
+          <span className="inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
+            Learn
+          </span>
+          <h1 className="font-heading text-[clamp(38px,5vw,52px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
+            Fly Fishing Guides &amp; Resources
+          </h1>
+          <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto">
+            Expert guides on private water access, club management, and getting
+            the most out of your fly fishing experience.
+          </p>
+        </div>
+      </section>
+
+      {/* Posts Grid */}
+      <section className="py-[80px] bg-offwhite">
+        <div className="max-w-[1000px] mx-auto px-8">
+          {posts.length === 0 ? (
+            <p className="text-center text-text-secondary">
+              No posts yet. Check back soon.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {posts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/learn/${post.slug}`}
+                  className="group bg-white border border-parchment rounded-[14px] px-7 py-8 no-underline transition-all duration-300 hover:border-bronze/30 hover:shadow-sm"
+                >
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="font-mono text-[10px] uppercase tracking-[0.15em] text-bronze bg-bronze/8 px-2 py-0.5 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h2 className="font-heading text-[22px] font-semibold text-forest mb-2 tracking-[-0.2px] group-hover:text-forest-deep transition-colors">
+                    {post.title}
+                  </h2>
+                  <p className="text-[14px] leading-[1.65] text-text-secondary mb-4">
+                    {post.description}
+                  </p>
+                  <div className="flex items-center gap-3 text-[12px] text-text-light">
+                    <span>{post.readingTime}</span>
+                    <span>&middot;</span>
+                    <time dateTime={post.publishedAt}>
+                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </time>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 bg-parchment-light text-center">
+        <div className="max-w-[600px] mx-auto px-8">
+          <h2 className="font-heading text-[clamp(24px,3vw,32px)] font-medium text-forest mb-4">
+            Ready to fish private water?
+          </h2>
+          <p className="text-[15px] text-text-secondary mb-8">
+            Learn how AnglerPass connects anglers with exclusive private water
+            through trusted fly fishing clubs.
+          </p>
+          <Link
+            href="/anglers"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
+          >
+            Explore AnglerPass for Anglers
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

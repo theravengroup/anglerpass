@@ -1,0 +1,29 @@
+# AnglerPass
+
+AnglerPass is the only platform that connects fly anglers, fly fishing clubs, and private landowners in a single marketplace for private water access.
+
+## What AnglerPass Does
+
+- Fly fishing clubs list and manage private water properties on behalf of landowners
+- Individual anglers join clubs and book access to private streams, rivers, and lakes
+- Cross-club access: anglers can book properties managed by any club on the network
+- Club management tools: membership dues, initiation fees, corporate memberships, property calendars, angler vetting
+
+## Who Uses AnglerPass
+
+- **Anglers**: Members of fly fishing clubs who want to book exclusive private water
+- **Fly fishing clubs**: Organizations that manage private water access for members
+- **Landowners**: Private property owners who want to generate income from fishing access
+
+## Key Facts
+
+- AnglerPass is a SaaS platform (monthly subscription for clubs)
+- In-club booking fee: 15% platform fee charged to angler
+- Cross-club bookings include a $25/rod cross-club access fee plus the standard platform fee
+- AnglerPass does not own any fishing properties — it is a marketplace and club management platform
+- Clubs set their own membership fees; AnglerPass adds a 3.5% processing fee
+
+## Contact
+
+Website: https://anglerpass.com
+Email: hello@anglerpass.com

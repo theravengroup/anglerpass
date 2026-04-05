@@ -304,6 +304,7 @@ export default function MarketingFooter() {
                   { href: '/clubs#corporate', label: 'Corporate Memberships' },
                   { href: '/explore', label: 'Explore Waters' },
                   { href: '/pricing', label: 'Pricing' },
+                  { href: '/learn', label: 'Learn' },
                 ].map((link) => (
                   <li key={link.href} className="mb-1.5">
                     <Link
@@ -323,6 +324,14 @@ export default function MarketingFooter() {
                 Company
               </h4>
               <ul className="list-none m-0 p-0">
+                <li className="mb-1.5">
+                  <Link
+                    href="/about"
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
+                  >
+                    About
+                  </Link>
+                </li>
                 <li className="mb-1.5">
                   <Link
                     href="/#faq"

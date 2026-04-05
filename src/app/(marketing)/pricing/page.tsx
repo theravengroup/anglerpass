@@ -1,16 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PAGES_SEO } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Pricing — AnglerPass',
-  description:
-    'Transparent pricing for clubs, landowners, anglers, and guides. See exactly what you pay and what you receive on AnglerPass.',
-  openGraph: {
-    title: 'Pricing — AnglerPass',
-    description:
-      'Transparent pricing for clubs, landowners, and anglers on AnglerPass.',
-  },
-};
+export const metadata: Metadata = PAGES_SEO.pricing;
 
 export default function PricingPage() {
   return (
