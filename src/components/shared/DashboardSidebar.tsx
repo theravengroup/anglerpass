@@ -59,10 +59,10 @@ export default function DashboardSidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-forest-deep text-white transition-[width,transform] duration-200",
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-forest-deep text-white transition-[width,transform] duration-200",
           collapsed ? "w-[68px]" : "w-64",
           open ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:static lg:z-auto lg:h-screen"
+          "lg:translate-x-0 lg:relative"
         )}
       >
         {/* Logo */}
@@ -82,8 +82,8 @@ export default function DashboardSidebar({
           )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        {/* Navigation — flex-1 + min-h-0 ensures it fills remaining space and scrolls */}
+        <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
           {items.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -130,46 +130,49 @@ export default function DashboardSidebar({
           })}
         </nav>
 
-        {/* Collapse toggle (desktop only) */}
-        <div className="hidden shrink-0 border-t border-white/10 px-3 py-2 lg:block">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
-          >
-            {collapsed ? (
-              <ChevronRight className="size-[18px] shrink-0" />
-            ) : (
-              <>
-                <ChevronLeft className="size-[18px] shrink-0" />
-                <span>Collapse</span>
-              </>
-            )}
-          </button>
-        </div>
+        {/* Bottom pinned sections */}
+        <div className="mt-auto shrink-0">
+          {/* Collapse toggle (desktop only) */}
+          <div className="hidden border-t border-white/10 px-3 py-2 lg:block">
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
+            >
+              {collapsed ? (
+                <ChevronRight className="size-[18px] shrink-0" />
+              ) : (
+                <>
+                  <ChevronLeft className="size-[18px] shrink-0" />
+                  <span>Collapse</span>
+                </>
+              )}
+            </button>
+          </div>
 
-        {/* User section */}
-        <div className="shrink-0 border-t border-white/10 px-3 py-3">
-          <Link
-            href="/dashboard/settings"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors"
-          >
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15">
-              <User className="size-3.5" />
-            </div>
-            {!collapsed && (
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-white/90">
-                  {user?.display_name || user?.email || "Account"}
-                </p>
-                <p className="truncate text-xs text-white/50">
-                  {user?.role ? ROLE_LABELS[user.role] || user.role : "Manage settings"}
-                </p>
+          {/* User section */}
+          <div className="border-t border-white/10 px-3 py-3">
+            <Link
+              href="/dashboard/settings"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors"
+            >
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15">
+                <User className="size-3.5" />
               </div>
-            )}
-            {!collapsed && (
-              <Settings className="size-4 shrink-0 text-white/40" />
-            )}
-          </Link>
+              {!collapsed && (
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white/90">
+                    {user?.display_name || user?.email || "Account"}
+                  </p>
+                  <p className="truncate text-xs text-white/50">
+                    {user?.role ? ROLE_LABELS[user.role] || user.role : "Manage settings"}
+                  </p>
+                </div>
+              )}
+              {!collapsed && (
+                <Settings className="size-4 shrink-0 text-white/40" />
+              )}
+            </Link>
+          </div>
         </div>
       </aside>
     </>
