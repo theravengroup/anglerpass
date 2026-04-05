@@ -34,6 +34,34 @@ export async function GET(
       );
     }
 
+    // Published properties are visible to everyone
+    if (data.status !== "published") {
+      // Non-published: only owner, club staff, or admin
+      let hasAccess = data.owner_id === user.id;
+
+      if (!hasAccess && data.created_by_club_id) {
+        const { requireClubRole } = await import("@/lib/api/helpers");
+        const role = await requireClubRole(user.id, data.created_by_club_id, "club.manage_properties");
+        if (role?.allowed) hasAccess = true;
+      }
+
+      if (!hasAccess) {
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        if (profile?.role === "admin") hasAccess = true;
+      }
+
+      if (!hasAccess) {
+        return NextResponse.json(
+          { error: "Property not found" },
+          { status: 404 }
+        );
+      }
+    }
+
     return NextResponse.json({ property: data });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
