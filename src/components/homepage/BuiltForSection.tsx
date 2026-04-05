@@ -37,7 +37,7 @@ export default function BuiltForSection() {
             </div>
             <div className="built-for-text">
               <span className="built-for-label">For Anglers</span>
-              <h3>Independent Anglers</h3>
+              <h3>Anglers</h3>
               <p>You know the quality of private water is unmatched. Join a club on AnglerPass and get access to vetted private waters you won&apos;t find anywhere else — with real availability, transparent rod fees, and a booking system that respects the resource.</p>
               <a href="/anglers" className="btn btn-bronze">Find Private Water</a>
             </div>

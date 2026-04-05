@@ -11,6 +11,9 @@ const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
   club: "Club or Association",
   angler: "Individual Angler",
+  guide: "Guide",
+  corporate: "Corporate Member",
+  partner: "Partner",
   investor: "Investor",
   other: "Other",
 };
@@ -28,6 +31,8 @@ async function sendWaitlistEmails(data: {
   lastName?: string;
   email: string;
   interestType: string;
+  state?: string;
+  roleResponse?: string;
   message?: string;
 }) {
   if (!resend) return;
@@ -67,6 +72,8 @@ async function sendWaitlistEmails(data: {
           <tr><td style="padding-right: 16px; color: #888;"><strong>Name</strong></td><td>${data.firstName} ${data.lastName ?? ""}</td></tr>
           <tr><td style="padding-right: 16px; color: #888;"><strong>Email</strong></td><td><a href="mailto:${data.email}">${data.email}</a></td></tr>
           <tr><td style="padding-right: 16px; color: #888;"><strong>Role</strong></td><td>${roleLabel}</td></tr>
+          ${data.state ? `<tr><td style="padding-right: 16px; color: #888;"><strong>State</strong></td><td>${data.state}</td></tr>` : ""}
+          ${data.roleResponse ? `<tr><td style="padding-right: 16px; color: #888;"><strong>Role Q&amp;A</strong></td><td>${data.roleResponse}</td></tr>` : ""}
           ${data.message ? `<tr><td style="padding-right: 16px; color: #888;"><strong>Message</strong></td><td>${data.message}</td></tr>` : ""}
         </table>
       </div>
@@ -151,7 +158,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { firstName, lastName, email, interestType, message, source, type } =
+    const { firstName, lastName, email, interestType, state, roleResponse, message, source, type } =
       result.data;
 
     // Save to Supabase if configured
@@ -184,6 +191,8 @@ export async function POST(request: Request) {
         type: type ?? "waitlist",
         message: message ?? null,
         source: source ?? "homepage",
+        state: state ?? null,
+        role_response: roleResponse ?? null,
       });
 
       if (error && error.code !== "23505") {
@@ -211,6 +220,8 @@ export async function POST(request: Request) {
           lastName,
           email,
           interestType,
+          state,
+          roleResponse,
           message,
         });
       }

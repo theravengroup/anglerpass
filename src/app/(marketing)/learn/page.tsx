@@ -89,20 +89,40 @@ export default function LearnPage() {
 
       {/* CTA */}
       <section className="py-20 bg-parchment-light text-center">
-        <div className="max-w-[600px] mx-auto px-8">
+        <div className="max-w-[700px] mx-auto px-8">
           <h2 className="font-heading text-[clamp(24px,3vw,32px)] font-medium text-forest mb-4">
-            Ready to fish private water?
+            Ready to get started?
           </h2>
-          <p className="text-[15px] text-text-secondary mb-8">
-            Learn how AnglerPass connects anglers with exclusive private water
-            through trusted fly fishing clubs.
+          <p className="text-[15px] text-text-secondary mb-10">
+            AnglerPass is the operating platform for private fly fishing access.
+            Find out how it works for your role.
           </p>
-          <Link
-            href="/anglers"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
-          >
-            Explore AnglerPass for Anglers
-          </Link>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Link
+              href="/anglers"
+              className="inline-flex items-center justify-center px-5 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-300 hover:opacity-90"
+            >
+              Anglers
+            </Link>
+            <Link
+              href="/clubs"
+              className="inline-flex items-center justify-center px-5 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-river text-white transition-all duration-300 hover:opacity-90"
+            >
+              Clubs
+            </Link>
+            <Link
+              href="/landowners"
+              className="inline-flex items-center justify-center px-5 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-forest text-white transition-all duration-300 hover:opacity-90"
+            >
+              Landowners
+            </Link>
+            <Link
+              href="/guides"
+              className="inline-flex items-center justify-center px-5 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-charcoal text-white transition-all duration-300 hover:opacity-90"
+            >
+              Guides
+            </Link>
+          </div>
         </div>
       </section>
     </>

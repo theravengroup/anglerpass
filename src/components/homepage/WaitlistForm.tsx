@@ -5,11 +5,51 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+const US_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
+  'Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
+  'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
+  'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+  'New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio',
+  'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
+  'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
+  'Wisconsin','Wyoming',
+];
+
+const ROLE_QUESTIONS: Record<string, { label: string; placeholder: string }> = {
+  angler: {
+    label: "What's your biggest frustration with accessing private water today?",
+    placeholder: 'e.g. Hard to find, too expensive, don\u2019t know anyone with access...',
+  },
+  landowner: {
+    label: 'Do you currently allow fishing on your property?',
+    placeholder: 'e.g. Yes through a local club, informally with friends, not yet...',
+  },
+  club: {
+    label: 'How many members does your club currently have?',
+    placeholder: 'e.g. 45 members, just getting started...',
+  },
+  guide: {
+    label: 'How many years have you been guiding and where?',
+    placeholder: 'e.g. 12 years on the Madison and Yellowstone...',
+  },
+  corporate: {
+    label: 'What company are you with?',
+    placeholder: 'e.g. Acme Corp',
+  },
+  partner: {
+    label: 'What type of partnership are you interested in?',
+    placeholder: 'e.g. Lodge referrals, gear brand, conservation org...',
+  },
+};
+
 const schema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().optional(),
   email: z.email('Invalid email'),
   role: z.string().min(1, 'Required'),
+  state: z.string().min(1, 'Required'),
+  roleResponse: z.string().optional(),
   message: z.string().optional(),
 });
 
@@ -18,9 +58,12 @@ type FormData = z.infer<typeof schema>;
 export default function WaitlistForm() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const selectedRole = watch('role');
+  const roleQuestion = selectedRole ? ROLE_QUESTIONS[selectedRole] : null;
 
   const onSubmit = async (data: FormData) => {
     setStatus('submitting');
@@ -28,7 +71,11 @@ export default function WaitlistForm() {
       await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, interestType: data.role, type: 'waitlist' }),
+        body: JSON.stringify({
+          ...data,
+          interestType: data.role,
+          type: 'waitlist',
+        }),
       });
     } catch {
       // silently handle
@@ -61,20 +108,41 @@ export default function WaitlistForm() {
           <label htmlFor="email">Email</label>
           <input type="email" id="email" placeholder="james@example.com" required {...register('email')} />
         </div>
-        <div className="form-group">
-          <label htmlFor="role">I am a...</label>
-          <select id="role" required defaultValue="" {...register('role')}>
-            <option value="" disabled>Select your role</option>
-            <option value="landowner">Landowner</option>
-            <option value="angler">Individual Angler</option>
-            <option value="club">Club or Association</option>
-            <option value="guide">Guide</option>
-            <option value="corporate">Corporate Member</option>
-            <option value="partner">Partner</option>
-          </select>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="role">I am a...</label>
+            <select id="role" required defaultValue="" {...register('role')}>
+              <option value="" disabled>Select your role</option>
+              <option value="landowner">Landowner</option>
+              <option value="angler">Individual Angler</option>
+              <option value="club">Club or Association</option>
+              <option value="guide">Guide</option>
+              <option value="corporate">Corporate Member</option>
+              <option value="partner">Partner</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="state">What state are you in?</label>
+            <select id="state" required defaultValue="" {...register('state')}>
+              <option value="" disabled>Select your state</option>
+              {US_STATES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
         </div>
+        {roleQuestion && (
+          <div className="form-group">
+            <label htmlFor="roleResponse">{roleQuestion.label}</label>
+            <textarea
+              id="roleResponse"
+              placeholder={roleQuestion.placeholder}
+              {...register('roleResponse')}
+            />
+          </div>
+        )}
         <div className="form-group">
-          <label htmlFor="message">Message <span style={{ fontWeight: 400, color: 'var(--text-light)' }}>(optional)</span></label>
+          <label htmlFor="message">Anything else? <span style={{ fontWeight: 400, color: 'var(--text-light)' }}>(optional)</span></label>
           <textarea id="message" placeholder="Tell us about your interest in AnglerPass..." {...register('message')} />
         </div>
         <div className="form-submit">
@@ -98,7 +166,7 @@ export default function WaitlistForm() {
           </button>
         </div>
       </form>
-      <p className="form-partner">Questions? Reach us at <a href="mailto:hello@anglerpass.com">hello@anglerpass.com</a></p>
+      <p className="form-partner">Questions? Reach us at <a href="mailto:hello@anglerpass.com">hello@anglerpass.com</a> or <a href="tel:+13035861008">303-586-1008</a></p>
     </div>
   );
 }

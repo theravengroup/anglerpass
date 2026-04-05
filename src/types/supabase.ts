@@ -1307,7 +1307,9 @@ export type Database = {
           interest_type: string
           last_name: string | null
           message: string | null
+          role_response: string | null
           source: string | null
+          state: string | null
           type: string
         }
         Insert: {
@@ -1318,7 +1320,9 @@ export type Database = {
           interest_type: string
           last_name?: string | null
           message?: string | null
+          role_response?: string | null
           source?: string | null
+          state?: string | null
           type?: string
         }
         Update: {
@@ -1329,7 +1333,9 @@ export type Database = {
           interest_type?: string
           last_name?: string | null
           message?: string | null
+          role_response?: string | null
           source?: string | null
+          state?: string | null
           type?: string
         }
         Relationships: []

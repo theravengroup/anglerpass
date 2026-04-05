@@ -151,13 +151,6 @@ export const PAGES_SEO = {
       'fly fishing booking fees',
     ],
   }),
-  contact: buildMetadata({
-    title: 'Contact AnglerPass',
-    description:
-      'Get in touch with the AnglerPass team. Questions about private water access, club management, or listing your property? We are here to help.',
-    path: '/contact',
-    keywords: ['contact anglerpass', 'fly fishing platform support'],
-  }),
 } as const;
 
 /** Internal linking map — topics to their canonical pages */

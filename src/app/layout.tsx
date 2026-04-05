@@ -81,6 +81,7 @@ const organizationJsonLd = buildJsonLd({
     "@type": "ContactPoint",
     contactType: "customer service",
     email: "hello@anglerpass.com",
+    telephone: "+1-303-586-1008",
   },
 });
 
