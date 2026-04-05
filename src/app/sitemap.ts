@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import { STATE_SEO_DATA } from '@/lib/state-seo-data';
-import { getAllPosts } from '@/lib/posts';
+import { getPublishedPosts } from '@/lib/posts';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/pricing`, changeFrequency: 'monthly', priority: 1.0 },
-{ url: `${SITE_URL}/learn`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE_URL}/learn`, changeFrequency: 'weekly', priority: 0.9 },
   ];
 
   // State pages
@@ -25,8 +25,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Blog posts
-  const posts = getAllPosts();
+  // Blog posts (only published — exclude future-dated)
+  const posts = getPublishedPosts();
   const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE_URL}/learn/${post.slug}`,
     changeFrequency: 'monthly' as const,
