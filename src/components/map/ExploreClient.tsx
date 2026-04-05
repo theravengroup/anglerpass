@@ -113,6 +113,17 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
         resultCount={filteredProperties.length}
       />
 
+      {filters.state && (
+        <p className="mt-2 text-center text-xs text-text-light">
+          <Link
+            href={`/fly-fishing/${filters.state.toLowerCase().replace(/\s+/g, "-")}`}
+            className="text-river hover:text-river-light"
+          >
+            Learn about fly fishing in {filters.state} →
+          </Link>
+        </p>
+      )}
+
       {filteredProperties.length === 0 && (
         <Card className="mt-6 border-stone-light/20">
           <CardContent className="flex flex-col items-center justify-center py-16">
