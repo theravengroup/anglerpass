@@ -166,6 +166,7 @@ export type Database = {
       }
       bookings: {
         Row: {
+          amount_cents: number | null
           angler_id: string
           base_rate: number
           booking_date: string
@@ -195,16 +196,22 @@ export type Database = {
           message: string | null
           non_fishing_guests: number
           on_behalf_of: boolean
+          paid_at: string | null
           party_size: number
+          payment_status: string
           platform_fee: number
+          platform_fee_cents: number | null
           property_id: string
           refund_amount: number | null
           refund_percentage: number | null
+          refunded_at: string | null
           status: string
+          stripe_payment_intent_id: string | null
           total_amount: number
           updated_at: string
         }
         Insert: {
+          amount_cents?: number | null
           angler_id: string
           base_rate: number
           booking_date: string
@@ -234,16 +241,22 @@ export type Database = {
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
+          paid_at?: string | null
           party_size?: number
+          payment_status?: string
           platform_fee?: number
+          platform_fee_cents?: number | null
           property_id: string
           refund_amount?: number | null
           refund_percentage?: number | null
+          refunded_at?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           total_amount: number
           updated_at?: string
         }
         Update: {
+          amount_cents?: number | null
           angler_id?: string
           base_rate?: number
           booking_date?: string
@@ -273,12 +286,17 @@ export type Database = {
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
+          paid_at?: string | null
           party_size?: number
+          payment_status?: string
           platform_fee?: number
+          platform_fee_cents?: number | null
           property_id?: string
           refund_amount?: number | null
           refund_percentage?: number | null
+          refunded_at?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
           total_amount?: number
           updated_at?: string
         }
@@ -2553,6 +2571,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stripe_webhook_events: {
+        Row: {
+          id: string
+          type: string
+          processed_at: string
+          data: Record<string, unknown> | null
+        }
+        Insert: {
+          id: string
+          type: string
+          processed_at?: string
+          data?: Record<string, unknown> | null
+        }
+        Update: {
+          id?: string
+          type?: string
+          processed_at?: string
+          data?: Record<string, unknown> | null
+        }
+        Relationships: []
       }
       signed_documents: {
         Row: {

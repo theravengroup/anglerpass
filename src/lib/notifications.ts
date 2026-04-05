@@ -41,7 +41,9 @@ export type NotificationType =
   | "guide_message_received"
   | "angler_review_received"
   | "referral_credit_earned"
-  | "referral_invite_sent";
+  | "referral_invite_sent"
+  | "membership_dues_failed"
+  | "membership_cancelled";
 
 interface NotificationPayload {
   userId: string;
@@ -73,6 +75,8 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   guide_credential_expiring: "email_booking_requested",
   guide_message_received: "email_booking_confirmed",
   angler_review_received: "email_booking_confirmed",
+  membership_dues_failed: "email_booking_cancelled",
+  membership_cancelled: "email_booking_cancelled",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -179,6 +183,8 @@ const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   guide_credential_expiring: "Credential Expiring Soon",
   guide_message_received: "New Message",
   angler_review_received: "Your Review is Now Visible",
+  membership_dues_failed: "Dues Payment Failed",
+  membership_cancelled: "Membership Cancelled",
 };
 
 const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
@@ -201,6 +207,8 @@ const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
   guide_credential_expiring: "Update Credentials →",
   guide_message_received: "View Messages →",
   angler_review_received: "View Review →",
+  membership_dues_failed: "Update Payment →",
+  membership_cancelled: "View Membership →",
 };
 
 const CTA_COLOR_MAP: Partial<Record<NotificationType, string>> = {
