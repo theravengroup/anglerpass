@@ -159,15 +159,17 @@ export default function RoleSwitcher({
         }}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${config.bg} ${config.color} hover:opacity-80`}
+        aria-label={`Current role: ${config.label}. Click to switch roles.`}
+        className="flex items-center gap-2 rounded-full bg-offwhite px-3 py-1.5 transition-colors hover:bg-stone-light/20"
       >
-        <ActiveIcon className="size-3.5" />
-        {config.label}
-        {currentRoles.length > 1 && (
-          <ChevronDown
-            className={`size-3 transition-transform ${open ? "rotate-180" : ""}`}
-          />
-        )}
+        <span className="text-xs text-text-light">Role:</span>
+        <span className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>
+          <ActiveIcon className="size-3.5" />
+          {config.label}
+        </span>
+        <ChevronDown
+          className={`size-3 text-text-light transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {/* Dropdown */}
