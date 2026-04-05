@@ -189,7 +189,7 @@ nav.scrolled .nav-cta .btn-login:hover{background:var(--forest);color:#fff}
 .cinematic-divider-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--offwhite) 0%,color-mix(in srgb,var(--offwhite) 80%,transparent) 6%,color-mix(in srgb,var(--offwhite) 50%,transparent) 12%,color-mix(in srgb,var(--offwhite) 25%,transparent) 18%,transparent 28%,transparent 72%,color-mix(in srgb,var(--offwhite) 25%,transparent) 82%,color-mix(in srgb,var(--offwhite) 50%,transparent) 88%,color-mix(in srgb,var(--offwhite) 80%,transparent) 94%,var(--offwhite) 100%);pointer-events:none}
 
 /* ═══ HOW IT WORKS ═══ */
-.how-it-works{padding:var(--section-pad) 0;background:var(--offwhite)}
+.how-it-works{padding:var(--section-pad) 0;background:var(--parchment-light)}
 .how-header{text-align:center;max-width:780px;margin:0 auto 72px}
 .how-header .section-heading{margin:16px 0 20px}
 .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
