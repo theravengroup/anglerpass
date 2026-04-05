@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Building2, Loader2, Settings } from "lucide-react";
 import ClubProfileForm from "@/components/clubs/ClubProfileForm";
 import PayoutSetup from "@/components/shared/PayoutSetup";
+import { PaymentMethodsSection } from "@/components/shared/PaymentMethodsSection";
 
 interface ClubData {
   id: string;
@@ -281,6 +282,11 @@ export default function ClubSettingsPage() {
             )}
           </button>
         </div>
+      </div>
+
+      {/* ── Payment Methods (for platform subscription billing) ── */}
+      <div className="rounded-lg border border-stone-light/20 p-6">
+        <PaymentMethodsSection theme="club" />
       </div>
 
       {/* ── Payout Setup ── */}

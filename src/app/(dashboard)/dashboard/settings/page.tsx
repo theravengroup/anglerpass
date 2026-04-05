@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { FetchError } from "@/components/shared/FetchError";
 import PayoutSetup from "@/components/shared/PayoutSetup";
+import { PaymentMethodsSection } from "@/components/shared/PaymentMethodsSection";
 import SettingsProfileCard from "@/components/shared/SettingsProfileCard";
 import SettingsHomeClubCard from "@/components/shared/SettingsHomeClubCard";
 import SettingsCrossClubCard from "@/components/shared/SettingsCrossClubCard";
@@ -128,6 +129,15 @@ export default function SettingsPage() {
         profile={profile}
         onProfileUpdate={setProfile}
       />
+
+      {/* Payment methods (anglers pay for bookings/memberships) */}
+      {(profile.role === "angler" || profile.role === "landowner") && (
+        <div className="rounded-lg border border-stone-light/20 p-6">
+          <PaymentMethodsSection
+            theme={profile.role === "landowner" ? "landowner" : "angler"}
+          />
+        </div>
+      )}
 
       {profile.role === "landowner" && <PayoutSetup type="landowner" />}
 

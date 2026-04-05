@@ -664,6 +664,8 @@ export type Database = {
           rules: string | null
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
+          stripe_subscription_id: string | null
+          platform_tier: string | null
           subscription_tier: string
           updated_at: string
           website: string | null
@@ -686,6 +688,8 @@ export type Database = {
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_subscription_id?: string | null
+          platform_tier?: string | null
           subscription_tier?: string
           updated_at?: string
           website?: string | null
@@ -708,6 +712,8 @@ export type Database = {
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_subscription_id?: string | null
+          platform_tier?: string | null
           subscription_tier?: string
           updated_at?: string
           website?: string | null
@@ -1912,6 +1918,7 @@ export type Database = {
           roles: string[] | null
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
+          stripe_customer_id: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string | null
@@ -1929,6 +1936,7 @@ export type Database = {
           roles?: string[] | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string | null
@@ -1946,6 +1954,7 @@ export type Database = {
           roles?: string[] | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string | null

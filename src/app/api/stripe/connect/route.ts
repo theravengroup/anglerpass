@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-const STRIPE_API = "https://api.stripe.com/v1";
-const STRIPE_SECRET = () => process.env.STRIPE_SECRET_KEY!;
+import {
+  createConnectAccount,
+  createAccountLink,
+  getConnectAccount,
+} from "@/lib/stripe/server";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
@@ -15,35 +17,6 @@ const RETURN_PATHS: Record<string, string> = {
   landowner: "/landowner",
   club: "/club",
 };
-
-// ─── Helpers: raw Stripe API via fetch ──────────────────────────────
-
-async function stripePost(path: string, body: Record<string, string>) {
-  const res = await fetch(`${STRIPE_API}${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${STRIPE_SECRET()}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(body).toString(),
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message ?? "Stripe API error");
-  }
-  return res.json();
-}
-
-async function stripeGet(path: string) {
-  const res = await fetch(`${STRIPE_API}${path}`, {
-    headers: { Authorization: `Bearer ${STRIPE_SECRET()}` },
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message ?? "Stripe API error");
-  }
-  return res.json();
-}
 
 // ─── Resolve the entity's Stripe fields from the correct table ──────
 
@@ -97,7 +70,6 @@ async function resolveEntity(
   }
 
   if (type === "club") {
-    // Find the club this user owns
     const { data } = await admin
       .from("clubs")
       .select("id, stripe_connect_account_id, stripe_connect_onboarded")
@@ -155,13 +127,8 @@ export async function POST(request: NextRequest) {
     let accountId = entity.stripeAccountId;
 
     if (!accountId) {
-      const account = await stripePost("/accounts", {
-        type: "express",
-        email: user.email ?? "",
-        "capabilities[card_payments][requested]": "true",
-        "capabilities[transfers][requested]": "true",
-      });
-      accountId = account.id as string;
+      const account = await createConnectAccount(user.email ?? "");
+      accountId = account.id;
 
       // Store the account ID in the appropriate table
       await admin
@@ -172,12 +139,11 @@ export async function POST(request: NextRequest) {
 
     // Create an Account Link for onboarding
     const returnPath = RETURN_PATHS[type] ?? "/dashboard";
-    const accountLink = await stripePost("/account_links", {
-      account: accountId,
-      type: "account_onboarding",
-      return_url: `${SITE_URL}${returnPath}?stripe_onboarding=complete`,
-      refresh_url: `${SITE_URL}${returnPath}?stripe_onboarding=refresh`,
-    });
+    const accountLink = await createAccountLink(
+      accountId,
+      `${SITE_URL}${returnPath}?stripe_onboarding=complete`,
+      `${SITE_URL}${returnPath}?stripe_onboarding=refresh`
+    );
 
     return NextResponse.json({ url: accountLink.url });
   } catch (err) {
@@ -230,7 +196,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Retrieve the account from Stripe to check charges_enabled
-    const account = await stripeGet(`/accounts/${entity.stripeAccountId}`);
+    const account = await getConnectAccount(entity.stripeAccountId);
     const onboarded = account.charges_enabled === true;
 
     // Update the DB if status changed

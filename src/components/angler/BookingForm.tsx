@@ -25,6 +25,7 @@ import {
 } from "@/lib/constants/fees";
 import GuidesSection from "./GuidesSection";
 import FeeBreakdown from "./FeeBreakdown";
+import BookingPaymentForm from "./BookingPaymentForm";
 
 interface MatchedGuide {
   id: string;
@@ -69,6 +70,8 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   const [submitting, setSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
 
   // Guide add-on state
   const [availableGuides, setAvailableGuides] = useState<MatchedGuide[]>([]);
@@ -156,7 +159,9 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         return;
       }
 
-      setBookingSuccess(true);
+      // Booking created — now show payment form
+      setPendingBookingId(data.booking?.id ?? data.id);
+      setShowPayment(true);
     } catch {
       setBookingError("An unexpected error occurred");
     } finally {
@@ -168,6 +173,38 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split("T")[0];
+
+  // Payment step — shown after booking is created
+  if (showPayment && pendingBookingId) {
+    return (
+      <Card className="sticky top-6 border-bronze/20">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CalendarDays className="size-4 text-bronze" />
+            Complete Payment
+          </CardTitle>
+          <p className="text-sm text-text-secondary">
+            Authorize payment to confirm your booking. Your card will not be
+            charged until after your trip.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <BookingPaymentForm
+            bookingId={pendingBookingId}
+            fees={fees}
+            onSuccess={() => {
+              setShowPayment(false);
+              setBookingSuccess(true);
+            }}
+            onBack={() => {
+              setShowPayment(false);
+              setPendingBookingId(null);
+            }}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (bookingSuccess) {
     return (
