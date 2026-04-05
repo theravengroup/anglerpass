@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { buildJsonLd, SITE_URL, SITE_NAME, DEFAULT_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
@@ -127,6 +128,19 @@ export default function RootLayout({
       <body>
         {children}
         <Analytics />
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-QBGLYMZSGX"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-QBGLYMZSGX');
+          `}
+        </Script>
       </body>
     </html>
   );
