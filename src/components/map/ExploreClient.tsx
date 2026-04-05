@@ -85,7 +85,7 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
   }, [initialProperties, filters]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 pb-12 pt-32 sm:px-6 lg:px-8">
       <div className="mb-8 text-center">
         <h1 className="font-heading text-3xl font-bold text-forest-deep sm:text-4xl">
           Explore Private Waters
