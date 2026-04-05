@@ -59,14 +59,14 @@ export default function DashboardSidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-forest-deep text-white transition-all duration-200",
+          "fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col bg-forest-deep text-white transition-[width,transform] duration-200",
           collapsed ? "w-[68px]" : "w-64",
           open ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:static lg:z-auto"
+          "lg:translate-x-0 lg:static lg:z-auto lg:h-screen"
         )}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 px-4 border-b border-white/10">
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-4">
           <img src="/images/anglerpass-noword-logo.svg" alt="" className="h-7 w-auto opacity-80" />
           {!collapsed && (
             <div className="flex items-center gap-2 overflow-hidden">
@@ -131,7 +131,7 @@ export default function DashboardSidebar({
         </nav>
 
         {/* Collapse toggle (desktop only) */}
-        <div className="hidden lg:block border-t border-white/10 px-3 py-2">
+        <div className="hidden shrink-0 border-t border-white/10 px-3 py-2 lg:block">
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
@@ -148,7 +148,7 @@ export default function DashboardSidebar({
         </div>
 
         {/* User section */}
-        <div className="border-t border-white/10 px-3 py-3">
+        <div className="shrink-0 border-t border-white/10 px-3 py-3">
           <Link
             href="/dashboard/settings"
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors"
