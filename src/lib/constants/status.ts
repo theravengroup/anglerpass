@@ -246,6 +246,47 @@ export const TRIP_REVIEW_STATUS: Record<string, StatusConfig> = {
   },
 };
 
+// ─── Trip Proposal Status ──────────────────────────────────────
+
+export const PROPOSAL_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  sent: {
+    label: "Sent",
+    icon: Send,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  accepted: {
+    label: "Accepted",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  declined: {
+    label: "Declined",
+    icon: XCircle,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+  expired: {
+    label: "Expired",
+    icon: Clock,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+  cancelled: {
+    label: "Cancelled",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+};
+
 // ─── Referral Credit Status ─────────────────────────────────────────
 
 export const REFERRAL_CREDIT_STATUS: Record<string, StatusConfig> = {

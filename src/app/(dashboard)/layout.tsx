@@ -17,6 +17,8 @@ import {
   UserPlus,
   Gift,
   ClipboardList,
+  SendHorizontal,
+  Inbox,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -132,6 +134,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <Users />,
     },
     {
+      label: "Proposals",
+      href: "/angler/proposals",
+      icon: <Inbox />,
+    },
+    {
       label: "Delegates",
       href: "/angler/delegates",
       icon: <Shield />,
@@ -152,6 +159,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       label: "Bookings",
       href: "/guide/bookings",
       icon: <CalendarDays />,
+    },
+    {
+      label: "Trip Proposals",
+      href: "/guide/proposals",
+      icon: <SendHorizontal />,
     },
     {
       label: "Reviews",
@@ -197,10 +209,13 @@ const PAGE_TITLES: Record<string, string> = {
   "/angler/discover": "Discover",
   "/angler/guides": "Find Guides",
   "/angler/delegates": "Trusted Delegates",
+  "/angler/proposals": "Trip Proposals",
   "/guide": "Guide Dashboard",
   "/guide/profile": "Guide Profile",
   "/guide/availability": "Availability",
   "/guide/bookings": "Guide Bookings",
+  "/guide/proposals": "Trip Proposals",
+  "/guide/proposals/new": "New Trip Proposal",
   "/guide/reviews": "Reviews",
   "/guide/messages": "Messages",
   "/guide/earnings": "Earnings",

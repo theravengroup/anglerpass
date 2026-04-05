@@ -1251,6 +1251,121 @@ export type Database = {
           },
         ]
       }
+      guide_trip_proposal_invitees: {
+        Row: {
+          id: string
+          proposal_id: string
+          angler_id: string
+          status: string
+          responded_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          proposal_id: string
+          angler_id: string
+          status?: string
+          responded_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          proposal_id?: string
+          angler_id?: string
+          status?: string
+          responded_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_trip_proposal_invitees_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "guide_trip_proposals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposal_invitees_angler_id_fkey"
+            columns: ["angler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_trip_proposals: {
+        Row: {
+          id: string
+          guide_id: string
+          property_id: string
+          club_id: string
+          proposed_date: string
+          start_time: string
+          duration_hours: number
+          max_anglers: number
+          guide_fee_per_angler: number
+          notes: string | null
+          status: string
+          expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          guide_id: string
+          property_id: string
+          club_id: string
+          proposed_date: string
+          start_time: string
+          duration_hours: number
+          max_anglers?: number
+          guide_fee_per_angler: number
+          notes?: string | null
+          status?: string
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          guide_id?: string
+          property_id?: string
+          club_id?: string
+          proposed_date?: string
+          start_time?: string
+          duration_hours?: number
+          max_anglers?: number
+          guide_fee_per_angler?: number
+          notes?: string | null
+          status?: string
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_trip_proposals_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposals_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposals_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guide_water_approvals: {
         Row: {
           club_id: string

@@ -43,7 +43,12 @@ export type NotificationType =
   | "referral_credit_earned"
   | "referral_invite_sent"
   | "membership_dues_failed"
-  | "membership_cancelled";
+  | "membership_cancelled"
+  | "proposal_received"
+  | "proposal_accepted"
+  | "proposal_declined"
+  | "proposal_expired"
+  | "proposal_expiry_reminder";
 
 interface NotificationPayload {
   userId: string;
@@ -77,6 +82,11 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   angler_review_received: "email_booking_confirmed",
   membership_dues_failed: "email_booking_cancelled",
   membership_cancelled: "email_booking_cancelled",
+  proposal_received: "email_booking_requested",
+  proposal_accepted: "email_booking_confirmed",
+  proposal_declined: "email_booking_declined",
+  proposal_expired: "email_booking_cancelled",
+  proposal_expiry_reminder: "email_booking_requested",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -185,6 +195,11 @@ const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   angler_review_received: "Your Review is Now Visible",
   membership_dues_failed: "Dues Payment Failed",
   membership_cancelled: "Membership Cancelled",
+  proposal_received: "New Trip Proposal",
+  proposal_accepted: "Trip Proposal Accepted!",
+  proposal_declined: "Trip Proposal Declined",
+  proposal_expired: "Trip Proposal Expired",
+  proposal_expiry_reminder: "Trip Proposal Expiring Soon",
 };
 
 const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
@@ -209,6 +224,11 @@ const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
   angler_review_received: "View Review →",
   membership_dues_failed: "Update Payment →",
   membership_cancelled: "View Membership →",
+  proposal_received: "View Proposal →",
+  proposal_accepted: "View Proposal →",
+  proposal_declined: "View Proposal →",
+  proposal_expired: "View Proposals →",
+  proposal_expiry_reminder: "View Proposal →",
 };
 
 const CTA_COLOR_MAP: Partial<Record<NotificationType, string>> = {
@@ -654,6 +674,108 @@ export async function notifyGuideAutoReinstated(
     title: "Guide profile reinstated!",
     body: "Your credentials have been renewed and your guide profile is live again. You can now accept bookings.",
     link: "/guide",
+  });
+}
+
+// ─── Proposal Notifications ─────────────────────────────────────
+
+/** Notify angler that a guide has sent them a trip proposal */
+export async function notifyProposalReceived(
+  admin: SupabaseClient,
+  opts: {
+    anglerId: string;
+    guideName: string;
+    propertyName: string;
+    proposedDate: string;
+    proposalId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.anglerId,
+    type: "proposal_received",
+    title: `Trip proposal from ${opts.guideName}`,
+    body: `${opts.guideName} has proposed a guided trip at ${opts.propertyName} on ${formatDate(opts.proposedDate)}. Review the proposal and respond before it expires.`,
+    link: `/angler/proposals/${opts.proposalId}`,
+    metadata: { proposal_id: opts.proposalId },
+  });
+}
+
+/** Notify guide that an angler accepted their proposal */
+export async function notifyProposalAccepted(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    anglerName: string;
+    propertyName: string;
+    proposalId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "proposal_accepted",
+    title: `Proposal accepted \u2014 ${opts.propertyName}`,
+    body: `${opts.anglerName} has accepted your trip proposal at ${opts.propertyName}. A confirmed booking has been created.`,
+    link: "/guide/proposals",
+    metadata: { proposal_id: opts.proposalId },
+  });
+}
+
+/** Notify guide that an angler declined their proposal */
+export async function notifyProposalDeclined(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    anglerName: string;
+    propertyName: string;
+    proposalId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "proposal_declined",
+    title: `Proposal declined \u2014 ${opts.propertyName}`,
+    body: `${opts.anglerName} has declined your trip proposal at ${opts.propertyName}.`,
+    link: "/guide/proposals",
+    metadata: { proposal_id: opts.proposalId },
+  });
+}
+
+/** Notify guide that a proposal expired without full response */
+export async function notifyProposalExpired(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    propertyName: string;
+    proposalId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "proposal_expired",
+    title: `Proposal expired \u2014 ${opts.propertyName}`,
+    body: `Your trip proposal at ${opts.propertyName} has expired without a response from all invitees.`,
+    link: "/guide/proposals",
+    metadata: { proposal_id: opts.proposalId },
+  });
+}
+
+/** Remind angler 24 hours before proposal expires if still pending */
+export async function notifyProposalExpiryReminder(
+  admin: SupabaseClient,
+  opts: {
+    anglerId: string;
+    guideName: string;
+    propertyName: string;
+    proposalId: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.anglerId,
+    type: "proposal_expiry_reminder",
+    title: `Trip proposal expiring soon`,
+    body: `The trip proposal from ${opts.guideName} at ${opts.propertyName} expires in 24 hours. Review and respond before it\u2019s too late.`,
+    link: `/angler/proposals/${opts.proposalId}`,
+    metadata: { proposal_id: opts.proposalId },
   });
 }
 
