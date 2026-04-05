@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Fetch messages in a thread (paginated)
 export async function GET(
@@ -83,6 +84,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ threadId: string }> }
 ) {
+  const limited = rateLimit("messages-reply", getClientIp(request), 20, 60_000);
+  if (limited) return limited;
+
   try {
     const { threadId } = await params;
     const supabase = await createClient();

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { calculateRefund } from "@/lib/cancellation";
 import { notifyBookingCancelled } from "@/lib/notifications";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Fetch a single booking
 export async function GET(
@@ -78,6 +79,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit("bookings-update", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const { id } = await params;
     const supabase = await createClient();

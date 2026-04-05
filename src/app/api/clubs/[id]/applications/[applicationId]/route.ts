@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { notifyMemberApproved } from "@/lib/notifications";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const reviewSchema = z.object({
@@ -56,6 +57,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; applicationId: string }> }
 ) {
+  const limited = rateLimit("club-application", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const { id, applicationId } = await params;
     const supabase = await createClient();

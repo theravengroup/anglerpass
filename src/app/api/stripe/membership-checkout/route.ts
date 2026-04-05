@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   getOrCreateCustomer,
@@ -25,6 +26,9 @@ const MembershipCheckoutSchema = z.object({
  * Processing fee (3.5%) is added to both.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit("stripe-membership", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

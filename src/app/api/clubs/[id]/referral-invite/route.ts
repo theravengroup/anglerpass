@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { referralInviteSchema } from "@/lib/validations/clubs";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { generateReferralCode, buildReferralLink } from "@/lib/referral";
 
 const resend = process.env.RESEND_API_KEY
@@ -48,6 +49,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit("referral-invite", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const { id: clubId } = await params;
     const supabase = await createClient();

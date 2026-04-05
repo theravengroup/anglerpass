@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const joinSchema = z.object({
   club_id: z.uuid(),
@@ -11,6 +12,9 @@ const joinSchema = z.object({
 
 // POST: Request to join a club
 export async function POST(request: Request) {
+  const limited = rateLimit("clubs-join", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

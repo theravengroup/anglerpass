@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Resend } from "resend";
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import type { Json } from "@/types/supabase";
 
 const resend = process.env.RESEND_API_KEY
@@ -14,6 +15,9 @@ const inviteSchema = z.object({
 
 // ─── POST: Invite a new admin team member ──────────────────────────
 export async function POST(request: Request) {
+  const limited = rateLimit("admin-invite", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   try {
     const auth = await requireAdmin();
     if (!auth) return jsonError("Forbidden", 403);

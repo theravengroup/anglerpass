@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { bookingSchema } from "@/lib/validations/bookings";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated } from "@/lib/notifications";
@@ -27,6 +28,9 @@ function deduplicateMultiDayBookings<T extends { booking_group_id: string | null
 
 // POST: Create a booking request
 export async function POST(request: Request) {
+  const limited = rateLimit("bookings-create", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

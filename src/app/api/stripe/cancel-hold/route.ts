@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cancelPaymentIntent } from "@/lib/stripe/server";
 
@@ -14,6 +15,9 @@ const CancelHoldSchema = z.object({
  * Releases the hold on the angler's card.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit("stripe-cancel-hold", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

@@ -1,4 +1,5 @@
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer, createSetupIntent } from "@/lib/stripe/server";
 
@@ -8,7 +9,10 @@ import { getOrCreateCustomer, createSetupIntent } from "@/lib/stripe/server";
  * Creates a SetupIntent so the user can save a payment method
  * (card or bank account) without being charged.
  */
-export async function POST() {
+export async function POST(request: Request) {
+  const limited = rateLimit("stripe-setup-intent", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

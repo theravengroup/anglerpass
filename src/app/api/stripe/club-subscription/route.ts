@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer, stripe } from "@/lib/stripe/server";
 
@@ -19,6 +20,9 @@ const ClubSubscriptionSchema = z.object({
  * Tiers: Starter $79/mo, Standard $199/mo, Pro $499/mo.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit("stripe-club-sub", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

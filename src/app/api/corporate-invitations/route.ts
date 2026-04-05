@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { corporateInviteSchema } from "@/lib/validations/clubs";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -77,6 +78,9 @@ export async function GET(request: Request) {
 // ─── POST: Send invitations ────────────────────────────────────────
 
 export async function POST(request: Request) {
+  const limited = rateLimit("corporate-invite", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

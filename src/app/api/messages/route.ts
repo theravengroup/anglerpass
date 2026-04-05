@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { messageSchema } from "@/lib/validations/guides";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: List user's message threads
 export async function GET() {
@@ -102,6 +103,9 @@ export async function GET() {
 
 // POST: Send a message (creates thread if needed)
 export async function POST(request: Request) {
+  const limited = rateLimit("messages-send", getClientIp(request), 20, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

@@ -11,6 +11,7 @@ import {
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { authorize, P, auditBookingAction, AuditAction } from "@/lib/permissions";
 import { jsonError } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 /**
  * POST /api/bookings/on-behalf
@@ -22,6 +23,9 @@ import { jsonError } from "@/lib/api/helpers";
  * records the staff member who performed the action.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit("bookings-on-behalf", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

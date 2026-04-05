@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { capturePaymentIntent } from "@/lib/stripe/server";
 
@@ -14,6 +15,9 @@ const CaptureSchema = z.object({
  * Only landowners or admins should call this.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit("stripe-capture", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

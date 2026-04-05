@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { profileUpdateSchema } from "@/lib/validations/profile";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Fetch current user's full profile
 export async function GET() {
@@ -60,6 +61,9 @@ export async function GET() {
 
 // PATCH: Update current user's profile
 export async function PATCH(request: Request) {
+  const limited = rateLimit("profile-update", getClientIp(request), 15, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {

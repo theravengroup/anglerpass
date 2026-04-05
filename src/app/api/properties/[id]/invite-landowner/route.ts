@@ -7,6 +7,7 @@ import {
   requireAuth,
   requireClubRole,
 } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -28,6 +29,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit("invite-landowner", getClientIp(request), 5, 60_000);
+  if (limited) return limited;
+
   const { id: propertyId } = await params;
 
   const auth = await requireAuth();

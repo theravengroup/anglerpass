@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   listPaymentMethods,
@@ -61,6 +62,9 @@ export async function GET() {
  * Detaches a payment method from the customer.
  */
 export async function DELETE(request: NextRequest) {
+  const limited = rateLimit("stripe-pm-delete", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

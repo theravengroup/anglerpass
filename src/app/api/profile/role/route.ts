@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const SWITCHABLE_ROLES = ["landowner", "club_admin", "angler", "guide"] as const;
 
@@ -15,6 +16,9 @@ const addRoleSchema = z.object({
 
 // PATCH: Switch active role (must already have this role)
 export async function PATCH(request: Request) {
+  const limited = rateLimit("role-switch", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   try {
     const supabase = await createClient();
     const {
