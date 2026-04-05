@@ -2220,6 +2220,54 @@ export type Database = {
           },
         ]
       }
+      staff_notes: {
+        Row: {
+          id: string
+          club_id: string
+          entity_type: string
+          entity_id: string
+          body: string
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          club_id: string
+          entity_type: string
+          entity_id: string
+          body: string
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          club_id?: string
+          entity_type?: string
+          entity_id?: string
+          body?: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_notes_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_notes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_credits: {
         Row: {
           amount: number

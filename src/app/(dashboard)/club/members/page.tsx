@@ -13,6 +13,7 @@ import { FetchError } from "@/components/shared/FetchError";
 import MemberCard from "@/components/clubs/MemberCard";
 import InviteForm from "@/components/clubs/InviteForm";
 import BulkInviteForm from "@/components/clubs/BulkInviteForm";
+import StaffNotes from "@/components/shared/StaffNotes";
 
 interface Member {
   id: string;
@@ -326,14 +327,22 @@ export default function MembersPage() {
       ) : (
         <div className="space-y-2">
           {filteredMembers.map((member) => (
-            <MemberCard
-              key={member.id}
-              member={member}
-              isOwner={isOwner}
-              isLoading={actionLoading === member.id}
-              onStatusChange={handleStatusChange}
-              onRemove={handleRemove}
-            />
+            <div key={member.id} className="space-y-1">
+              <MemberCard
+                member={member}
+                isOwner={isOwner}
+                isLoading={actionLoading === member.id}
+                onStatusChange={handleStatusChange}
+                onRemove={handleRemove}
+              />
+              {clubId && member.user_id && (
+                <StaffNotes
+                  clubId={clubId}
+                  entityType="member"
+                  entityId={member.user_id}
+                />
+              )}
+            </div>
           ))}
         </div>
       )}

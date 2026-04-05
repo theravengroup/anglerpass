@@ -20,6 +20,7 @@ import {
 import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 import { FetchError } from "@/components/shared/FetchError";
 import InviteLandownerModal from "@/components/properties/InviteLandownerModal";
+import StaffNotes from "@/components/shared/StaffNotes";
 
 interface PropertyAccess {
   id: string;
@@ -328,6 +329,7 @@ export default function ClubPropertiesPage() {
             <PropertyCard
               key={access.id}
               access={access}
+              clubId={clubId}
               isLoading={actionLoading === access.id}
               onApprove={() => handleAction(access.id, "approved")}
               onDecline={() => handleAction(access.id, "declined")}
@@ -344,7 +346,7 @@ export default function ClubPropertiesPage() {
             Active Properties ({activeProperties.length})
           </h3>
           {activeProperties.map((access) => (
-            <PropertyCard key={access.id} access={access} />
+            <PropertyCard key={access.id} access={access} clubId={clubId} />
           ))}
         </div>
       )}
@@ -357,7 +359,7 @@ export default function ClubPropertiesPage() {
             Declined ({declinedProperties.length})
           </h3>
           {declinedProperties.map((access) => (
-            <PropertyCard key={access.id} access={access} />
+            <PropertyCard key={access.id} access={access} clubId={clubId} />
           ))}
         </div>
       )}
@@ -399,11 +401,13 @@ export default function ClubPropertiesPage() {
 
 function PropertyCard({
   access,
+  clubId,
   isLoading,
   onApprove,
   onDecline,
 }: {
   access: PropertyAccess;
+  clubId: string | null;
   isLoading?: boolean;
   onApprove?: () => void;
   onDecline?: () => void;
@@ -415,77 +419,85 @@ function PropertyCard({
   const Icon = config.icon;
 
   return (
-    <Card className="border-stone-light/20">
-      <CardContent className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-4">
-          {/* Photo thumbnail */}
-          <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-offwhite">
-            {property.photos?.[0] ? (
-               
-              <img
-                src={property.photos[0]}
-                alt={property.name}
-                className="size-full object-cover"
-              />
-            ) : (
-              <MapPin className="size-5 text-text-light" />
-            )}
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-text-primary">
-              {property.name}
-            </p>
-            {property.location_description && (
-              <p className="text-xs text-text-light">
-                {property.location_description}
-              </p>
-            )}
-            {property.water_type && (
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-text-light">
-                <Droplets className="size-3" />
-                {WATER_TYPE_LABELS[property.water_type] ?? property.water_type}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Status badge */}
-          <div
-            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${config.bg} ${config.color}`}
-          >
-            <Icon className="size-3" />
-            {config.label}
-          </div>
-
-          {/* Actions for pending */}
-          {access.status === "pending" && !isLoading && onApprove && onDecline && (
-            <div className="flex gap-1">
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 border-forest/30 text-xs text-forest hover:bg-forest/5"
-                onClick={onApprove}
-              >
-                Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 border-red-200 text-xs text-red-500 hover:bg-red-50"
-                onClick={onDecline}
-              >
-                Decline
-              </Button>
+    <div className="space-y-1">
+      <Card className="border-stone-light/20">
+        <CardContent className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-4">
+            {/* Photo thumbnail */}
+            <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-offwhite">
+              {property.photos?.[0] ? (
+                <img
+                  src={property.photos[0]}
+                  alt={property.name}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <MapPin className="size-5 text-text-light" />
+              )}
             </div>
-          )}
 
-          {isLoading && (
-            <Loader2 className="size-4 animate-spin text-text-light" />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            <div>
+              <p className="text-sm font-medium text-text-primary">
+                {property.name}
+              </p>
+              {property.location_description && (
+                <p className="text-xs text-text-light">
+                  {property.location_description}
+                </p>
+              )}
+              {property.water_type && (
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-text-light">
+                  <Droplets className="size-3" />
+                  {WATER_TYPE_LABELS[property.water_type] ?? property.water_type}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Status badge */}
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${config.bg} ${config.color}`}
+            >
+              <Icon className="size-3" />
+              {config.label}
+            </div>
+
+            {/* Actions for pending */}
+            {access.status === "pending" && !isLoading && onApprove && onDecline && (
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 border-forest/30 text-xs text-forest hover:bg-forest/5"
+                  onClick={onApprove}
+                >
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 border-red-200 text-xs text-red-500 hover:bg-red-50"
+                  onClick={onDecline}
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+
+            {isLoading && (
+              <Loader2 className="size-4 animate-spin text-text-light" />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      {clubId && (
+        <StaffNotes
+          clubId={clubId}
+          entityType="property"
+          entityId={property.id}
+        />
+      )}
+    </div>
   );
 }
