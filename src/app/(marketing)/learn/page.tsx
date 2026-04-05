@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllPosts } from '@/lib/posts';
+import { getPublishedPosts } from '@/lib/posts';
 import { buildMetadata } from '@/lib/seo';
+import LearnPostGrid from '@/components/shared/LearnPostGrid';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildMetadata({
   title: 'Fly Fishing Guides & Resources | AnglerPass Learn',
@@ -17,7 +20,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function LearnPage() {
-  const posts = getAllPosts();
+  const posts = getPublishedPosts();
 
   return (
     <>
@@ -46,43 +49,7 @@ export default function LearnPage() {
               No posts yet. Check back soon.
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {posts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/learn/${post.slug}`}
-                  className="group bg-white border border-parchment rounded-[14px] px-7 py-8 no-underline transition-all duration-300 hover:border-bronze/30 hover:shadow-sm"
-                >
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {post.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="font-mono text-[10px] uppercase tracking-[0.15em] text-bronze bg-bronze/8 px-2 py-0.5 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h2 className="font-heading text-[22px] font-semibold text-forest mb-2 tracking-[-0.2px] group-hover:text-forest-deep transition-colors">
-                    {post.title}
-                  </h2>
-                  <p className="text-[14px] leading-[1.65] text-text-secondary mb-4">
-                    {post.description}
-                  </p>
-                  <div className="flex items-center gap-3 text-[12px] text-text-light">
-                    <span>{post.readingTime}</span>
-                    <span>&middot;</span>
-                    <time dateTime={post.publishedAt}>
-                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </time>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <LearnPostGrid posts={posts} />
           )}
         </div>
       </section>

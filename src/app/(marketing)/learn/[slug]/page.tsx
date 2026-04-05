@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { getAllPosts, getPostBySlug, getRelatedPosts } from '@/lib/posts';
 import { buildJsonLd, SITE_URL } from '@/lib/seo';
 
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -16,7 +18,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) return {};
+  if (!post || new Date(post.publishedAt).getTime() > Date.now()) return {};
 
   const url = `${SITE_URL}/learn/${post.slug}`;
 
@@ -85,6 +87,9 @@ export default async function LearnPostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();
+
+  // Gate: future-dated posts are not accessible
+  if (new Date(post.publishedAt).getTime() > Date.now()) notFound();
 
   const related = getRelatedPosts(slug, 3);
 

@@ -34,6 +34,14 @@ export function getAllPosts(): Post[] {
   );
 }
 
+/** Returns only posts whose publishedAt date is in the past. */
+export function getPublishedPosts(): Post[] {
+  const now = Date.now();
+  return getAllPosts().filter(
+    (p) => new Date(p.publishedAt).getTime() <= now
+  );
+}
+
 export function getPostBySlug(slug: string): Post | undefined {
   const filePath = path.join(postsDirectory, `${slug}.json`);
   if (!fs.existsSync(filePath)) return undefined;
@@ -43,7 +51,7 @@ export function getPostBySlug(slug: string): Post | undefined {
 }
 
 export function getRelatedPosts(currentSlug: string, limit = 3): Post[] {
-  const allPosts = getAllPosts();
+  const allPosts = getPublishedPosts();
   const current = allPosts.find((p) => p.slug === currentSlug);
   if (!current) return allPosts.filter((p) => p.slug !== currentSlug).slice(0, limit);
 
