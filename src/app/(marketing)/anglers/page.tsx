@@ -303,7 +303,7 @@ export default function AnglersPage() {
             ].map((s) => (
               <Link
                 key={s.slug}
-                href={`/fly-fishing/${s.slug}`}
+                href={`/explore?state=${encodeURIComponent(s.name)}`}
                 className="bg-white border border-parchment rounded-lg px-4 py-3 text-center text-[14px] font-medium text-forest no-underline hover:border-bronze/30 hover:bg-bronze/5 transition-all"
               >
                 {s.name}

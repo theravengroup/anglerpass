@@ -46,6 +46,7 @@ export default function DiscoverPage() {
     q: "",
     water_type: "",
     species: "",
+    state: "",
     min_price: "",
     max_price: "",
     lodging: false,
@@ -77,18 +78,27 @@ export default function DiscoverPage() {
     fetchProperties();
   }, [filters.water_type, filters.species, filters.min_price, filters.max_price, filters.lodging]);
 
-  // Client-side text search filter (q filter)
+  // Client-side text search + state filter
   const filteredProperties = useMemo(() => {
-    if (!filters.q) return properties;
-    const q = filters.q.toLowerCase();
-    return properties.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.location_description?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.species?.some((s) => s.toLowerCase().includes(q))
-    );
-  }, [properties, filters.q]);
+    let results = properties;
+    if (filters.state) {
+      const st = filters.state.toLowerCase();
+      results = results.filter((p) =>
+        p.location_description?.toLowerCase().includes(st)
+      );
+    }
+    if (filters.q) {
+      const q = filters.q.toLowerCase();
+      results = results.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.location_description?.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q) ||
+          p.species?.some((s) => s.toLowerCase().includes(q))
+      );
+    }
+    return results;
+  }, [properties, filters.q, filters.state]);
 
   if (loading) {
     return (

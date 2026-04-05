@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, lazy, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Compass, Fish } from "lucide-react";
@@ -35,16 +36,18 @@ interface ExploreClientProps {
 }
 
 export default function ExploreClient({ initialProperties }: ExploreClientProps) {
+  const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [filters, setFilters] = useState<SearchFiltersState>({
+  const [filters, setFilters] = useState<SearchFiltersState>(() => ({
     q: "",
     water_type: "",
     species: "",
+    state: searchParams.get("state") ?? "",
     min_price: "",
     max_price: "",
     lodging: false,
-  });
+  }));
 
   const filteredProperties = useMemo(() => {
     let results = initialProperties;
@@ -68,6 +71,12 @@ export default function ExploreClient({ initialProperties }: ExploreClientProps)
       const max = parseFloat(filters.max_price);
       results = results.filter(
         (p) => p.rate_adult_full_day != null && p.rate_adult_full_day <= max
+      );
+    }
+    if (filters.state) {
+      const st = filters.state.toLowerCase();
+      results = results.filter((p) =>
+        p.location_description?.toLowerCase().includes(st)
       );
     }
     if (filters.q) {

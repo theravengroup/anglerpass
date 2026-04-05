@@ -195,12 +195,20 @@ export default async function StatePage({ params }: PageProps) {
             Join a fly fishing club on AnglerPass and access private waters
             across {data.name} and beyond.
           </p>
-          <Link
-            href="/anglers"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
-          >
-            Explore AnglerPass for Anglers
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href={`/explore?state=${encodeURIComponent(data.name)}`}
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
+            >
+              Browse {data.name} Properties →
+            </Link>
+            <Link
+              href="/anglers"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-parchment/10 text-parchment/70 transition-all duration-[400ms] hover:bg-parchment/15"
+            >
+              Learn More About AnglerPass
+            </Link>
+          </div>
         </div>
       </section>
     </>

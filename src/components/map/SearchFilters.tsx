@@ -9,13 +9,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X, Map, List, Home } from "lucide-react";
+import { Search, X, Map, List, Home, MapPin } from "lucide-react";
 import { WATER_TYPE_OPTIONS, COMMON_SPECIES } from "@/lib/constants/water-types";
+
+const STATES = [
+  "Montana", "Colorado", "Wyoming", "Idaho", "Oregon", "Washington",
+  "Virginia", "Pennsylvania", "North Carolina", "Tennessee", "Utah", "New York",
+];
 
 export interface SearchFiltersState {
   q: string;
   water_type: string;
   species: string;
+  state: string;
   min_price: string;
   max_price: string;
   lodging: boolean;
@@ -44,6 +50,7 @@ export default function SearchFilters({
     filters.q ||
     filters.water_type ||
     filters.species ||
+    filters.state ||
     filters.min_price ||
     filters.max_price ||
     filters.lodging;
@@ -53,6 +60,7 @@ export default function SearchFilters({
       q: "",
       water_type: "",
       species: "",
+      state: "",
       min_price: "",
       max_price: "",
       lodging: false,
@@ -112,6 +120,23 @@ export default function SearchFilters({
             {WATER_TYPE_OPTIONS.map((wt) => (
               <SelectItem key={wt.value} value={wt.value}>
                 {wt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.state || "_all"}
+          onValueChange={(v) => update("state", v === "_all" ? "" : v)}
+        >
+          <SelectTrigger className="w-[140px] text-xs">
+            <SelectValue placeholder="State" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">All States</SelectItem>
+            {STATES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
               </SelectItem>
             ))}
           </SelectContent>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ExploreClient from "@/components/map/ExploreClient";
 
@@ -42,8 +43,10 @@ export default async function ExplorePage() {
     .limit(100);
 
   return (
-    <ExploreClient
-      initialProperties={(properties ?? []) as SearchProperty[]}
-    />
+    <Suspense>
+      <ExploreClient
+        initialProperties={(properties ?? []) as SearchProperty[]}
+      />
+    </Suspense>
   );
 }
