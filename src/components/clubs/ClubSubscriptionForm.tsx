@@ -9,37 +9,37 @@ import {
 import { StripeProvider } from "@/components/shared/StripeProvider";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock, CheckCircle2, Zap } from "lucide-react";
-
-type Tier = "starter" | "standard" | "pro";
-
-interface TierConfig {
-  name: string;
-  price: number;
-  priceId: string;
-  features: string[];
-}
+import {
+  STRIPE_PRICE_IDS,
+  CLUB_TIER_CONFIG,
+  type ClubTier,
+} from "@/lib/constants/stripe-prices";
 
 interface ClubSubscriptionFormProps {
   clubId: string;
-  currentTier?: Tier | null;
-  tiers: Record<Tier, TierConfig>;
+  currentTier?: ClubTier | null;
   /** Called after subscription is confirmed */
-  onSuccess?: (tier: Tier) => void;
+  onSuccess?: (tier: ClubTier) => void;
 }
 
 export default function ClubSubscriptionForm({
   clubId,
   currentTier,
-  tiers,
   onSuccess,
 }: ClubSubscriptionFormProps) {
-  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const tiers = Object.fromEntries(
+    Object.entries(CLUB_TIER_CONFIG).map(([tier, config]) => [
+      tier,
+      { ...config, priceId: STRIPE_PRICE_IDS[tier as ClubTier] },
+    ])
+  ) as Record<ClubTier, { name: string; price: number; priceId: string; features: string[] }>;
+  const [selectedTier, setSelectedTier] = useState<ClubTier | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  async function handleSelectTier(tier: Tier) {
+  async function handleSelectTier(tier: ClubTier) {
     setSelectedTier(tier);
     setLoading(true);
     setError(null);
@@ -148,7 +148,7 @@ export default function ClubSubscriptionForm({
       )}
 
       <div className="grid gap-3">
-        {(Object.entries(tiers) as [Tier, TierConfig][]).map(([tier, config]) => {
+        {(Object.entries(tiers) as [ClubTier, { name: string; price: number; priceId: string; features: string[] }][]).map(([tier, config]) => {
           const isCurrent = tier === currentTier;
 
           return (
