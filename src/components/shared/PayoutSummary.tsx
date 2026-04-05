@@ -72,7 +72,9 @@ export function PayoutSummary({ fees, className = "" }: PayoutSummaryProps) {
         Payout Distribution
       </h4>
 
-      {/* Visual bar */}
+      {/* Visual bar — inline style={{ width }} is required here because each
+         segment's width is a runtime-computed percentage of the total. Tailwind
+         cannot generate arbitrary dynamic values so this is an accepted exception. */}
       <div className="flex h-3 overflow-hidden rounded-full">
         {fees.landownerPayout > 0 && (
           <div
@@ -80,7 +82,6 @@ export function PayoutSummary({ fees, className = "" }: PayoutSummaryProps) {
             title={`Landowner: $${fees.landownerPayout.toFixed(2)}`}
             aria-label={`Landowner payout: $${fees.landownerPayout.toFixed(2)}`}
             role="img"
-            /* eslint-disable-next-line -- dynamic width needed */
             style={{ width: `${(fees.landownerPayout / fees.totalAmount) * 100}%` }}
           />
         )}

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { documentTemplateSchema } from "@/lib/validations/documents";
@@ -12,17 +12,14 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get("property_id");
 
     if (!propertyId) {
-      return NextResponse.json(
-        { error: "property_id is required" },
-        { status: 400 }
-      );
+      return jsonError("property_id is required", 400);
     }
 
     const admin = createAdminClient();
@@ -50,19 +47,13 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[documents] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch templates" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch templates", 500);
     }
 
-    return NextResponse.json({ templates: templates ?? [] });
+    return jsonOk({ templates: templates ?? [] });
   } catch (err) {
     console.error("[documents] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -75,25 +66,19 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const { property_id, ...templateData } = body;
 
     if (!property_id) {
-      return NextResponse.json(
-        { error: "property_id is required" },
-        { status: 400 }
-      );
+      return jsonError("property_id is required", 400);
     }
 
     const result = documentTemplateSchema.safeParse(templateData);
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -106,7 +91,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { data: template, error } = await admin
@@ -121,18 +106,12 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[documents] Insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to create template" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create template", 500);
     }
 
-    return NextResponse.json({ template }, { status: 201 });
+    return jsonCreated({ template });
   } catch (err) {
     console.error("[documents] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
 import { platformStaffAssignSchema, platformStaffRevokeSchema } from "@/lib/validations/permissions";
 import { auditLog, AuditAction, P, authorize } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -80,10 +79,7 @@ export async function POST(request: Request) {
   const result = platformStaffAssignSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json(
-      { error: result.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 }
-    );
+    return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
   const { user_id, role } = result.data;
@@ -204,7 +200,7 @@ export async function POST(request: Request) {
     scope: "platform",
   }).catch((err) => console.error("[platform-staff] Audit error:", err));
 
-  return NextResponse.json({ staff: newStaff }, { status: 201 });
+  return jsonCreated({ staff: newStaff });
 }
 
 /**
@@ -230,10 +226,7 @@ export async function DELETE(request: Request) {
   const result = platformStaffRevokeSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json(
-      { error: result.error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 }
-    );
+    return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
   const { user_id, reason } = result.data;

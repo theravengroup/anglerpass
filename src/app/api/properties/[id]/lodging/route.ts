@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { lodgingSchema } from "@/lib/validations/lodging";
@@ -15,7 +15,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,19 +28,13 @@ export async function GET(
 
     if (error) {
       console.error("[lodging] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch lodging" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch lodging", 500);
     }
 
-    return NextResponse.json({ lodging: data });
+    return jsonOk({ lodging: data });
   } catch (err) {
     console.error("[lodging] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -56,7 +50,7 @@ export async function PUT(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -69,17 +63,14 @@ export async function PUT(
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const result = lodgingSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const {
@@ -136,18 +127,12 @@ export async function PUT(
 
     if (error) {
       console.error("[lodging] Upsert error:", error);
-      return NextResponse.json(
-        { error: "Failed to save lodging" },
-        { status: 500 }
-      );
+      return jsonError("Failed to save lodging", 500);
     }
 
-    return NextResponse.json({ lodging: data });
+    return jsonOk({ lodging: data });
   } catch (err) {
     console.error("[lodging] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

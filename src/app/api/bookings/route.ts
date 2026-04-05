@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -38,17 +38,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = bookingSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const {
@@ -75,31 +72,19 @@ export async function POST(request: Request) {
       .single();
 
     if (propError || !property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     if (property.status !== "published") {
-      return NextResponse.json(
-        { error: "This property is not currently accepting bookings" },
-        { status: 400 }
-      );
+      return jsonError("This property is not currently accepting bookings", 400);
     }
 
     if (!property.owner_id) {
-      return NextResponse.json(
-        { error: "This property has not been claimed by a landowner yet" },
-        { status: 400 }
-      );
+      return jsonError("This property has not been claimed by a landowner yet", 400);
     }
 
     if (duration === "half_day" && !property.half_day_allowed) {
-      return NextResponse.json(
-        { error: "This property does not offer half-day bookings" },
-        { status: 400 }
-      );
+      return jsonError("This property does not offer half-day bookings", 400);
     }
 
     // Verify the membership belongs to this user and is active
@@ -111,17 +96,11 @@ export async function POST(request: Request) {
       .single();
 
     if (memError || !membership) {
-      return NextResponse.json(
-        { error: "Invalid club membership" },
-        { status: 400 }
-      );
+      return jsonError("Invalid club membership", 400);
     }
 
     if (membership.status !== "active") {
-      return NextResponse.json(
-        { error: "Your club membership is not active" },
-        { status: 400 }
-      );
+      return jsonError("Your club membership is not active", 400);
     }
 
     // Determine access route: direct (home-club) or cross-club
@@ -132,13 +111,7 @@ export async function POST(request: Request) {
     );
 
     if (!routing) {
-      return NextResponse.json(
-        {
-          error:
-            "Your club does not have access to this property",
-        },
-        { status: 403 }
-      );
+      return jsonError("Your club does not have access to this property", 403);
     }
 
     // ── Date range validation ─────────────────────────────────────
@@ -153,17 +126,11 @@ export async function POST(request: Request) {
     today.setHours(0, 0, 0, 0);
 
     if (startDateObj <= today) {
-      return NextResponse.json(
-        { error: "Booking date must be in the future" },
-        { status: 400 }
-      );
+      return jsonError("Booking date must be in the future", 400);
     }
 
     if (endDateObj < startDateObj) {
-      return NextResponse.json(
-        { error: "End date cannot be before start date" },
-        { status: 400 }
-      );
+      return jsonError("End date cannot be before start date", 400);
     }
 
     // Calculate number of days (inclusive)
@@ -173,10 +140,7 @@ export async function POST(request: Request) {
     ) + 1;
 
     if (numberOfDays > 14) {
-      return NextResponse.json(
-        { error: "Bookings cannot exceed 14 days" },
-        { status: 400 }
-      );
+      return jsonError("Bookings cannot exceed 14 days", 400);
     }
 
     // Build array of all dates in the range
@@ -194,23 +158,13 @@ export async function POST(request: Request) {
 
     // Validate party_size against max_rods
     if (maxRods && party_size > maxRods) {
-      return NextResponse.json(
-        {
-          error: `This property allows a maximum of ${maxRods} anglers (rods). You requested ${party_size}.`,
-        },
-        { status: 400 }
-      );
+      return jsonError(`This property allows a maximum of ${maxRods} anglers (rods). You requested ${party_size}.`, 400);
     }
 
     // Validate total people against max_guests
     const totalPeople = party_size + non_fishing_guests;
     if (maxGuests && totalPeople > maxGuests) {
-      return NextResponse.json(
-        {
-          error: `This property allows a maximum of ${maxGuests} total people. Your party of ${totalPeople} (${party_size} anglers + ${non_fishing_guests} non-fishing guests) exceeds this limit.`,
-        },
-        { status: 400 }
-      );
+      return jsonError(`This property allows a maximum of ${maxGuests} total people. Your party of ${totalPeople} (${party_size} anglers + ${non_fishing_guests} non-fishing guests) exceeds this limit.`, 400);
     }
 
     // Check existing bookings don't exceed capacity for ALL dates in range
@@ -237,21 +191,11 @@ export async function POST(request: Request) {
         );
 
         if (maxRods && existingRods + party_size > maxRods) {
-          return NextResponse.json(
-            {
-              error: `This property has reached its rod limit for ${date}.`,
-            },
-            { status: 409 }
-          );
+          return jsonError(`This property has reached its rod limit for ${date}.`, 409);
         }
 
         if (maxGuests && existingTotal + totalPeople > maxGuests) {
-          return NextResponse.json(
-            {
-              error: `This property has reached its guest capacity for ${date}.`,
-            },
-            { status: 409 }
-          );
+          return jsonError(`This property has reached its guest capacity for ${date}.`, 409);
         }
       }
     }
@@ -272,10 +216,7 @@ export async function POST(request: Request) {
         .single();
 
       if (!guideProfile || guideProfile.status !== "approved") {
-        return NextResponse.json(
-          { error: "Selected guide is not available" },
-          { status: 400 }
-        );
+        return jsonError("Selected guide is not available", 400);
       }
 
       // Verify guide has water approval for this property
@@ -288,10 +229,7 @@ export async function POST(request: Request) {
         .single();
 
       if (!waterApproval) {
-        return NextResponse.json(
-          { error: "Selected guide is not approved for this property" },
-          { status: 400 }
-        );
+        return jsonError("Selected guide is not approved for this property", 400);
       }
 
       // Verify guide is available on ALL dates in the range
@@ -304,18 +242,12 @@ export async function POST(request: Request) {
 
       if (blockedDates && blockedDates.length > 0) {
         const unavailableDate = blockedDates[0].date;
-        return NextResponse.json(
-          { error: `Selected guide is not available on ${unavailableDate}` },
-          { status: 400 }
-        );
+        return jsonError(`Selected guide is not available on ${unavailableDate}`, 400);
       }
 
       // Check party size fits guide capacity
       if (guideProfile.max_anglers && party_size > guideProfile.max_anglers) {
-        return NextResponse.json(
-          { error: `Guide can accommodate up to ${guideProfile.max_anglers} anglers` },
-          { status: 400 }
-        );
+        return jsonError(`Guide can accommodate up to ${guideProfile.max_anglers} anglers`, 400);
       }
 
       guideRate =
@@ -388,19 +320,10 @@ export async function POST(request: Request) {
     if (insertError) {
       // Check for unique constraint violation (double booking)
       if (insertError.code === "23505") {
-        return NextResponse.json(
-          {
-            error:
-              "A booking already exists for this property on one of the selected dates",
-          },
-          { status: 409 }
-        );
+        return jsonError("A booking already exists for this property on one of the selected dates", 409);
       }
       console.error("[bookings] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create booking" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create booking", 500);
     }
 
     // Primary booking is the first day's record
@@ -476,18 +399,15 @@ export async function POST(request: Request) {
       },
     }).catch((err) => console.error("[bookings] Audit error:", err));
 
-    return NextResponse.json({
+    return jsonCreated({
       booking,
       booking_days: numberOfDays,
       booking_start_date: startDate,
       booking_end_date: endDate,
-    }, { status: 201 });
+    });
   } catch (err) {
     console.error("[bookings] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -500,7 +420,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -527,14 +447,11 @@ export async function GET(request: Request) {
 
       if (error) {
         console.error("[bookings] Landowner fetch error:", error);
-        return NextResponse.json(
-          { error: "Failed to fetch bookings" },
-          { status: 500 }
-        );
+        return jsonError("Failed to fetch bookings", 500);
       }
 
       const bookings = deduplicateMultiDayBookings(rawBookings ?? []);
-      return NextResponse.json({ bookings });
+      return jsonOk({ bookings });
     }
 
     // Angler view: their own bookings
@@ -548,19 +465,13 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[bookings] Angler fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch bookings" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch bookings", 500);
     }
 
     const bookings = deduplicateMultiDayBookings(rawBookings ?? []);
-    return NextResponse.json({ bookings });
+    return jsonOk({ bookings });
   } catch (err) {
     console.error("[bookings] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

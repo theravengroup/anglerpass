@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -24,10 +24,7 @@ export async function GET(
       .single();
 
     if (error || !guide) {
-      return NextResponse.json(
-        { error: "Guide not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide not found", 404);
     }
 
     // Fetch revealed reviews for this guide
@@ -51,16 +48,13 @@ export async function GET(
       .eq("guide_id", id)
       .eq("status", "live");
 
-    return NextResponse.json({
+    return jsonOk({
       guide,
       reviews: reviews ?? [],
       waters: waters ?? [],
     });
   } catch (err) {
     console.error("[guides/[id]] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

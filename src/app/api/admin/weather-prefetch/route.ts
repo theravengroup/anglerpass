@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getPropertyForecast } from "@/lib/weather";
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       .single();
 
     if (profile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Fetch all published properties with coordinates
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       .not("longitude", "is", null);
 
     if (!properties?.length) {
-      return NextResponse.json({
+      return jsonOk({
         message: "No properties to prefetch",
         prefetched: 0,
         failed: 0,
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
-    return NextResponse.json({
+    return jsonOk({
       message: `Prefetched ${prefetched} of ${properties.length} properties`,
       prefetched,
       failed,
@@ -83,9 +83,6 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     console.error("[weather-prefetch] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

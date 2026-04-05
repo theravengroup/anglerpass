@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { calculateRefund } from "@/lib/cancellation";
@@ -18,7 +18,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -32,10 +32,7 @@ export async function GET(
       .single();
 
     if (error || !booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return jsonError("Booking not found", 404);
     }
 
     // Verify access: angler, property owner, or admin
@@ -51,7 +48,7 @@ export async function GET(
         .single();
 
       if (profile?.role !== "admin") {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return jsonError("Forbidden", 403);
       }
     }
 
@@ -64,13 +61,10 @@ export async function GET(
       }
     }
 
-    return NextResponse.json({ booking });
+    return jsonOk({ booking });
   } catch (err) {
     console.error("[bookings/[id]] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -90,7 +84,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -105,10 +99,7 @@ export async function PATCH(
       .single();
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return jsonError("Booking not found", 404);
     }
 
     const body = await request.json();
@@ -122,21 +113,15 @@ export async function PATCH(
 
     // Only angler cancellation is supported (instant-book — no landowner approval)
     if (body.status !== "cancelled") {
-      return NextResponse.json(
-        { error: "Only cancellation is supported. Bookings are confirmed instantly." },
-        { status: 400 }
-      );
+      return jsonError("Only cancellation is supported. Bookings are confirmed instantly.", 400);
     }
 
     if (booking.angler_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     if (booking.status !== "confirmed") {
-      return NextResponse.json(
-        { error: "This booking cannot be cancelled" },
-        { status: 400 }
-      );
+      return jsonError("This booking cannot be cancelled", 400);
     }
 
     // Calculate refund based on cancellation policy
@@ -166,10 +151,7 @@ export async function PATCH(
 
     if (updateError) {
       console.error("[bookings/[id]] Cancel error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to cancel booking" },
-        { status: 500 }
-      );
+      return jsonError("Failed to cancel booking", 500);
     }
 
     // Notify landowner of cancellation
@@ -186,12 +168,9 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json({ booking: updated, refund });
+    return jsonOk({ booking: updated, refund });
   } catch (err) {
     console.error("[bookings/[id]] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

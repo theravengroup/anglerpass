@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema, propertyStatusTransition, MIN_PHOTOS } from "@/lib/validations/properties";
@@ -16,7 +16,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,10 +28,7 @@ export async function GET(
       .single();
 
     if (error || !data) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     // Published properties are visible to everyone
@@ -55,20 +52,14 @@ export async function GET(
       }
 
       if (!hasAccess) {
-        return NextResponse.json(
-          { error: "Property not found" },
-          { status: 404 }
-        );
+        return jsonError("Property not found", 404);
       }
     }
 
-    return NextResponse.json({ property: data });
+    return jsonOk({ property: data });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -84,7 +75,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -97,10 +88,7 @@ export async function PATCH(
       .single();
 
     if (!existing) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     // Allow owner OR club staff who created the property
@@ -111,7 +99,7 @@ export async function PATCH(
       if (role?.allowed) hasAccess = true;
     }
     if (!hasAccess) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
@@ -120,10 +108,7 @@ export async function PATCH(
     if (body.status && Object.keys(body).length === 1) {
       const statusResult = propertyStatusTransition.safeParse(body);
       if (!statusResult.success) {
-        return NextResponse.json(
-          { error: "Invalid status transition" },
-          { status: 400 }
-        );
+        return jsonError("Invalid status transition", 400);
       }
 
       // Only drafts and changes_requested can be submitted for review
@@ -132,20 +117,14 @@ export async function PATCH(
         existing.status !== "draft" &&
         existing.status !== "changes_requested"
       ) {
-        return NextResponse.json(
-          { error: "Only draft or changes-requested properties can be submitted for review" },
-          { status: 400 }
-        );
+        return jsonError("Only draft or changes-requested properties can be submitted for review", 400);
       }
 
       // Server-side validation for submit-for-review
       if (statusResult.data.status === "pending_review") {
         const photoCount = (existing.photos as string[])?.length ?? 0;
         if (photoCount < MIN_PHOTOS) {
-          return NextResponse.json(
-            { error: `At least ${MIN_PHOTOS} photos are required to submit for review` },
-            { status: 400 }
-          );
+          return jsonError(`At least ${MIN_PHOTOS} photos are required to submit for review`, 400);
         }
 
         if (
@@ -153,17 +132,11 @@ export async function PATCH(
           existing.rate_youth_full_day == null ||
           existing.rate_child_full_day == null
         ) {
-          return NextResponse.json(
-            { error: "Full-day rates for Adult, Youth, and Child are required to submit for review" },
-            { status: 400 }
-          );
+          return jsonError("Full-day rates for Adult, Youth, and Child are required to submit for review", 400);
         }
 
         if (existing.max_rods == null) {
-          return NextResponse.json(
-            { error: "Max rods per day is required to submit for review" },
-            { status: 400 }
-          );
+          return jsonError("Max rods per day is required to submit for review", 400);
         }
       }
 
@@ -173,10 +146,7 @@ export async function PATCH(
         existing.status !== "pending_review" &&
         existing.status !== "changes_requested"
       ) {
-        return NextResponse.json(
-          { error: "Only pending or changes-requested properties can be withdrawn" },
-          { status: 400 }
-        );
+        return jsonError("Only pending or changes-requested properties can be withdrawn", 400);
       }
 
       const { data, error } = await admin
@@ -188,22 +158,16 @@ export async function PATCH(
 
       if (error) {
         console.error("[properties] Status update error:", error);
-        return NextResponse.json(
-          { error: "Failed to update status" },
-          { status: 500 }
-        );
+        return jsonError("Failed to update status", 500);
       }
 
-      return NextResponse.json({ property: data });
+      return jsonOk({ property: data });
     }
 
     // Handle field updates
     const result = propertySchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { water_type, coordinates, ...rest } = result.data;
@@ -224,19 +188,13 @@ export async function PATCH(
 
     if (error) {
       console.error("[properties] Update error:", error);
-      return NextResponse.json(
-        { error: "Failed to update property" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update property", 500);
     }
 
-    return NextResponse.json({ property: data });
+    return jsonOk({ property: data });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -252,7 +210,7 @@ export async function DELETE(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -265,7 +223,7 @@ export async function DELETE(
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Delete photos from storage
@@ -294,18 +252,12 @@ export async function DELETE(
 
     if (error) {
       console.error("[properties] Delete error:", error);
-      return NextResponse.json(
-        { error: "Failed to delete property. Only drafts can be deleted." },
-        { status: 400 }
-      );
+      return jsonError("Failed to delete property. Only drafts can be deleted.", 400);
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

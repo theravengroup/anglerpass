@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,7 +15,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,7 +28,7 @@ export async function GET(
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Get existing token or create one
@@ -47,10 +47,7 @@ export async function GET(
 
       if (error) {
         console.error("[calendar-token] Insert error:", error);
-        return NextResponse.json(
-          { error: "Failed to create calendar token" },
-          { status: 500 }
-        );
+        return jsonError("Failed to create calendar token", 500);
       }
 
       tokenRecord = newToken;
@@ -60,13 +57,10 @@ export async function GET(
       process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
     const feedUrl = `${siteUrl}/api/properties/${id}/calendar.ics?token=${tokenRecord!.token}`;
 
-    return NextResponse.json({ token: tokenRecord!.token, feed_url: feedUrl });
+    return jsonOk({ token: tokenRecord!.token, feed_url: feedUrl });
   } catch (err) {
     console.error("[calendar-token] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -83,7 +77,7 @@ export async function DELETE(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -96,7 +90,7 @@ export async function DELETE(
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Delete existing token
@@ -114,22 +108,16 @@ export async function DELETE(
 
     if (error) {
       console.error("[calendar-token] Regenerate error:", error);
-      return NextResponse.json(
-        { error: "Failed to regenerate token" },
-        { status: 500 }
-      );
+      return jsonError("Failed to regenerate token", 500);
     }
 
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
     const feedUrl = `${siteUrl}/api/properties/${id}/calendar.ics?token=${newToken!.token}`;
 
-    return NextResponse.json({ token: newToken!.token, feed_url: feedUrl });
+    return jsonOk({ token: newToken!.token, feed_url: feedUrl });
   } catch (err) {
     console.error("[calendar-token] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -26,17 +26,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = inviteSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { club_name, admin_email, admin_name } = result.data;
@@ -52,15 +49,9 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        {
-          error:
-            existing.status === "accepted"
+      return jsonError(existing.status === "accepted"
               ? "This club has already joined AnglerPass"
-              : "You've already sent an invitation to this email",
-        },
-        { status: 409 }
-      );
+              : "You've already sent an invitation to this email", 409);
     }
 
     // Get angler's name
@@ -86,10 +77,7 @@ export async function POST(request: Request) {
 
     if (insertError || !invitation) {
       console.error("[anglers/invite-club] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create invitation" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create invitation", 500);
     }
 
     // Send invitation email via Resend
@@ -172,13 +160,10 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ invitation }, { status: 201 });
+    return jsonCreated({ invitation });
   } catch (err) {
     console.error("[anglers/invite-club] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -191,7 +176,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -204,18 +189,12 @@ export async function GET() {
 
     if (error) {
       console.error("[anglers/invite-club] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch invitations" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch invitations", 500);
     }
 
-    return NextResponse.json({ invitations });
+    return jsonOk({ invitations });
   } catch (err) {
     console.error("[anglers/invite-club] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

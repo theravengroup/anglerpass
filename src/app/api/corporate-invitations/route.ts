@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -22,17 +22,14 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
     const membershipId = searchParams.get("membership_id");
 
     if (!membershipId) {
-      return NextResponse.json(
-        { error: "membership_id is required" },
-        { status: 400 }
-      );
+      return jsonError("membership_id is required", 400);
     }
 
     const admin = createAdminClient();
@@ -47,7 +44,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (!membershipCheck) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Fetch invitations
@@ -59,19 +56,13 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[corporate-invitations] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch invitations" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch invitations", 500);
     }
 
-    return NextResponse.json({ invitations: invitations ?? [] });
+    return jsonOk({ invitations: invitations ?? [] });
   } catch (err) {
     console.error("[corporate-invitations] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -88,17 +79,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = corporateInviteSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { emails } = result.data;
@@ -106,10 +94,7 @@ export async function POST(request: Request) {
     const membershipId = body.membership_id as string;
 
     if (!clubId || !membershipId) {
-      return NextResponse.json(
-        { error: "club_id and membership_id are required" },
-        { status: 400 }
-      );
+      return jsonError("club_id and membership_id are required", 400);
     }
 
     const admin = createAdminClient();
@@ -125,17 +110,11 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!membership) {
-      return NextResponse.json(
-        { error: "You must be an active corporate member to send invitations" },
-        { status: 403 }
-      );
+      return jsonError("You must be an active corporate member to send invitations", 403);
     }
 
     if (membership.club_id !== clubId) {
-      return NextResponse.json(
-        { error: "Club ID mismatch" },
-        { status: 400 }
-      );
+      return jsonError("Club ID mismatch", 400);
     }
 
     // Fetch club info for email
@@ -243,13 +222,10 @@ export async function POST(request: Request) {
       pendingEmails.add(normalizedEmail);
     }
 
-    return NextResponse.json({ sent, skipped });
+    return jsonOk({ sent, skipped });
   } catch (err) {
     console.error("[corporate-invitations] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 

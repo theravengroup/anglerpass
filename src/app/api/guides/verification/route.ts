@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
@@ -34,7 +34,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -48,10 +48,7 @@ export async function GET() {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
     // Determine verification steps
@@ -64,7 +61,7 @@ export async function GET() {
       live: profile.status === "live",
     };
 
-    return NextResponse.json({
+    return jsonOk({
       status: profile.status,
       steps,
       checkr_status: profile.checkr_status,
@@ -76,10 +73,7 @@ export async function GET() {
     });
   } catch (err) {
     console.error("[guides/verification] GET error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -93,7 +87,7 @@ export async function POST() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -107,37 +101,22 @@ export async function POST() {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found. Create your profile first." },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found. Create your profile first.", 404);
     }
 
     // Already paid
     if (profile.verification_fee_paid) {
-      return NextResponse.json(
-        { error: "Verification fee already paid" },
-        { status: 409 }
-      );
+      return jsonError("Verification fee already paid", 409);
     }
 
     // Must be in draft or rejected status to initiate
     if (!["draft", "rejected"].includes(profile.status)) {
-      return NextResponse.json(
-        { error: `Cannot initiate verification from ${profile.status} status` },
-        { status: 400 }
-      );
+      return jsonError(`Cannot initiate verification from ${profile.status} status`, 400);
     }
 
     // Validate required credentials are uploaded
     if (!profile.license_url || !profile.insurance_url) {
-      return NextResponse.json(
-        {
-          error:
-            "Please upload your guide license and insurance documents before starting verification",
-        },
-        { status: 400 }
-      );
+      return jsonError("Please upload your guide license and insurance documents before starting verification", 400);
     }
 
     // Create Stripe Checkout Session for one-time verification fee
@@ -160,12 +139,9 @@ export async function POST() {
       "metadata[type]": "guide_verification",
     });
 
-    return NextResponse.json({ url: session.url });
+    return jsonOk({ url: session.url });
   } catch (err) {
     console.error("[guides/verification] POST error:", err);
-    return NextResponse.json(
-      { error: "Failed to create checkout session" },
-      { status: 500 }
-    );
+    return jsonError("Failed to create checkout session", 500);
   }
 }

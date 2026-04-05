@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // GET: Fetch invitation details by token (public — used during signup flow)
@@ -8,10 +8,7 @@ export async function GET(request: Request) {
     const token = searchParams.get("token");
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Token is required" },
-        { status: 400 }
-      );
+      return jsonError("Token is required", 400);
     }
 
     const admin = createAdminClient();
@@ -23,29 +20,20 @@ export async function GET(request: Request) {
       .single();
 
     if (error || !invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return jsonError("Invitation not found", 404);
     }
 
     if (invitation.status !== "sent") {
-      return NextResponse.json(
-        { error: "This invitation has already been used" },
-        { status: 410 }
-      );
+      return jsonError("This invitation has already been used", 410);
     }
 
-    return NextResponse.json({
+    return jsonOk({
       club_name: invitation.club_name,
       property_name:
         (invitation.properties as { name: string } | null)?.name ?? null,
     });
   } catch (err) {
     console.error("[clubs/invitation-details] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

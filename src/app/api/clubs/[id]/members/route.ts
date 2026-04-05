@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -57,7 +57,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -65,7 +65,7 @@ export async function GET(
     // Verify user is club owner or staff
     const auth = await verifyClubManager(admin, id, user.id);
     if (!auth) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Fetch members with profile info
@@ -77,10 +77,7 @@ export async function GET(
 
     if (error) {
       console.error("[clubs/members] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch members" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch members", 500);
     }
 
     // Get user emails from auth (admin client needed)
@@ -110,13 +107,10 @@ export async function GET(
       })
     );
 
-    return NextResponse.json({ members: enrichedMembers });
+    return jsonOk({ members: enrichedMembers });
   } catch (err) {
     console.error("[clubs/members] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -133,7 +127,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -141,7 +135,7 @@ export async function POST(
     // Verify user is club owner or staff
     const auth = await verifyClubManager(admin, id, user.id);
     if (!auth) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
@@ -149,17 +143,11 @@ export async function POST(
 
     // Staff can only invite members, not other staff
     if (!auth.isOwner && result.success && result.data.role === "staff") {
-      return NextResponse.json(
-        { error: "Only the club owner can invite staff members" },
-        { status: 403 }
-      );
+      return jsonError("Only the club owner can invite staff members", 403);
     }
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { email, role } = result.data;
@@ -185,7 +173,7 @@ export async function POST(
             : existingMembership.status === "pending"
               ? "An invitation has already been sent to this person"
               : "This person already has a membership record";
-        return NextResponse.json({ error: msg }, { status: 409 });
+        return jsonError(msg, 409);
       }
 
       // Create membership linked to existing user
@@ -204,15 +192,12 @@ export async function POST(
 
       if (insertError) {
         console.error("[clubs/members] Insert error:", insertError);
-        return NextResponse.json(
-          { error: "Failed to create membership" },
-          { status: 500 }
-        );
+        return jsonError("Failed to create membership", 500);
       }
 
       await sendMemberInviteEmail(email, auth.club.name, false, role);
 
-      return NextResponse.json({ membership }, { status: 201 });
+      return jsonCreated({ membership });
     }
 
     // Check for existing invite by email (no user account yet)
@@ -224,10 +209,7 @@ export async function POST(
       .maybeSingle();
 
     if (existingInvite) {
-      return NextResponse.json(
-        { error: "An invitation has already been sent to this email" },
-        { status: 409 }
-      );
+      return jsonError("An invitation has already been sent to this email", 409);
     }
 
     // Create membership with just the email (no user_id yet)
@@ -246,21 +228,15 @@ export async function POST(
 
     if (insertError) {
       console.error("[clubs/members] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create membership" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create membership", 500);
     }
 
     await sendMemberInviteEmail(email, auth.club.name, true, role);
 
-    return NextResponse.json({ membership }, { status: 201 });
+    return jsonCreated({ membership });
   } catch (err) {
     console.error("[clubs/members] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 

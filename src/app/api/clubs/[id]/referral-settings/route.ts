@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { referralSettingsSchema } from "@/lib/validations/clubs";
 
@@ -48,7 +48,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Get club with referral settings
@@ -58,11 +58,11 @@ export async function GET(
     const club = clubs?.[0];
 
     if (!club) {
-      return NextResponse.json({ error: "Club not found" }, { status: 404 });
+      return jsonError("Club not found", 404);
     }
 
     if (club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Get referral stats
@@ -83,7 +83,7 @@ export async function GET(
       )
       .reduce((sum: number, c: { amount: number }) => sum + Number(c.amount), 0);
 
-    return NextResponse.json({
+    return jsonOk({
       referral_program_enabled: club.referral_program_enabled ?? false,
       referral_reward: Number(club.referral_reward ?? 0),
       initiation_fee: Number(club.initiation_fee ?? 0),
@@ -95,10 +95,7 @@ export async function GET(
     });
   } catch (err) {
     console.error("[referral-settings] GET error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -115,7 +112,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Get club
@@ -125,21 +122,18 @@ export async function PATCH(
     const club = clubs?.[0];
 
     if (!club) {
-      return NextResponse.json({ error: "Club not found" }, { status: 404 });
+      return jsonError("Club not found", 404);
     }
 
     if (club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const parsed = referralSettingsSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     // Validate reward doesn't exceed initiation fee
@@ -150,12 +144,7 @@ export async function PATCH(
       initiationFee > 0 &&
       parsed.data.referral_reward > initiationFee
     ) {
-      return NextResponse.json(
-        {
-          error: `Referral reward ($${parsed.data.referral_reward}) cannot exceed the initiation fee ($${initiationFee}).`,
-        },
-        { status: 400 }
-      );
+      return jsonError(`Referral reward ($${parsed.data.referral_reward}) cannot exceed the initiation fee ($${initiationFee}).`, 400);
     }
 
     const res = await pgPatch("clubs", `id=eq.${id}`, {
@@ -165,18 +154,12 @@ export async function PATCH(
 
     if (!res.ok) {
       console.error("[referral-settings] Update error:", await res.text());
-      return NextResponse.json(
-        { error: "Failed to update settings" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update settings", 500);
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[referral-settings] PATCH error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { migrationInquirySchema } from "@/lib/validations/migration-inquiry";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -40,10 +40,7 @@ export async function POST(request: Request) {
     const result = migrationInquirySchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const data = result.data;
@@ -83,10 +80,7 @@ export async function POST(request: Request) {
 
       if (error) {
         console.error("[migration-inquiry] Insert error:", error);
-        return NextResponse.json(
-          { error: "Failed to save inquiry" },
-          { status: 500 }
-        );
+        return jsonError("Failed to save inquiry", 500);
       }
     }
 
@@ -141,12 +135,9 @@ export async function POST(request: Request) {
       // Don't fail the request if email fails — inquiry is already saved
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[migration-inquiry] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

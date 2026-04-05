@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubPropertyAccessSchema } from "@/lib/validations/clubs";
@@ -16,7 +16,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -29,7 +29,7 @@ export async function PATCH(
       .single();
 
     if (!club || club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Verify the access record belongs to this club
@@ -41,20 +41,14 @@ export async function PATCH(
       .single();
 
     if (!access) {
-      return NextResponse.json(
-        { error: "Property association not found" },
-        { status: 404 }
-      );
+      return jsonError("Property association not found", 404);
     }
 
     const body = await request.json();
     const result = clubPropertyAccessSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const updates: Record<string, unknown> = {
@@ -75,18 +69,12 @@ export async function PATCH(
 
     if (updateError) {
       console.error("[clubs/properties] Update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update property association" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update property association", 500);
     }
 
-    return NextResponse.json({ access: updated });
+    return jsonOk({ access: updated });
   } catch (err) {
     console.error("[clubs/properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

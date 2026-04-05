@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { CREDENTIAL_TYPES } from "@/lib/validations/guides";
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const formData = await request.formData();
@@ -20,22 +20,16 @@ export async function POST(request: Request) {
     const type = formData.get("type") as string | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return jsonError("No file provided", 400);
     }
 
     if (!type || !CREDENTIAL_TYPES.includes(type as typeof CREDENTIAL_TYPES[number])) {
-      return NextResponse.json(
-        { error: `Invalid credential type. Must be one of: ${CREDENTIAL_TYPES.join(", ")}` },
-        { status: 400 }
-      );
+      return jsonError(`Invalid credential type. Must be one of: ${CREDENTIAL_TYPES.join(", ")}`, 400);
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: "File size must be under 10MB" },
-        { status: 400 }
-      );
+      return jsonError("File size must be under 10MB", 400);
     }
 
     // Validate file type
@@ -46,10 +40,7 @@ export async function POST(request: Request) {
       "image/webp",
     ];
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: "File must be a PDF, JPEG, PNG, or WebP" },
-        { status: 400 }
-      );
+      return jsonError("File must be a PDF, JPEG, PNG, or WebP", 400);
     }
 
     const admin = createAdminClient();
@@ -62,10 +53,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!guideProfile) {
-      return NextResponse.json(
-        { error: "Guide profile not found. Create a profile first." },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found. Create a profile first.", 404);
     }
 
     // Upload to storage
@@ -81,10 +69,7 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error("[guides/credentials] Upload error:", uploadError);
-      return NextResponse.json(
-        { error: "Failed to upload file" },
-        { status: 500 }
-      );
+      return jsonError("Failed to upload file", 500);
     }
 
     // Get the URL (private bucket — use createSignedUrl for viewing)
@@ -104,12 +89,9 @@ export async function POST(request: Request) {
       })
       .eq("id", guideProfile.id);
 
-    return NextResponse.json({ url, type, path }, { status: 201 });
+    return jsonCreated({ url, type, path });
   } catch (err) {
     console.error("[guides/credentials] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubRoleAssignSchema } from "@/lib/validations/permissions";
@@ -21,17 +21,14 @@ export async function PATCH(request: Request, context: RouteContext) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = clubRoleAssignSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { member_id, role } = result.data;
@@ -45,10 +42,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     });
 
     if (!authResult.allowed) {
-      return NextResponse.json(
-        { error: "Only the club owner can assign staff roles" },
-        { status: 403 }
-      );
+      return jsonError("Only the club owner can assign staff roles", 403);
     }
 
     // Verify the target membership exists in this club
@@ -60,10 +54,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .single();
 
     if (memError || !membership) {
-      return NextResponse.json(
-        { error: "Member not found in this club" },
-        { status: 404 }
-      );
+      return jsonError("Member not found in this club", 404);
     }
 
     // Prevent changing the owner's role
@@ -74,10 +65,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .single();
 
     if (club && membership.user_id === club.owner_id) {
-      return NextResponse.json(
-        { error: "Cannot change the club owner's role" },
-        { status: 400 }
-      );
+      return jsonError("Cannot change the club owner's role", 400);
     }
 
     const oldRole = membership.role;
@@ -95,10 +83,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     if (updateError) {
       console.error("[club-roles] Update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update role" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update role", 500);
     }
 
     auditLog({
@@ -114,9 +99,9 @@ export async function PATCH(request: Request, context: RouteContext) {
       scope: "organization",
     }).catch((err) => console.error("[club-roles] Audit error:", err));
 
-    return NextResponse.json({ membership: updated });
+    return jsonOk({ membership: updated });
   } catch (err) {
     console.error("[club-roles] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }

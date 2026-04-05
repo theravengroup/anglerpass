@@ -35,14 +35,13 @@ export function PayoutObligationsCard({
           </p>
         ) : (
           <>
+            {/* Dynamic widths from runtime data — Tailwind cannot generate arbitrary values */}
             <div className="flex h-4 overflow-hidden rounded-full">
               {payoutStreams.map((s) => (
                 <div
                   key={s.label}
                   className={`${s.color} transition-all`}
-                  style={{
-                    width: `${(s.amount / totalPayouts) * 100}%`,
-                  }}
+                  style={{ width: `${(s.amount / totalPayouts) * 100}%` }}
                 />
               ))}
             </div>

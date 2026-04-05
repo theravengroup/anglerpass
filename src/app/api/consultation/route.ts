@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { consultationSchema } from "@/lib/validations/consultation";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -17,10 +17,7 @@ export async function POST(request: Request) {
     const result = consultationSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { name, email, organization, property_count, preferred_dates, notes } =
@@ -92,12 +89,9 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[consultation] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

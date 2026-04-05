@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
@@ -68,22 +68,19 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
     const auth = await verifyClubManager(admin, id, user.id);
     if (!auth) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const parsed = reviewSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     // Fetch the application
@@ -95,17 +92,11 @@ export async function PATCH(
       .single();
 
     if (!application) {
-      return NextResponse.json(
-        { error: "Application not found" },
-        { status: 404 }
-      );
+      return jsonError("Application not found", 404);
     }
 
     if (application.status !== "pending") {
-      return NextResponse.json(
-        { error: `Application already ${application.status}` },
-        { status: 409 }
-      );
+      return jsonError(`Application already ${application.status}`, 409);
     }
 
     const now = new Date().toISOString();
@@ -160,7 +151,7 @@ export async function PATCH(
         console.error("[clubs/applications] Notification error:", err)
       );
 
-      return NextResponse.json({
+      return jsonOk({
         application: { id: applicationId, status: "approved" },
       });
     }
@@ -197,14 +188,11 @@ export async function PATCH(
         .eq("id", existingMembership.id);
     }
 
-    return NextResponse.json({
+    return jsonOk({
       application: { id: applicationId, status: "declined" },
     });
   } catch (err) {
     console.error("[clubs/applications] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

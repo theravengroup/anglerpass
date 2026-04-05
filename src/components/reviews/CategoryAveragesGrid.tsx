@@ -55,7 +55,7 @@ export default function CategoryAveragesGrid({
               </span>
               <Star className="size-3.5 fill-bronze text-bronze" />
             </div>
-            {/* Visual bar */}
+            {/* Visual bar — dynamic width from runtime data, Tailwind cannot generate arbitrary values */}
             <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-stone-light/20">
               <div
                 className="h-full rounded-full bg-bronze/70 transition-all duration-500"

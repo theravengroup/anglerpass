@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -12,10 +13,7 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Club ID is required" },
-        { status: 400 }
-      );
+      return jsonError("Club ID is required", 400);
     }
 
     const admin = createAdminClient();
@@ -30,10 +28,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !club) {
-      return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
-      );
+      return jsonError("Club not found", 404);
     }
 
     // Get active member count for social proof
@@ -43,15 +38,12 @@ export async function GET(request: NextRequest) {
       .eq("club_id", id)
       .eq("status", "active");
 
-    return NextResponse.json({
+    return jsonOk({
       club,
       memberCount: memberCount ?? 0,
     });
   } catch (err) {
     console.error("[clubs/public] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

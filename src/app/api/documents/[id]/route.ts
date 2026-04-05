@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { documentTemplateSchema } from "@/lib/validations/documents";
@@ -16,7 +16,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,26 +28,20 @@ export async function GET(
       .single();
 
     if (error || !template) {
-      return NextResponse.json(
-        { error: "Template not found" },
-        { status: 404 }
-      );
+      return jsonError("Template not found", 404);
     }
 
     // Authorization: only the property owner can view templates directly.
     // Anglers access templates through the /documents/[id]/sign endpoint.
     const propertyOwner = (template.properties as { owner_id: string } | null)?.owner_id;
     if (propertyOwner !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
-    return NextResponse.json({ template });
+    return jsonOk({ template });
   } catch (err) {
     console.error("[documents/[id]] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -64,7 +58,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -77,17 +71,14 @@ export async function PATCH(
       .single();
 
     if (!existing || existing.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const result = documentTemplateSchema.partial().safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { data: template, error } = await admin
@@ -102,19 +93,13 @@ export async function PATCH(
 
     if (error) {
       console.error("[documents/[id]] Update error:", error);
-      return NextResponse.json(
-        { error: "Failed to update template" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update template", 500);
     }
 
-    return NextResponse.json({ template });
+    return jsonOk({ template });
   } catch (err) {
     console.error("[documents/[id]] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -131,7 +116,7 @@ export async function DELETE(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -144,7 +129,7 @@ export async function DELETE(
       .single();
 
     if (!existing || existing.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Check for signed documents
@@ -160,7 +145,7 @@ export async function DELETE(
         .update({ active: false, updated_at: new Date().toISOString() })
         .eq("id", id);
 
-      return NextResponse.json({
+      return jsonOk({
         success: true,
         deactivated: true,
         message:
@@ -175,18 +160,12 @@ export async function DELETE(
 
     if (error) {
       console.error("[documents/[id]] Delete error:", error);
-      return NextResponse.json(
-        { error: "Failed to delete template" },
-        { status: 500 }
-      );
+      return jsonError("Failed to delete template", 500);
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[documents/[id]] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -26,17 +26,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = inviteSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { property_id, club_name, admin_email } = result.data;
@@ -50,14 +47,11 @@ export async function POST(request: Request) {
       .single();
 
     if (propError || !property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     if (property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Check for duplicate invitation (same property + same email)
@@ -70,15 +64,9 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        {
-          error:
-            existing.status === "accepted"
+      return jsonError(existing.status === "accepted"
               ? "This club has already accepted the invitation"
-              : "An invitation has already been sent to this email for this property",
-        },
-        { status: 409 }
-      );
+              : "An invitation has already been sent to this email for this property", 409);
     }
 
     // Get inviter's name
@@ -104,10 +92,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       console.error("[clubs/invite] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create invitation" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create invitation", 500);
     }
 
     // Send invitation email via Resend
@@ -172,13 +157,10 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ invitation }, { status: 201 });
+    return jsonCreated({ invitation });
   } catch (err) {
     console.error("[clubs/invite] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -191,17 +173,14 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get("property_id");
 
     if (!propertyId) {
-      return NextResponse.json(
-        { error: "property_id is required" },
-        { status: 400 }
-      );
+      return jsonError("property_id is required", 400);
     }
 
     const admin = createAdminClient();
@@ -214,7 +193,7 @@ export async function GET(request: Request) {
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { data: invitations, error } = await admin
@@ -225,18 +204,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[clubs/invite] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch invitations" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch invitations", 500);
     }
 
-    return NextResponse.json({ invitations });
+    return jsonOk({ invitations });
   } catch (err) {
     console.error("[clubs/invite] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

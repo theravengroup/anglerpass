@@ -1,39 +1,68 @@
-import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { adminGuideReviewSchema } from "@/lib/validations/guides";
+import { jsonOk, jsonError, requireAdmin } from "@/lib/api/helpers";
+import {
+  adminGuideReviewSchema,
+  GUIDE_STATUSES,
+} from "@/lib/validations/guides";
 import {
   notifyGuideProfileApproved,
   notifyGuideProfileRejected,
 } from "@/lib/notifications";
+import { z } from "zod";
+
+// ─── Query Params Validation ───────────────────────────────────────
+
+const guideListQuerySchema = z.object({
+  status: z.enum(GUIDE_STATUSES).optional(),
+});
+
+// ─── PATCH Body Validation ─────────────────────────────────────────
+
+const adminGuidePatchSchema = z.object({
+  guide_id: z.uuid("guide_id must be a valid UUID"),
+  action: adminGuideReviewSchema.shape.action,
+  reason: adminGuideReviewSchema.shape.reason,
+});
+
+// ─── Guide Profile Update Shape ────────────────────────────────────
+
+interface GuideProfileUpdate {
+  updated_at: string;
+  status?: string;
+  live_at?: string | null;
+  verified_by?: string | null;
+  rejection_reason?: string | null;
+  suspended_reason?: string | null;
+  suspension_type?: string | null;
+}
+
+// ─── Status Counts ─────────────────────────────────────────────────
+
+type GuideStatusCounts = Record<(typeof GUIDE_STATUSES)[number], number>;
 
 // GET: List all guide profiles with filters
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await requireAdmin();
+    if (!authResult) {
+      return jsonError("Unauthorized", 401);
     }
 
-    const admin = createAdminClient();
-
-    // Verify admin
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const { admin } = authResult;
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    const queryParse = guideListQuerySchema.safeParse({
+      status: searchParams.get("status") || undefined,
+    });
+
+    if (!queryParse.success) {
+      return jsonError(
+        queryParse.error.issues[0]?.message ?? "Invalid query parameters",
+        400
+      );
+    }
+
+    const { status } = queryParse.data;
 
     let query = admin
       .from("guide_profiles")
@@ -50,14 +79,11 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[admin/guides] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch guides" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch guides", 500);
     }
 
     // Get counts per status
-    const counts = {
+    const counts: GuideStatusCounts = {
       pending: 0,
       verified: 0,
       live: 0,
@@ -66,66 +92,41 @@ export async function GET(request: Request) {
       draft: 0,
     };
     for (const g of guides ?? []) {
-      const s = g.status as keyof typeof counts;
+      const s = g.status as keyof GuideStatusCounts;
       if (s in counts) counts[s]++;
     }
 
-    return NextResponse.json({
+    return jsonOk({
       guides: guides ?? [],
       counts,
     });
   } catch (err) {
     console.error("[admin/guides] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
 // PATCH: Review guide — make_live, reject, suspend, or request_info
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await requireAdmin();
+    if (!authResult) {
+      return jsonError("Unauthorized", 401);
     }
 
-    const admin = createAdminClient();
-
-    // Verify admin
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const { user, admin } = authResult;
 
     const body = await request.json();
-    const { guide_id, ...actionBody } = body;
-
-    if (!guide_id) {
-      return NextResponse.json(
-        { error: "guide_id is required" },
-        { status: 400 }
-      );
-    }
-
-    const result = adminGuideReviewSchema.safeParse(actionBody);
+    const result = adminGuidePatchSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
+      return jsonError(
+        result.error.issues[0]?.message ?? "Invalid input",
+        400
       );
     }
+
+    const { guide_id, action, reason } = result.data;
 
     // Fetch guide profile
     const { data: guideProfile } = await admin
@@ -135,23 +136,16 @@ export async function PATCH(request: Request) {
       .single();
 
     if (!guideProfile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
-     
-    const updates: Record<string, any> = {
+    const updates: GuideProfileUpdate = {
       updated_at: new Date().toISOString(),
     };
 
-    if (result.data.action === "make_live") {
+    if (action === "make_live") {
       if (guideProfile.status !== "verified") {
-        return NextResponse.json(
-          { error: "Only verified guides can be made live" },
-          { status: 400 }
-        );
+        return jsonError("Only verified guides can be made live", 400);
       }
       updates.status = "live";
       updates.live_at = new Date().toISOString();
@@ -159,22 +153,19 @@ export async function PATCH(request: Request) {
       updates.rejection_reason = null;
       updates.suspended_reason = null;
       updates.suspension_type = null;
-    } else if (result.data.action === "reject") {
-      if (!result.data.reason) {
-        return NextResponse.json(
-          { error: "Reason is required when rejecting" },
-          { status: 400 }
-        );
+    } else if (action === "reject") {
+      if (!reason) {
+        return jsonError("Reason is required when rejecting", 400);
       }
       updates.status = "rejected";
-      updates.rejection_reason = result.data.reason;
-    } else if (result.data.action === "suspend") {
+      updates.rejection_reason = reason;
+    } else if (action === "suspend") {
       updates.status = "suspended";
-      updates.suspended_reason = result.data.reason || "Suspended by admin";
+      updates.suspended_reason = reason || "Suspended by admin";
       updates.suspension_type = "admin";
-    } else if (result.data.action === "request_info") {
+    } else if (action === "request_info") {
       updates.status = "draft";
-      updates.rejection_reason = result.data.reason || "Additional information requested";
+      updates.rejection_reason = reason || "Additional information requested";
     }
 
     const { data: updated, error: updateError } = await admin
@@ -186,10 +177,7 @@ export async function PATCH(request: Request) {
 
     if (updateError) {
       console.error("[admin/guides] Update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update guide" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update guide", 500);
     }
 
     // Log to verification events
@@ -198,32 +186,29 @@ export async function PATCH(request: Request) {
       event_type: "admin_review",
       old_status: guideProfile.status,
       new_status: updates.status,
-      metadata: { action: result.data.action, reason: result.data.reason },
+      metadata: { action, reason },
       actor_id: user.id,
     });
 
     // Notify guide
-    if (result.data.action === "make_live") {
+    if (action === "make_live") {
       notifyGuideProfileApproved(admin, {
         guideUserId: guideProfile.user_id,
       }).catch((err) =>
         console.error("[admin/guides] Notification error:", err)
       );
-    } else if (result.data.action === "reject") {
+    } else if (action === "reject") {
       notifyGuideProfileRejected(admin, {
         guideUserId: guideProfile.user_id,
-        reason: result.data.reason ?? "No reason provided",
+        reason: reason ?? "No reason provided",
       }).catch((err) =>
         console.error("[admin/guides] Notification error:", err)
       );
     }
 
-    return NextResponse.json({ guide: updated });
+    return jsonOk({ guide: updated });
   } catch (err) {
     console.error("[admin/guides] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -51,13 +51,13 @@ export async function requireAdmin() {
   if (!auth) return null;
 
   const admin = createAdminClient();
-  const { data: profile } = await admin
+  const { data: profile, error } = await admin
     .from("profiles")
     .select("role")
     .eq("id", auth.user.id)
     .single();
 
-  if (profile?.role !== "admin") return null;
+  if (error || !profile || profile.role !== "admin") return null;
 
   return { ...auth, admin };
 }
@@ -77,7 +77,7 @@ export async function requirePropertyOwner(
     .from("properties")
     .select("*")
     .eq("id", propertyId)
-    .single();
+    .maybeSingle();
 
   if (!property || property.owner_id !== userId) return null;
   return property;
@@ -96,7 +96,7 @@ export async function requireClubManager(
     .from("clubs")
     .select("*")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club || club.owner_id !== userId) return null;
   return club;
@@ -166,14 +166,15 @@ export async function requireClubRole(
   // Check authorization
   const authResult = await authorize({ permission, userId, clubId });
 
-  // Get membership info
+  // Get membership info — .single() returns error when no row matches,
+  // so membership may be null even without a thrown exception.
   const { data: membership } = await admin
     .from("club_memberships")
     .select("id, role, status")
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (!authResult.allowed && !membership) return null;
 

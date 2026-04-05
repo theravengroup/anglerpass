@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubGuideApprovalSchema } from "@/lib/validations/guides";
@@ -20,7 +20,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -33,7 +33,7 @@ export async function GET(
       .single();
 
     if (!club || club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { searchParams } = new URL(request.url);
@@ -55,19 +55,13 @@ export async function GET(
 
     if (error) {
       console.error("[clubs/guide-approvals] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch guide approvals" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch guide approvals", 500);
     }
 
-    return NextResponse.json({ approvals: approvals ?? [] });
+    return jsonOk({ approvals: approvals ?? [] });
   } catch (err) {
     console.error("[clubs/guide-approvals] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -84,7 +78,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -97,26 +91,20 @@ export async function PATCH(
       .single();
 
     if (!club || club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const { approval_id, ...actionBody } = body;
 
     if (!approval_id) {
-      return NextResponse.json(
-        { error: "approval_id is required" },
-        { status: 400 }
-      );
+      return jsonError("approval_id is required", 400);
     }
 
     const result = clubGuideApprovalSchema.safeParse(actionBody);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     // Fetch the approval
@@ -130,10 +118,7 @@ export async function PATCH(
       .single();
 
     if (!approval) {
-      return NextResponse.json(
-        { error: "Approval not found" },
-        { status: 404 }
-      );
+      return jsonError("Approval not found", 404);
     }
 
     const newStatus =
@@ -158,10 +143,7 @@ export async function PATCH(
 
     if (updateError) {
       console.error("[clubs/guide-approvals] Update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update approval" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update approval", 500);
     }
 
     // Notify the guide
@@ -188,12 +170,9 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ approval: updated });
+    return jsonOk({ approval: updated });
   } catch (err) {
     console.error("[clubs/guide-approvals] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

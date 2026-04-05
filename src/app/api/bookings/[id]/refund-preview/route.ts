@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -19,7 +19,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -31,21 +31,15 @@ export async function GET(
       .single();
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return jsonError("Booking not found", 404);
     }
 
     if (booking.angler_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     if (booking.status !== "confirmed") {
-      return NextResponse.json(
-        { error: "This booking cannot be cancelled" },
-        { status: 400 }
-      );
+      return jsonError("This booking cannot be cancelled", 400);
     }
 
     const totalAmount =
@@ -56,16 +50,13 @@ export async function GET(
     // All bookings are instant-confirmed, so refund tiers always apply
     const refund = calculateRefund(booking.booking_date, totalAmount);
 
-    return NextResponse.json({
+    return jsonOk({
       refund,
       booking_status: booking.status,
       policy: CANCELLATION_POLICY_TEXT,
     });
   } catch (err) {
     console.error("[bookings/refund-preview] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

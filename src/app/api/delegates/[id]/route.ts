@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { delegateUpdateSchema } from "@/lib/validations/permissions";
 import { auditLog, AuditAction } from "@/lib/permissions";
@@ -20,17 +20,14 @@ export async function PATCH(request: Request, context: RouteContext) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = delegateUpdateSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { data: existing, error: fetchError } = await createAdminClient().from("angler_delegates")
@@ -39,18 +36,15 @@ export async function PATCH(request: Request, context: RouteContext) {
       .single();
 
     if (fetchError || !existing) {
-      return NextResponse.json({ error: "Delegate not found" }, { status: 404 });
+      return jsonError("Delegate not found", 404);
     }
 
     if (existing.angler_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     if (existing.status === "revoked") {
-      return NextResponse.json(
-        { error: "Cannot modify a revoked delegate. Re-invite instead." },
-        { status: 400 }
-      );
+      return jsonError("Cannot modify a revoked delegate. Re-invite instead.", 400);
     }
 
     const { access_level } = result.data;
@@ -64,7 +58,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     if (error) {
       console.error("[delegates] Update error:", error);
-      return NextResponse.json({ error: "Failed to update delegate" }, { status: 500 });
+      return jsonError("Failed to update delegate", 500);
     }
 
     auditLog({
@@ -77,10 +71,10 @@ export async function PATCH(request: Request, context: RouteContext) {
       scope: "consumer",
     }).catch((err) => console.error("[delegates] Audit error:", err));
 
-    return NextResponse.json({ delegate: updated });
+    return jsonOk({ delegate: updated });
   } catch (err) {
     console.error("[delegates] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -98,7 +92,7 @@ export async function DELETE(request: Request, context: RouteContext) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { data: existing, error: fetchError } = await createAdminClient().from("angler_delegates")
@@ -107,15 +101,15 @@ export async function DELETE(request: Request, context: RouteContext) {
       .single();
 
     if (fetchError || !existing) {
-      return NextResponse.json({ error: "Delegate not found" }, { status: 404 });
+      return jsonError("Delegate not found", 404);
     }
 
     if (existing.angler_id !== user.id && existing.delegate_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     if (existing.status === "revoked") {
-      return NextResponse.json({ error: "Already revoked" }, { status: 400 });
+      return jsonError("Already revoked", 400);
     }
 
     const { error } = await createAdminClient().from("angler_delegates")
@@ -127,7 +121,7 @@ export async function DELETE(request: Request, context: RouteContext) {
 
     if (error) {
       console.error("[delegates] Revoke error:", error);
-      return NextResponse.json({ error: "Failed to revoke delegate" }, { status: 500 });
+      return jsonError("Failed to revoke delegate", 500);
     }
 
     auditLog({
@@ -140,9 +134,9 @@ export async function DELETE(request: Request, context: RouteContext) {
       scope: "consumer",
     }).catch((err) => console.error("[delegates] Audit error:", err));
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[delegates] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { signDocumentSchema, substituteVariables } from "@/lib/validations/documents";
@@ -16,7 +16,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
@@ -26,10 +26,7 @@ export async function POST(
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -43,10 +40,7 @@ export async function POST(
       .single();
 
     if (!template) {
-      return NextResponse.json(
-        { error: "Template not found or inactive" },
-        { status: 404 }
-      );
+      return jsonError("Template not found or inactive", 404);
     }
 
     // Fetch the booking and verify the signer is the angler
@@ -57,25 +51,16 @@ export async function POST(
       .single();
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return jsonError("Booking not found", 404);
     }
 
     if (booking.angler_id !== user.id) {
-      return NextResponse.json(
-        { error: "You can only sign documents for your own bookings" },
-        { status: 403 }
-      );
+      return jsonError("You can only sign documents for your own bookings", 403);
     }
 
     // Verify the template belongs to the same property as the booking
     if (template.property_id !== booking.property_id) {
-      return NextResponse.json(
-        { error: "Template does not belong to the booking's property" },
-        { status: 400 }
-      );
+      return jsonError("Template does not belong to the booking's property", 400);
     }
 
     // Check if already signed
@@ -88,10 +73,7 @@ export async function POST(
       .maybeSingle();
 
     if (existingSig) {
-      return NextResponse.json(
-        { error: "You have already signed this document for this booking" },
-        { status: 409 }
-      );
+      return jsonError("You have already signed this document for this booking", 409);
     }
 
     // Get signer's profile and email
@@ -137,19 +119,13 @@ export async function POST(
 
     if (error) {
       console.error("[documents/sign] Insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to record signature" },
-        { status: 500 }
-      );
+      return jsonError("Failed to record signature", 500);
     }
 
-    return NextResponse.json({ signed_document: signed }, { status: 201 });
+    return jsonCreated({ signed_document: signed });
   } catch (err) {
     console.error("[documents/sign] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -166,17 +142,14 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
     const bookingId = searchParams.get("booking_id");
 
     if (!bookingId) {
-      return NextResponse.json(
-        { error: "booking_id is required" },
-        { status: 400 }
-      );
+      return jsonError("booking_id is required", 400);
     }
 
     const admin = createAdminClient();
@@ -189,15 +162,12 @@ export async function GET(
       .eq("signer_id", user.id)
       .maybeSingle();
 
-    return NextResponse.json({
+    return jsonOk({
       signed: !!signed,
       signed_document: signed ?? null,
     });
   } catch (err) {
     console.error("[documents/sign] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

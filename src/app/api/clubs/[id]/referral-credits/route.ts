@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -29,7 +29,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Check if user is club owner
@@ -39,7 +39,7 @@ export async function GET(
     const club = clubs?.[0];
 
     if (!club) {
-      return NextResponse.json({ error: "Club not found" }, { status: 404 });
+      return jsonError("Club not found", 404);
     }
 
     const isOwner = club.owner_id === user.id;
@@ -51,7 +51,7 @@ export async function GET(
     const membership = memberships?.[0];
 
     if (!isOwner && !membership) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Build query for credits
@@ -107,12 +107,9 @@ export async function GET(
       )
     );
 
-    return NextResponse.json({ credits: enrichedCredits });
+    return jsonOk({ credits: enrichedCredits });
   } catch (err) {
     console.error("[referral-credits] GET error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

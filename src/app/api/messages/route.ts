@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { messageSchema } from "@/lib/validations/guides";
@@ -13,7 +13,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -29,14 +29,11 @@ export async function GET() {
 
     if (error) {
       console.error("[messages] Threads fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch threads" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch threads", 500);
     }
 
     if (!threads?.length) {
-      return NextResponse.json({ threads: [] });
+      return jsonOk({ threads: [] });
     }
 
     // For each thread, get the other participant's info and unread count
@@ -91,13 +88,10 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json({ threads: enrichedThreads });
+    return jsonOk({ threads: enrichedThreads });
   } catch (err) {
     console.error("[messages] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -113,17 +107,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = messageSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -173,10 +164,7 @@ export async function POST(request: Request) {
 
       if (threadError) {
         console.error("[messages] Thread creation error:", threadError);
-        return NextResponse.json(
-          { error: "Failed to create conversation" },
-          { status: 500 }
-        );
+        return jsonError("Failed to create conversation", 500);
       }
 
       threadId = newThread!.id;
@@ -197,18 +185,12 @@ export async function POST(request: Request) {
 
     if (msgError) {
       console.error("[messages] Message insert error:", msgError);
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
-      );
+      return jsonError("Failed to send message", 500);
     }
 
-    return NextResponse.json({ message, thread_id: threadId }, { status: 201 });
+    return jsonCreated({ message, thread_id: threadId });
   } catch (err) {
     console.error("[messages] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

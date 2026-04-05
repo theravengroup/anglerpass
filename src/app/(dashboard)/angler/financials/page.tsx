@@ -296,15 +296,13 @@ export default function AnglerFinancialsPage() {
               </p>
             ) : (
               <>
-                {/* Stacked bar */}
+                {/* Stacked bar -- dynamic widths require inline style (percentage computed from data) */}
                 <div className="flex h-4 overflow-hidden rounded-full">
                   {feeBreakdown.map((f) => (
                     <div
                       key={f.label}
                       className={`${f.color} transition-all`}
-                      style={{
-                        width: `${(f.amount / feeTotal) * 100}%`,
-                      }}
+                      style={{ width: `${(f.amount / feeTotal) * 100}%` }}
                     />
                   ))}
                 </div>
@@ -364,6 +362,7 @@ export default function AnglerFinancialsPage() {
                         trip{prop.bookings !== 1 ? "s" : ""}
                       </span>
                     </div>
+                    {/* Dynamic width requires inline style -- percentage computed from data */}
                     <div className="h-2 overflow-hidden rounded-full bg-offwhite">
                       <div
                         className="h-full rounded-full bg-bronze transition-all"

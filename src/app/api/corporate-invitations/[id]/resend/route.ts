@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -26,7 +26,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -39,10 +39,7 @@ export async function POST(
       .single();
 
     if (fetchErr || !invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return jsonError("Invitation not found", 404);
     }
 
     // Verify the user owns the corporate membership
@@ -54,14 +51,11 @@ export async function POST(
       .maybeSingle();
 
     if (!membership) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     if (invitation.status !== "pending") {
-      return NextResponse.json(
-        { error: "Only pending invitations can be resent" },
-        { status: 400 }
-      );
+      return jsonError("Only pending invitations can be resent", 400);
     }
 
     // Regenerate token and update invited_at
@@ -79,10 +73,7 @@ export async function POST(
 
     if (updateErr) {
       console.error("[corporate-invitations/resend] Update error:", updateErr);
-      return NextResponse.json(
-        { error: "Failed to update invitation" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update invitation", 500);
     }
 
     // Fetch club info
@@ -150,13 +141,10 @@ export async function POST(
       }
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[corporate-invitations/resend] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 

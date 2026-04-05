@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -100,27 +101,21 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const type = body.type as EntityType;
 
     if (!type || !["guide", "landowner", "club"].includes(type)) {
-      return NextResponse.json(
-        { error: "Invalid type. Must be guide, landowner, or club." },
-        { status: 400 }
-      );
+      return jsonError("Invalid type. Must be guide, landowner, or club.", 400);
     }
 
     const admin = createAdminClient();
     const entity = await resolveEntity(admin, user.id, type);
 
     if (!entity) {
-      return NextResponse.json(
-        { error: `No ${type} record found for this user.` },
-        { status: 404 }
-      );
+      return jsonError(`No ${type} record found for this user.`, 404);
     }
 
     // Create a Connect Express account if one doesn't already exist
@@ -145,13 +140,10 @@ export async function POST(request: NextRequest) {
       `${SITE_URL}${returnPath}?stripe_onboarding=refresh`
     );
 
-    return NextResponse.json({ url: accountLink.url });
+    return jsonOk({ url: accountLink.url });
   } catch (err) {
     console.error("[stripe/connect] POST error:", err);
-    return NextResponse.json(
-      { error: "Failed to create Stripe onboarding link" },
-      { status: 500 }
-    );
+    return jsonError("Failed to create Stripe onboarding link", 500);
   }
 }
 
@@ -165,31 +157,28 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") as EntityType;
 
     if (!type || !["guide", "landowner", "club"].includes(type)) {
-      return NextResponse.json(
-        { error: "Invalid type. Must be guide, landowner, or club." },
-        { status: 400 }
-      );
+      return jsonError("Invalid type. Must be guide, landowner, or club.", 400);
     }
 
     const admin = createAdminClient();
     const entity = await resolveEntity(admin, user.id, type);
 
     if (!entity) {
-      return NextResponse.json({
+      return jsonOk({
         onboarded: false,
         hasAccount: false,
       });
     }
 
     if (!entity.stripeAccountId) {
-      return NextResponse.json({
+      return jsonOk({
         onboarded: false,
         hasAccount: false,
       });
@@ -207,16 +196,13 @@ export async function GET(request: NextRequest) {
         .eq(entity.idColumn, entity.idValue);
     }
 
-    return NextResponse.json({
+    return jsonOk({
       onboarded,
       hasAccount: true,
       accountId: entity.stripeAccountId,
     });
   } catch (err) {
     console.error("[stripe/connect] GET error:", err);
-    return NextResponse.json(
-      { error: "Failed to check onboarding status" },
-      { status: 500 }
-    );
+    return jsonError("Failed to check onboarding status", 500);
   }
 }

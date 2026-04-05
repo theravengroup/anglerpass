@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { profileUpdateSchema } from "@/lib/validations/profile";
@@ -13,7 +13,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,10 +28,7 @@ export async function GET() {
       .single();
 
     if (error || !profile) {
-      return NextResponse.json(
-        { error: "Profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Profile not found", 404);
     }
 
     // Fetch club memberships
@@ -43,7 +40,7 @@ export async function GET() {
       .eq("user_id", user.id)
       .in("status", ["active", "pending"]);
 
-    return NextResponse.json({
+    return jsonOk({
       profile: {
         ...profile,
         email: user.email ?? null,
@@ -52,10 +49,7 @@ export async function GET() {
     });
   } catch (err) {
     console.error("[profile] GET error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -71,17 +65,14 @@ export async function PATCH(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const parsed = profileUpdateSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -97,18 +88,12 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error("[profile] PATCH error:", error);
-      return NextResponse.json(
-        { error: "Failed to update profile" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update profile", 500);
     }
 
-    return NextResponse.json({ profile: updated });
+    return jsonOk({ profile: updated });
   } catch (err) {
     console.error("[profile] PATCH unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

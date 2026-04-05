@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,7 +21,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -38,16 +38,13 @@ export async function GET() {
       for (const key of VALID_PREFS) {
         defaults[key] = true;
       }
-      return NextResponse.json({ preferences: defaults });
+      return jsonOk({ preferences: defaults });
     }
 
-    return NextResponse.json({ preferences: prefs });
+    return jsonOk({ preferences: prefs });
   } catch (err) {
     console.error("[notification-preferences] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -60,7 +57,7 @@ export async function PATCH(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
@@ -74,10 +71,7 @@ export async function PATCH(request: Request) {
     }
 
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json(
-        { error: "No valid preferences provided" },
-        { status: 400 }
-      );
+      return jsonError("No valid preferences provided", 400);
     }
 
     const admin = createAdminClient();
@@ -97,10 +91,7 @@ export async function PATCH(request: Request) {
 
       if (error) {
         console.error("[notification-preferences] Update error:", error);
-        return NextResponse.json(
-          { error: "Failed to update preferences" },
-          { status: 500 }
-        );
+        return jsonError("Failed to update preferences", 500);
       }
     } else {
       const { error } = await admin
@@ -109,19 +100,13 @@ export async function PATCH(request: Request) {
 
       if (error) {
         console.error("[notification-preferences] Insert error:", error);
-        return NextResponse.json(
-          { error: "Failed to save preferences" },
-          { status: 500 }
-        );
+        return jsonError("Failed to save preferences", 500);
       }
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[notification-preferences] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

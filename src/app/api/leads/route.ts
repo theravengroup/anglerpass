@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { leadSchema } from "@/lib/validations/leads";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -152,10 +152,7 @@ export async function POST(request: Request) {
     const result = leadSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { firstName, lastName, email, interestType, state, roleResponse, message, source, type } =
@@ -197,10 +194,7 @@ export async function POST(request: Request) {
 
       if (error && error.code !== "23505") {
         console.error("[leads] Insert error:", error);
-        return NextResponse.json(
-          { error: "Failed to save lead" },
-          { status: 500 }
-        );
+        return jsonError("Failed to save lead", 500);
       }
     }
 
@@ -230,12 +224,9 @@ export async function POST(request: Request) {
       // Don't fail the request if email fails — lead is already saved
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[leads] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

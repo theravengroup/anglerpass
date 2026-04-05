@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -26,14 +26,10 @@ export async function GET(request: Request) {
 
     switch (view) {
       case "landowner":
-        return NextResponse.json(
-          await getLandownerAnalytics(admin, user.id, sinceISO)
-        );
+        return jsonOk(await getLandownerAnalytics(admin, user.id, sinceISO));
 
       case "angler":
-        return NextResponse.json(
-          await getAnglerAnalytics(admin, user.id, sinceISO)
-        );
+        return jsonOk(await getAnglerAnalytics(admin, user.id, sinceISO));
 
       case "admin": {
         // Verify admin role
@@ -44,25 +40,17 @@ export async function GET(request: Request) {
           .single();
 
         if (profile?.role !== "admin") {
-          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+          return jsonError("Forbidden", 403);
         }
-        return NextResponse.json(
-          await getAdminAnalytics(admin, sinceISO)
-        );
+        return jsonOk(await getAdminAnalytics(admin, sinceISO));
       }
 
       default:
-        return NextResponse.json(
-          { error: "Invalid view parameter" },
-          { status: 400 }
-        );
+        return jsonError("Invalid view parameter", 400);
     }
   } catch (err) {
     console.error("[analytics] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 

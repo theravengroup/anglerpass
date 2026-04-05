@@ -295,6 +295,7 @@ export default function ClubFinancialsPage() {
                       </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-offwhite">
+                      {/* Dynamic width requires inline style -- percentage computed from data */}
                       <div
                         className="h-full rounded-full bg-river transition-all"
                         style={{ width: `${pct}%` }}
@@ -467,7 +468,7 @@ function MonthlyBarChart({
   const max = Math.max(...data.map((d) => d.amount), 1);
 
   return (
-    <div className="flex items-end gap-1.5" style={{ height: 120 }}>
+    <div className="flex h-[120px] items-end gap-1.5">
       {data.map((d) => {
         const pct = (d.amount / max) * 100;
         const label = new Date(d.month + "-01").toLocaleDateString("en-US", {
@@ -482,9 +483,10 @@ function MonthlyBarChart({
               ${d.amount.toLocaleString()}
             </span>
             <div className="w-full overflow-hidden rounded-t">
+              {/* Dynamic height requires inline style -- percentage computed from data */}
               <div
-                className={`w-full rounded-t ${color} transition-all`}
-                style={{ height: `${Math.max(pct, 2)}%`, minHeight: 2 }}
+                className={`w-full min-h-[2px] rounded-t ${color} transition-all`}
+                style={{ height: `${Math.max(pct, 2)}%` }}
               />
             </div>
             <span className="text-[10px] text-text-light">{label}</span>

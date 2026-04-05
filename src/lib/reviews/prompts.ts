@@ -143,36 +143,37 @@ async function findEligibleBookings(
       (LANDOWNER_FAULTS as readonly string[]).includes(b.cancellation_fault)
   );
 
-  // Normalize Supabase join shape into flat EligibleBooking
-  interface RawBookingRow {
-    id: string;
-    property_id: string;
-    angler_id: string;
-    booking_date: string;
-    booking_end_date: string | null;
-    properties: { name: string } | { name: string }[] | null;
-  }
-
-  function normalize(rows: RawBookingRow[]): EligibleBooking[] {
+  // Normalize Supabase join shape into flat EligibleBooking.
+  // Supabase queries with joins return loosely typed records, so we
+  // safely extract each field with runtime checks instead of unsafe casts.
+  function normalize(
+    rows: Record<string, unknown>[]
+  ): EligibleBooking[] {
     return rows.map((b) => {
       const props = b.properties;
-      const name = Array.isArray(props)
-        ? props[0]?.name ?? "your booked property"
-        : props?.name ?? "your booked property";
+      let name = "your booked property";
+      if (Array.isArray(props) && props.length > 0) {
+        const first = props[0] as Record<string, unknown> | undefined;
+        if (first && typeof first.name === "string") name = first.name;
+      } else if (props && typeof props === "object" && !Array.isArray(props)) {
+        const obj = props as Record<string, unknown>;
+        if (typeof obj.name === "string") name = obj.name;
+      }
+
       return {
-        id: b.id,
-        property_id: b.property_id,
-        angler_id: b.angler_id,
-        booking_date: b.booking_date,
-        booking_end_date: b.booking_end_date,
+        id: b.id as string,
+        property_id: b.property_id as string,
+        angler_id: b.angler_id as string,
+        booking_date: b.booking_date as string,
+        booking_end_date: (b.booking_end_date as string | null) ?? null,
         property_name: name,
       };
     });
   }
 
   const allBookings = [
-    ...normalize((completedBookings ?? []) as unknown as RawBookingRow[]),
-    ...normalize(landownerFaultBookings as unknown as RawBookingRow[]),
+    ...normalize((completedBookings ?? []) as Record<string, unknown>[]),
+    ...normalize(landownerFaultBookings as Record<string, unknown>[]),
   ];
 
   if (allBookings.length === 0) return [];

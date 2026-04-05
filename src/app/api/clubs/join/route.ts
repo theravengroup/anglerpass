@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
@@ -22,17 +22,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const parsed = joinSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid club ID" },
-        { status: 400 }
-      );
+      return jsonError("Invalid club ID", 400);
     }
 
     const { club_id, referral_code, application_note } = parsed.data;
@@ -46,10 +43,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!club) {
-      return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
-      );
+      return jsonError("Club not found", 404);
     }
 
     // Enforce one home club: check if user already has an active or pending membership
@@ -67,23 +61,11 @@ export async function POST(request: Request) {
     );
 
     if (activeClub && activeClub.club_id !== club_id) {
-      return NextResponse.json(
-        {
-          error:
-            "You already have a home club. Through the Cross-Club Network, you can fish at partner clubs without needing to join them.",
-        },
-        { status: 409 }
-      );
+      return jsonError("You already have a home club. Through the Cross-Club Network, you can fish at partner clubs without needing to join them.", 409);
     }
 
     if (pendingClub && pendingClub.club_id !== club_id) {
-      return NextResponse.json(
-        {
-          error:
-            "You already have a pending club request. Please wait for it to be approved or contact the club to withdraw it first.",
-        },
-        { status: 409 }
-      );
+      return jsonError("You already have a pending club request. Please wait for it to be approved or contact the club to withdraw it first.", 409);
     }
 
     // Check if already a member of THIS club
@@ -96,16 +78,10 @@ export async function POST(request: Request) {
 
     if (existing) {
       if (existing.status === "active") {
-        return NextResponse.json(
-          { error: "You are already a member of this club" },
-          { status: 409 }
-        );
+        return jsonError("You are already a member of this club", 409);
       }
       if (existing.status === "pending") {
-        return NextResponse.json(
-          { error: "Your request to join is already pending" },
-          { status: 409 }
-        );
+        return jsonError("Your request to join is already pending", 409);
       }
       // If declined or inactive, update to pending
       await admin
@@ -144,7 +120,7 @@ export async function POST(request: Request) {
         }
       }
 
-      return NextResponse.json({
+      return jsonOk({
         success: true,
         message: `Join request sent to ${club.name}`,
       });
@@ -216,10 +192,7 @@ export async function POST(request: Request) {
 
       if (!insertRes.ok) {
         console.error("[clubs/join] Insert error:", await insertRes.text());
-        return NextResponse.json(
-          { error: "Failed to submit join request" },
-          { status: 500 }
-        );
+        return jsonError("Failed to submit join request", 500);
       }
 
       const inserted = await insertRes.json();
@@ -240,10 +213,7 @@ export async function POST(request: Request) {
 
       if (insertError) {
         console.error("[clubs/join] Insert error:", insertError);
-        return NextResponse.json(
-          { error: "Failed to submit join request" },
-          { status: 500 }
-        );
+        return jsonError("Failed to submit join request", 500);
       }
 
       newMembershipId = newMembership?.id ?? null;
@@ -313,15 +283,12 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({
+    return jsonOk({
       success: true,
       message: `Join request sent to ${club.name}`,
     });
   } catch (err) {
     console.error("[clubs/join] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

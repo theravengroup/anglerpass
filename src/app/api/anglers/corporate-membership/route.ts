@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,7 +14,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -29,10 +29,10 @@ export async function GET() {
       .maybeSingle();
 
     if (!membership) {
-      return NextResponse.json({ membership: null });
+      return jsonOk({ membership: null });
     }
 
-    return NextResponse.json({
+    return jsonOk({
       membership: {
         membership_id: membership.id,
         club_id: membership.club_id,
@@ -42,9 +42,6 @@ export async function GET() {
     });
   } catch (err) {
     console.error("[anglers/corporate-membership] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

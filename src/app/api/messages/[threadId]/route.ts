@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -16,7 +16,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -29,14 +29,11 @@ export async function GET(
       .single();
 
     if (!thread) {
-      return NextResponse.json(
-        { error: "Thread not found" },
-        { status: 404 }
-      );
+      return jsonError("Thread not found", 404);
     }
 
     if (thread.participant_a !== user.id && thread.participant_b !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { searchParams } = new URL(request.url);
@@ -52,10 +49,7 @@ export async function GET(
 
     if (error) {
       console.error("[messages/thread] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch messages" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch messages", 500);
     }
 
     // Mark unread messages as read
@@ -66,16 +60,13 @@ export async function GET(
       .eq("recipient_id", user.id)
       .is("read_at", null);
 
-    return NextResponse.json({
+    return jsonOk({
       messages: messages ?? [],
       thread,
     });
   } catch (err) {
     console.error("[messages/thread] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -95,7 +86,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -108,24 +99,18 @@ export async function POST(
       .single();
 
     if (!thread) {
-      return NextResponse.json(
-        { error: "Thread not found" },
-        { status: 404 }
-      );
+      return jsonError("Thread not found", 404);
     }
 
     if (thread.participant_a !== user.id && thread.participant_b !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const messageBody = typeof body.body === "string" ? body.body.trim() : "";
 
     if (!messageBody || messageBody.length > 5000) {
-      return NextResponse.json(
-        { error: "Message must be between 1 and 5000 characters" },
-        { status: 400 }
-      );
+      return jsonError("Message must be between 1 and 5000 characters", 400);
     }
 
     const recipientId =
@@ -148,10 +133,7 @@ export async function POST(
 
     if (msgError) {
       console.error("[messages/thread] Insert error:", msgError);
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
-      );
+      return jsonError("Failed to send message", 500);
     }
 
     // Update thread last_message_at
@@ -160,12 +142,9 @@ export async function POST(
       .update({ last_message_at: new Date().toISOString() })
       .eq("id", threadId);
 
-    return NextResponse.json({ message }, { status: 201 });
+    return jsonCreated({ message });
   } catch (err) {
     console.error("[messages/thread] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

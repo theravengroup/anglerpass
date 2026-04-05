@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { markReadSchema } from "@/lib/validations/notifications";
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -37,10 +37,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[notifications] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch notifications" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch notifications", 500);
     }
 
     // Also return unread count
@@ -50,16 +47,13 @@ export async function GET(request: Request) {
       .eq("user_id", user.id)
       .eq("read", false);
 
-    return NextResponse.json({
+    return jsonOk({
       notifications: notifications ?? [],
       unread_count: count ?? 0,
     });
   } catch (err) {
     console.error("[notifications] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -72,17 +66,14 @@ export async function PATCH(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const parsed = markReadSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -97,13 +88,10 @@ export async function PATCH(request: Request) {
 
       if (error) {
         console.error("[notifications] Mark all read error:", error);
-        return NextResponse.json(
-          { error: "Failed to update notifications" },
-          { status: 500 }
-        );
+        return jsonError("Failed to update notifications", 500);
       }
 
-      return NextResponse.json({ success: true });
+      return jsonOk({ success: true });
     }
 
     // Mark specific notification(s) as read
@@ -117,18 +105,12 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error("[notifications] Mark read error:", error);
-      return NextResponse.json(
-        { error: "Failed to update notifications" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update notifications", 500);
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[notifications] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

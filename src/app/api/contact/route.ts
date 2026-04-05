@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { contactSchema, CONTACT_DEPARTMENTS } from "@/lib/validations/contact";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -16,16 +16,13 @@ export async function POST(request: Request) {
     const result = contactSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { name, email, department, message } = result.data;
     const dept = CONTACT_DEPARTMENTS.find((d) => d.value === department);
     if (!dept) {
-      return NextResponse.json({ error: "Invalid department" }, { status: 400 });
+      return jsonError("Invalid department", 400);
     }
 
     // Save to leads table
@@ -101,12 +98,9 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return jsonOk({ success: true });
   } catch (err) {
     console.error("[contact] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

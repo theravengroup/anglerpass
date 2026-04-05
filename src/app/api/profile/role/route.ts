@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
@@ -26,17 +26,14 @@ export async function PATCH(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const parsed = switchRoleSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid role" },
-        { status: 400 }
-      );
+      return jsonError("Invalid role", 400);
     }
 
     const admin = createAdminClient();
@@ -49,19 +46,13 @@ export async function PATCH(request: Request) {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Profile not found", 404);
     }
 
     const roles: string[] = profile.roles ?? [];
 
     if (!roles.includes(parsed.data.role)) {
-      return NextResponse.json(
-        { error: "You don't have this role. Add it first." },
-        { status: 403 }
-      );
+      return jsonError("You don't have this role. Add it first.", 403);
     }
 
     // Update active role
@@ -72,22 +63,16 @@ export async function PATCH(request: Request) {
 
     if (updateError) {
       console.error("[profile/role] Switch error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to switch role" },
-        { status: 500 }
-      );
+      return jsonError("Failed to switch role", 500);
     }
 
-    return NextResponse.json({
+    return jsonOk({
       success: true,
       active_role: parsed.data.role,
     });
   } catch (err) {
     console.error("[profile/role] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -100,17 +85,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const parsed = addRoleSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid role" },
-        { status: 400 }
-      );
+      return jsonError("Invalid role", 400);
     }
 
     const admin = createAdminClient();
@@ -123,19 +105,13 @@ export async function POST(request: Request) {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Profile not found", 404);
     }
 
     const roles: string[] = profile.roles ?? [];
 
     if (roles.includes(parsed.data.role)) {
-      return NextResponse.json(
-        { error: "You already have this role" },
-        { status: 409 }
-      );
+      return jsonError("You already have this role", 409);
     }
 
     // Add role and switch to it
@@ -147,22 +123,16 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error("[profile/role] Add role error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to add role" },
-        { status: 500 }
-      );
+      return jsonError("Failed to add role", 500);
     }
 
-    return NextResponse.json({
+    return jsonOk({
       success: true,
       roles: newRoles,
       active_role: parsed.data.role,
     });
   } catch (err) {
     console.error("[profile/role] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

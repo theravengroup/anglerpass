@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -72,18 +72,12 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[properties/search] Error:", error);
-      return NextResponse.json(
-        { error: "Failed to search properties" },
-        { status: 500 }
-      );
+      return jsonError("Failed to search properties", 500);
     }
 
-    return NextResponse.json({ properties: properties ?? [] });
+    return jsonOk({ properties: properties ?? [] });
   } catch (err) {
     console.error("[properties/search] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

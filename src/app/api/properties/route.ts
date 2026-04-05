@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { propertySchema } from "@/lib/validations/properties";
@@ -12,7 +12,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -25,19 +25,13 @@ export async function GET() {
 
     if (error) {
       console.error("[properties] List error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch properties" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch properties", 500);
     }
 
-    return NextResponse.json({ properties: data });
+    return jsonOk({ properties: data });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -49,17 +43,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = propertySchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { water_type, coordinates, ...rest } = result.data;
@@ -83,18 +74,12 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[properties] Insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to create property" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create property", 500);
     }
 
-    return NextResponse.json({ property: data }, { status: 201 });
+    return jsonCreated({ property: data });
   } catch (err) {
     console.error("[properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

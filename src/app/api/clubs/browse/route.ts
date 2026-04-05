@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { escapeIlike } from "@/lib/api/helpers";
+import { escapeIlike, jsonError, jsonOk } from "@/lib/api/helpers";
 
 // GET: Browse/search clubs (for anglers looking to join)
 export async function GET(request: Request) {
@@ -12,7 +11,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -58,10 +57,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[clubs/browse] Query error:", error);
-      return NextResponse.json(
-        { error: "Failed to search clubs" },
-        { status: 500 }
-      );
+      return jsonError("Failed to search clubs", 500);
     }
 
     // Get member counts for each club
@@ -85,12 +81,9 @@ export async function GET(request: Request) {
       is_member: memberClubIds.has(club.id),
     }));
 
-    return NextResponse.json({ clubs: enrichedClubs });
+    return jsonOk({ clubs: enrichedClubs });
   } catch (err) {
     console.error("[clubs/browse] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { authorize, P } from "@/lib/permissions";
@@ -21,7 +21,7 @@ export async function GET(request: Request, context: RouteContext) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Authorize: user must be able to view the roster
@@ -32,7 +32,7 @@ export async function GET(request: Request, context: RouteContext) {
     });
 
     if (!authResult.allowed) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const admin = createAdminClient();
@@ -47,7 +47,7 @@ export async function GET(request: Request, context: RouteContext) {
 
     if (memError) {
       console.error("[club-staff] Fetch error:", memError);
-      return NextResponse.json({ error: "Failed to fetch staff" }, { status: 500 });
+      return jsonError("Failed to fetch staff", 500);
     }
 
     const allMembers = memberships ?? [];
@@ -107,13 +107,13 @@ export async function GET(request: Request, context: RouteContext) {
       .eq("id", clubId)
       .single();
 
-    return NextResponse.json({
+    return jsonOk({
       staff,
       members: regularMembers,
       is_owner: club?.owner_id === user.id,
     });
   } catch (err) {
     console.error("[club-staff] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }

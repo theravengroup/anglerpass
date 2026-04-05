@@ -255,6 +255,7 @@ function ConfirmWithSavedCard({
   return (
     <StripeProvider clientSecret={clientSecret}>
       <ConfirmWithSavedCardInner
+        clientSecret={clientSecret}
         paymentMethodId={paymentMethodId}
         totalAmount={totalAmount}
         onSuccess={onSuccess}
@@ -269,6 +270,7 @@ function ConfirmWithSavedCard({
 }
 
 function ConfirmWithSavedCardInner({
+  clientSecret,
   paymentMethodId,
   totalAmount,
   onSuccess,
@@ -278,6 +280,7 @@ function ConfirmWithSavedCardInner({
   error,
   setError,
 }: {
+  clientSecret: string;
   paymentMethodId: string;
   totalAmount: number;
   onSuccess: () => void;
@@ -295,7 +298,7 @@ function ConfirmWithSavedCardInner({
     setError(null);
 
     const { error: confirmError } = await stripe.confirmPayment({
-      clientSecret: undefined as never, // Already set via Elements provider
+      clientSecret,
       confirmParams: {
         payment_method: paymentMethodId,
         return_url: `${window.location.origin}${window.location.pathname}?payment=success`,

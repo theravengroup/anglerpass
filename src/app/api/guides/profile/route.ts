@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { guideProfileSchema } from "@/lib/validations/guides";
@@ -12,7 +12,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -25,26 +25,17 @@ export async function GET() {
 
     if (error) {
       console.error("[guides/profile] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch guide profile" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch guide profile", 500);
     }
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
-    return NextResponse.json({ profile });
+    return jsonOk({ profile });
   } catch (err) {
     console.error("[guides/profile] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -57,17 +48,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = guideProfileSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -80,10 +68,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Guide profile already exists. Use PATCH to update." },
-        { status: 409 }
-      );
+      return jsonError("Guide profile already exists. Use PATCH to update.", 409);
     }
 
     // Add 'guide' to user's roles if not present
@@ -141,19 +126,13 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[guides/profile] Insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to create guide profile" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create guide profile", 500);
     }
 
-    return NextResponse.json({ profile }, { status: 201 });
+    return jsonCreated({ profile });
   } catch (err) {
     console.error("[guides/profile] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -166,7 +145,7 @@ export async function PATCH(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
@@ -180,10 +159,7 @@ export async function PATCH(request: Request) {
       .single();
 
     if (!existing) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
     // Build update object from allowed fields
@@ -226,18 +202,12 @@ export async function PATCH(request: Request) {
 
     if (error) {
       console.error("[guides/profile] Update error:", error);
-      return NextResponse.json(
-        { error: "Failed to update guide profile" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update guide profile", 500);
     }
 
-    return NextResponse.json({ profile });
+    return jsonOk({ profile });
   } catch (err) {
     console.error("[guides/profile] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

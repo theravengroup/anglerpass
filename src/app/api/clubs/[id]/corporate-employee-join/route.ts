@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -20,17 +20,14 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = bodySchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { token } = result.data;
@@ -44,26 +41,17 @@ export async function POST(
       .single();
 
     if (invErr || !invitation) {
-      return NextResponse.json(
-        { error: "Invalid invitation token" },
-        { status: 404 }
-      );
+      return jsonError("Invalid invitation token", 404);
     }
 
     // Verify status is pending
     if (invitation.status !== "pending") {
-      return NextResponse.json(
-        { error: "This invitation has already been used or has expired" },
-        { status: 400 }
-      );
+      return jsonError("This invitation has already been used or has expired", 400);
     }
 
     // Verify club_id matches
     if (invitation.club_id !== clubId) {
-      return NextResponse.json(
-        { error: "Club ID mismatch" },
-        { status: 400 }
-      );
+      return jsonError("Club ID mismatch", 400);
     }
 
     // Check if user already has a membership in this club
@@ -75,10 +63,7 @@ export async function POST(
       .maybeSingle();
 
     if (existingMembership) {
-      return NextResponse.json(
-        { error: "You already have a membership in this club" },
-        { status: 409 }
-      );
+      return jsonError("You already have a membership in this club", 409);
     }
 
     // Get corporate member info
@@ -89,10 +74,7 @@ export async function POST(
       .single();
 
     if (!corporateMembership) {
-      return NextResponse.json(
-        { error: "Corporate membership not found" },
-        { status: 404 }
-      );
+      return jsonError("Corporate membership not found", 404);
     }
 
     // Create the employee membership
@@ -115,10 +97,7 @@ export async function POST(
 
     if (insertErr) {
       console.error("[corporate-employee-join] Insert error:", insertErr);
-      return NextResponse.json(
-        { error: "Failed to create membership" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create membership", 500);
     }
 
     // Update invitation status
@@ -169,12 +148,9 @@ export async function POST(
       });
     }
 
-    return NextResponse.json({ membership });
+    return jsonOk({ membership });
   } catch (err) {
     console.error("[corporate-employee-join] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

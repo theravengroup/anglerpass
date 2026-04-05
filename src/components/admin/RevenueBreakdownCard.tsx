@@ -35,6 +35,7 @@ export function RevenueBreakdownCard({
           </p>
         ) : (
           <>
+            {/* Dynamic widths from runtime data — Tailwind cannot generate arbitrary values */}
             <div className="flex h-4 overflow-hidden rounded-full">
               {revenueStreams.map((s) => (
                 <div

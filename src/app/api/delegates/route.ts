@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { delegateInviteSchema } from "@/lib/validations/permissions";
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
       if (error) {
         console.error("[delegates] Principals fetch error:", error);
-        return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+        return jsonError("Failed to fetch", 500);
       }
 
       const anglerIds = (delegations ?? []).map((d) => d.angler_id);
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
         angler_name: profileMap.get(d.angler_id) ?? "Unknown",
       }));
 
-      return NextResponse.json({ principals: enriched });
+      return jsonOk({ principals: enriched });
     }
 
     // Default: show delegates for this angler
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[delegates] Delegates fetch error:", error);
-      return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+      return jsonError("Failed to fetch", 500);
     }
 
     const delegateIds = (delegates ?? [])
@@ -81,10 +81,10 @@ export async function GET(request: Request) {
       delegate_name: d.delegate_id ? profileMap.get(d.delegate_id) ?? null : null,
     }));
 
-    return NextResponse.json({ delegates: enriched });
+    return jsonOk({ delegates: enriched });
   } catch (err) {
     console.error("[delegates] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -101,27 +101,21 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = delegateInviteSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const { email, access_level } = result.data;
     const admin = createAdminClient();
 
     if (user.email === email) {
-      return NextResponse.json(
-        { error: "You cannot add yourself as a delegate" },
-        { status: 400 }
-      );
+      return jsonError("You cannot add yourself as a delegate", 400);
     }
 
     // Check if delegate already exists by email
@@ -132,10 +126,7 @@ export async function POST(request: Request) {
       .single();
 
     if (existingByEmail && existingByEmail.status !== "revoked") {
-      return NextResponse.json(
-        { error: "This person is already a delegate or has a pending invitation" },
-        { status: 409 }
-      );
+      return jsonError("This person is already a delegate or has a pending invitation", 409);
     }
 
     // Look up user by email
@@ -152,10 +143,7 @@ export async function POST(request: Request) {
         .single();
 
       if (existingById && existingById.status !== "revoked") {
-        return NextResponse.json(
-          { error: "This person is already a delegate" },
-          { status: 409 }
-        );
+        return jsonError("This person is already a delegate", 409);
       }
     }
 
@@ -180,7 +168,7 @@ export async function POST(request: Request) {
 
       if (error) {
         console.error("[delegates] Update error:", error);
-        return NextResponse.json({ error: "Failed to update delegate" }, { status: 500 });
+        return jsonError("Failed to update delegate", 500);
       }
 
       auditLog({
@@ -192,7 +180,7 @@ export async function POST(request: Request) {
         scope: "consumer",
       }).catch((err) => console.error("[delegates] Audit error:", err));
 
-      return NextResponse.json({ delegate }, { status: 200 });
+      return jsonOk({ delegate });
     }
 
     const { data: delegate, error } = await createAdminClient().from("angler_delegates")
@@ -202,7 +190,7 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[delegates] Insert error:", error);
-      return NextResponse.json({ error: "Failed to create delegate" }, { status: 500 });
+      return jsonError("Failed to create delegate", 500);
     }
 
     auditLog({
@@ -214,9 +202,9 @@ export async function POST(request: Request) {
       scope: "consumer",
     }).catch((err) => console.error("[delegates] Audit error:", err));
 
-    return NextResponse.json({ delegate }, { status: 201 });
+    return jsonCreated({ delegate });
   } catch (err) {
     console.error("[delegates] Unexpected error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return jsonError("Internal server error", 500);
   }
 }

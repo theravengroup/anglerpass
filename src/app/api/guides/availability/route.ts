@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { guideAvailabilitySchema } from "@/lib/validations/guides";
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -33,10 +33,7 @@ export async function GET(request: Request) {
         .single();
 
       if (!profile) {
-        return NextResponse.json(
-          { error: "Guide profile not found" },
-          { status: 404 }
-        );
+        return jsonError("Guide profile not found", 404);
       }
       targetGuideId = profile.id;
     }
@@ -58,19 +55,13 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[guides/availability] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch availability" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch availability", 500);
     }
 
-    return NextResponse.json({ availability: availability ?? [] });
+    return jsonOk({ availability: availability ?? [] });
   } catch (err) {
     console.error("[guides/availability] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -83,17 +74,14 @@ export async function PUT(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = guideAvailabilitySchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -105,10 +93,7 @@ export async function PUT(request: Request) {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
     const { dates, status } = result.data;
@@ -126,7 +111,7 @@ export async function PUT(request: Request) {
       const filteredDates = dates.filter((d) => !bookedSet.has(d));
 
       if (filteredDates.length === 0) {
-        return NextResponse.json({
+        return jsonOk({
           message: "All selected dates are already booked and cannot be blocked.",
           updated: 0,
         });
@@ -145,13 +130,10 @@ export async function PUT(request: Request) {
 
       if (error) {
         console.error("[guides/availability] Upsert error:", error);
-        return NextResponse.json(
-          { error: "Failed to update availability" },
-          { status: 500 }
-        );
+        return jsonError("Failed to update availability", 500);
       }
 
-      return NextResponse.json({
+      return jsonOk({
         message: `${filteredDates.length} date(s) updated to ${status}`,
         updated: filteredDates.length,
       });
@@ -169,24 +151,18 @@ export async function PUT(request: Request) {
 
       if (error) {
         console.error("[guides/availability] Delete error:", error);
-        return NextResponse.json(
-          { error: "Failed to update availability" },
-          { status: 500 }
-        );
+        return jsonError("Failed to update availability", 500);
       }
 
-      return NextResponse.json({
+      return jsonOk({
         message: `${dates.length} date(s) set to available`,
         updated: dates.length,
       });
     }
 
-    return NextResponse.json({ message: "No changes made", updated: 0 });
+    return jsonOk({ message: "No changes made", updated: 0 });
   } catch (err) {
     console.error("[guides/availability] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

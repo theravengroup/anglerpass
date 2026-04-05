@@ -46,6 +46,7 @@ export function TopPropertiesCard({ properties }: TopPropertiesCardProps) {
                   booking{prop.bookings !== 1 ? "s" : ""}
                 </span>
               </div>
+              {/* Dynamic width from runtime data — Tailwind cannot generate arbitrary values */}
               <div className="h-2 overflow-hidden rounded-full bg-offwhite">
                 <div
                   className="h-full rounded-full bg-forest transition-all"

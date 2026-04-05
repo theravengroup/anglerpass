@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubSchema } from "@/lib/validations/clubs";
@@ -16,7 +16,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,10 +28,7 @@ export async function GET(
       .single();
 
     if (error || !club) {
-      return NextResponse.json(
-        { error: "Club not found" },
-        { status: 404 }
-      );
+      return jsonError("Club not found", 404);
     }
 
     // Only owner or members can view full details
@@ -52,7 +49,7 @@ export async function GET(
         .single();
 
       if (!membership && profile?.role !== "admin") {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return jsonError("Forbidden", 403);
       }
     }
 
@@ -84,7 +81,7 @@ export async function GET(
       .eq("club_id", id)
       .eq("status", "pending");
 
-    return NextResponse.json({
+    return jsonOk({
       club,
       stats: {
         active_members: memberCount ?? 0,
@@ -95,10 +92,7 @@ export async function GET(
     });
   } catch (err) {
     console.error("[clubs/[id]] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -115,7 +109,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -128,17 +122,14 @@ export async function PATCH(
       .single();
 
     if (!club || club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const body = await request.json();
     const result = clubSchema.partial().safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const updates: Record<string, unknown> = {
@@ -162,18 +153,12 @@ export async function PATCH(
 
     if (updateError) {
       console.error("[clubs/[id]] Update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update club" },
-        { status: 500 }
-      );
+      return jsonError("Failed to update club", 500);
     }
 
-    return NextResponse.json({ club: updated });
+    return jsonOk({ club: updated });
   } catch (err) {
     console.error("[clubs/[id]] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -10,8 +10,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 export function useUnreadCount(intervalMs = 60_000) {
   const [count, setCount] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fetchingRef = useRef(false);
 
   const refresh = useCallback(async () => {
+    // Prevent concurrent fetches from overlapping interval ticks
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
     try {
       const res = await fetch("/api/notifications?unread=true&limit=1");
       if (res.ok) {
@@ -20,21 +24,27 @@ export function useUnreadCount(intervalMs = 60_000) {
       }
     } catch {
       // Network error — keep previous count
+    } finally {
+      fetchingRef.current = false;
     }
   }, []);
 
   useEffect(() => {
-    function startPolling() {
-      // Fetch immediately, then start interval
-      refresh();
-      timerRef.current = setInterval(refresh, intervalMs);
-    }
+    let cancelled = false;
 
     function stopPolling() {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+    }
+
+    function startPolling() {
+      // Always clear any existing interval before starting a new one
+      stopPolling();
+      if (cancelled) return;
+      refresh();
+      timerRef.current = setInterval(refresh, intervalMs);
     }
 
     function handleVisibility() {
@@ -53,6 +63,7 @@ export function useUnreadCount(intervalMs = 60_000) {
     document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
+      cancelled = true;
       stopPolling();
       document.removeEventListener("visibilitychange", handleVisibility);
     };

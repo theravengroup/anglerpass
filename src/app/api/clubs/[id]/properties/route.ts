@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,7 +15,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -28,7 +28,7 @@ export async function GET(
       .single();
 
     if (!club || club.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Fetch property access records with property details
@@ -42,18 +42,12 @@ export async function GET(
 
     if (error) {
       console.error("[clubs/properties] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch properties" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch properties", 500);
     }
 
-    return NextResponse.json({ properties: access ?? [] });
+    return jsonOk({ properties: access ?? [] });
   } catch (err) {
     console.error("[clubs/properties] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

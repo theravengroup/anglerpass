@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubSchema } from "@/lib/validations/clubs";
@@ -12,17 +12,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = clubSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -35,10 +32,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existingClub) {
-      return NextResponse.json(
-        { error: "You already have a club. You can manage it from your dashboard." },
-        { status: 409 }
-      );
+      return jsonError("You already have a club. You can manage it from your dashboard.", 409);
     }
 
     const { name, description, location, rules, website } = result.data;
@@ -59,10 +53,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       console.error("[clubs] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create club" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create club", 500);
     }
 
     // Auto-create admin membership for the owner
@@ -175,13 +166,10 @@ export async function POST(request: Request) {
       // Don't fail club creation for this
     }
 
-    return NextResponse.json({ club }, { status: 201 });
+    return jsonCreated({ club });
   } catch (err) {
     console.error("[clubs] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -194,7 +182,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -208,10 +196,7 @@ export async function GET() {
 
     if (ownedError) {
       console.error("[clubs] Fetch owned error:", ownedError);
-      return NextResponse.json(
-        { error: "Failed to fetch clubs" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch clubs", 500);
     }
 
     // Get clubs the user is a member/staff of (but doesn't own)
@@ -236,16 +221,13 @@ export async function GET() {
       .map((m) => m.clubs)
       .filter(Boolean);
 
-    return NextResponse.json({
+    return jsonOk({
       owned: ownedClubs ?? [],
       staff_of: staffClubs,
       member_of: memberClubs,
     });
   } catch (err) {
     console.error("[clubs] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

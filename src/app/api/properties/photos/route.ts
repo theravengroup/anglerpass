@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_PHOTOS } from "@/lib/validations/properties";
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const formData = await request.formData();
@@ -21,18 +21,12 @@ export async function POST(request: Request) {
     const propertyId = formData.get("propertyId") as string | null;
 
     if (!file || !propertyId) {
-      return NextResponse.json(
-        { error: "File and propertyId are required" },
-        { status: 400 }
-      );
+      return jsonError("File and propertyId are required", 400);
     }
 
     // Server-side file size check
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: "File is too large. Maximum size is 5MB." },
-        { status: 413 }
-      );
+      return jsonError("File is too large. Maximum size is 5MB.", 413);
     }
 
     // Verify property ownership and check current photo count
@@ -44,15 +38,12 @@ export async function POST(request: Request) {
       .single();
 
     if (!property || property.owner_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const currentCount = (property.photos as string[])?.length ?? 0;
     if (currentCount >= MAX_PHOTOS) {
-      return NextResponse.json(
-        { error: `Maximum of ${MAX_PHOTOS} photos allowed` },
-        { status: 400 }
-      );
+      return jsonError(`Maximum of ${MAX_PHOTOS} photos allowed`, 400);
     }
 
     // Upload to Supabase Storage
@@ -68,10 +59,7 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error("[photos] Upload error:", uploadError);
-      return NextResponse.json(
-        { error: "Failed to upload photo" },
-        { status: 500 }
-      );
+      return jsonError("Failed to upload photo", 500);
     }
 
     // Get public URL
@@ -79,12 +67,9 @@ export async function POST(request: Request) {
       data: { publicUrl },
     } = supabase.storage.from("property-photos").getPublicUrl(fileName);
 
-    return NextResponse.json({ url: publicUrl });
+    return jsonOk({ url: publicUrl });
   } catch (err) {
     console.error("[photos] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

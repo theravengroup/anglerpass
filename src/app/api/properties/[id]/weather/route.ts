@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getPropertyForecast } from "@/lib/weather";
@@ -20,7 +20,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { id } = await params;
@@ -35,17 +35,11 @@ export async function GET(
       .single();
 
     if (error || !property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 }
-      );
+      return jsonError("Property not found", 404);
     }
 
     if (property.latitude == null || property.longitude == null) {
-      return NextResponse.json(
-        { error: "Property coordinates not available" },
-        { status: 404 }
-      );
+      return jsonError("Property coordinates not available", 404);
     }
 
     const forecast = await getPropertyForecast(
@@ -54,23 +48,17 @@ export async function GET(
     );
 
     if (!forecast) {
-      return NextResponse.json(
-        { error: "Forecast temporarily unavailable" },
-        { status: 503 }
-      );
+      return jsonError("Forecast temporarily unavailable", 503);
     }
 
     // Allow browser to cache for 15 minutes, CDN for 30 minutes
-    return NextResponse.json(forecast, {
+    return Response.json(forecast, {
       headers: {
         "Cache-Control": "public, s-maxage=1800, max-age=900, stale-while-revalidate=3600",
       },
     });
   } catch (err) {
     console.error("[weather] Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

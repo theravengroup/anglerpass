@@ -19,9 +19,9 @@ function BrowserChrome({
       {/* Browser bar */}
       <div className="flex items-center gap-2 px-4 py-2.5 bg-parchment-light/60 border-b border-parchment">
         <div className="flex gap-[6px]">
-          <span className="size-[10px] rounded-full bg-[#ee6a5f]" />
-          <span className="size-[10px] rounded-full bg-[#f5bd4f]" />
-          <span className="size-[10px] rounded-full bg-[#61c454]" />
+          <span className="size-[10px] rounded-full bg-red-400" />
+          <span className="size-[10px] rounded-full bg-yellow-400" />
+          <span className="size-[10px] rounded-full bg-green-400" />
         </div>
         <div className="flex-1 ml-2 px-3 py-1 bg-white rounded-md text-[11px] font-mono text-text-light">
           {url}

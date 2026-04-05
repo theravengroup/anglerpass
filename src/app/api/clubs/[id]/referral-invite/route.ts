@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { referralInviteSchema } from "@/lib/validations/clubs";
@@ -60,7 +60,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Verify club exists and has referral program enabled
@@ -70,14 +70,11 @@ export async function POST(
     const club = clubs?.[0];
 
     if (!club) {
-      return NextResponse.json({ error: "Club not found" }, { status: 404 });
+      return jsonError("Club not found", 404);
     }
 
     if (!club.referral_program_enabled) {
-      return NextResponse.json(
-        { error: "Referral program is not enabled for this club" },
-        { status: 400 }
-      );
+      return jsonError("Referral program is not enabled for this club", 400);
     }
 
     // Verify caller is an active member with referral_code
@@ -87,13 +84,7 @@ export async function POST(
     const membership = memberships?.[0];
 
     if (!membership) {
-      return NextResponse.json(
-        {
-          error:
-            "You must be an active member of this club to send referrals",
-        },
-        { status: 403 }
-      );
+      return jsonError("You must be an active member of this club to send referrals", 403);
     }
 
     // Parse input
@@ -101,10 +92,7 @@ export async function POST(
     const parsed = referralInviteSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     // Generate referral code if the member doesn't have one yet
@@ -126,18 +114,12 @@ export async function POST(
           continue;
         }
 
-        return NextResponse.json(
-          { error: "Failed to generate referral code" },
-          { status: 500 }
-        );
+        return jsonError("Failed to generate referral code", 500);
       }
     }
 
     if (!referralCode) {
-      return NextResponse.json(
-        { error: "Failed to generate a unique referral code" },
-        { status: 500 }
-      );
+      return jsonError("Failed to generate a unique referral code", 500);
     }
 
     const referralLink = buildReferralLink(clubId, referralCode);
@@ -194,17 +176,14 @@ export async function POST(
       });
     }
 
-    return NextResponse.json({
+    return jsonOk({
       success: true,
       referralLink,
       referralCode,
     });
   } catch (err) {
     console.error("[referral-invite] POST error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -221,7 +200,7 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     // Verify active membership
@@ -231,10 +210,7 @@ export async function GET(
     const membership = memberships?.[0];
 
     if (!membership) {
-      return NextResponse.json(
-        { error: "Not an active member" },
-        { status: 403 }
-      );
+      return jsonError("Not an active member", 403);
     }
 
     // Generate code if needed
@@ -247,15 +223,12 @@ export async function GET(
       });
     }
 
-    return NextResponse.json({
+    return jsonOk({
       referralCode,
       referralLink: buildReferralLink(clubId, referralCode),
     });
   } catch (err) {
     console.error("[referral-invite] GET error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

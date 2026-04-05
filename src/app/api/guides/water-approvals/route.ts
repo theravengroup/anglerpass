@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { guideWaterApprovalSchema } from "@/lib/validations/guides";
@@ -13,7 +13,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -25,10 +25,7 @@ export async function GET() {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
     const { data: approvals, error } = await admin
@@ -41,19 +38,13 @@ export async function GET() {
 
     if (error) {
       console.error("[guides/water-approvals] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch approvals" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch approvals", 500);
     }
 
-    return NextResponse.json({ approvals: approvals ?? [] });
+    return jsonOk({ approvals: approvals ?? [] });
   } catch (err) {
     console.error("[guides/water-approvals] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -66,17 +57,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = guideWaterApprovalSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -89,17 +77,11 @@ export async function POST(request: Request) {
       .single();
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Guide profile not found" },
-        { status: 404 }
-      );
+      return jsonError("Guide profile not found", 404);
     }
 
     if (profile.status !== "live") {
-      return NextResponse.json(
-        { error: "Your guide profile must be live before requesting water access" },
-        { status: 400 }
-      );
+      return jsonError("Your guide profile must be live before requesting water access", 400);
     }
 
     const { property_id, club_id } = result.data;
@@ -113,10 +95,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        { error: `You already have a ${existing.status} request for this property` },
-        { status: 409 }
-      );
+      return jsonError(`You already have a ${existing.status} request for this property`, 409);
     }
 
     // Create approval request
@@ -133,10 +112,7 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[guides/water-approvals] Insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to create approval request" },
-        { status: 500 }
-      );
+      return jsonError("Failed to create approval request", 500);
     }
 
     // Notify club admin
@@ -162,12 +138,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ approval }, { status: 201 });
+    return jsonCreated({ approval });
   } catch (err) {
     console.error("[guides/water-approvals] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
@@ -51,13 +51,13 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
     const auth = await verifyClubManager(admin, id, user.id);
     if (!auth) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     const { searchParams } = new URL(request.url);
@@ -79,10 +79,7 @@ export async function GET(
 
     if (error) {
       console.error("[clubs/applications] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch applications" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch applications", 500);
     }
 
     // Enrich with user profile and email from auth
@@ -124,12 +121,9 @@ export async function GET(
       })
     );
 
-    return NextResponse.json({ applications: enriched });
+    return jsonOk({ applications: enriched });
   } catch (err) {
     console.error("[clubs/applications] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

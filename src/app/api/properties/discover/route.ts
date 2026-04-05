@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { discoverCrossClubProperties } from "@/lib/cross-club";
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const admin = createAdminClient();
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
       .eq("status", "active");
 
     if (!memberships?.length) {
-      return NextResponse.json({
+      return jsonOk({
         properties: [],
         memberships: [],
         message:
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
     const allPropertyIds = [...directPropertyIds, ...crossClubPropertyIds];
 
     if (allPropertyIds.length === 0) {
-      return NextResponse.json({
+      return jsonOk({
         properties: [],
         memberships: memberships.map((m) => ({
           id: m.id,
@@ -152,10 +152,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[properties/discover] Fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch properties" },
-        { status: 500 }
-      );
+      return jsonError("Failed to fetch properties", 500);
     }
 
     // Fetch active lodging data for these properties
@@ -223,7 +220,7 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({
+    return jsonOk({
       properties: enriched,
       memberships: memberships.map((m) => ({
         id: m.id,
@@ -233,9 +230,6 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error("[properties/discover] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

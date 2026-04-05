@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -22,10 +22,7 @@ export async function GET(request: Request) {
     const duration = searchParams.get("duration") ?? "full_day";
 
     if (!propertyId || !date) {
-      return NextResponse.json(
-        { error: "property_id and date are required" },
-        { status: 400 }
-      );
+      return jsonError("property_id and date are required", 400);
     }
 
     const partySize = parseInt(partySizeStr ?? "1", 10);
@@ -39,7 +36,7 @@ export async function GET(request: Request) {
       .eq("status", "live");
 
     if (!approvals?.length) {
-      return NextResponse.json({ guides: [] });
+      return jsonOk({ guides: [] });
     }
 
     const guideIds = approvals.map((a) => a.guide_id);
@@ -56,7 +53,7 @@ export async function GET(request: Request) {
       .order("rating_avg", { ascending: false });
 
     if (!guides?.length) {
-      return NextResponse.json({ guides: [] });
+      return jsonOk({ guides: [] });
     }
 
     // Check availability — exclude blocked/booked guides
@@ -95,12 +92,9 @@ export async function GET(request: Request) {
             : g.rate_full_day,
       }));
 
-    return NextResponse.json({ guides: availableGuides });
+    return jsonOk({ guides: availableGuides });
   } catch (err) {
     console.error("[guides/match] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }

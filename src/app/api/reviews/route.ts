@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { reviewSchema } from "@/lib/validations/guides";
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const { searchParams } = new URL(request.url);
@@ -35,13 +35,10 @@ export async function GET(request: Request) {
         .order("created_at", { ascending: false });
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to fetch reviews" },
-          { status: 500 }
-        );
+        return jsonError("Failed to fetch reviews", 500);
       }
 
-      return NextResponse.json({ reviews: reviews ?? [] });
+      return jsonOk({ reviews: reviews ?? [] });
     }
 
     if (bookingId) {
@@ -54,10 +51,7 @@ export async function GET(request: Request) {
         .eq("booking_id", bookingId);
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to fetch reviews" },
-          { status: 500 }
-        );
+        return jsonError("Failed to fetch reviews", 500);
       }
 
       // Filter: only show revealed reviews or ones written by the current user
@@ -65,7 +59,7 @@ export async function GET(request: Request) {
         (r) => r.is_revealed || r.reviewer_id === user.id
       );
 
-      return NextResponse.json({ reviews: filtered });
+      return jsonOk({ reviews: filtered });
     }
 
     if (subjectId) {
@@ -80,13 +74,10 @@ export async function GET(request: Request) {
         .order("created_at", { ascending: false });
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to fetch reviews" },
-          { status: 500 }
-        );
+        return jsonError("Failed to fetch reviews", 500);
       }
 
-      return NextResponse.json({ reviews: reviews ?? [] });
+      return jsonOk({ reviews: reviews ?? [] });
     }
 
     // Default: user's pending reviews to write
@@ -120,13 +111,10 @@ export async function GET(request: Request) {
         return new Date() <= windowClose;
       });
 
-    return NextResponse.json({ pending_reviews: pendingReviews });
+    return jsonOk({ pending_reviews: pendingReviews });
   } catch (err) {
     console.error("[reviews] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
@@ -139,17 +127,14 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
 
     const body = await request.json();
     const result = reviewSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
     }
 
     const admin = createAdminClient();
@@ -162,17 +147,11 @@ export async function POST(request: Request) {
       .single();
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return jsonError("Booking not found", 404);
     }
 
     if (!booking.guide_id) {
-      return NextResponse.json(
-        { error: "This booking has no guide to review" },
-        { status: 400 }
-      );
+      return jsonError("This booking has no guide to review", 400);
     }
 
     // Verify user is the angler or guide
@@ -182,26 +161,20 @@ export async function POST(request: Request) {
     const isGuide = guideProfile?.user_id === user.id;
 
     if (!isAngler && !isGuide) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
 
     // Check booking is completed (date has passed)
     const bookingDate = new Date(booking.booking_date + "T23:59:59");
     if (new Date() < bookingDate) {
-      return NextResponse.json(
-        { error: "You can only review after the trip has taken place" },
-        { status: 400 }
-      );
+      return jsonError("You can only review after the trip has taken place", 400);
     }
 
     // Check review window (14 days)
     const windowClose = new Date(booking.booking_date + "T00:00:00");
     windowClose.setDate(windowClose.getDate() + 14);
     if (new Date() > windowClose) {
-      return NextResponse.json(
-        { error: "The review window has closed (14 days after the trip)" },
-        { status: 400 }
-      );
+      return jsonError("The review window has closed (14 days after the trip)", 400);
     }
 
     // Determine reviewer/subject roles
@@ -220,10 +193,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        { error: "You have already reviewed this booking" },
-        { status: 409 }
-      );
+      return jsonError("You have already reviewed this booking", 409);
     }
 
     // Create the review
@@ -246,10 +216,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       console.error("[reviews] Insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to submit review" },
-        { status: 500 }
-      );
+      return jsonError("Failed to submit review", 500);
     }
 
     // Check if both sides have submitted → reveal both
@@ -271,13 +238,10 @@ export async function POST(request: Request) {
       await recalculateGuideStats(admin, isAngler ? subjectId : user.id);
     }
 
-    return NextResponse.json({ review }, { status: 201 });
+    return jsonCreated({ review });
   } catch (err) {
     console.error("[reviews] Unexpected error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return jsonError("Internal server error", 500);
   }
 }
 
