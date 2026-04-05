@@ -9,9 +9,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Nav />
-      <div className="relative min-h-[calc(100vh-80px)] bg-offwhite">
+      <div className="relative flex-1 bg-offwhite">
         {/* Subtle background texture */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(154,115,64,0.04),_transparent_60%)]" />
 
@@ -38,6 +38,6 @@ export default function AuthLayout({
         </div>
       </div>
       <MarketingFooter />
-    </>
+    </div>
   );
 }
