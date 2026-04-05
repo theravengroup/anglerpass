@@ -30,6 +30,8 @@ export default function ClubBrowser() {
   const [loading, setLoading] = useState(true);
   const [searchQ, setSearchQ] = useState("");
   const [joining, setJoining] = useState<string | null>(null);
+  const [applyingTo, setApplyingTo] = useState<string | null>(null);
+  const [applicationNote, setApplicationNote] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   const fetchClubs = useCallback(async (q = "") => {
@@ -60,18 +62,23 @@ export default function ClubBrowser() {
   const hasHomeClub = clubs.some((c) => c.membership_status === "active");
   const hasPending = clubs.some((c) => c.membership_status === "pending");
 
-  const handleJoin = async (clubId: string) => {
+  const handleJoin = async (clubId: string, note?: string) => {
     setJoining(clubId);
     setMessage(null);
     try {
       const res = await fetch("/api/clubs/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ club_id: clubId }),
+        body: JSON.stringify({
+          club_id: clubId,
+          application_note: note || undefined,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         setMessage(data.message);
+        setApplyingTo(null);
+        setApplicationNote("");
         setClubs((prev) =>
           prev.map((c) =>
             c.id === clubId
@@ -210,12 +217,51 @@ export default function ClubBrowser() {
                             <Clock className="size-3.5" />
                             Pending
                           </span>
+                        ) : applyingTo === club.id ? (
+                          <div className="flex w-full flex-col gap-2">
+                            <textarea
+                              value={applicationNote}
+                              onChange={(e) =>
+                                setApplicationNote(e.target.value)
+                              }
+                              placeholder="Tell the club about yourself (optional)..."
+                              maxLength={2000}
+                              rows={2}
+                              className="w-full resize-none rounded-md border border-stone-light/40 bg-white px-2.5 py-2 text-xs text-text-primary placeholder:text-text-light focus:border-river focus:outline-none"
+                            />
+                            <div className="flex gap-1.5">
+                              <Button
+                                size="sm"
+                                className="h-7 flex-1 bg-river text-xs text-white hover:bg-river/90"
+                                onClick={() =>
+                                  handleJoin(club.id, applicationNote)
+                                }
+                                disabled={joining === club.id}
+                              >
+                                {joining === club.id ? (
+                                  <Loader2 className="size-3 animate-spin" />
+                                ) : null}
+                                Submit Application
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-xs text-text-light"
+                                onClick={() => {
+                                  setApplyingTo(null);
+                                  setApplicationNote("");
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
                         ) : (
                           <Button
                             size="sm"
                             variant="outline"
                             className="h-7 border-river/30 text-xs text-river hover:bg-river/5"
-                            onClick={() => handleJoin(club.id)}
+                            onClick={() => setApplyingTo(club.id)}
                             disabled={!canJoin || joining === club.id}
                             title={
                               !canJoin
@@ -223,9 +269,6 @@ export default function ClubBrowser() {
                                 : undefined
                             }
                           >
-                            {joining === club.id ? (
-                              <Loader2 className="size-3 animate-spin" />
-                            ) : null}
                             Request to Join
                           </Button>
                         )}

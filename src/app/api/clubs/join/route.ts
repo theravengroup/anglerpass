@@ -6,6 +6,7 @@ import { z } from "zod";
 const joinSchema = z.object({
   club_id: z.uuid(),
   referral_code: z.string().max(20).optional(),
+  application_note: z.string().max(2000).optional(),
 });
 
 // POST: Request to join a club
@@ -30,13 +31,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { club_id, referral_code } = parsed.data;
+    const { club_id, referral_code, application_note } = parsed.data;
     const admin = createAdminClient();
 
-    // Check club exists
+    // Check club exists (include application settings)
     const { data: club } = await admin
       .from("clubs")
-      .select("id, name")
+      .select("id, name, membership_application_required")
       .eq("id", club_id)
       .single();
 
@@ -107,6 +108,37 @@ export async function POST(request: Request) {
         .from("club_memberships")
         .update({ status: "pending", updated_at: new Date().toISOString() })
         .eq("id", existing.id);
+
+      // Also create/update application record
+      if (club.membership_application_required !== false) {
+        const { data: existingApp } = await admin
+          .from("membership_applications")
+          .select("id")
+          .eq("club_id", club_id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (existingApp) {
+          await admin
+            .from("membership_applications")
+            .update({
+              status: "pending",
+              application_note: application_note ?? null,
+              reviewed_by: null,
+              reviewed_at: null,
+              declined_reason: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingApp.id);
+        } else {
+          await admin.from("membership_applications").insert({
+            club_id,
+            user_id: user.id,
+            status: "pending",
+            application_note: application_note ?? null,
+          });
+        }
+      }
 
       return NextResponse.json({
         success: true,
@@ -211,6 +243,26 @@ export async function POST(request: Request) {
       }
 
       newMembershipId = newMembership?.id ?? null;
+    }
+
+    // Create membership_application record for clubs that require vetting
+    if (club.membership_application_required !== false) {
+      // Check if application already exists
+      const { data: existingApp } = await admin
+        .from("membership_applications")
+        .select("id")
+        .eq("club_id", club_id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!existingApp) {
+        await admin.from("membership_applications").insert({
+          club_id,
+          user_id: user.id,
+          status: "pending",
+          application_note: application_note ?? null,
+        });
+      }
     }
 
     // Create pending referral credit if referred

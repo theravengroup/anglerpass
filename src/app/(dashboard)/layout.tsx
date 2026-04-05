@@ -16,6 +16,7 @@ import {
   Shield,
   UserPlus,
   Gift,
+  ClipboardList,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -63,6 +64,11 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
     },
   ],
   club_admin: [
+    {
+      label: "Applications",
+      href: "/club/applications",
+      icon: <ClipboardList />,
+    },
     {
       label: "Members",
       href: "/club/members",
@@ -176,6 +182,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/landowner/documents/new": "New Document",
   "/club": "Club Management",
   "/club/setup": "Set Up Your Club",
+  "/club/applications": "Membership Applications",
   "/club/members": "Members",
   "/club/properties": "Properties",
   "/club/financials": "Club Financials",
