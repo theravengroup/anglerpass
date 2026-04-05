@@ -55,6 +55,7 @@ function LoginForm() {
 
       if (authError) {
         setError(authError.message);
+        setIsLoading(false);
         return;
       }
 
@@ -79,12 +80,12 @@ function LoginForm() {
         : "/dashboard";
       router.push(destination);
       router.refresh();
+      // Keep spinner running until navigation completes
     } catch (err) {
       console.error("[login] Auth error:", err);
       setError(
         "Unable to connect to authentication service. Please try again or contact support."
       );
-    } finally {
       setIsLoading(false);
     }
   }
