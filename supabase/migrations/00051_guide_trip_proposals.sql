@@ -72,16 +72,7 @@ CREATE POLICY "guide_trip_proposals_own_update"
     )
   );
 
--- Anglers who are invitees can view the proposal
-CREATE POLICY "guide_trip_proposals_invitee_read"
-  ON guide_trip_proposals FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM guide_trip_proposal_invitees
-      WHERE guide_trip_proposal_invitees.proposal_id = guide_trip_proposals.id
-        AND guide_trip_proposal_invitees.angler_id = auth.uid()
-    )
-  );
+-- NOTE: invitee_read policy is defined after the invitees table below
 
 -- Admin can view all proposals
 CREATE POLICY "guide_trip_proposals_admin_read"
@@ -161,7 +152,20 @@ CREATE POLICY "proposal_invitees_admin_read"
     )
   );
 
--- ── 3. Comments ────────────────────────────────────────────────────────
+-- ── 3. Deferred RLS policy (requires invitees table) ──────────────────
+
+-- Anglers who are invitees can view the proposal
+CREATE POLICY "guide_trip_proposals_invitee_read"
+  ON guide_trip_proposals FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM guide_trip_proposal_invitees
+      WHERE guide_trip_proposal_invitees.proposal_id = guide_trip_proposals.id
+        AND guide_trip_proposal_invitees.angler_id = auth.uid()
+    )
+  );
+
+-- ── 4. Comments ────────────────────────────────────────────────────────
 
 COMMENT ON TABLE guide_trip_proposals IS
   'Guide-initiated trip proposals. Guides build a proposed trip and send it to anglers for acceptance.';
