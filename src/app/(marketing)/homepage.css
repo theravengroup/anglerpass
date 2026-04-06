@@ -482,8 +482,8 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .compass-headline em{font-style:italic;color:var(--bronze-light)}
 .compass-subhead{font-size:17px;color:rgba(255,255,255,.6);max-width:600px;line-height:1.7;margin:0 auto}
 .compass-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:stretch}
-.compass-features{display:flex;flex-direction:column;gap:20px;justify-content:space-between}
-.compass-feature-card{display:flex;align-items:flex-start;gap:16px;padding:28px 28px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);transition:all .4s;flex:1}
+.compass-features{display:flex;flex-direction:column;justify-content:space-between}
+.compass-feature-card{display:flex;align-items:flex-start;gap:16px;padding:24px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);transition:all .4s}
 .compass-feature-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
 .compass-feature-icon{font-size:22px;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border-radius:10px}
 .compass-feature-title{font-family:var(--heading);font-size:19px;font-weight:600;color:#fff;margin-bottom:5px}
