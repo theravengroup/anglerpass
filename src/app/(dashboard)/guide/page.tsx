@@ -17,6 +17,7 @@ import {
   MessageSquare,
   ArrowRight,
   ShieldCheck,
+  Handshake,
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import GuideOnboardingCard from "@/components/guide/GuideOnboardingCard";
@@ -253,6 +254,11 @@ function ActiveGuideDashboard({
             label: "Verification",
             href: "/guide/verification",
             icon: ShieldCheck,
+          },
+          {
+            label: "Club Affiliations",
+            href: "/guide/affiliations",
+            icon: Handshake,
           },
           {
             label: "Set Availability",

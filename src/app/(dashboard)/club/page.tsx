@@ -27,6 +27,7 @@ import {
   Network,
   Gift,
   Shield,
+  Handshake,
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist";
@@ -490,6 +491,14 @@ function ActiveClubDashboard({
             icon: Shield,
             color: "text-river",
             bg: "bg-river/10",
+          },
+          {
+            label: "Guide Affiliations",
+            description: "Manage affiliated guides for your waters",
+            href: "/club/guides",
+            icon: Handshake,
+            color: "text-charcoal",
+            bg: "bg-charcoal/10",
           },
           {
             label: "Club Network",

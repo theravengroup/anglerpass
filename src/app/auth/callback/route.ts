@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRoleHomePath } from "@/types/roles";
+import { sendWelcomeEmail } from "@/lib/welcome-emails";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -21,6 +22,9 @@ export async function GET(request: Request) {
         if (user) {
           // Auto-link pending club memberships by email
           await linkPendingMemberships(user.id, user.email);
+
+          // Send welcome email 1 for new signups (step = 0 means never sent)
+          await sendWelcomeEmailIfNew(user.id);
         }
 
         // Determine redirect destination
@@ -102,5 +106,33 @@ async function linkPendingMemberships(
   } catch (err) {
     // Don't fail the auth flow if linking fails
     console.error("[auth/callback] Error linking memberships:", err);
+  }
+}
+
+/**
+ * Send the first welcome email if this user has not received one yet.
+ * Runs on every auth callback but only sends once (checks welcome_email_step).
+ */
+async function sendWelcomeEmailIfNew(userId: string) {
+  try {
+    const admin = createAdminClient();
+
+    // welcome_email_step is added by migration but not in generated types
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("role, welcome_email_step")
+      .eq("id", userId)
+      .returns<Array<{ role: string; welcome_email_step: number }>>()
+      .single();
+
+    if (!profile) return;
+
+    // Only send if step is 0 (never sent)
+    if (profile.welcome_email_step > 0) return;
+
+    await sendWelcomeEmail(admin, userId, profile.role, 1);
+  } catch (err) {
+    // Don't fail the auth flow if welcome email fails
+    console.error("[auth/callback] Error sending welcome email:", err);
   }
 }

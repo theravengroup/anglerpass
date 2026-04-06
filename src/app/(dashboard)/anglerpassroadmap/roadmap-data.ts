@@ -185,7 +185,7 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-mkt-waitlist", label: "Waitlist + investor lead capture with email confirmation", done: true },
           { id: "c-mkt-contact", label: "Contact form with department routing", done: true },
           { id: "c-mkt-conservation", label: "Conservation page (habitat preservation, catch-and-release values)", done: true },
-          { id: "c-mkt-ai", label: "AnglerPass AI section (Compass trip matching, Concierge planning)", done: true },
+          { id: "c-mkt-ai", label: "AnglerPass Compass AI section (trip matching, planning, on-water guidance)", done: true },
           { id: "c-mkt-explore", label: "Public Explore Waters page (search properties without login)", done: true },
         ],
       },
@@ -276,8 +276,8 @@ export const PHASES: RoadmapPhase[] = [
           {
             id: "p1-welcome",
             label: "Welcome email sequence",
-            detail: "Role-specific 3-email series: what to do next, complete your profile, explore the platform.",
-            done: false,
+            detail: "3-email Resend sequence per role (immediate, day 2, day 5). Customer.io upgrade planned for Phase 2.",
+            done: true,
           },
           {
             id: "p1-booking-emails",
@@ -312,9 +312,9 @@ export const PHASES: RoadmapPhase[] = [
         items: [
           {
             id: "p1-about",
-            label: "Team / About page",
-            detail: "Founder story, team photos, mission statement. Human identity for a trust-based platform.",
-            done: false,
+            label: "Team / About page (deferred — solo founder)",
+            detail: "Not needed yet as a one-person operation. Will build when team grows.",
+            done: true,
           },
           {
             id: "p1-conservation",
@@ -357,13 +357,13 @@ export const PHASES: RoadmapPhase[] = [
             id: "p1-staff-constraint",
             label: "Add staff role CHECK constraint",
             detail: "club_memberships.role has no constraint for 'staff'. Add to migration.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-guide-affiliations",
             label: "Guide club affiliations API + UI",
-            detail: "Table exists with RLS. Needs API endpoints and dashboard UI.",
-            done: false,
+            detail: "API endpoints (CRUD) + guide dashboard UI + club manager approval UI.",
+            done: true,
           },
           {
             id: "p1-copy-audit",
@@ -483,6 +483,31 @@ export const PHASES: RoadmapPhase[] = [
           { id: "p2-corp-billing", label: "Corporate billing (invoices, PO numbers, net-30 terms)", done: false },
           { id: "p2-corp-events", label: "Enterprise event booking (multi-property, catering, itinerary)", done: false },
           { id: "p2-corp-gifts", label: "Gift certificate programs (branded gift experiences)", done: false },
+        ],
+      },
+      {
+        id: "p2-marketing-automation",
+        title: "2H: Marketing Automation",
+        description: "Replace manual Resend emails with intelligent, behavior-driven campaigns.",
+        items: [
+          {
+            id: "p2-customerio",
+            label: "Customer.io integration",
+            detail: "Replace Resend-based welcome sequence with Customer.io for advanced drip campaigns, segmentation, and behavioral triggers.",
+            done: false,
+          },
+          {
+            id: "p2-drip-campaigns",
+            label: "Behavioral drip campaigns",
+            detail: "Trigger-based email sequences: abandoned onboarding, inactive re-engagement, post-trip follow-up.",
+            done: false,
+          },
+          {
+            id: "p2-segment-messaging",
+            label: "Segmented messaging",
+            detail: "Target users by role, activity level, geography, club membership status.",
+            done: false,
+          },
         ],
       },
     ],

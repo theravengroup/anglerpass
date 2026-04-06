@@ -287,6 +287,35 @@ export const PROPOSAL_STATUS: Record<string, StatusConfig> = {
   },
 };
 
+// ─── Guide Affiliation Status ──────────────────────────────────────
+
+export const AFFILIATION_STATUS: Record<string, StatusConfig> = {
+  pending: {
+    label: "Pending",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  active: {
+    label: "Active",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  rejected: {
+    label: "Rejected",
+    icon: XCircle,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+  revoked: {
+    label: "Revoked",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+};
+
 // ─── Referral Credit Status ─────────────────────────────────────────
 
 export const REFERRAL_CREDIT_STATUS: Record<string, StatusConfig> = {

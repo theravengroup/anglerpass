@@ -53,7 +53,10 @@ export type NotificationType =
   | "booking_reminder"
   | "booking_gate_code"
   | "booking_thank_you"
-  | "membership_renewal_reminder";
+  | "membership_renewal_reminder"
+  | "guide_affiliation_requested"
+  | "guide_affiliation_approved"
+  | "guide_affiliation_rejected";
 
 interface NotificationPayload {
   userId: string;
@@ -96,6 +99,9 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   booking_gate_code: "email_booking_confirmed",
   booking_thank_you: "email_booking_confirmed",
   membership_renewal_reminder: "email_member_approved",
+  guide_affiliation_requested: "email_booking_requested",
+  guide_affiliation_approved: "email_booking_confirmed",
+  guide_affiliation_rejected: "email_booking_declined",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -973,6 +979,60 @@ export async function notifyMembershipRenewalReminder(
       renewal_date: opts.renewalDate,
       days_until_renewal: opts.daysUntilRenewal,
     },
+  });
+}
+
+// ─── Guide Affiliations ─────────────────────────────────────────────
+
+/** Notify club manager that a guide wants to affiliate */
+export async function notifyGuideAffiliationRequested(
+  admin: SupabaseClient,
+  opts: {
+    clubOwnerId: string;
+    guideName: string;
+    clubName: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.clubOwnerId,
+    type: "guide_affiliation_requested",
+    title: `Guide affiliation request`,
+    body: `${opts.guideName} has requested to affiliate with ${opts.clubName}.`,
+    link: "/club/guides",
+  });
+}
+
+/** Notify guide that their affiliation was approved */
+export async function notifyGuideAffiliationApproved(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    clubName: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_affiliation_approved",
+    title: `Affiliation approved`,
+    body: `${opts.clubName} has approved your guide affiliation request. You can now be assigned to trips on their waters.`,
+    link: "/guide/affiliations",
+  });
+}
+
+/** Notify guide that their affiliation was rejected */
+export async function notifyGuideAffiliationRejected(
+  admin: SupabaseClient,
+  opts: {
+    guideUserId: string;
+    clubName: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.guideUserId,
+    type: "guide_affiliation_rejected",
+    title: `Affiliation not approved`,
+    body: `${opts.clubName} did not approve your guide affiliation request at this time.`,
+    link: "/guide/affiliations",
   });
 }
 

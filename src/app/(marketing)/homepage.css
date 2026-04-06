@@ -549,20 +549,8 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 /* Bottom tagline */
 .compass-tagline{text-align:center;margin-top:56px;font-family:var(--heading);font-size:16px;font-style:italic;color:rgba(255,255,255,.4);letter-spacing:-.2px}
 
-/* ═══ CONCIERGE ═══ */
-.concierge-section{padding:0 0 var(--section-pad);background:var(--forest-deep);position:relative;overflow:hidden}
-.concierge-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(154,115,64,.1) 0%,transparent 55%),radial-gradient(ellipse at 20% 80%,rgba(58,107,124,.06) 0%,transparent 40%);pointer-events:none;z-index:1}
-.concierge-header{text-align:center;max-width:700px;margin:0 auto 72px;position:relative;z-index:2}
-.concierge-headline{font-family:var(--heading);font-size:clamp(38px,5vw,56px);font-weight:500;line-height:1.1;color:#fff;letter-spacing:-.5px;margin:20px 0 24px}
-.concierge-headline em{font-style:italic;color:var(--bronze-light)}
-.concierge-subhead{font-size:17px;color:rgba(255,255,255,.6);max-width:600px;line-height:1.7;margin:0 auto}
-.concierge-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:stretch}
-.concierge-phases{display:flex;flex-direction:column;gap:20px}
-.concierge-phase-card{display:flex;align-items:flex-start;gap:16px;padding:22px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);transition:all .4s}
-.concierge-phase-card:hover{background:rgba(255,255,255,.07);border-color:rgba(154,115,64,.25)}
-.concierge-phase-icon{font-size:22px;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(154,115,64,.1);border-radius:10px}
-.concierge-phase-title{font-family:var(--heading);font-size:19px;font-weight:600;color:#fff;margin-bottom:5px}
-.concierge-phase-desc{font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.6}
+/* ═══ CONCIERGE (chat mockup — now embedded in Compass section) ═══ */
+/* Phase cards and grid removed — merged into Compass features */
 
 /* Concierge mockup */
 .concierge-mockup-wrap{position:relative;display:flex;flex-direction:column}
@@ -597,17 +585,7 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .concierge-suggestions{display:flex;gap:6px;padding:12px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
 .concierge-suggestions span{font-family:var(--mono);font-size:10px;letter-spacing:.3px;color:var(--bronze);background:rgba(154,115,64,.08);padding:5px 10px;border-radius:20px;cursor:default}
 
-/* Real context section */
-.concierge-real-context{margin-top:56px;text-align:center}
-.concierge-real-context-title{font-family:var(--heading);font-size:22px;font-weight:600;color:#fff;margin-bottom:24px}
-.concierge-context-sources{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:700px;margin:0 auto 20px}
-.concierge-source{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius)}
-.concierge-source-icon{font-size:20px}
-.concierge-source span:last-child{font-size:12px;color:rgba(255,255,255,.5);line-height:1.5;text-align:center}
-.concierge-real-context-note{font-size:14px;color:rgba(255,255,255,.4);font-style:italic}
-
-/* Tagline */
-.concierge-tagline{text-align:center;margin-top:56px;font-family:var(--heading);font-size:16px;font-style:italic;color:rgba(255,255,255,.4);letter-spacing:-.2px}
+/* Real context + tagline removed — merged into Compass */
 
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:1280px){
@@ -624,7 +602,7 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .problem-grid{grid-template-columns:repeat(2,1fr)}
 .ai-offering{padding:40px 28px}
 .compass-grid{grid-template-columns:1fr}
-.concierge-grid{grid-template-columns:1fr}
+/* concierge grid removed */
 .why .container{grid-template-columns:1fr;gap:50px}
 .waitlist .container{grid-template-columns:1fr;gap:50px}
 .investors-columns{grid-template-columns:1fr;gap:50px}
@@ -655,7 +633,7 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .ai-nav-btn{justify-content:center}
 .ai-offering{padding:32px 20px;border-radius:18px}
 .compass-results-grid{grid-template-columns:1fr}
-.concierge-context-sources{grid-template-columns:repeat(2,1fr)}
+/* concierge sources removed */
 .nav-dropdown-menu{display:none}
 .footer-inner{flex-direction:column;gap:24px}
 .footer-links{flex-wrap:wrap;gap:18px}

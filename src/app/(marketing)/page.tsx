@@ -4,7 +4,6 @@ import ProblemSection from '@/components/homepage/ProblemSection';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
 import FeaturesSection from '@/components/homepage/FeaturesSection';
 import CompassSection from '@/components/homepage/CompassSection';
-import ConciergeSection from '@/components/homepage/ConciergeSection';
 import WhySection from '@/components/homepage/WhySection';
 import BuiltForSection from '@/components/homepage/BuiltForSection';
 import WaitlistSection from '@/components/homepage/WaitlistSection';
@@ -70,7 +69,6 @@ export default function HomePage() {
       <HowItWorksSection />
       <FeaturesSection />
       <CompassSection />
-      <ConciergeSection />
       <WhySection />
       <BuiltForSection />
       <WaitlistSection />

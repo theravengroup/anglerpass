@@ -133,6 +133,20 @@ export const clubGuideApprovalSchema = z.object({
 
 export type ClubGuideApprovalData = z.infer<typeof clubGuideApprovalSchema>;
 
+// ─── Guide Club Affiliation ────────────────────────────────────────
+
+export const guideAffiliationSchema = z.object({
+  club_id: z.uuid("Invalid club ID"),
+});
+
+export type GuideAffiliationData = z.infer<typeof guideAffiliationSchema>;
+
+export const guideAffiliationActionSchema = z.object({
+  status: z.enum(["active", "rejected"]),
+});
+
+export type GuideAffiliationActionData = z.infer<typeof guideAffiliationActionSchema>;
+
 // ─── Technique Labels ───────────────────────────────────────────────
 
 export const TECHNIQUE_LABELS: Record<string, string> = {

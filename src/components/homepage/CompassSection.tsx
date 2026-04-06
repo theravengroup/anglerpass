@@ -61,22 +61,32 @@ const FEATURES = [
   {
     icon: '🧭',
     title: 'Smart Trip Matching',
-    description: 'Natural language in, ranked recommendations out. No filters, no friction.',
+    description: 'Describe what you want in plain language. Compass evaluates conditions, availability, species, and timing — then ranks the best options for you.',
   },
   {
     icon: '⚡',
-    title: 'Dynamic Recommendations',
-    description: 'Adjusts in real time as weather shifts, availability changes, and conditions evolve.',
+    title: 'Real-Time Awareness',
+    description: 'Adjusts as weather shifts, flows change, and availability moves. Every recommendation reflects what\'s happening right now.',
+  },
+  {
+    icon: '🎒',
+    title: 'Trip Preparation',
+    description: 'Know what to bring, when to arrive, and what to expect — gear, flies, access details, and conditions tailored to your specific booking.',
   },
   {
     icon: '🎣',
-    title: 'Full Trip Awareness',
-    description: 'Considers the whole picture — water, guide, timing, and conditions together.',
+    title: 'On-Water Guidance',
+    description: 'Make better decisions in the moment. Adjust based on changing conditions, time of day, hatches, and local patterns.',
+  },
+  {
+    icon: '📋',
+    title: 'Post-Trip Intelligence',
+    description: 'Revisit what worked, get suggestions for similar waters, and plan your next trip with more confidence each time.',
   },
   {
     icon: '📈',
     title: 'Continuous Learning',
-    description: 'Improves with every search and booking. Gets sharper the more you use it.',
+    description: 'Gets sharper with every search, booking, and trip. The more you use it, the better it knows what you\'re looking for.',
   },
 ];
 
@@ -141,199 +151,215 @@ export default function CompassSection() {
         {/* AI Section Intro */}
         <div className="ai-intro reveal">
           <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
-            AnglerPass AI
+            AnglerPass Compass &middot; AI-Powered
           </span>
           <h2 className="ai-headline">
-            Smarter tools.
-            <br />
-            <em>Better days on the water.</em>
-          </h2>
-          <p className="ai-subhead">
-            Two AI-powered tools built into the platform — one to match you
-            with the right water, one to make sure you&apos;re ready when you
-            get there.
-          </p>
-          <div className="ai-nav-buttons">
-            <a href="#compass" className="ai-nav-btn ai-nav-btn-compass">
-              <span className="ai-nav-btn-icon">
-                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="16" cy="16" r="14" stroke="url(#compass-grad)" strokeWidth="1.5" opacity=".4" />
-                  <circle cx="16" cy="16" r="10" stroke="url(#compass-grad)" strokeWidth="1" opacity=".2" />
-                  <path d="M20.5 11.5l-3 6.5-6.5 3 3-6.5 6.5-3z" fill="url(#compass-grad)" opacity=".9" />
-                  <circle cx="16" cy="16" r="1.5" fill="#fff" opacity=".8" />
-                  <line x1="16" y1="4" x2="16" y2="7" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
-                  <line x1="16" y1="25" x2="16" y2="28" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
-                  <line x1="4" y1="16" x2="7" y2="16" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
-                  <line x1="25" y1="16" x2="28" y2="16" stroke="url(#compass-grad)" strokeWidth="1" strokeLinecap="round" opacity=".5" />
-                  <defs>
-                    <linearGradient id="compass-grad" x1="4" y1="4" x2="28" y2="28">
-                      <stop stopColor="#7AB8D0" />
-                      <stop offset="1" stopColor="#3A6B7C" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </span>
-              <span className="ai-nav-btn-text">
-                <span className="ai-nav-btn-label">AnglerPass</span>
-                <span className="ai-nav-btn-name">Compass</span>
-              </span>
-              <span className="ai-nav-btn-arrow">&darr;</span>
-            </a>
-            <a href="#concierge" className="ai-nav-btn ai-nav-btn-concierge">
-              <span className="ai-nav-btn-icon">
-                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="4" y="6" width="24" height="17" rx="4" stroke="url(#concierge-grad)" strokeWidth="1.5" opacity=".4" />
-                  <path d="M12 27l2-4h4l2 4" stroke="url(#concierge-grad)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity=".4" />
-                  <circle cx="11" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".6" />
-                  <circle cx="16" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".8" />
-                  <circle cx="21" cy="14.5" r="1.5" fill="url(#concierge-grad)" opacity=".6" />
-                  <path d="M9 11h14" stroke="url(#concierge-grad)" strokeWidth=".75" strokeLinecap="round" opacity=".25" />
-                  <path d="M9 18h14" stroke="url(#concierge-grad)" strokeWidth=".75" strokeLinecap="round" opacity=".25" />
-                  <defs>
-                    <linearGradient id="concierge-grad" x1="4" y1="6" x2="28" y2="27">
-                      <stop stopColor="#C4965A" />
-                      <stop offset="1" stopColor="#9A7340" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </span>
-              <span className="ai-nav-btn-text">
-                <span className="ai-nav-btn-label">AnglerPass</span>
-                <span className="ai-nav-btn-name">Concierge</span>
-              </span>
-              <span className="ai-nav-btn-arrow">&darr;</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Compass Offering */}
-        <div className="ai-offering" id="compass">
-        <div className="compass-header reveal">
-          <span className="eyebrow" style={{ color: 'var(--sand)' }}>
-            Introducing AnglerPass Compass &middot; The First AI-Powered Private Water Platform
-          </span>
-          <h2 className="compass-headline">
             You don&apos;t search.
             <br />
             <em>You ask.</em>
           </h2>
-          <p className="compass-subhead">
-            AnglerPass Compass is the intelligent matching engine built into the
-            platform. Tell it what you&apos;re looking for — it handles the rest.
-            Conditions, availability, species, timing, guide fit — evaluated in
-            real time, ranked for you.
+          <p className="ai-subhead">
+            AnglerPass Compass is the intelligent engine built into the platform.
+            It finds your water, prepares your trip, and guides your day &mdash;
+            all from a single conversation. Tell it what you&apos;re looking for.
+            It handles the rest.
           </p>
         </div>
 
-        {/* Two-column layout */}
-        <div className="compass-grid">
-          {/* Left — feature cards */}
-          <div className="compass-features">
-            {FEATURES.map((feature, i) => (
-              <div key={feature.title} className={`compass-feature-card reveal d${i + 1}`}>
-                <div className="compass-feature-icon">{feature.icon}</div>
-                <div>
-                  <h4 className="compass-feature-title">{feature.title}</h4>
-                  <p className="compass-feature-desc">{feature.description}</p>
-                </div>
-              </div>
-            ))}
+        {/* Main Compass offering */}
+        <div className="ai-offering" id="compass">
+          <div className="compass-header reveal">
+            <span className="eyebrow" style={{ color: 'var(--sand)' }}>
+              The First AI-Powered Private Water Platform
+            </span>
+            <h2 className="compass-headline">
+              Find your water.
+              <br />
+              <em>Plan your trip. Fish smarter.</em>
+            </h2>
+            <p className="compass-subhead">
+              From discovery to post-trip &mdash; Compass understands what
+              you&apos;re after and gives you clear, contextual guidance at every
+              step. Conditions, gear, timing, access &mdash; evaluated in real
+              time, personalized for you.
+            </p>
           </div>
 
-          {/* Right — UI mockup */}
-          <div className="compass-mockup-wrap reveal-right">
-            <div className="compass-mockup">
-              {/* Top bar */}
-              <div className="compass-topbar">
-                <div className="compass-dots">
-                  <span className="compass-dot compass-dot-red" />
-                  <span className="compass-dot compass-dot-yellow" />
-                  <span className="compass-dot compass-dot-green" />
+          {/* Two-column: features + search mockup */}
+          <div className="compass-grid">
+            {/* Left — feature cards */}
+            <div className="compass-features">
+              {FEATURES.map((feature, i) => (
+                <div key={feature.title} className={`compass-feature-card reveal d${(i % 4) + 1}`}>
+                  <div className="compass-feature-icon">{feature.icon}</div>
+                  <div>
+                    <h4 className="compass-feature-title">{feature.title}</h4>
+                    <p className="compass-feature-desc">{feature.description}</p>
+                  </div>
                 </div>
-                <span className="compass-topbar-title">AnglerPass Compass</span>
-                <span className="compass-topbar-badge">AI · Beta</span>
+              ))}
+            </div>
+
+            {/* Right — stacked mockups */}
+            <div className="compass-mockup-wrap reveal-right">
+              {/* Search Mockup */}
+              <div className="compass-mockup">
+                {/* Top bar */}
+                <div className="compass-topbar">
+                  <div className="compass-dots">
+                    <span className="compass-dot compass-dot-red" />
+                    <span className="compass-dot compass-dot-yellow" />
+                    <span className="compass-dot compass-dot-green" />
+                  </div>
+                  <span className="compass-topbar-title">AnglerPass Compass</span>
+                  <span className="compass-topbar-badge">AI &middot; Beta</span>
+                </div>
+
+                {/* Query input */}
+                <div className="compass-input-area">
+                  <div className="compass-input-label">Ask Compass</div>
+                  <div className="compass-input-box">
+                    <svg className="compass-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
+                    </svg>
+                    <div className="compass-input-text">
+                      {typedText}
+                      <span className="compass-cursor" />
+                    </div>
+                    <button className="compass-input-btn" aria-label="Find Water">
+                      <span className="compass-input-btn-arrow">&uarr;</span> Find Water
+                    </button>
+                  </div>
+                </div>
+
+                {/* Processing bar */}
+                <div className="compass-processing">
+                  <div className="compass-processing-top">
+                    <div className="compass-loading-dots">
+                      <span /><span /><span />
+                    </div>
+                    <span className="compass-processing-text">
+                      Evaluating conditions, availability &amp; match score
+                    </span>
+                  </div>
+                  <div className="compass-processing-tags">
+                    <span>Proximity</span>
+                    <span>Species</span>
+                    <span>Weather</span>
+                    <span>Flow</span>
+                  </div>
+                </div>
+
+                {/* Results */}
+                <div className="compass-results">
+                  <div className="compass-results-label">Top Matches &mdash; This Weekend</div>
+                  <div className="compass-results-grid">
+                    {RESULTS.map((r) => (
+                      <div key={r.name} className="compass-result-card">
+                        <div className="compass-result-header">
+                          <span className="compass-result-name">{r.name}</span>
+                          <span className="compass-result-match">{r.match}%</span>
+                        </div>
+                        <div className="compass-result-location">
+                          {r.river ? `${r.river} · ` : ''}{r.location} · {r.drive}
+                        </div>
+                        <div className="compass-result-badge-row">
+                          <span className={`compass-result-badge ${r.badgeClass}`}>{r.badge}</span>
+                        </div>
+                        <div className="compass-result-stats">
+                          <span>🌊 {r.cfs} cfs</span>
+                          <span>🌡 {r.temp}&deg;F</span>
+                          <span>🎣 {r.species}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Conditions strip */}
+                <div className="compass-conditions">
+                  <span>☀️ Clear, 61&deg;F Sat</span>
+                  <span className="compass-conditions-sep">|</span>
+                  <span>💧 Flows Stable</span>
+                  <span className="compass-conditions-sep">|</span>
+                  <span>🪰 Hatch: PMD Likely</span>
+                  <span className="compass-conditions-sep">|</span>
+                  <span>🌙 Moon: 55% Waning</span>
+                </div>
               </div>
 
-              {/* Query input */}
-              <div className="compass-input-area">
-                <div className="compass-input-label">Ask Compass</div>
-                <div className="compass-input-box">
-                  <svg className="compass-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
-                  </svg>
-                  <div className="compass-input-text">
-                    {typedText}
-                    <span className="compass-cursor" />
+              {/* Trip Planning Chat Mockup */}
+              <div className="concierge-mockup" style={{ marginTop: '16px' }}>
+                {/* Top bar */}
+                <div className="concierge-topbar">
+                  <div className="concierge-dots">
+                    <span className="concierge-dot concierge-dot-red" />
+                    <span className="concierge-dot concierge-dot-yellow" />
+                    <span className="concierge-dot concierge-dot-green" />
                   </div>
-                  <button className="compass-input-btn" aria-label="Find Water">
-                    <span className="compass-input-btn-arrow">↑</span> Find Water
-                  </button>
+                  <span className="concierge-topbar-title">
+                    AnglerPass Compass &middot; Trip Assistant
+                  </span>
+                  <span className="concierge-topbar-badge">AI</span>
                 </div>
-              </div>
 
-              {/* Processing bar */}
-              <div className="compass-processing">
-                <div className="compass-processing-top">
-                  <div className="compass-loading-dots">
-                    <span /><span /><span />
-                  </div>
-                  <span className="compass-processing-text">
-                    Evaluating conditions, availability &amp; match score
+                {/* Trip context bar */}
+                <div className="concierge-context-bar">
+                  <span className="concierge-context-icon">📍</span>
+                  <span>
+                    Abell River Ranch &middot; South Platte &middot; Apr 12
+                    &middot; Half Day AM
                   </span>
                 </div>
-                <div className="compass-processing-tags">
-                  <span>Proximity</span>
-                  <span>Species</span>
-                  <span>Weather</span>
-                  <span>Flow</span>
-                </div>
-              </div>
 
-              {/* Results */}
-              <div className="compass-results">
-                <div className="compass-results-label">Top Matches — This Weekend</div>
-                <div className="compass-results-grid">
-                  {RESULTS.map((r) => (
-                    <div key={r.name} className="compass-result-card">
-                      <div className="compass-result-header">
-                        <span className="compass-result-name">{r.name}</span>
-                        <span className="compass-result-match">{r.match}%</span>
-                      </div>
-                      <div className="compass-result-location">
-                        {r.river ? `${r.river} · ` : ''}{r.location} · {r.drive}
-                      </div>
-                      <div className="compass-result-badge-row">
-                        <span className={`compass-result-badge ${r.badgeClass}`}>{r.badge}</span>
-                      </div>
-                      <div className="compass-result-stats">
-                        <span>🌊 {r.cfs} cfs</span>
-                        <span>🌡 {r.temp}°F</span>
-                        <span>🎣 {r.species}</span>
-                      </div>
+                {/* Chat messages */}
+                <div className="concierge-chat">
+                  <div className="concierge-msg concierge-msg-user">
+                    <div className="concierge-msg-label">You</div>
+                    <div className="concierge-msg-bubble concierge-msg-bubble-user">
+                      What should I bring for this trip?
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Conditions strip */}
-              <div className="compass-conditions">
-                <span>☀️ Clear, 61°F Sat</span>
-                <span className="compass-conditions-sep">|</span>
-                <span>💧 Flows Stable</span>
-                <span className="compass-conditions-sep">|</span>
-                <span>🪰 Hatch: PMD Likely</span>
-                <span className="compass-conditions-sep">|</span>
-                <span>🌙 Moon: 55% Waning</span>
+                  <div className="concierge-msg concierge-msg-assistant">
+                    <div className="concierge-msg-label">Compass</div>
+                    <div className="concierge-msg-bubble concierge-msg-bubble-assistant">
+                      <p className="concierge-msg-intro">
+                        Based on current conditions at Abell River Ranch:
+                      </p>
+                      <ul className="concierge-msg-list">
+                        <li>Waders recommended &mdash; water temp around 52&deg;F</li>
+                        <li>4&ndash;5wt rod, 9ft leaders, 5x tippet</li>
+                        <li>PMD and BWO patterns, size 16&ndash;20</li>
+                        <li>
+                          Layers for morning &mdash; temps near 38&deg;F at the
+                          put-in
+                        </li>
+                        <li>Felt-sole wading boots &mdash; rocky substrate</li>
+                      </ul>
+                      <p className="concierge-msg-outro">
+                        Conditions look favorable for dry fly activity in the late
+                        morning window.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Suggestion chips */}
+                <div className="concierge-suggestions">
+                  <span>Do I need a guide?</span>
+                  <span>Best time of day?</span>
+                  <span>Good for beginners?</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Bottom tagline */}
-        <p className="compass-tagline reveal">
-          Powered by AnglerPass Compass — Intelligent trip matching for modern anglers.
-        </p>
+          {/* Bottom tagline */}
+          <p className="compass-tagline reveal">
+            One AI. Every step of the journey &mdash; from finding your water to fishing it.
+          </p>
         </div>
       </div>
     </section>
