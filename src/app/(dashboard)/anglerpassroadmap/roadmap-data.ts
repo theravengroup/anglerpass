@@ -324,9 +324,9 @@ export const PHASES: RoadmapPhase[] = [
           },
           {
             id: "p1-liability",
-            label: "Liability framework page",
-            detail: "Waiver system explanation, recreational use statutes, recommended insurance for landowners.",
-            done: false,
+            label: "Liability framework section on /landowners",
+            detail: "Club insurance, signed waivers, vetted members — added as 'Your Protection' section with 3-card grid.",
+            done: true,
           },
           {
             id: "p1-security",
@@ -344,8 +344,8 @@ export const PHASES: RoadmapPhase[] = [
           {
             id: "p1-sentry",
             label: "Sentry error tracking",
-            detail: "npm install + init. Visibility into production errors. Without this, bugs are invisible.",
-            done: false,
+            detail: "Client/server/edge configs, global error boundary, source map uploads, /monitoring tunnel.",
+            done: true,
           },
           {
             id: "p1-cancel-fix",
