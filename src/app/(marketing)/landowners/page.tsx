@@ -95,7 +95,7 @@ const landownerFaqJsonLd = buildJsonLd({
       name: 'Is my property protected from damage or misuse?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'All anglers who access private water through AnglerPass are vetted club members. Clubs are responsible for establishing and enforcing conduct standards. AnglerPass provides verified trip records and a review system.',
+        text: 'Every club on AnglerPass carries its own liability insurance and requires members to sign waivers before accessing private water. All anglers are vetted club members with verified identities. Clubs enforce conduct standards, and AnglerPass provides verified trip records and a review system.',
       },
     },
   ],
@@ -195,8 +195,80 @@ export default function LandownersPage() {
         </div>
       </section>
 
+      {/* Liability / Protection */}
+      <section className="py-[100px] bg-offwhite">
+        <div className="max-w-[900px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
+              Your Protection
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
+              Clubs carry the liability &mdash; not you
+            </h2>
+            <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[580px] mx-auto">
+              Every club on AnglerPass maintains its own liability insurance and requires
+              members to sign waivers before accessing private water. You don&rsquo;t manage
+              any of it &mdash; the club handles everything.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[860px] mx-auto">
+            <div className="reveal d1 bg-white border border-parchment rounded-[14px] px-7 py-8 text-center">
+              <div className="w-[44px] h-[44px] rounded-[10px] bg-forest/8 flex items-center justify-center mb-5 mx-auto text-forest">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                Club Insurance
+              </h3>
+              <p className="text-[14px] leading-[1.7] text-text-secondary m-0">
+                Each club carries liability insurance that covers angler activity on your
+                property. This is a requirement for clubs on the platform.
+              </p>
+            </div>
+
+            <div className="reveal d2 bg-white border border-parchment rounded-[14px] px-7 py-8 text-center">
+              <div className="w-[44px] h-[44px] rounded-[10px] bg-forest/8 flex items-center justify-center mb-5 mx-auto text-forest">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </div>
+              <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                Signed Waivers
+              </h3>
+              <p className="text-[14px] leading-[1.7] text-text-secondary m-0">
+                Club members sign liability waivers as part of their membership. Every angler
+                on your water has already signed before they arrive.
+              </p>
+            </div>
+
+            <div className="reveal d3 bg-white border border-parchment rounded-[14px] px-7 py-8 text-center">
+              <div className="w-[44px] h-[44px] rounded-[10px] bg-forest/8 flex items-center justify-center mb-5 mx-auto text-forest">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+              <h3 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                Vetted Members Only
+              </h3>
+              <p className="text-[14px] leading-[1.7] text-text-secondary m-0">
+                No anonymous visitors. Every person on your property is a known, vetted
+                club member with a verified identity and booking record.
+              </p>
+            </div>
+          </div>
+
+          <p className="reveal text-center text-[14.5px] text-text-secondary mt-10 max-w-[520px] mx-auto leading-[1.7]">
+            The club model means you receive income from your water while the clubs
+            take on the operational and liability responsibilities. You focus on your
+            land &mdash; they handle the rest.
+          </p>
+        </div>
+      </section>
+
       {/* Club affiliation */}
-      <section className="py-20 bg-offwhite">
+      <section className="py-20 bg-parchment-light">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
             How It Works
@@ -284,7 +356,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'What if someone damages my property or violates my rules?',
-                a: 'Every angler is tied to a club that vouches for them. If an issue arises, you report it through the platform and work with the club to resolve it. Clubs have a direct incentive to maintain good standing — repeated violations can result in a club losing access to your property.',
+                a: 'Every club carries its own liability insurance and requires members to sign waivers — so you are protected before anyone sets foot on your property. If an issue arises, you report it through the platform and work with the club to resolve it. Clubs have a direct incentive to maintain good standing — repeated violations can result in a club losing access to your property.',
               },
               {
                 q: 'Can I list multiple properties or water sections?',
