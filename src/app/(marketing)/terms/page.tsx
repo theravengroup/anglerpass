@@ -262,10 +262,10 @@ export default function TermsPage() {
                 Policies
               </a>{' '}
               page. In general, cancellations made more than 48 hours before the
-              trip date receive a full refund. Cancellations within 24&ndash;48
-              hours receive a 50% refund. Cancellations less than 24 hours before
-              the trip date receive no refund. AnglerPass reserves the right to
-              mediate disputes between parties.
+              trip date receive a full refund. Cancellations made less than 48
+              hours before, but prior to the day of the trip, receive a 50%
+              refund. Cancellations on the day of the trip receive no refund.
+              AnglerPass reserves the right to mediate disputes between parties.
             </p>
           </div>
 

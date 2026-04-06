@@ -247,8 +247,8 @@ export default function PolicyContent() {
             <tbody>
               {[
                 { window: '48+ hours before fishing date', refund: '100% refund' },
-                { window: '24\u201348 hours before fishing date', refund: '50% refund' },
-                { window: 'Less than 24 hours', refund: 'No refund' },
+                { window: 'Less than 48 hours, before the day of', refund: '50% refund' },
+                { window: 'Day of the reservation', refund: 'No refund' },
               ].map((row) => (
                 <tr key={row.window} className="border-t border-parchment">
                   <td className="p-3 px-5 text-[14px] text-text-secondary">

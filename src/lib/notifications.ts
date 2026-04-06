@@ -6,6 +6,7 @@
 
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getUnsubscribeUrl } from "@/lib/unsubscribe";
 
 // Lazy-initialize Resend client to avoid holding a connection when not needed
 let _resend: Resend | null = null;
@@ -51,7 +52,8 @@ export type NotificationType =
   | "proposal_expiry_reminder"
   | "booking_reminder"
   | "booking_gate_code"
-  | "booking_thank_you";
+  | "booking_thank_you"
+  | "membership_renewal_reminder";
 
 interface NotificationPayload {
   userId: string;
@@ -93,6 +95,7 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   booking_reminder: "email_booking_confirmed",
   booking_gate_code: "email_booking_confirmed",
   booking_thank_you: "email_booking_confirmed",
+  membership_renewal_reminder: "email_member_approved",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -165,6 +168,7 @@ export async function notify(
     body: payload.body,
     link: payload.link,
     type: payload.type,
+    userId: payload.userId,
   });
 }
 
@@ -177,6 +181,7 @@ interface EmailParams {
   body: string;
   link?: string;
   type: NotificationType;
+  userId?: string;
 }
 
 const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
@@ -209,6 +214,7 @@ const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   booking_reminder: "Your Trip is Tomorrow!",
   booking_gate_code: "Access Details for Today\u2019s Trip",
   booking_thank_you: "Thanks for Fishing with AnglerPass!",
+  membership_renewal_reminder: "Membership Renewal Coming Up",
 };
 
 const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
@@ -241,6 +247,7 @@ const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
   booking_reminder: "View Booking Details →",
   booking_gate_code: "View Full Access Details →",
   booking_thank_you: "Leave a Review →",
+  membership_renewal_reminder: "View Membership →",
 };
 
 const CTA_COLOR_MAP: Partial<Record<NotificationType, string>> = {
@@ -258,7 +265,7 @@ async function sendNotificationEmail(params: EmailParams) {
   const resend = getResend();
   if (!resend) return;
 
-  const { to, displayName, title, body, link, type } = params;
+  const { to, displayName, title, body, link, type, userId } = params;
   const subject = SUBJECT_MAP[type] ?? title;
   const ctaLabel = CTA_LABEL_MAP[type] ?? "View on AnglerPass →";
   const ctaColor = CTA_COLOR_MAP[type] ?? "#2a5a3a";
@@ -266,6 +273,9 @@ async function sendNotificationEmail(params: EmailParams) {
   // Validate link is a relative path (prevent javascript: or external URLs)
   const safePath = link && link.startsWith("/") ? link : "";
   const ctaUrl = safePath ? `${SITE_URL}${safePath}` : SITE_URL;
+
+  // Generate unsubscribe URL for CAN-SPAM compliance
+  const unsubscribeUrl = userId ? getUnsubscribeUrl(userId) : null;
 
   try {
     await resend.emails.send({
@@ -279,7 +289,14 @@ async function sendNotificationEmail(params: EmailParams) {
         ctaUrl,
         ctaLabel,
         ctaColor,
+        unsubscribeUrl,
       }),
+      headers: unsubscribeUrl
+        ? {
+            "List-Unsubscribe": `<${unsubscribeUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          }
+        : undefined,
     });
   } catch (err) {
     console.error("[notify] Email send error:", err);
@@ -293,7 +310,12 @@ function buildEmailHtml(params: {
   ctaUrl: string;
   ctaLabel: string;
   ctaColor: string;
+  unsubscribeUrl?: string | null;
 }): string {
+  const unsubscribeHtml = params.unsubscribeUrl
+    ? `<a href="${params.unsubscribeUrl}" style="color: #9a9a8e; text-decoration: underline;">Unsubscribe from all emails</a> &middot; `
+    : "";
+
   return `
 <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
   <h2 style="font-size: 22px; font-weight: 500; margin-bottom: 8px;">${params.title}</h2>
@@ -310,8 +332,7 @@ function buildEmailHtml(params: {
     </a>
   </div>
   <p style="font-size: 13px; line-height: 1.6; color: #9a9a8e;">
-    You can manage your email preferences in your
-    <a href="${SITE_URL}/dashboard/settings" style="color: #3a6b7c;">account settings</a>.
+    ${unsubscribeHtml}<a href="${SITE_URL}/dashboard/settings" style="color: #9a9a8e; text-decoration: underline;">Email preferences</a>
   </p>
   <p style="font-size: 13px; color: #9a9a8e; margin-top: 24px;">&mdash; The AnglerPass Team</p>
 </div>`.trim();
@@ -919,6 +940,39 @@ export async function notifyProposalExpiryReminder(
     body: `The trip proposal from ${opts.guideName} at ${opts.propertyName} expires in 24 hours. Review and respond before it\u2019s too late.`,
     link: `/angler/proposals/${opts.proposalId}`,
     metadata: { proposal_id: opts.proposalId },
+  });
+}
+
+// ─── Membership Renewal Notifications ──────────────────────────────
+
+/** Remind a member their dues are renewing soon */
+export async function notifyMembershipRenewalReminder(
+  admin: SupabaseClient,
+  opts: {
+    userId: string;
+    clubName: string;
+    renewalDate: string;
+    daysUntilRenewal: number;
+    annualDues: number;
+  }
+) {
+  const duesFormatted = `$${opts.annualDues.toFixed(2)}`;
+  const body =
+    opts.daysUntilRenewal <= 3
+      ? `Your ${opts.clubName} membership dues of ${duesFormatted} will auto-renew in ${opts.daysUntilRenewal} day${opts.daysUntilRenewal !== 1 ? "s" : ""} on ${formatDate(opts.renewalDate)}. Make sure your payment method is up to date.`
+      : `Heads up \u2014 your ${opts.clubName} membership dues of ${duesFormatted} will auto-renew on ${formatDate(opts.renewalDate)} (${opts.daysUntilRenewal} days from now). If you need to update your payment method, you can do so in your account settings.`;
+
+  await notify(admin, {
+    userId: opts.userId,
+    type: "membership_renewal_reminder",
+    title: `${opts.clubName} dues renewing ${opts.daysUntilRenewal <= 3 ? "soon" : `in ${opts.daysUntilRenewal} days`}`,
+    body,
+    link: "/dashboard/settings",
+    metadata: {
+      club_name: opts.clubName,
+      renewal_date: opts.renewalDate,
+      days_until_renewal: opts.daysUntilRenewal,
+    },
   });
 }
 
