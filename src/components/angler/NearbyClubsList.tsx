@@ -147,7 +147,7 @@ export default function NearbyClubsList() {
       </p>
 
       {message && (
-        <div className="rounded-lg border border-forest/20 bg-forest/5 px-4 py-3 text-sm text-forest">
+        <div className="rounded-lg border border-forest/20 bg-forest/5 px-4 py-3 text-sm text-forest" role="alert" aria-live="polite">
           {message}
         </div>
       )}

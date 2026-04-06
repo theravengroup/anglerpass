@@ -463,6 +463,8 @@ async function sendReminderSms(
 /**
  * Send an SMS message. Currently uses Twilio if configured.
  * Falls back to logging when TWILIO_ACCOUNT_SID is not set.
+ *
+ * TCPA guard: skips the send if the user has not opted in to SMS.
  */
 async function sendSmsMessage(
   admin: SupabaseClient,
@@ -471,6 +473,21 @@ async function sendSmsMessage(
   phone: string,
   message: string
 ): Promise<boolean> {
+  // ── TCPA consent check ────────────────────────────────────────────
+  const { data: consentProfile } = await admin
+    .from("profiles")
+    .select("sms_consent")
+    .eq("id", ctx.anglerId)
+    .single();
+
+  if (!consentProfile?.sms_consent) {
+    console.log(
+      `[review-prompts] SMS (${promptType}) skipped for ${ctx.anglerId}: no SMS consent`
+    );
+    await logPrompt(admin, ctx, promptType, "sms", "skipped", "No SMS consent (TCPA)");
+    return false;
+  }
+
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_FROM_NUMBER;

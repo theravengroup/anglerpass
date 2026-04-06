@@ -9,6 +9,7 @@ import SettingsProfileCard from "@/components/shared/SettingsProfileCard";
 import SettingsHomeClubCard from "@/components/shared/SettingsHomeClubCard";
 import SettingsCrossClubCard from "@/components/shared/SettingsCrossClubCard";
 import SettingsNotificationsCard from "@/components/shared/SettingsNotificationsCard";
+import SettingsSmsCard from "@/components/shared/SettingsSmsCard";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -144,6 +145,8 @@ export default function SettingsPage() {
       <SettingsHomeClubCard memberships={memberships} />
 
       <SettingsCrossClubCard />
+
+      <SettingsSmsCard />
 
       <SettingsNotificationsCard initialPrefs={prefs} />
     </div>

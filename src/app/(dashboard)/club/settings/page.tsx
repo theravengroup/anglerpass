@@ -6,6 +6,7 @@ import { Building2, Loader2, Settings } from "lucide-react";
 import ClubProfileForm from "@/components/clubs/ClubProfileForm";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import { PaymentMethodsSection } from "@/components/shared/PaymentMethodsSection";
+import SettingsSmsCard from "@/components/shared/SettingsSmsCard";
 
 interface ClubData {
   id: string;
@@ -288,6 +289,9 @@ export default function ClubSettingsPage() {
       <div className="rounded-lg border border-stone-light/20 p-6">
         <PaymentMethodsSection theme="club" />
       </div>
+
+      {/* ── SMS Notifications ── */}
+      <SettingsSmsCard />
 
       {/* ── Payout Setup ── */}
       <PayoutSetup type="club" />

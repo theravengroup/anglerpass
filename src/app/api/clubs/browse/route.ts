@@ -92,15 +92,18 @@ export async function GET(request: Request) {
 
     // Get member counts for each club
     const clubIds = (clubs ?? []).map((c) => c.id);
-    const { data: countData } = await admin
-      .from("club_memberships")
-      .select("club_id")
-      .in("club_id", clubIds)
-      .eq("status", "active");
-
     const memberCounts = new Map<string, number>();
-    for (const row of countData ?? []) {
-      memberCounts.set(row.club_id, (memberCounts.get(row.club_id) ?? 0) + 1);
+
+    if (clubIds.length > 0) {
+      const { data: countData } = await admin
+        .from("club_memberships")
+        .select("club_id")
+        .in("club_id", clubIds)
+        .eq("status", "active");
+
+      for (const row of countData ?? []) {
+        memberCounts.set(row.club_id, (memberCounts.get(row.club_id) ?? 0) + 1);
+      }
     }
 
     // Enrich clubs with membership status and member count

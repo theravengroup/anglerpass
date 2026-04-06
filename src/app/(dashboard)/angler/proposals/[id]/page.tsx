@@ -166,7 +166,7 @@ export default function ProposalDetailPage() {
           Back to Proposals
         </Link>
         <div className="mt-3 flex items-center justify-between">
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+          <h2 className="font-heading text-2xl font-semibold text-text-primary">
             Trip Proposal
           </h2>
           <div

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       angler_club_invitations: {
@@ -189,16 +214,25 @@ export type Database = {
           guide_rate: number | null
           guide_service_fee: number | null
           home_club_referral: number
+          hospitable_reservation_uuid: string | null
           id: string
+          includes_lodging: boolean | null
           is_cross_club: boolean
           landowner_notes: string | null
           landowner_payout: number
+          lodging_checkin_date: string | null
+          lodging_checkout_date: string | null
+          lodging_nightly_rate: number | null
+          lodging_nights: number | null
+          lodging_platform_fee: number | null
+          lodging_source: string | null
+          lodging_subtotal: number | null
           message: string | null
           non_fishing_guests: number
           on_behalf_of: boolean
           paid_at: string | null
           party_size: number
-          payment_status: string
+          payment_status: string | null
           platform_fee: number
           platform_fee_cents: number | null
           property_id: string
@@ -234,16 +268,25 @@ export type Database = {
           guide_rate?: number | null
           guide_service_fee?: number | null
           home_club_referral?: number
+          hospitable_reservation_uuid?: string | null
           id?: string
+          includes_lodging?: boolean | null
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          lodging_checkin_date?: string | null
+          lodging_checkout_date?: string | null
+          lodging_nightly_rate?: number | null
+          lodging_nights?: number | null
+          lodging_platform_fee?: number | null
+          lodging_source?: string | null
+          lodging_subtotal?: number | null
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
           paid_at?: string | null
           party_size?: number
-          payment_status?: string
+          payment_status?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
           property_id: string
@@ -279,16 +322,25 @@ export type Database = {
           guide_rate?: number | null
           guide_service_fee?: number | null
           home_club_referral?: number
+          hospitable_reservation_uuid?: string | null
           id?: string
+          includes_lodging?: boolean | null
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          lodging_checkin_date?: string | null
+          lodging_checkout_date?: string | null
+          lodging_nightly_rate?: number | null
+          lodging_nights?: number | null
+          lodging_platform_fee?: number | null
+          lodging_source?: string | null
+          lodging_subtotal?: number | null
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
           paid_at?: string | null
           party_size?: number
-          payment_status?: string
+          payment_status?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
           property_id?: string
@@ -366,45 +418,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      consultation_requests: {
-        Row: {
-          id: string
-          name: string
-          email: string
-          organization: string
-          property_count: number | null
-          preferred_dates: string | null
-          notes: string | null
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          email: string
-          organization: string
-          property_count?: number | null
-          preferred_dates?: string | null
-          notes?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          email?: string
-          organization?: string
-          property_count?: number | null
-          preferred_dates?: string | null
-          notes?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       club_invitations: {
         Row: {
@@ -659,13 +672,13 @@ export type Database = {
           membership_application_required: boolean
           name: string
           owner_id: string
+          platform_tier: string | null
           referral_program_enabled: boolean
           referral_reward: number
           rules: string | null
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
           stripe_subscription_id: string | null
-          platform_tier: string | null
           subscription_tier: string
           updated_at: string
           website: string | null
@@ -683,13 +696,13 @@ export type Database = {
           membership_application_required?: boolean
           name: string
           owner_id: string
+          platform_tier?: string | null
           referral_program_enabled?: boolean
           referral_reward?: number
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_subscription_id?: string | null
-          platform_tier?: string | null
           subscription_tier?: string
           updated_at?: string
           website?: string | null
@@ -707,13 +720,13 @@ export type Database = {
           membership_application_required?: boolean
           name?: string
           owner_id?: string
+          platform_tier?: string | null
           referral_program_enabled?: boolean
           referral_reward?: number
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_subscription_id?: string | null
-          platform_tier?: string | null
           subscription_tier?: string
           updated_at?: string
           website?: string | null
@@ -727,6 +740,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      consultation_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          organization: string
+          preferred_dates: string | null
+          property_count: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          organization: string
+          preferred_dates?: string | null
+          property_count?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          organization?: string
+          preferred_dates?: string | null
+          property_count?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       corporate_invitations: {
         Row: {
@@ -1203,6 +1255,121 @@ export type Database = {
           },
         ]
       }
+      guide_trip_proposal_invitees: {
+        Row: {
+          angler_id: string
+          created_at: string
+          id: string
+          proposal_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          angler_id: string
+          created_at?: string
+          id?: string
+          proposal_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          angler_id?: string
+          created_at?: string
+          id?: string
+          proposal_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_trip_proposal_invitees_angler_id_fkey"
+            columns: ["angler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposal_invitees_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "guide_trip_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_trip_proposals: {
+        Row: {
+          club_id: string
+          created_at: string
+          duration_hours: number
+          expires_at: string | null
+          guide_fee_per_angler: number
+          guide_id: string
+          id: string
+          max_anglers: number
+          notes: string | null
+          property_id: string
+          proposed_date: string
+          start_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          duration_hours: number
+          expires_at?: string | null
+          guide_fee_per_angler: number
+          guide_id: string
+          id?: string
+          max_anglers?: number
+          notes?: string | null
+          property_id: string
+          proposed_date: string
+          start_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          duration_hours?: number
+          expires_at?: string | null
+          guide_fee_per_angler?: number
+          guide_id?: string
+          id?: string
+          max_anglers?: number
+          notes?: string | null
+          property_id?: string
+          proposed_date?: string
+          start_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_trip_proposals_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposals_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guide_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_trip_proposals_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guide_verification_events: {
         Row: {
           actor_id: string | null
@@ -1247,121 +1414,6 @@ export type Database = {
             columns: ["guide_id"]
             isOneToOne: false
             referencedRelation: "guide_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      guide_trip_proposal_invitees: {
-        Row: {
-          id: string
-          proposal_id: string
-          angler_id: string
-          status: string
-          responded_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          proposal_id: string
-          angler_id: string
-          status?: string
-          responded_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          proposal_id?: string
-          angler_id?: string
-          status?: string
-          responded_at?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "guide_trip_proposal_invitees_proposal_id_fkey"
-            columns: ["proposal_id"]
-            isOneToOne: false
-            referencedRelation: "guide_trip_proposals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "guide_trip_proposal_invitees_angler_id_fkey"
-            columns: ["angler_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      guide_trip_proposals: {
-        Row: {
-          id: string
-          guide_id: string
-          property_id: string
-          club_id: string
-          proposed_date: string
-          start_time: string
-          duration_hours: number
-          max_anglers: number
-          guide_fee_per_angler: number
-          notes: string | null
-          status: string
-          expires_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          guide_id: string
-          property_id: string
-          club_id: string
-          proposed_date: string
-          start_time: string
-          duration_hours: number
-          max_anglers?: number
-          guide_fee_per_angler: number
-          notes?: string | null
-          status?: string
-          expires_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          guide_id?: string
-          property_id?: string
-          club_id?: string
-          proposed_date?: string
-          start_time?: string
-          duration_hours?: number
-          max_anglers?: number
-          guide_fee_per_angler?: number
-          notes?: string | null
-          status?: string
-          expires_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "guide_trip_proposals_guide_id_fkey"
-            columns: ["guide_id"]
-            isOneToOne: false
-            referencedRelation: "guide_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "guide_trip_proposals_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "guide_trip_proposals_club_id_fkey"
-            columns: ["club_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -1436,6 +1488,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hospitable_connections: {
+        Row: {
+          connection_status: string | null
+          created_at: string
+          hospitable_access_token: string | null
+          hospitable_connected_at: string | null
+          hospitable_refresh_token: string | null
+          hospitable_token_expires_at: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_status?: string | null
+          created_at?: string
+          hospitable_access_token?: string | null
+          hospitable_connected_at?: string | null
+          hospitable_refresh_token?: string | null
+          hospitable_token_expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_status?: string | null
+          created_at?: string
+          hospitable_access_token?: string | null
+          hospitable_connected_at?: string | null
+          hospitable_refresh_token?: string | null
+          hospitable_token_expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       leads: {
         Row: {
@@ -2029,14 +2117,21 @@ export type Database = {
           fishing_experience: string | null
           id: string
           location: string | null
+          phone: string | null
           role: string
           roles: string[] | null
+          sms_consent: boolean
+          sms_consent_at: string | null
+          sms_consent_ip: string | null
+          sms_consent_revoked_at: string | null
+          sms_consent_text: string | null
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
           stripe_customer_id: string | null
           suspended_at: string | null
           suspended_reason: string | null
           updated_at: string | null
+          welcome_email_step: number
         }
         Insert: {
           avatar_url?: string | null
@@ -2047,14 +2142,21 @@ export type Database = {
           fishing_experience?: string | null
           id: string
           location?: string | null
+          phone?: string | null
           role?: string
           roles?: string[] | null
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_ip?: string | null
+          sms_consent_revoked_at?: string | null
+          sms_consent_text?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string | null
+          welcome_email_step?: number
         }
         Update: {
           avatar_url?: string | null
@@ -2065,73 +2167,23 @@ export type Database = {
           fishing_experience?: string | null
           id?: string
           location?: string | null
+          phone?: string | null
           role?: string
           roles?: string[] | null
+          sms_consent?: boolean
+          sms_consent_at?: string | null
+          sms_consent_ip?: string | null
+          sms_consent_revoked_at?: string | null
+          sms_consent_text?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
           updated_at?: string | null
+          welcome_email_step?: number
         }
         Relationships: []
-      }
-      property_claim_invitations: {
-        Row: {
-          id: string
-          property_id: string
-          club_id: string
-          landowner_email: string
-          token: string
-          status: string
-          reminder_count: number
-          last_reminded_at: string | null
-          created_at: string
-          claimed_at: string | null
-          claimed_by: string | null
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          club_id: string
-          landowner_email: string
-          token?: string
-          status?: string
-          reminder_count?: number
-          last_reminded_at?: string | null
-          created_at?: string
-          claimed_at?: string | null
-          claimed_by?: string | null
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          club_id?: string
-          landowner_email?: string
-          token?: string
-          status?: string
-          reminder_count?: number
-          last_reminded_at?: string | null
-          created_at?: string
-          claimed_at?: string | null
-          claimed_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "property_claim_invitations_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "property_claim_invitations_club_id_fkey"
-            columns: ["club_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       properties: {
         Row: {
@@ -2172,6 +2224,7 @@ export type Database = {
           access_notes?: string | null
           coordinates?: string | null
           created_at?: string | null
+          created_by_club_id?: string | null
           description?: string | null
           gate_code?: string | null
           gate_code_required?: boolean | null
@@ -2185,7 +2238,6 @@ export type Database = {
           max_guests?: number | null
           max_rods?: number | null
           name: string
-          created_by_club_id?: string | null
           owner_id?: string | null
           photos?: string[] | null
           rate_adult_full_day?: number | null
@@ -2238,6 +2290,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "properties_created_by_club_id_fkey"
+            columns: ["created_by_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "properties_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
@@ -2246,84 +2305,148 @@ export type Database = {
           },
         ]
       }
+      property_claim_invitations: {
+        Row: {
+          claimed_at: string | null
+          claimed_by: string | null
+          club_id: string
+          created_at: string
+          id: string
+          landowner_email: string
+          last_reminded_at: string | null
+          property_id: string
+          reminder_count: number
+          status: string
+          token: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          club_id: string
+          created_at?: string
+          id?: string
+          landowner_email: string
+          last_reminded_at?: string | null
+          property_id: string
+          reminder_count?: number
+          status?: string
+          token?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by?: string | null
+          club_id?: string
+          created_at?: string
+          id?: string
+          landowner_email?: string
+          last_reminded_at?: string | null
+          property_id?: string
+          reminder_count?: number
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_claim_invitations_claimed_by_fkey"
+            columns: ["claimed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_claim_invitations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_claim_invitations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_lodging: {
         Row: {
-          id: string
-          property_id: string
+          amenities: Json
+          bathrooms: number | null
+          bedrooms: number | null
+          checkin_time: string | null
+          checkout_time: string | null
           created_at: string
-          updated_at: string
+          external_listing_url: string | null
+          hospitable_last_synced_at: string | null
+          hospitable_listing_url: string | null
+          hospitable_property_uuid: string | null
+          hospitable_sync_status: string | null
+          id: string
           is_active: boolean
+          lodging_description: string | null
           lodging_name: string | null
           lodging_type: string | null
           lodging_type_other: string | null
-          lodging_description: string | null
-          sleeps: number | null
-          bedrooms: number | null
-          bathrooms: number | null
-          amenities: Json
-          nightly_rate_min: number | null
-          nightly_rate_max: number | null
           min_nights: number
+          nightly_rate_max: number | null
+          nightly_rate_min: number | null
           pet_policy: string
-          checkin_time: string | null
-          checkout_time: string | null
-          external_listing_url: string | null
-          hospitable_property_uuid: string | null
-          hospitable_last_synced_at: string | null
-          hospitable_sync_status: string | null
-          hospitable_listing_url: string | null
+          property_id: string
+          sleeps: number | null
+          updated_at: string
         }
         Insert: {
-          id?: string
-          property_id: string
+          amenities?: Json
+          bathrooms?: number | null
+          bedrooms?: number | null
+          checkin_time?: string | null
+          checkout_time?: string | null
           created_at?: string
-          updated_at?: string
+          external_listing_url?: string | null
+          hospitable_last_synced_at?: string | null
+          hospitable_listing_url?: string | null
+          hospitable_property_uuid?: string | null
+          hospitable_sync_status?: string | null
+          id?: string
           is_active?: boolean
+          lodging_description?: string | null
           lodging_name?: string | null
           lodging_type?: string | null
           lodging_type_other?: string | null
-          lodging_description?: string | null
-          sleeps?: number | null
-          bedrooms?: number | null
-          bathrooms?: number | null
-          amenities?: Json
-          nightly_rate_min?: number | null
-          nightly_rate_max?: number | null
           min_nights?: number
+          nightly_rate_max?: number | null
+          nightly_rate_min?: number | null
           pet_policy?: string
-          checkin_time?: string | null
-          checkout_time?: string | null
-          external_listing_url?: string | null
-          hospitable_property_uuid?: string | null
-          hospitable_last_synced_at?: string | null
-          hospitable_sync_status?: string | null
-          hospitable_listing_url?: string | null
+          property_id: string
+          sleeps?: number | null
+          updated_at?: string
         }
         Update: {
-          id?: string
-          property_id?: string
+          amenities?: Json
+          bathrooms?: number | null
+          bedrooms?: number | null
+          checkin_time?: string | null
+          checkout_time?: string | null
           created_at?: string
-          updated_at?: string
+          external_listing_url?: string | null
+          hospitable_last_synced_at?: string | null
+          hospitable_listing_url?: string | null
+          hospitable_property_uuid?: string | null
+          hospitable_sync_status?: string | null
+          id?: string
           is_active?: boolean
+          lodging_description?: string | null
           lodging_name?: string | null
           lodging_type?: string | null
           lodging_type_other?: string | null
-          lodging_description?: string | null
-          sleeps?: number | null
-          bedrooms?: number | null
-          bathrooms?: number | null
-          amenities?: Json
-          nightly_rate_min?: number | null
-          nightly_rate_max?: number | null
           min_nights?: number
+          nightly_rate_max?: number | null
+          nightly_rate_min?: number | null
           pet_policy?: string
-          checkin_time?: string | null
-          checkout_time?: string | null
-          external_listing_url?: string | null
-          hospitable_property_uuid?: string | null
-          hospitable_last_synced_at?: string | null
-          hospitable_sync_status?: string | null
-          hospitable_listing_url?: string | null
+          property_id?: string
+          sleeps?: number | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -2331,54 +2454,6 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: true
             referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      staff_notes: {
-        Row: {
-          id: string
-          club_id: string
-          entity_type: string
-          entity_id: string
-          body: string
-          created_by: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          club_id: string
-          entity_type: string
-          entity_id: string
-          body: string
-          created_by: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          club_id?: string
-          entity_type?: string
-          entity_id?: string
-          body?: string
-          created_by?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "staff_notes_club_id_fkey"
-            columns: ["club_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "staff_notes_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2744,27 +2819,6 @@ export type Database = {
           },
         ]
       }
-      stripe_webhook_events: {
-        Row: {
-          id: string
-          type: string
-          processed_at: string
-          data: Record<string, unknown> | null
-        }
-        Insert: {
-          id: string
-          type: string
-          processed_at?: string
-          data?: Record<string, unknown> | null
-        }
-        Update: {
-          id?: string
-          type?: string
-          processed_at?: string
-          data?: Record<string, unknown> | null
-        }
-        Relationships: []
-      }
       signed_documents: {
         Row: {
           booking_id: string
@@ -2828,6 +2882,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_notes: {
+        Row: {
+          body: string
+          club_id: string
+          created_at: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          club_id: string
+          created_at?: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_notes_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_notes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_webhook_events: {
+        Row: {
+          data: Json | null
+          id: string
+          processed_at: string
+          type: string
+        }
+        Insert: {
+          data?: Json | null
+          id: string
+          processed_at?: string
+          type: string
+        }
+        Update: {
+          data?: Json | null
+          id?: string
+          processed_at?: string
+          type?: string
+        }
+        Relationships: []
       }
       trip_reviews: {
         Row: {
@@ -2948,6 +3071,10 @@ export type Database = {
       }
     }
     Functions: {
+      cross_club_agreement_limit: {
+        Args: { p_club_id: string }
+        Returns: number
+      }
       is_cross_club_eligible: { Args: { p_club_id: string }; Returns: boolean }
     }
     Enums: {
@@ -3077,6 +3204,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

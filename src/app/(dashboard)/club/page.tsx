@@ -32,6 +32,7 @@ import {
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist";
 import Link from "next/link";
+import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
 interface ClubData {
   id: string;
@@ -464,6 +465,9 @@ function ActiveClubDashboard({
           </CardContent>
         </Card>
       )}
+
+      {/* SMS Consent — optional, dismissable */}
+      <SmsConsentCard />
 
       {/* Quick actions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

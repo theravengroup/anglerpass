@@ -105,9 +105,16 @@ export default function PrivacyPage() {
             </p>
 
             <p className={textClass}>
+              <strong>Phone number.</strong>{' '}If you opt in to SMS notifications,
+              we collect your mobile phone number. Your phone number is used
+              solely for sending platform-related text messages and is never
+              shared with third parties for marketing purposes.
+            </p>
+
+            <p className={textClass}>
               <strong>Communications and preferences.</strong>{' '}We store your
-              notification preferences (which email notifications you opt into or
-              out of) and any messages sent through the platform.
+              notification preferences (which email and SMS notifications you opt
+              into or out of) and any messages sent through the platform.
             </p>
           </div>
 
@@ -118,10 +125,11 @@ export default function PrivacyPage() {
               We use your information to operate the AnglerPass platform,
               including: authenticating your identity, displaying your profile to
               other users, processing bookings and payments, verifying guide
-              credentials, sending transactional emails (booking confirmations,
-              credential expiry warnings, payout notifications), and enforcing
-              platform policies. We do not sell, rent, or share your personal
-              information with third parties for marketing purposes.
+              credentials, sending transactional emails and SMS messages (booking
+              confirmations, trip reminders, credential expiry warnings, payout
+              notifications), and enforcing platform policies. We do not sell,
+              rent, or share your personal information with third parties for
+              marketing purposes.
             </p>
           </div>
 
@@ -176,6 +184,67 @@ export default function PrivacyPage() {
             </p>
           </div>
 
+          {/* SMS communications */}
+          <div className={sectionClass}>
+            <h2 className={headingClass}>SMS communications</h2>
+            <p className={textClass}>
+              AnglerPass offers optional SMS (text message) notifications for
+              booking confirmations, trip reminders, gate code delivery, review
+              prompts, and account alerts. SMS is strictly opt-in &mdash; we will
+              never send text messages unless you have expressly consented.
+            </p>
+            <p className={textClass}>
+              <strong>Consent.</strong>{' '}By providing your phone number and
+              checking the SMS consent box, you agree to receive text messages
+              from AnglerPass at the number provided. Consent is not a condition
+              of using the platform or making a purchase.
+            </p>
+            <p className={textClass}>
+              <strong>Message frequency.</strong>{' '}Message frequency varies based
+              on your booking activity. You may receive messages for booking
+              confirmations, pre-trip reminders, morning-of access details,
+              post-trip review prompts, and account notifications.
+            </p>
+            <p className={textClass}>
+              <strong>Opting out.</strong>{' '}You may opt out at any time by
+              replying STOP to any message, or by toggling off SMS notifications
+              in your{' '}
+              <a href="/dashboard/settings" className="text-river underline">
+                account settings
+              </a>
+              . After opting out, you will receive one final confirmation message
+              and no further texts.
+            </p>
+            <p className={textClass}>
+              <strong>Message and data rates.</strong>{' '}Standard message and data
+              rates from your wireless carrier may apply. AnglerPass does not
+              charge for SMS messages.
+            </p>
+            <p className={textClass}>
+              <strong>Supported carriers.</strong>{' '}SMS is supported on all major
+              U.S. carriers including AT&amp;T, T-Mobile, Verizon, and US
+              Cellular. Carriers are not liable for delayed or undelivered
+              messages.
+            </p>
+            <p className={textClass}>
+              <strong>Consent records.</strong>{' '}We retain a record of your SMS
+              consent, including the date and time of opt-in, the disclosure text
+              you agreed to, and your IP address at the time of consent, as
+              required by the Telephone Consumer Protection Act (TCPA). These
+              records are retained even after you opt out.
+            </p>
+            <p className={textClass}>
+              For questions about SMS, contact{' '}
+              <a
+                href="mailto:support@anglerpass.com"
+                className="text-river underline"
+              >
+                support@anglerpass.com
+              </a>
+              .
+            </p>
+          </div>
+
           {/* Third-party services */}
           <div className={sectionClass}>
             <h2 className={headingClass}>Third-party services</h2>
@@ -198,6 +267,13 @@ export default function PrivacyPage() {
               <li className={listItemClass}>
                 <strong>Checkr</strong> &mdash; background checks for guide
                 verification
+              </li>
+              <li className={listItemClass}>
+                <strong>Twilio</strong> &mdash; SMS message delivery (if you opt
+                in to text notifications)
+              </li>
+              <li className={listItemClass}>
+                <strong>Resend</strong> &mdash; transactional email delivery
               </li>
             </ul>
           </div>

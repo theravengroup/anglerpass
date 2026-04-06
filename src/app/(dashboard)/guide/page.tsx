@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import GuideOnboardingCard from "@/components/guide/GuideOnboardingCard";
+import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
 interface GuideProfile {
   id: string;
@@ -245,6 +246,9 @@ function ActiveGuideDashboard({
           </CardContent>
         </Card>
       </div>
+
+      {/* SMS Consent — optional, dismissable */}
+      <SmsConsentCard />
 
       {/* Quick links */}
       <div className="grid gap-4 sm:grid-cols-3">

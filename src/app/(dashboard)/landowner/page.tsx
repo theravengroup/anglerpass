@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import LandownerOnboardingCard from "@/components/properties/LandownerOnboardingCard";
+import SmsConsentCard from "@/components/shared/SmsConsentCard";
 import { PERIOD_OPTIONS, STATUS_BADGE_COLORS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 
@@ -395,6 +396,9 @@ function ActiveLandownerDashboard({
           </CardContent>
         </Card>
       </div>
+
+      {/* SMS Consent — optional, dismissable */}
+      <SmsConsentCard />
 
       {/* Add another property */}
       <Link href="/landowner/properties/new">

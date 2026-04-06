@@ -25,6 +25,7 @@ const TOC_ITEMS = [
   { href: '#guide-services', label: 'Guide Services' },
   { href: '#guest-policy', label: 'Guest Policy' },
   { href: '#club-subscriptions', label: 'Club Subscriptions' },
+  { href: '#sms-terms', label: 'SMS Terms & Conditions' },
   { href: '#review-moderation', label: 'Review Moderation' },
 ];
 

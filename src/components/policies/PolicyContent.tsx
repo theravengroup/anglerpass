@@ -467,6 +467,81 @@ export default function PolicyContent() {
         </p>
       </div>
 
+      {/* SMS Terms */}
+      <div id="sms-terms" className={sectionClass}>
+        <h2 className={headingClass}>SMS Terms &amp; Conditions</h2>
+        <p className={textClass}>
+          By opting in to SMS notifications on AnglerPass, you consent to receive
+          automated text messages at the mobile number you provide. SMS is entirely
+          optional and is not required to use the platform.
+        </p>
+
+        <h3 className={subHeadingClass}>What messages you&rsquo;ll receive</h3>
+        <ul className={listClass}>
+          <li className={listItemClass}>Booking confirmations and updates</li>
+          <li className={listItemClass}>Trip reminders (24 hours before your fishing date)</li>
+          <li className={listItemClass}>Access details and gate codes on the morning of your trip</li>
+          <li className={listItemClass}>Post-trip review prompts</li>
+          <li className={listItemClass}>Account and membership notifications</li>
+        </ul>
+
+        <h3 className={subHeadingClass}>Message frequency</h3>
+        <p className={textClass}>
+          Message frequency varies based on your booking activity. You will typically
+          receive 2&ndash;5 messages per booking (confirmation, reminder, access details,
+          thank you). If you are not actively booking, you will not receive messages.
+        </p>
+
+        <h3 className={subHeadingClass}>How to opt out</h3>
+        <p className={textClass}>
+          You may opt out of SMS notifications at any time by:
+        </p>
+        <ul className={listClass}>
+          <li className={listItemClass}>Replying <strong>STOP</strong> to any message from AnglerPass</li>
+          <li className={listItemClass}>
+            Turning off SMS notifications in your{' '}
+            <a href="/dashboard/settings" className="text-river underline">account settings</a>
+          </li>
+        </ul>
+        <p className={textClass}>
+          Opting out of SMS does not affect email notifications or in-app notifications.
+        </p>
+
+        <h3 className={subHeadingClass}>Supported carriers</h3>
+        <p className={textClass}>
+          SMS messages are delivered via standard carrier networks. Major US carriers
+          are supported, including AT&amp;T, Verizon, T-Mobile, and Sprint. Carrier
+          message and data rates may apply.
+        </p>
+
+        <h3 className={subHeadingClass}>Message and data rates</h3>
+        <p className={textClass}>
+          Message and data rates may apply depending on your mobile plan. AnglerPass
+          does not charge for SMS messages, but your carrier may charge standard
+          messaging fees.
+        </p>
+
+        <h3 className={subHeadingClass}>Privacy</h3>
+        <p className={textClass}>
+          Your phone number is stored securely and used only for delivering SMS
+          notifications you have opted in to. We do not share your phone number with
+          third parties for marketing purposes. See our{' '}
+          <Link href="/privacy" className="text-river underline">
+            Privacy Policy
+          </Link>{' '}
+          for full details on how we handle your data.
+        </p>
+
+        <h3 className={subHeadingClass}>Help</h3>
+        <p className={textClass}>
+          For help with SMS notifications, reply <strong>HELP</strong> to any message
+          or contact{' '}
+          <a href="mailto:support@anglerpass.com" className="text-river underline">
+            support@anglerpass.com
+          </a>.
+        </p>
+      </div>
+
       {/* Review Moderation */}
       <div id="review-moderation" className={sectionClass}>
         <h2 className={headingClass}>Review Moderation</h2>

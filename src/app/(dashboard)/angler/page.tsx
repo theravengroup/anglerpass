@@ -29,6 +29,7 @@ import { downloadCSV } from "@/lib/csv";
 import OnboardingCard from "@/components/angler/OnboardingCard";
 import MembershipStatusCard from "@/components/angler/MembershipStatusCard";
 import CorporateInviteSection from "@/components/angler/CorporateInviteSection";
+import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
 /** Angler-specific period options (includes "All time") */
 const PERIOD_OPTIONS = [
@@ -409,6 +410,9 @@ function ActiveDashboard({
           onExport={exportCSV}
         />
       </div>
+
+      {/* SMS Consent — optional, dismissable */}
+      <SmsConsentCard />
 
       {/* Discover CTA */}
       <Card className="border-bronze/20 bg-bronze/5">
