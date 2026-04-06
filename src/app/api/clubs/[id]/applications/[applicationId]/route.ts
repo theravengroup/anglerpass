@@ -102,18 +102,33 @@ export async function PATCH(
     const now = new Date().toISOString();
 
     if (parsed.data.action === "approve") {
+      // Check if club charges fees — determines whether payment is needed
+      const { data: clubDetails } = await admin
+        .from("clubs")
+        .select("initiation_fee, annual_dues")
+        .eq("id", id)
+        .single();
+
+      const hasFees =
+        (clubDetails?.initiation_fee ?? 0) > 0 ||
+        (clubDetails?.annual_dues ?? 0) > 0;
+
+      // If fees required, set to payment_pending; otherwise activate immediately
+      const appStatus = hasFees ? "payment_pending" : "approved";
+      const memberStatus = hasFees ? "pending" : "active";
+
       // Update application
       await admin
         .from("membership_applications")
         .update({
-          status: "approved",
+          status: appStatus,
           reviewed_by: user.id,
           reviewed_at: now,
           updated_at: now,
         })
         .eq("id", applicationId);
 
-      // Check if membership already exists (from old join flow)
+      // Check if membership already exists (from join flow)
       const { data: existingMembership } = await admin
         .from("club_memberships")
         .select("id, status")
@@ -122,23 +137,21 @@ export async function PATCH(
         .maybeSingle();
 
       if (existingMembership) {
-        // Update existing membership to active
         await admin
           .from("club_memberships")
           .update({
-            status: "active",
-            joined_at: now,
+            status: memberStatus,
+            ...(memberStatus === "active" ? { joined_at: now } : {}),
             updated_at: now,
           })
           .eq("id", existingMembership.id);
       } else {
-        // Create new membership
         await admin.from("club_memberships").insert({
           club_id: id,
           user_id: application.user_id,
           role: "member",
-          status: "active",
-          joined_at: now,
+          status: memberStatus,
+          ...(memberStatus === "active" ? { joined_at: now } : {}),
         });
       }
 
@@ -147,12 +160,13 @@ export async function PATCH(
         userId: application.user_id,
         clubName: auth.club.name,
         clubId: id,
+        paymentRequired: hasFees,
       }).catch((err) =>
         console.error("[clubs/applications] Notification error:", err)
       );
 
       return jsonOk({
-        application: { id: applicationId, status: "approved" },
+        application: { id: applicationId, status: appStatus },
       });
     }
 

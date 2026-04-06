@@ -61,10 +61,10 @@ export async function POST(request: Request) {
       .eq("club_id", clubId)
       .eq("user_id", auth.user.id)
       .in("status", ["active", "pending"])
-      .single();
+      .maybeSingle();
 
-    if (existingMembership) {
-      return jsonError("You already have a membership with this club", 409);
+    if (existingMembership?.status === "active") {
+      return jsonError("You already have an active membership with this club", 409);
     }
 
     // Get or create Stripe Customer
@@ -89,22 +89,34 @@ export async function POST(request: Request) {
         .eq("id", auth.user.id);
     }
 
-    // Create the membership record first
-    const { data: membership, error: membershipError } = await admin
-      .from("club_memberships")
-      .insert({
-        club_id: clubId,
-        user_id: auth.user.id,
-        role: "member",
-        status: "pending",
-        dues_status: "pending",
-      })
-      .select("id")
-      .single();
+    // Use existing pending membership (from join/approve flow) or create new one
+    let membershipId: string;
 
-    if (membershipError || !membership) {
-      console.error("[membership-checkout] Failed to create membership:", membershipError);
-      return jsonError("Failed to create membership", 500);
+    if (existingMembership?.status === "pending") {
+      membershipId = existingMembership.id;
+      // Update dues_status to pending for the checkout
+      await admin
+        .from("club_memberships")
+        .update({ dues_status: "pending", updated_at: new Date().toISOString() })
+        .eq("id", existingMembership.id);
+    } else {
+      const { data: membership, error: membershipError } = await admin
+        .from("club_memberships")
+        .insert({
+          club_id: clubId,
+          user_id: auth.user.id,
+          role: "member",
+          status: "pending",
+          dues_status: "pending",
+        })
+        .select("id")
+        .single();
+
+      if (membershipError || !membership) {
+        console.error("[membership-checkout] Failed to create membership:", membershipError);
+        return jsonError("Failed to create membership", 500);
+      }
+      membershipId = membership.id;
     }
 
     const result: {
@@ -114,7 +126,7 @@ export async function POST(request: Request) {
       initiationAmount?: number;
       duesAmount?: number;
       processingFee?: number;
-    } = { membershipId: membership.id };
+    } = { membershipId };
 
     // 1. Initiation fee PaymentIntent
     const initiationFee = club.initiation_fee ?? 0;
@@ -129,7 +141,7 @@ export async function POST(request: Request) {
         metadata: {
           type: "membership_initiation",
           club_id: clubId,
-          membership_id: membership.id,
+          membership_id: membershipId,
           user_id: auth.user.id,
           initiation_fee: String(initiationFee),
           processing_fee: String(processingFee),
@@ -149,7 +161,7 @@ export async function POST(request: Request) {
         metadata: {
           type: "membership_dues",
           club_id: clubId,
-          membership_id: membership.id,
+          membership_id: membershipId,
         },
         payment_behavior: "default_incomplete",
         payment_settings: {
@@ -173,7 +185,7 @@ export async function POST(request: Request) {
       await admin
         .from("club_memberships")
         .update({ stripe_subscription_id: subscription.id })
-        .eq("id", membership.id);
+        .eq("id", membershipId);
 
       result.duesAmount = club.annual_dues ?? 0;
     }

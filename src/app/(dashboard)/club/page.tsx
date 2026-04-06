@@ -1,4 +1,3 @@
-// TODO: Convert to server component with async data fetching
 "use client";
 
 import { useEffect, useState } from "react";
@@ -30,6 +29,7 @@ import {
   Shield,
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
+import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist";
 import Link from "next/link";
 
 interface ClubData {
@@ -47,50 +47,64 @@ interface ClubStats {
   pending_properties: number;
 }
 
+type ClubOnboardingState = "no_club" | "setup_incomplete" | "active";
+
+interface OnboardingData {
+  state: ClubOnboardingState;
+  club?: {
+    id: string;
+    name: string;
+    subscription_tier: string | null;
+  };
+  checklist?: {
+    club_created: boolean;
+    has_description: boolean;
+    has_subscription: boolean;
+    has_payout: boolean;
+    has_members: boolean;
+    has_properties: boolean;
+  };
+}
+
 const SITE_URL = "https://anglerpass.com";
 
 export default function ClubPage() {
   const router = useRouter();
+  const [onboarding, setOnboarding] = useState<OnboardingData | null>(null);
   const [club, setClub] = useState<ClubData | null>(null);
   const [stats, setStats] = useState<ClubStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [linkCopied, setLinkCopied] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
-  const [hasClub, setHasClub] = useState<boolean | null>(null);
 
-  async function loadClub() {
+  async function load() {
     try {
-      const res = await fetch("/api/clubs");
-      if (!res.ok) return;
-
-      const data = await res.json();
-      if (!data.owned?.length) {
-        setHasClub(false);
-        setLoading(false);
-        return;
+      // Fetch onboarding status first
+      const onboardingRes = await fetch("/api/clubs/onboarding-status");
+      let onboardingData: OnboardingData = { state: "no_club" };
+      if (onboardingRes.ok) {
+        onboardingData = await onboardingRes.json();
       }
+      setOnboarding(onboardingData);
 
-      setHasClub(true);
-      const owned = data.owned[0];
-
-      // Fetch detailed stats
-      const detailRes = await fetch(`/api/clubs/${owned.id}`);
-      if (detailRes.ok) {
-        const detail = await detailRes.json();
-        setClub(detail.club);
-        setStats(detail.stats);
-      } else {
-        setClub(owned);
+      // Only fetch full details if active
+      if (onboardingData.state === "active" && onboardingData.club) {
+        const detailRes = await fetch(
+          `/api/clubs/${onboardingData.club.id}`
+        );
+        if (detailRes.ok) {
+          const detail = await detailRes.json();
+          setClub(detail.club);
+          setStats(detail.stats);
+        }
       }
     } catch {
-      setHasClub(false);
+      // silent
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadClub();
+    load();
   }, []);
 
   if (loading) {
@@ -102,11 +116,11 @@ export default function ClubPage() {
   }
 
   // No club yet — show setup CTA
-  if (!hasClub || !club) {
+  if (onboarding?.state === "no_club") {
     return (
       <div className="mx-auto max-w-5xl space-y-8">
         <div>
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+          <h2 className="font-heading text-2xl font-semibold text-text-primary">
             Club Management
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
@@ -116,38 +130,123 @@ export default function ClubPage() {
         </div>
 
         <Card className="border-river/20 bg-river/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Settings className="size-5 text-river" />
-              Set Up Your Club
-            </CardTitle>
-            <CardDescription>
-              Create your club profile to start managing members, coordinating
-              property access, and running your club through AnglerPass.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              className="bg-river text-white hover:bg-river/90"
-              onClick={() => router.push("/club/setup")}
-            >
-              Get Started
-              <ArrowRight className="ml-1 size-4" />
-            </Button>
+          <CardContent className="py-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex size-16 items-center justify-center rounded-full bg-river/10">
+                <Users className="size-8 text-river" />
+              </div>
+              <h3 className="mt-4 text-lg font-medium text-text-primary">
+                Set Up Your Club on AnglerPass
+              </h3>
+              <p className="mt-2 max-w-lg text-sm text-text-secondary">
+                Create your club profile to start managing members, coordinating
+                property access through the Cross-Club Network, and running your
+                club digitally.
+              </p>
+              <div className="mt-4 grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-forest/10">
+                    <Users className="size-5 text-forest" />
+                  </div>
+                  <p className="mt-2 text-xs text-text-secondary">
+                    Manage members
+                  </p>
+                </div>
+                <div>
+                  <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-bronze/10">
+                    <MapPin className="size-5 text-bronze" />
+                  </div>
+                  <p className="mt-2 text-xs text-text-secondary">
+                    Property access
+                  </p>
+                </div>
+                <div>
+                  <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-river/10">
+                    <Network className="size-5 text-river" />
+                  </div>
+                  <p className="mt-2 text-xs text-text-secondary">
+                    Cross-Club Network
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="mt-6 bg-river text-white hover:bg-river/90"
+                onClick={() => router.push("/club/setup")}
+              >
+                Get Started
+                <ArrowRight className="ml-1 size-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  // Setup incomplete — show onboarding checklist
+  if (
+    onboarding?.state === "setup_incomplete" &&
+    onboarding.club &&
+    onboarding.checklist
+  ) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div>
+          <h2 className="font-heading text-2xl font-semibold text-text-primary">
+            {onboarding.club.name}
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            Complete your club setup to start managing members and bookings.
+          </p>
+        </div>
+        <ClubOnboardingChecklist
+          club={onboarding.club}
+          checklist={onboarding.checklist}
+          onComplete={() => {
+            setLoading(true);
+            load();
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Active — show full dashboard
+  if (!club) {
+    return (
+      <div className="mx-auto flex max-w-5xl items-center justify-center py-24">
+        <Loader2 className="size-6 animate-spin text-river" />
+      </div>
+    );
+  }
+
+  return (
+    <ActiveClubDashboard
+      club={club}
+      stats={stats}
+    />
+  );
+}
+
+// ─── Active Club Dashboard ─────────────────────────────────────────
+
+function ActiveClubDashboard({
+  club,
+  stats,
+}: {
+  club: ClubData;
+  stats: ClubStats | null;
+}) {
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
+
   const statCards = [
     {
       label: "Active Members",
       value: String(stats?.active_members ?? 0),
-      description:
-        stats?.pending_members
-          ? `${stats.pending_members} pending`
-          : "Manage your roster",
+      description: stats?.pending_members
+        ? `${stats.pending_members} pending`
+        : "Manage your roster",
       icon: Users,
       color: "text-forest",
       bg: "bg-forest/10",
@@ -165,10 +264,9 @@ export default function ClubPage() {
     {
       label: "Active Properties",
       value: String(stats?.active_properties ?? 0),
-      description:
-        stats?.pending_properties
-          ? `${stats.pending_properties} pending approval`
-          : "Managed by your club",
+      description: stats?.pending_properties
+        ? `${stats.pending_properties} pending approval`
+        : "Managed by your club",
       icon: MapPin,
       color: "text-bronze",
       bg: "bg-bronze/10",
@@ -180,7 +278,7 @@ export default function ClubPage() {
     <div className="mx-auto max-w-5xl space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
+          <h2 className="font-heading text-2xl font-semibold text-text-primary">
             {club.name}
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
@@ -255,9 +353,7 @@ export default function ClubPage() {
               size="sm"
               className="shrink-0"
               onClick={() => {
-                navigator.clipboard.writeText(
-                  `${SITE_URL}/join/${club.id}`
-                );
+                navigator.clipboard.writeText(`${SITE_URL}/join/${club.id}`);
                 setLinkCopied(true);
                 setTimeout(() => setLinkCopied(false), 2000);
               }}
@@ -286,11 +382,11 @@ export default function ClubPage() {
             </div>
             <p className="text-xs text-text-secondary">
               Copy the code snippet below and paste it into your
-              website&rsquo;s HTML. Works with any platform &mdash;
-              WordPress, Squarespace, Wix, or custom sites.
+              website&rsquo;s HTML. Works with any platform &mdash; WordPress,
+              Squarespace, Wix, or custom sites.
             </p>
             <div className="overflow-x-auto rounded-lg bg-forest-deep p-4">
-              <pre className="font-[family-name:var(--font-mono)] text-xs leading-relaxed text-parchment/80">
+              <pre className="font-mono text-xs leading-relaxed text-parchment/80">
                 {`<a href="${SITE_URL}/join/${club.id}" style="display:inline-block;padding:14px 28px;background:#1a3a2a;color:#fff;font-family:sans-serif;font-size:14px;font-weight:500;text-decoration:none;border-radius:6px;letter-spacing:.3px;">Join ${club.name} on AnglerPass</a>`}
               </pre>
             </div>
@@ -370,91 +466,68 @@ export default function ClubPage() {
 
       {/* Quick actions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/club/members">
-          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
-            <CardContent className="flex items-center gap-4 py-5">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-forest/10">
-                <UserPlus className="size-5 text-forest" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Invite Members
-                </p>
-                <p className="text-xs text-text-light">
-                  Grow your club by inviting anglers
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/club/properties">
-          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
-            <CardContent className="flex items-center gap-4 py-5">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-bronze/10">
-                <MapPin className="size-5 text-bronze" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Manage Properties
-                </p>
-                <p className="text-xs text-text-light">
-                  View and approve property associations
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/club/staff">
-          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
-            <CardContent className="flex items-center gap-4 py-5">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-river/10">
-                <Shield className="size-5 text-river" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Manage Staff
-                </p>
-                <p className="text-xs text-text-light">
-                  Assign roles and permissions to members
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/club/network">
-          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
-            <CardContent className="flex items-center gap-4 py-5">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-river/10">
-                <Network className="size-5 text-river" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Club Network
-                </p>
-                <p className="text-xs text-text-light">
-                  Partner with other clubs for shared access
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/club/referrals">
-          <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
-            <CardContent className="flex items-center gap-4 py-5">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-bronze/10">
-                <Gift className="size-5 text-bronze" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-text-primary">
-                  Member Referrals
-                </p>
-                <p className="text-xs text-text-light">
-                  Set up referral rewards for members
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        {[
+          {
+            label: "Invite Members",
+            description: "Grow your club by inviting anglers",
+            href: "/club/members",
+            icon: UserPlus,
+            color: "text-forest",
+            bg: "bg-forest/10",
+          },
+          {
+            label: "Manage Properties",
+            description: "View and approve property associations",
+            href: "/club/properties",
+            icon: MapPin,
+            color: "text-bronze",
+            bg: "bg-bronze/10",
+          },
+          {
+            label: "Manage Staff",
+            description: "Assign roles and permissions to members",
+            href: "/club/staff",
+            icon: Shield,
+            color: "text-river",
+            bg: "bg-river/10",
+          },
+          {
+            label: "Club Network",
+            description: "Partner with other clubs for shared access",
+            href: "/club/network",
+            icon: Network,
+            color: "text-river",
+            bg: "bg-river/10",
+          },
+          {
+            label: "Member Referrals",
+            description: "Set up referral rewards for members",
+            href: "/club/referrals",
+            icon: Gift,
+            color: "text-bronze",
+            bg: "bg-bronze/10",
+          },
+        ].map((item) => (
+          <Link key={item.href} href={item.href}>
+            <Card className="border-stone-light/20 transition-colors hover:border-stone-light/40">
+              <CardContent className="flex items-center gap-4 py-5">
+                <div
+                  className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${item.bg}`}
+                >
+                  <item.icon className={`size-5 ${item.color}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    {item.label}
+                  </p>
+                  <p className="text-xs text-text-light">
+                    {item.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );

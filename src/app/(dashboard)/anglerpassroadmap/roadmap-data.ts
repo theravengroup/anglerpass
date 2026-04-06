@@ -289,7 +289,7 @@ export const PHASES: RoadmapPhase[] = [
             id: "p1-onboarding",
             label: "Onboarding nudges",
             detail: "Incomplete profile reminders, 'finish setting up your property' for landowners, 'join a club' for anglers.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-renewal-reminders",
@@ -433,6 +433,12 @@ export const PHASES: RoadmapPhase[] = [
           { id: "p2-fishing-log", label: "Personal fishing log (properties visited, species caught, days)", done: false },
           { id: "p2-group-booking", label: "Group booking coordination (split payment, group invite)", done: false },
           { id: "p2-loyalty", label: "Loyalty / repeat-booking incentives", done: false },
+          {
+            id: "p2-geo-match",
+            label: "Geographic matching — structured location data",
+            detail: "Upgrade fuzzy text location matching to structured city/state/region fields with geo coordinates for precise club-to-angler proximity matching.",
+            done: false,
+          },
         ],
       },
       {

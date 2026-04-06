@@ -576,14 +576,21 @@ export async function notifyMemberApproved(
     userId: string;
     clubName: string;
     clubId: string;
+    paymentRequired?: boolean;
   }
 ) {
+  const body = opts.paymentRequired
+    ? `Great news! ${opts.clubName} has approved your membership. Complete your membership by paying the initiation fee and annual dues on your dashboard.`
+    : `Your membership in ${opts.clubName} has been approved. You can now browse and book access to the club\u2019s private waters.`;
+
   await notify(admin, {
     userId: opts.userId,
     type: "member_approved",
-    title: `Welcome to ${opts.clubName}!`,
-    body: `Your membership in ${opts.clubName} has been approved. You can now browse and book access to the club\u2019s private waters.`,
-    link: "/angler/discover",
+    title: opts.paymentRequired
+      ? `Approved! Complete your ${opts.clubName} membership`
+      : `Welcome to ${opts.clubName}!`,
+    body,
+    link: "/angler",
     metadata: { club_id: opts.clubId },
   });
 }

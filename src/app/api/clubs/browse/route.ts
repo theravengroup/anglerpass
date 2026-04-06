@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() ?? "";
     const location = searchParams.get("location")?.trim() ?? "";
+    const nearMe = searchParams.get("near_me") === "true";
 
     const admin = createAdminClient();
 
@@ -48,9 +49,38 @@ export async function GET(request: Request) {
       );
     }
 
-    if (location) {
-      const safeLoc = escapeIlike(location);
-      query = query.ilike("location", `%${safeLoc}%`);
+    // If near_me is set, use the angler's profile location for fuzzy matching
+    let locationFilter = location;
+    if (nearMe && !location) {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("location")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.location) {
+        // Extract meaningful location parts (city, state, region)
+        // e.g. "Denver, CO" → search for "Denver" and "CO" separately
+        const parts = (profile.location as string)
+          .split(/[,\s]+/)
+          .filter((p) => p.length > 1);
+        if (parts.length > 0) {
+          locationFilter = parts.join(" ");
+        }
+      }
+    }
+
+    if (locationFilter) {
+      // Fuzzy match: split into terms and OR-match each against location
+      const terms = locationFilter
+        .split(/[,\s]+/)
+        .filter((t) => t.length > 1)
+        .map((t) => escapeIlike(t));
+
+      if (terms.length > 0) {
+        const locationOr = terms.map((t) => `location.ilike.%${t}%`).join(",");
+        query = query.or(locationOr);
+      }
     }
 
     const { data: clubs, error } = await query;
