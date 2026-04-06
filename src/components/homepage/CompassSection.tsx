@@ -147,24 +147,32 @@ export default function CompassSection() {
   return (
     <section className="compass-section" id="ai">
       <div className="compass-overlay" />
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        {/* AI Section Intro */}
-        <div className="ai-intro reveal">
-          <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
-            AnglerPass Compass &middot; AI-Powered
-          </span>
-          <h2 className="ai-headline">
-            You don&apos;t search.
-            <br />
-            <em>You ask.</em>
-          </h2>
-          <p className="ai-subhead">
-            AnglerPass Compass is the intelligent engine built into the platform.
-            It finds your water, prepares your trip, and guides your day &mdash;
-            all from a single conversation. Tell it what you&apos;re looking for.
-            It handles the rest.
-          </p>
+
+      {/* Cinematic hero background */}
+      <div className="compass-hero">
+        <div className="compass-hero-bg" />
+        <div className="compass-hero-overlay" />
+        <div className="container compass-hero-content">
+          <div className="ai-intro reveal">
+            <span className="eyebrow" style={{ color: 'var(--bronze-light)' }}>
+              AnglerPass Compass &middot; AI-Powered
+            </span>
+            <h2 className="ai-headline">
+              You don&apos;t search.
+              <br />
+              <em>You ask.</em>
+            </h2>
+            <p className="ai-subhead">
+              AnglerPass Compass is the intelligent engine built into the platform.
+              It finds your water, prepares your trip, and guides your day &mdash;
+              all from a single conversation. Tell it what you&apos;re looking for.
+              It handles the rest.
+            </p>
+          </div>
         </div>
+      </div>
+
+      <div className="container compass-offerings-wrap" style={{ position: 'relative', zIndex: 2 }}>
 
         {/* Main Compass offering */}
         <div className="ai-offering" id="compass">
