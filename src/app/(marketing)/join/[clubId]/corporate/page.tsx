@@ -193,14 +193,6 @@ export default async function CorporateJoinPage({
             </p>
           </div>
 
-          {/* Stripe payment placeholder */}
-          <div className="mb-10 rounded-xl border-2 border-dashed border-stone-light/30 bg-parchment-light/50 px-6 py-10 text-center">
-            <p className="text-sm font-medium text-text-light">
-              Corporate Membership Payment &mdash; Stripe integration coming
-              soon
-            </p>
-          </div>
-
           {/* Corporate Join CTA */}
           <CorporateJoinCta clubId={club.id} clubName={club.name} />
 

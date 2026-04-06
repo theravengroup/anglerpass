@@ -28,6 +28,8 @@ interface BookingPaymentFormProps {
   onSuccess: () => void;
   /** Called when the user wants to go back */
   onBack?: () => void;
+  /** Pre-created PaymentIntent client secret. Skips internal PI creation. */
+  initialClientSecret?: string;
 }
 
 /**
@@ -44,11 +46,15 @@ export default function BookingPaymentForm({
   fees,
   onSuccess,
   onBack,
+  initialClientSecret,
 }: BookingPaymentFormProps) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(
+    initialClientSecret ?? null
+  );
   const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [useNewCard, setUseNewCard] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,33 +73,36 @@ export default function BookingPaymentForm({
         setSavedCards(methods.cards ?? []);
       }
 
-      // Create the PaymentIntent
-      const piRes = await fetch("/api/stripe/payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingId,
-          amountCents: totalCents,
-          platformFeeCents,
-        }),
-      });
+      // Skip PaymentIntent creation if a client secret was provided
+      if (!initialClientSecret) {
+        const piRes = await fetch("/api/stripe/payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookingId,
+            amountCents: totalCents,
+            platformFeeCents,
+          }),
+        });
 
-      if (!piRes.ok) {
-        const data = await piRes.json();
-        throw new Error(data.error ?? "Failed to initialize payment");
+        if (!piRes.ok) {
+          const data = await piRes.json();
+          throw new Error(data.error ?? "Failed to initialize payment");
+        }
+
+        const { clientSecret: secret } = await piRes.json();
+        setClientSecret(secret);
       }
-
-      const { clientSecret: secret } = await piRes.json();
-      setClientSecret(secret);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
+      setInitialized(true);
     }
   }
 
   // Auto-initialize on mount
-  if (!clientSecret && !loading && !error) {
+  if (!initialized && !loading) {
     initPayment();
   }
 

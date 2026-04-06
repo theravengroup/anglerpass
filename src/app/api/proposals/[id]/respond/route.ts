@@ -4,6 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { proposalResponseSchema } from "@/lib/validations/proposals";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import {
+  getOrCreateCustomer,
+  createPaymentIntent,
+} from "@/lib/stripe/server";
+import {
   notifyProposalAccepted,
   notifyProposalDeclined,
 } from "@/lib/notifications";
@@ -225,16 +229,60 @@ export async function POST(
         return jsonError("Failed to create booking from proposal", 500);
       }
 
-      // TODO: Stripe — create PaymentIntent for proposal acceptance
+      // ── Stripe: create PaymentIntent for proposal acceptance ──
+      const totalCents = Math.round(fees.totalAmount * 100);
+      const platformFeeCents = Math.round(fees.platformFee * 100);
 
-      // Fetch angler name for notification
+      // Fetch angler profile (for Stripe customer + notification)
       const { data: anglerProfile } = await admin
         .from("profiles")
-        .select("display_name")
+        .select("display_name, stripe_customer_id")
         .eq("id", user.id)
         .single();
 
       const anglerName = anglerProfile?.display_name ?? "An angler";
+
+      // Get or create Stripe Customer for the angler
+      let customerId = anglerProfile?.stripe_customer_id;
+
+      if (!customerId) {
+        customerId = await getOrCreateCustomer(
+          user.id,
+          user.email ?? "",
+          anglerProfile?.display_name ?? undefined
+        );
+
+        await admin
+          .from("profiles")
+          .update({ stripe_customer_id: customerId })
+          .eq("id", user.id);
+      }
+
+      // Create PaymentIntent with manual capture (authorization hold)
+      const paymentIntent = await createPaymentIntent({
+        amountCents: totalCents,
+        customerId,
+        captureMethod: "manual",
+        transferGroup: `booking_${booking.id}`,
+        metadata: {
+          booking_id: booking.id,
+          angler_id: user.id,
+          platform_fee_cents: String(platformFeeCents),
+          proposal_id: proposalId,
+        },
+      });
+
+      // Store PaymentIntent on the booking
+      await admin
+        .from("bookings")
+        .update({
+          stripe_payment_intent_id: paymentIntent.id,
+          amount_cents: totalCents,
+          platform_fee_cents: platformFeeCents,
+          payment_status: "unpaid",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", booking.id);
 
       // Notify guide
       notifyProposalAccepted(admin, {
@@ -249,6 +297,7 @@ export async function POST(
       return jsonOk({
         invitee: { ...invitee, status: "accepted", responded_at: now },
         booking,
+        clientSecret: paymentIntent.client_secret,
       });
     }
 

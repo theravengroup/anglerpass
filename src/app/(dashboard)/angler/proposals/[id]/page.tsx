@@ -20,6 +20,7 @@ import ProposalCostBreakdown from "@/components/angler/ProposalCostBreakdown";
 import ProposalActionButtons from "@/components/angler/ProposalActionButtons";
 import ProposalPropertyCard from "@/components/angler/ProposalPropertyCard";
 import ProposalGuideCard from "@/components/angler/ProposalGuideCard";
+import BookingPaymentForm from "@/components/angler/BookingPaymentForm";
 
 interface ProposalDetail {
   id: string;
@@ -62,6 +63,11 @@ export default function ProposalDetailPage() {
   const [responseResult, setResponseResult] = useState<
     "accepted" | "declined" | null
   >(null);
+  const [paymentData, setPaymentData] = useState<{
+    clientSecret: string;
+    bookingId: string;
+  } | null>(null);
+  const [paymentComplete, setPaymentComplete] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -124,7 +130,10 @@ export default function ProposalDetailPage() {
     !expiry.isExpired &&
     !responseResult;
 
-  function handleResponded(response: "accepted" | "declined") {
+  function handleResponded(
+    response: "accepted" | "declined",
+    data?: { clientSecret: string; booking: { id: string } }
+  ) {
     setResponseResult(response);
     setProposal((prev) =>
       prev
@@ -135,6 +144,14 @@ export default function ProposalDetailPage() {
           }
         : prev
     );
+
+    // If accepted with a clientSecret, show the payment form
+    if (response === "accepted" && data?.clientSecret) {
+      setPaymentData({
+        clientSecret: data.clientSecret,
+        bookingId: data.booking.id,
+      });
+    }
   }
 
   return (
@@ -277,8 +294,32 @@ export default function ProposalDetailPage() {
         </p>
       )}
 
+      {/* Payment form after acceptance */}
+      {responseResult === "accepted" &&
+        paymentData &&
+        !paymentComplete &&
+        proposal && (
+          <Card className="border-bronze/20">
+            <CardContent className="py-5">
+              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-primary">
+                Complete Payment
+              </h3>
+              <p className="mb-4 text-sm text-text-secondary">
+                Your trip is confirmed. Please authorize payment to secure your
+                booking.
+              </p>
+              <BookingPaymentForm
+                bookingId={paymentData.bookingId}
+                fees={proposal.fee_breakdown}
+                initialClientSecret={paymentData.clientSecret}
+                onSuccess={() => setPaymentComplete(true)}
+              />
+            </CardContent>
+          </Card>
+        )}
+
       {/* Response result message */}
-      {responseResult && (
+      {responseResult && (paymentComplete || !paymentData) && (
         <div
           className={`rounded-lg border px-4 py-3 text-sm font-medium ${
             responseResult === "accepted"
@@ -288,9 +329,11 @@ export default function ProposalDetailPage() {
           role="alert"
           aria-live="polite"
         >
-          {responseResult === "accepted"
-            ? "You've accepted this trip proposal. A confirmed booking has been created."
-            : "You've declined this trip proposal."}
+          {responseResult === "accepted" && paymentComplete
+            ? "Payment authorized! Your booking is confirmed."
+            : responseResult === "accepted"
+              ? "You've accepted this trip proposal. A confirmed booking has been created."
+              : "You've declined this trip proposal."}
         </div>
       )}
 

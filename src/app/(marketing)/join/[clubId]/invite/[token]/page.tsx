@@ -305,14 +305,6 @@ export default async function EmployeeInvitePage({
             </p>
           </div>
 
-          {/* Stripe payment placeholder */}
-          <div className="mb-10 rounded-xl border-2 border-dashed border-stone-light/30 bg-parchment-light/50 px-6 py-10 text-center">
-            <p className="text-sm font-medium text-text-light">
-              Membership Payment &mdash; Stripe integration coming soon
-            </p>
-            {/* STRIPE PAYMENT INTEGRATION — add Stripe Elements here */}
-          </div>
-
           {/* Join CTA */}
           <EmployeeJoinCta
             clubId={clubId}

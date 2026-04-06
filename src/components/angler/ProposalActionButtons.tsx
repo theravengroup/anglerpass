@@ -4,9 +4,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
+interface AcceptedResponseData {
+  clientSecret: string;
+  booking: { id: string };
+}
+
 interface ProposalActionButtonsProps {
   proposalId: string;
-  onResponded: (response: "accepted" | "declined") => void;
+  onResponded: (
+    response: "accepted" | "declined",
+    data?: AcceptedResponseData
+  ) => void;
 }
 
 export default function ProposalActionButtons({
@@ -35,7 +43,16 @@ export default function ProposalActionButtons({
         return;
       }
 
-      onResponded(response);
+      const data = await res.json();
+
+      if (response === "accepted" && data.clientSecret) {
+        onResponded(response, {
+          clientSecret: data.clientSecret,
+          booking: data.booking,
+        });
+      } else {
+        onResponded(response);
+      }
     } catch {
       setError("Network error. Please try again.");
     } finally {
