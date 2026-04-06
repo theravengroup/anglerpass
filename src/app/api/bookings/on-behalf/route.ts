@@ -353,8 +353,12 @@ export async function POST(request: Request) {
     notifyBookingConfirmed(admin, {
       anglerId: angler_id,
       propertyName: property.name,
-      bookingDate: dateLabel,
+      bookingDate: startDate,
+      bookingEndDate: isMultiDay ? endDate : undefined,
       bookingId: booking.id,
+      duration,
+      partySize: party_size,
+      totalAmount: fees.totalAmount,
       guideName: guideName ?? undefined,
     }).catch((err) => console.error("[bookings/on-behalf] Angler notification error:", err));
 

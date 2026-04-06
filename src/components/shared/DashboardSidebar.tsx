@@ -82,8 +82,10 @@ export default function DashboardSidebar({
           )}
         </div>
 
-        {/* Navigation — flex-1 + min-h-0 ensures it fills remaining space and scrolls */}
-        <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
+        {/* Navigation — flex-1 + min-h-0 ensures it fills remaining space and scrolls.
+            Uses div+role instead of <nav> to avoid homepage.css bare nav{} selector
+            which applies position:fixed and breaks the flex column layout. */}
+        <div role="navigation" className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
           {items.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -128,7 +130,7 @@ export default function DashboardSidebar({
               </Link>
             );
           })}
-        </nav>
+        </div>
 
         {/* Bottom pinned sections */}
         <div className="mt-auto shrink-0">

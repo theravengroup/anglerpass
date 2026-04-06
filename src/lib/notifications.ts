@@ -48,7 +48,10 @@ export type NotificationType =
   | "proposal_accepted"
   | "proposal_declined"
   | "proposal_expired"
-  | "proposal_expiry_reminder";
+  | "proposal_expiry_reminder"
+  | "booking_reminder"
+  | "booking_gate_code"
+  | "booking_thank_you";
 
 interface NotificationPayload {
   userId: string;
@@ -87,6 +90,9 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   proposal_declined: "email_booking_declined",
   proposal_expired: "email_booking_cancelled",
   proposal_expiry_reminder: "email_booking_requested",
+  booking_reminder: "email_booking_confirmed",
+  booking_gate_code: "email_booking_confirmed",
+  booking_thank_you: "email_booking_confirmed",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -200,6 +206,9 @@ const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   proposal_declined: "Trip Proposal Declined",
   proposal_expired: "Trip Proposal Expired",
   proposal_expiry_reminder: "Trip Proposal Expiring Soon",
+  booking_reminder: "Your Trip is Tomorrow!",
+  booking_gate_code: "Access Details for Today\u2019s Trip",
+  booking_thank_you: "Thanks for Fishing with AnglerPass!",
 };
 
 const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
@@ -229,6 +238,9 @@ const CTA_LABEL_MAP: Partial<Record<NotificationType, string>> = {
   proposal_declined: "View Proposal →",
   proposal_expired: "View Proposals →",
   proposal_expiry_reminder: "View Proposal →",
+  booking_reminder: "View Booking Details →",
+  booking_gate_code: "View Full Access Details →",
+  booking_thank_you: "Leave a Review →",
 };
 
 const CTA_COLOR_MAP: Partial<Record<NotificationType, string>> = {
@@ -354,15 +366,31 @@ export async function notifyBookingConfirmed(
     anglerId: string;
     propertyName: string;
     bookingDate: string;
+    bookingEndDate?: string;
     bookingId: string;
+    duration: string;
+    partySize: number;
+    totalAmount?: number;
     landownerNotes?: string;
     guideName?: string;
   }
 ) {
-  let body = `Your booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)} is confirmed! Access details are now available in your booking.`;
-  if (opts.guideName) {
-    body += ` Your guide ${opts.guideName} will be in touch before your trip.`;
+  const dateRange = opts.bookingEndDate
+    ? `${formatDate(opts.bookingDate)} \u2013 ${formatDate(opts.bookingEndDate)}`
+    : formatDate(opts.bookingDate);
+  const durationLabel = opts.duration === "half_day" ? "Half day" : "Full day";
+
+  let body = `Your booking at ${opts.propertyName} is confirmed!\n\n`;
+  body += `\u2022 Date: ${dateRange}\n`;
+  body += `\u2022 Duration: ${durationLabel}\n`;
+  body += `\u2022 Party size: ${opts.partySize} angler${opts.partySize > 1 ? "s" : ""}`;
+  if (opts.totalAmount) {
+    body += `\n\u2022 Total: $${(opts.totalAmount / 100).toFixed(2)}`;
   }
+  if (opts.guideName) {
+    body += `\n\u2022 Guide: ${opts.guideName}`;
+  }
+  body += `\n\nAccess details will be sent the morning of your trip.`;
   if (opts.landownerNotes) {
     body += ` Note from the landowner: \u201C${opts.landownerNotes}\u201D`;
   }
@@ -426,6 +454,114 @@ export async function notifyBookingCancelled(
     title: `Booking cancelled \u2014 ${opts.propertyName}`,
     body: `${opts.anglerName} has cancelled their booking at ${opts.propertyName} on ${formatDate(opts.bookingDate)}.`,
     link: "/landowner/bookings",
+    metadata: {
+      booking_id: opts.bookingId,
+      property_name: opts.propertyName,
+    },
+  });
+}
+
+// ─── Booking Lifecycle Notifications ────────────────────────────────
+
+/** 24h pre-trip reminder — sent by daily cron for tomorrow's bookings */
+export async function notifyBookingReminder(
+  admin: SupabaseClient,
+  opts: {
+    anglerId: string;
+    propertyName: string;
+    propertyLocation: string;
+    bookingDate: string;
+    duration: string;
+    partySize: number;
+    guideName?: string;
+    bookingId: string;
+  }
+) {
+  const durationLabel = opts.duration === "half_day" ? "half day" : "full day";
+
+  let body = `Reminder: your ${durationLabel} trip to ${opts.propertyName} is tomorrow, ${formatDate(opts.bookingDate)}.\n\n`;
+  body += `\u2022 Location: ${opts.propertyLocation}\n`;
+  body += `\u2022 Party size: ${opts.partySize} angler${opts.partySize > 1 ? "s" : ""}`;
+  if (opts.guideName) {
+    body += `\n\u2022 Guide: ${opts.guideName}`;
+  }
+  body += `\n\nAccess details including any gate codes will be sent tomorrow morning. Check the weather and make sure your gear is ready!`;
+
+  await notify(admin, {
+    userId: opts.anglerId,
+    type: "booking_reminder",
+    title: `Trip tomorrow \u2014 ${opts.propertyName}`,
+    body,
+    link: "/angler/bookings",
+    metadata: {
+      booking_id: opts.bookingId,
+      property_name: opts.propertyName,
+    },
+  });
+}
+
+/** Morning-of gate code and access delivery — sent by daily cron for today's bookings */
+export async function notifyBookingGateCode(
+  admin: SupabaseClient,
+  opts: {
+    anglerId: string;
+    propertyName: string;
+    propertyLocation: string;
+    bookingDate: string;
+    gateCode?: string;
+    accessNotes?: string;
+    bookingId: string;
+  }
+) {
+  let body = `Here are your access details for today\u2019s trip to ${opts.propertyName}:\n\n`;
+  body += `\u2022 Location: ${opts.propertyLocation}`;
+  if (opts.gateCode) {
+    body += `\n\u2022 Gate code: ${opts.gateCode}`;
+  }
+  if (opts.accessNotes) {
+    body += `\n\u2022 Access notes: ${opts.accessNotes}`;
+  }
+  if (!opts.gateCode && !opts.accessNotes) {
+    body += `\n\nNo special access instructions on file. Check your booking details for any additional notes from the landowner.`;
+  }
+  body += `\n\nTight lines and enjoy your day on the water!`;
+
+  await notify(admin, {
+    userId: opts.anglerId,
+    type: "booking_gate_code",
+    title: `Access details \u2014 ${opts.propertyName}`,
+    body,
+    link: "/angler/bookings",
+    metadata: {
+      booking_id: opts.bookingId,
+      property_name: opts.propertyName,
+    },
+  });
+}
+
+/** Post-trip thank-you — sent by daily cron for yesterday's completed bookings */
+export async function notifyBookingThankYou(
+  admin: SupabaseClient,
+  opts: {
+    anglerId: string;
+    propertyName: string;
+    bookingDate: string;
+    bookingId: string;
+    guideName?: string;
+  }
+) {
+  let body = `Thanks for fishing at ${opts.propertyName} on ${formatDate(opts.bookingDate)}! We hope you had a great time on the water.`;
+  if (opts.guideName) {
+    body += ` Your guide ${opts.guideName} would love to hear how the trip went.`;
+  }
+  body += `\n\nYour review helps other anglers find great water and keeps the community strong. You have 21 days to submit a review.`;
+
+  await notify(admin, {
+    userId: opts.anglerId,
+    type: "booking_thank_you",
+    title: `How was your trip to ${opts.propertyName}?`,
+    body,
+    link: `/angler/bookings`,
     metadata: {
       booking_id: opts.bookingId,
       property_name: opts.propertyName,
