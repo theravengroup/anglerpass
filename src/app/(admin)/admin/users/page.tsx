@@ -17,7 +17,9 @@ import {
   CheckCircle2,
   MoreHorizontal,
   Download,
+  Eye,
 } from "lucide-react";
+import { startImpersonation } from "@/lib/admin/actions/impersonation";
 import {
   ROLE_LABELS,
   ROLE_BADGE_COLORS,
@@ -310,6 +312,24 @@ export default function UsersPage() {
                             {ROLE_LABELS[r]}
                           </button>
                         ))}
+
+                        {/* Impersonate (non-admin users only) */}
+                        {u.role !== "admin" && (
+                          <>
+                            <div className="my-1 border-t border-stone-light/15" />
+                            <form action={startImpersonation}>
+                              <input type="hidden" name="targetUserId" value={u.id} />
+                              <button
+                                type="submit"
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-bronze hover:bg-bronze/5"
+                                disabled={actionLoading}
+                              >
+                                <Eye className="size-3.5" />
+                                Impersonate User
+                              </button>
+                            </form>
+                          </>
+                        )}
 
                         <div className="my-1 border-t border-stone-light/15" />
 

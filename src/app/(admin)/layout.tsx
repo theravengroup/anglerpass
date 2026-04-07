@@ -11,6 +11,7 @@ import {
   Compass,
   DollarSign,
   Shield,
+  LifeBuoy,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -63,6 +64,11 @@ const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Shield />,
   },
   {
+    label: "Support Tickets",
+    href: "/admin/support",
+    icon: <LifeBuoy />,
+  },
+  {
     label: "Settings",
     href: "/admin/settings",
     icon: <Settings />,
@@ -85,6 +91,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/platform-staff": "Platform Staff Roles",
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
+  "/admin/support": "Support Tickets",
 };
 
 export default async function AdminLayout({

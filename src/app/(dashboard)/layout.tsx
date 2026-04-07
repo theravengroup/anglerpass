@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import ImpersonationWrapper from "@/components/shared/ImpersonationWrapper";
 import {
   LayoutDashboard,
   MapPin,
@@ -19,6 +20,7 @@ import {
   ClipboardList,
   SendHorizontal,
   Inbox,
+  Sparkles,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -29,6 +31,12 @@ const SHARED_ITEMS: SidebarItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: <LayoutDashboard />,
+  },
+  {
+    label: "Compass AI",
+    href: "/compass",
+    icon: <Sparkles />,
+    badge: "AI",
   },
   {
     label: "Notifications",
@@ -221,6 +229,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/guide/earnings": "Earnings",
   "/dashboard/notifications": "Notifications",
   "/dashboard/settings": "Settings",
+  "/compass": "AnglerPass Compass",
 };
 
 export default async function DashboardLayout({
@@ -237,17 +246,20 @@ export default async function DashboardLayout({
   const roleItems = ROLE_ITEMS[profile.role] ?? [];
   const sidebarItems: SidebarItem[] = [
     SHARED_ITEMS[0], // Dashboard
+    SHARED_ITEMS[1], // Compass AI
     ...roleItems,
-    ...SHARED_ITEMS.slice(1), // Messages, Settings
+    ...SHARED_ITEMS.slice(2), // Notifications, Settings
   ];
 
   return (
-    <DashboardShell
-      sidebarItems={sidebarItems}
-      pageTitles={PAGE_TITLES}
-      user={profile}
-    >
-      {children}
-    </DashboardShell>
+    <ImpersonationWrapper>
+      <DashboardShell
+        sidebarItems={sidebarItems}
+        pageTitles={PAGE_TITLES}
+        user={profile}
+      >
+        {children}
+      </DashboardShell>
+    </ImpersonationWrapper>
   );
 }

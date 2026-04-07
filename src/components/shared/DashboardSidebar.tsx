@@ -6,13 +6,15 @@ import { usePathname } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
+  LifeBuoy,
   User,
   Settings,
 } from "lucide-react";
- 
+
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/lib/auth/get-profile";
 import { useUnreadCount } from "@/hooks/use-unread-count";
+import SupportTicketModal from "@/components/support/SupportTicketModal";
 
 const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
@@ -46,6 +48,7 @@ export default function DashboardSidebar({
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const { count: unreadCount } = useUnreadCount();
 
   return (
@@ -135,6 +138,20 @@ export default function DashboardSidebar({
 
         {/* Bottom pinned sections */}
         <div className="mt-auto shrink-0">
+          {/* Get Help */}
+          <div className="border-t border-white/10 px-3 py-2">
+            <button
+              onClick={() => setSupportOpen(true)}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/8 hover:text-white"
+              title={collapsed ? "Get Help" : undefined}
+            >
+              <span className="shrink-0 [&>svg]:size-[18px]">
+                <LifeBuoy />
+              </span>
+              {!collapsed && <span className="truncate">Get Help</span>}
+            </button>
+          </div>
+
           {/* Collapse toggle (desktop only) */}
           <div className="hidden border-t border-white/10 px-3 py-2 lg:block">
             <button
@@ -178,6 +195,11 @@ export default function DashboardSidebar({
           </div>
         </div>
       </aside>
+
+      <SupportTicketModal
+        open={supportOpen}
+        onOpenChange={setSupportOpen}
+      />
     </>
   );
 }
