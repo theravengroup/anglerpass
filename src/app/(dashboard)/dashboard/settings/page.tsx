@@ -6,6 +6,7 @@ import { FetchError } from "@/components/shared/FetchError";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import { PaymentMethodsSection } from "@/components/shared/PaymentMethodsSection";
 import SettingsProfileCard from "@/components/shared/SettingsProfileCard";
+import SettingsPasswordCard from "@/components/shared/SettingsPasswordCard";
 import SettingsHomeClubCard from "@/components/shared/SettingsHomeClubCard";
 import SettingsCrossClubCard from "@/components/shared/SettingsCrossClubCard";
 import SettingsNotificationsCard from "@/components/shared/SettingsNotificationsCard";
@@ -130,6 +131,8 @@ export default function SettingsPage() {
         profile={profile}
         onProfileUpdate={setProfile}
       />
+
+      <SettingsPasswordCard />
 
       {/* Payment methods (anglers pay for bookings/memberships) */}
       {(profile.role === "angler" || profile.role === "landowner") && (
