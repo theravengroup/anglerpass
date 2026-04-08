@@ -16,7 +16,11 @@ export async function getProfile(): Promise<UserProfile | null> {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  // Use admin client for profile lookup to avoid RLS issues
+  // (the cookie-based session can fail to establish auth.uid() in some cases)
+  const admin = createAdminClient();
+
+  const { data: profile } = await admin
     .from("profiles")
     .select("id, display_name, role, roles")
     .eq("id", user.id)
@@ -52,18 +56,14 @@ export async function getProfile(): Promise<UserProfile | null> {
     (user.user_metadata?.first_name as string) ??
     null;
 
-  const admin = createAdminClient();
   const { data: created, error: insertError } = await admin
     .from("profiles")
-    .upsert(
-      {
-        id: user.id,
-        display_name: displayName,
-        role: defaultRole,
-        roles: [defaultRole],
-      },
-      { onConflict: "id" }
-    )
+    .insert({
+      id: user.id,
+      display_name: displayName,
+      role: defaultRole,
+      roles: [defaultRole],
+    })
     .select("id, display_name, role, roles")
     .single();
 
