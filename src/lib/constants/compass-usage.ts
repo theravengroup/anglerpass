@@ -27,16 +27,16 @@ export interface CreditPack {
 }
 
 export const CREDIT_PACKS: CreditPack[] = [
-  { key: "pack_25", messages: 25, priceCents: 500, label: "25 messages" },
-  { key: "pack_60", messages: 60, priceCents: 1000, label: "60 messages" },
-  { key: "pack_175", messages: 175, priceCents: 2500, label: "175 messages" },
-  { key: "pack_400", messages: 400, priceCents: 5000, label: "400 messages" },
-  { key: "pack_900", messages: 900, priceCents: 10000, label: "900 messages" },
+  { key: "pack_15", messages: 15, priceCents: 500, label: "15 messages" },
+  { key: "pack_40", messages: 40, priceCents: 1000, label: "40 messages" },
+  { key: "pack_120", messages: 120, priceCents: 2500, label: "120 messages" },
+  { key: "pack_275", messages: 275, priceCents: 5000, label: "275 messages" },
+  { key: "pack_600", messages: 600, priceCents: 10000, label: "600 messages" },
   {
-    key: "pack_2500",
-    messages: 2500,
+    key: "pack_1750",
+    messages: 1750,
     priceCents: 25000,
-    label: "2,500 messages",
+    label: "1,750 messages",
   },
 ];
 
