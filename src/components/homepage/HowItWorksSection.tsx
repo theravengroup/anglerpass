@@ -196,13 +196,8 @@ export default function HowItWorksSection() {
                 {/* Center AnglerPass node — outer ring */}
                 <circle cx="240" cy="65" r="28" fill="rgba(58,107,124,.3)" stroke="var(--river)" strokeWidth="2" />
 
-                {/* AnglerPass logo (scaled to fit center node) */}
-                <g transform="translate(224, 49) scale(1.15)">
-                  <path d="M14 2C7.37 2 2 7.37 2 14s5.37 12 12 12 12-5.37 12-12S20.63 2 14 2z" stroke="white" strokeWidth="1.2" fill="none" opacity=".6" />
-                  <path d="M6 18c2-3 4-8 8-8s6 5 8 8" stroke="white" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity=".8" />
-                  <path d="M10 13c0-2 1.5-5 4-5s4 3 4 5" stroke="white" strokeWidth=".9" strokeLinecap="round" fill="none" opacity=".3" />
-                  <circle cx="14" cy="8" r="1.3" fill="white" opacity=".5" />
-                </g>
+                {/* AnglerPass logo */}
+                <image href="/images/anglerpass-noword-logo.svg" x="218" y="43" width="44" height="44" />
 
                 {/* Pulse rings on center */}
                 <circle cx="240" cy="65" r="28" fill="none" stroke="var(--river)" strokeWidth="1" opacity=".4" className="cross-club-pulse" />
