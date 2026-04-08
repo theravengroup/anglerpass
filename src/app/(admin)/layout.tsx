@@ -13,6 +13,7 @@ import {
   Shield,
   LifeBuoy,
   Sparkles,
+  CalendarDays,
 } from "lucide-react";
 import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
 import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
@@ -78,6 +79,11 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Settings />,
   },
   {
+    label: "Bookings",
+    href: "/admin/bookings",
+    icon: <CalendarDays />,
+  },
+  {
     label: "Compass AI",
     href: "/admin/compass",
     icon: <Sparkles />,
@@ -101,6 +107,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
   "/admin/support": "Support Tickets",
+  "/admin/bookings": "Booking Management",
   "/admin/compass": "Compass AI Usage",
 };
 

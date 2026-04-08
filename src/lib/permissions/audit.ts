@@ -41,6 +41,9 @@ export const AuditAction = {
   BOOKING_CANCELLED: "booking.cancelled",
   BOOKING_FEE_WAIVED: "booking.fee_waived",
   BOOKING_LIMIT_OVERRIDDEN: "booking.limit_overridden",
+  BOOKING_STANDING_CHANGED: "booking.standing_changed",
+  BOOKING_ABUSE_FLAGGED: "booking.abuse_flagged",
+  BOOKING_LATE_CANCEL_FEE: "booking.late_cancel_fee",
 
   // Users
   USER_ROLE_CHANGED: "user.role_changed",

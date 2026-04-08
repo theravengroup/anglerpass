@@ -2,8 +2,10 @@ import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { calculateRefund } from "@/lib/cancellation";
-import { notifyBookingCancelled } from "@/lib/notifications";
+import { notifyBookingCancelled, notifyLateCancelFee } from "@/lib/notifications";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
+import { updateStanding } from "@/lib/bookings/limits";
+import { auditBookingAction, AuditAction } from "@/lib/permissions";
 
 // GET: Fetch a single booking
 export async function GET(
@@ -143,6 +145,7 @@ export async function PATCH(
         updated_at: new Date().toISOString(),
         refund_percentage: refund.percentage,
         refund_amount: refund.amount,
+        late_cancel_fee: refund.lateCancelFee,
         ...(cancellationReason ? { cancellation_reason: cancellationReason } : {}),
       })
       .eq("id", id)
@@ -167,6 +170,45 @@ export async function PATCH(
         console.error("[bookings/[id]] Notification error:", err)
       );
     }
+
+    // Notify angler of late cancellation fee if applicable
+    if (refund.lateCancelFee > 0 && property) {
+      notifyLateCancelFee(admin, {
+        userId: user.id,
+        fee: refund.lateCancelFee,
+        propertyName: property.name,
+        bookingDate: booking.booking_date,
+      }).catch((err) =>
+        console.error("[bookings/[id]] Late cancel fee notification error:", err)
+      );
+
+      auditBookingAction({
+        actorId: user.id,
+        action: AuditAction.BOOKING_LATE_CANCEL_FEE,
+        bookingId: booking.id,
+        newData: { late_cancel_fee: refund.lateCancelFee },
+      }).catch((err) => console.error("[bookings/[id]] Audit error:", err));
+    }
+
+    // Recalculate booking standing (fire-and-forget)
+    updateStanding(user.id).catch((err) =>
+      console.error("[bookings/[id]] Standing update error:", err)
+    );
+
+    // Audit the cancellation
+    auditBookingAction({
+      actorId: user.id,
+      action: AuditAction.BOOKING_CANCELLED,
+      bookingId: booking.id,
+      oldData: { status: "confirmed" },
+      newData: {
+        status: "cancelled",
+        refund_percentage: refund.percentage,
+        refund_amount: refund.amount,
+        late_cancel_fee: refund.lateCancelFee,
+      },
+      reason: cancellationReason ?? undefined,
+    }).catch((err) => console.error("[bookings/[id]] Audit error:", err));
 
     return jsonOk({ booking: updated, refund });
   } catch (err) {

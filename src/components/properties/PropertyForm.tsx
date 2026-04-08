@@ -76,6 +76,8 @@ export default function PropertyForm({ initialData, mode, clubId }: PropertyForm
       water_miles: null,
       max_rods: null,
       max_guests: null,
+      max_bookings_per_member_per_month: null,
+      advance_booking_days: null,
       regulations: "",
       photos: [],
       rate_adult_full_day: null,

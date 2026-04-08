@@ -70,6 +70,11 @@ export const ADMIN_PAGE_ACCESS: Record<string, PlatformRole[]> = {
     "compliance_admin",
     "readonly_internal",
   ],
+  "/admin/bookings": [
+    "super_admin",
+    "ops_admin",
+    "support_agent",
+  ],
   "/admin/compass": [
     "super_admin",
     "ops_admin",

@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { bookingSchema } from "@/lib/validations/bookings";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
-import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated } from "@/lib/notifications";
+import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated, notifyBookingLimitWarning } from "@/lib/notifications";
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { auditBookingAction, AuditAction } from "@/lib/permissions";
+import { checkConcurrentLimit, checkPropertyLimit } from "@/lib/bookings/limits";
 
 /**
  * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
@@ -112,6 +113,24 @@ export async function POST(request: Request) {
 
     if (!routing) {
       return jsonError("Your club does not have access to this property", 403);
+    }
+
+    // ── Booking abuse prevention checks ──────────────────────────
+    const concurrentCheck = await checkConcurrentLimit(user.id);
+    if (!concurrentCheck.allowed) {
+      return jsonError(
+        `You have ${concurrentCheck.current} active reservations, which is the maximum allowed (${concurrentCheck.cap}). Cancel an existing booking to make a new one.`,
+        429
+      );
+    }
+
+    const propertyCheck = await checkPropertyLimit(
+      user.id,
+      property_id,
+      booking_date
+    );
+    if (!propertyCheck.allowed) {
+      return jsonError(propertyCheck.reason ?? "Booking limit reached for this property", 400);
     }
 
     // ── Date range validation ─────────────────────────────────────
@@ -402,6 +421,15 @@ export async function POST(request: Request) {
         total_amount: fees.totalAmount,
       },
     }).catch((err) => console.error("[bookings] Audit error:", err));
+
+    // Warn user if they're now at their concurrent cap
+    if (concurrentCheck.current + 1 >= concurrentCheck.cap) {
+      notifyBookingLimitWarning(admin, {
+        userId: user.id,
+        current: concurrentCheck.current + 1,
+        cap: concurrentCheck.cap,
+      }).catch((err) => console.error("[bookings] Limit warning error:", err));
+    }
 
     return jsonCreated({
       booking,

@@ -56,7 +56,11 @@ export type NotificationType =
   | "membership_renewal_reminder"
   | "guide_affiliation_requested"
   | "guide_affiliation_approved"
-  | "guide_affiliation_rejected";
+  | "guide_affiliation_rejected"
+  | "booking_limit_warning"
+  | "booking_standing_changed"
+  | "booking_abuse_flagged"
+  | "booking_late_cancel_fee";
 
 interface NotificationPayload {
   userId: string;
@@ -102,6 +106,10 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   guide_affiliation_requested: "email_booking_requested",
   guide_affiliation_approved: "email_booking_confirmed",
   guide_affiliation_rejected: "email_booking_declined",
+  booking_limit_warning: "email_booking_confirmed",
+  booking_standing_changed: "email_booking_cancelled",
+  booking_abuse_flagged: "email_booking_cancelled",
+  booking_late_cancel_fee: "email_booking_cancelled",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -1033,6 +1041,78 @@ export async function notifyGuideAffiliationRejected(
     title: `Affiliation not approved`,
     body: `${opts.clubName} did not approve your guide affiliation request at this time.`,
     link: "/guide/affiliations",
+  });
+}
+
+// ─── Booking Abuse Prevention ────────────────────────────────────────
+
+export async function notifyBookingLimitWarning(
+  admin: SupabaseClient,
+  opts: { userId: string; current: number; cap: number }
+) {
+  await notify(admin, {
+    userId: opts.userId,
+    type: "booking_limit_warning",
+    title: "Approaching booking limit",
+    body: `You have ${opts.current} of ${opts.cap} allowed concurrent reservations. Cancel existing bookings to free up slots.`,
+    link: "/angler/bookings",
+  });
+}
+
+export async function notifyBookingStandingChanged(
+  admin: SupabaseClient,
+  opts: { userId: string; oldStanding: string; newStanding: string }
+) {
+  const improved = opts.newStanding === "good" ||
+    (opts.newStanding === "warned" && opts.oldStanding !== "good");
+  await notify(admin, {
+    userId: opts.userId,
+    type: "booking_standing_changed",
+    title: improved
+      ? "Booking standing improved"
+      : "Booking standing updated",
+    body: improved
+      ? `Your booking standing has improved to ${opts.newStanding}. Keep it up!`
+      : `Your booking standing has changed to ${opts.newStanding} due to your cancellation history. This may affect how many reservations you can hold at once.`,
+    link: "/angler/bookings",
+  });
+}
+
+export async function notifyBookingAbuseFlagged(
+  admin: SupabaseClient,
+  opts: {
+    adminUserId: string;
+    anglerName: string;
+    anglerId: string;
+    score: number;
+    standing: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.adminUserId,
+    type: "booking_abuse_flagged",
+    title: "Booking abuse alert",
+    body: `${opts.anglerName} has a ${Math.round(opts.score * 100)}% cancellation rate and is now "${opts.standing}".`,
+    link: "/admin/bookings",
+    metadata: { angler_id: opts.anglerId, score: opts.score },
+  });
+}
+
+export async function notifyLateCancelFee(
+  admin: SupabaseClient,
+  opts: {
+    userId: string;
+    fee: number;
+    propertyName: string;
+    bookingDate: string;
+  }
+) {
+  await notify(admin, {
+    userId: opts.userId,
+    type: "booking_late_cancel_fee",
+    title: "Late cancellation fee",
+    body: `A $${opts.fee} late cancellation fee has been recorded for your ${formatDate(opts.bookingDate)} booking at ${opts.propertyName}.`,
+    link: "/angler/bookings",
   });
 }
 

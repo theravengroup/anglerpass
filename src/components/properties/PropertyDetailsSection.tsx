@@ -126,6 +126,61 @@ export default function PropertyDetailsSection({
             </div>
           </div>
         </div>
+
+        {/* Booking Limits */}
+        <div className="space-y-4 rounded-lg border border-stone-light/20 bg-offwhite/30 p-4">
+          <div>
+            <p className="text-sm font-medium text-text-primary">
+              Booking Limits
+            </p>
+            <p className="mt-0.5 text-xs text-text-light">
+              Optional controls to limit how often members can book and how far
+              in advance. Leave blank for no restrictions.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="max_bookings_per_member_per_month">
+                Max Bookings per Member / Month
+              </Label>
+              <Input
+                id="max_bookings_per_member_per_month"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="No limit"
+                {...register("max_bookings_per_member_per_month", {
+                  valueAsNumber: true,
+                })}
+              />
+              {errors.max_bookings_per_member_per_month && (
+                <p className="text-sm text-red-600">
+                  {errors.max_bookings_per_member_per_month.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="advance_booking_days">
+                Advance Booking Window (Days)
+              </Label>
+              <Input
+                id="advance_booking_days"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="No limit"
+                {...register("advance_booking_days", {
+                  valueAsNumber: true,
+                })}
+              />
+              {errors.advance_booking_days && (
+                <p className="text-sm text-red-600">
+                  {errors.advance_booking_days.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

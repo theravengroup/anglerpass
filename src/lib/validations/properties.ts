@@ -83,6 +83,20 @@ export const propertySchema = z
       .optional()
       .nullable(),
 
+    // Booking limits (property-level)
+    max_bookings_per_member_per_month: z
+      .number()
+      .int()
+      .min(1, "Must allow at least 1 booking per month")
+      .optional()
+      .nullable(),
+    advance_booking_days: z
+      .number()
+      .int()
+      .min(1, "Must allow at least 1 day advance booking")
+      .optional()
+      .nullable(),
+
     // Regulations
     regulations: z.string().max(5000).optional().or(z.literal("")),
 

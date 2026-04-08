@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist";
+import BookingAlertsCard from "@/components/clubs/BookingAlertsCard";
 import Link from "next/link";
 import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
@@ -465,6 +466,9 @@ function ActiveClubDashboard({
           </CardContent>
         </Card>
       )}
+
+      {/* Booking alerts — flagged members */}
+      <BookingAlertsCard clubId={club.id} />
 
       {/* SMS Consent — optional, dismissable */}
       <SmsConsentCard />
