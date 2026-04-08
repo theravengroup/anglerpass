@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getLogoDataUri } from '@/lib/og-logo';
+import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
 
 export const alt = 'For Anglers — AnglerPass';
 export const size = { width: 1200, height: 630 };
@@ -7,6 +7,7 @@ export const contentType = 'image/png';
 
 export default async function Image() {
   const logoSrc = getLogoDataUri();
+  const bgSrc = getOgBackgroundDataUri('patagonia');
 
   return new ImageResponse(
     (
@@ -15,15 +16,39 @@ export default async function Image() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background: 'linear-gradient(145deg, #2a1f0e 0%, #3d2e14 40%, #2a1f0e 100%)',
           position: 'relative',
           overflow: 'hidden',
-          fontFamily: 'serif',
         }}
       >
+        {/* Cinematic background */}
+        <img
+          src={bgSrc}
+          width={1200}
+          height={630}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+
+        {/* Warm bronze overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(145deg, rgba(42,31,14,0.82) 0%, rgba(42,31,14,0.55) 40%, rgba(42,31,14,0.85) 100%)',
+            display: 'flex',
+          }}
+        />
+
+        {/* Bronze accent top edge */}
         <div
           style={{
             position: 'absolute',
@@ -35,103 +60,117 @@ export default async function Image() {
             display: 'flex',
           }}
         />
+
+        {/* Content */}
         <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'radial-gradient(ellipse at 50% 40%, rgba(184,148,78,0.08) 0%, transparent 60%)',
             display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
+            padding: '0 80px',
           }}
-        />
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1 }}>
+        >
+          {/* Logo mark */}
           <img
             src={logoSrc}
-            width={80}
-            height={66}
-            style={{ marginBottom: 20, opacity: 0.7 }}
+            width={90}
+            height={74}
+            style={{ marginBottom: 20 }}
           />
 
+          {/* Eyebrow */}
           <div
             style={{
               fontFamily: 'sans-serif',
               fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: '0.2em',
-              color: 'rgba(240,234,214,0.35)',
-              marginBottom: 20,
+              fontWeight: 600,
+              letterSpacing: '0.25em',
+              color: '#b8944e',
+              marginBottom: 16,
               display: 'flex',
+              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
             }}
           >
             ANGLERPASS
           </div>
 
+          {/* Title */}
           <div
             style={{
-              fontSize: 68,
+              fontSize: 72,
               fontWeight: 700,
-              color: '#f0ead6',
+              fontFamily: 'serif',
+              color: '#f5f0e0',
               letterSpacing: '-1px',
               lineHeight: 1.1,
-              marginBottom: 12,
+              marginBottom: 16,
               display: 'flex',
+              textShadow: '0 2px 16px rgba(0,0,0,0.5)',
             }}
           >
             For Anglers
           </div>
 
-          <div style={{ width: 50, height: 1, background: 'rgba(184,148,78,0.5)', marginBottom: 24, display: 'flex' }} />
+          {/* Gold divider */}
+          <div
+            style={{
+              width: 60,
+              height: 2,
+              background: '#b8944e',
+              marginBottom: 20,
+              display: 'flex',
+            }}
+          />
 
+          {/* Tagline */}
           <div
             style={{
               fontFamily: 'sans-serif',
-              fontSize: 21,
-              fontWeight: 400,
-              color: 'rgba(240,234,214,0.5)',
-              maxWidth: 620,
+              fontSize: 22,
+              fontWeight: 500,
+              color: 'rgba(245,240,224,0.85)',
+              maxWidth: 640,
               textAlign: 'center',
               lineHeight: 1.6,
               display: 'flex',
+              textShadow: '0 1px 8px rgba(0,0,0,0.5)',
             }}
           >
-            Discover private waters, book experiences, and access trusted properties across the country.
-          </div>
-
-          <div style={{ display: 'flex', gap: 12, marginTop: 36, fontFamily: 'sans-serif' }}>
-            {['Discover Waters', 'Book Experiences', 'Trusted Access'].map((label) => (
-              <div
-                key={label}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  letterSpacing: '0.06em',
-                  color: 'rgba(240,234,214,0.55)',
-                  padding: '7px 16px',
-                  borderRadius: 100,
-                  border: '1px solid rgba(184,148,78,0.35)',
-                  display: 'flex',
-                }}
-              >
-                {label}
-              </div>
-            ))}
+            Discover private waters, book exclusive access, and fish where others can&apos;t.
           </div>
         </div>
 
+        {/* Bottom */}
         <div
           style={{
             position: 'absolute',
-            bottom: 32,
-            fontFamily: 'sans-serif',
-            fontSize: 13,
-            color: 'rgba(240,234,214,0.2)',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 50,
+            background: 'linear-gradient(180deg, transparent 0%, rgba(42,31,14,0.9) 100%)',
             display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            paddingBottom: 14,
           }}
         >
-          anglerpass.com
+          <div
+            style={{
+              fontFamily: 'sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'rgba(184,148,78,0.5)',
+              letterSpacing: '0.15em',
+              display: 'flex',
+            }}
+          >
+            anglerpass.com
+          </div>
         </div>
       </div>
     ),

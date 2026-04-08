@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getLogoDataUri } from '@/lib/og-logo';
+import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
 
 export const alt = 'AnglerPass — Private Water Access, Modernized';
 export const size = { width: 1200, height: 630 };
@@ -7,6 +7,7 @@ export const contentType = 'image/png';
 
 export default async function Image() {
   const logoSrc = getLogoDataUri();
+  const bgSrc = getOgBackgroundDataUri('hero');
 
   return new ImageResponse(
     (
@@ -15,29 +16,26 @@ export default async function Image() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background: 'linear-gradient(145deg, #0f2618 0%, #1a3a2a 40%, #0f2618 100%)',
           position: 'relative',
           overflow: 'hidden',
-          fontFamily: 'serif',
         }}
       >
-        {/* Decorative top line */}
-        <div
+        {/* Cinematic background photo */}
+        <img
+          src={bgSrc}
+          width={1200}
+          height={630}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            right: 0,
-            height: 4,
-            background: 'linear-gradient(90deg, transparent 0%, #b8944e 50%, transparent 100%)',
-            display: 'flex',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
           }}
         />
 
-        {/* Subtle radial glow */}
+        {/* Dark cinematic overlay */}
         <div
           style={{
             position: 'absolute',
@@ -45,7 +43,20 @@ export default async function Image() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'radial-gradient(ellipse at 30% 20%, rgba(184,148,78,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(74,124,104,0.08) 0%, transparent 50%)',
+            background: 'linear-gradient(180deg, rgba(10,20,15,0.75) 0%, rgba(10,20,15,0.55) 40%, rgba(10,20,15,0.80) 100%)',
+            display: 'flex',
+          }}
+        />
+
+        {/* Gold accent top edge */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: 'linear-gradient(90deg, transparent 0%, #b8944e 30%, #d4b06a 50%, #b8944e 70%, transparent 100%)',
             display: 'flex',
           }}
         />
@@ -56,120 +67,111 @@ export default async function Image() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
             zIndex: 1,
+            padding: '0 80px',
           }}
         >
-          {/* Logo */}
+          {/* Logo mark */}
           <img
             src={logoSrc}
-            width={100}
-            height={82}
-            style={{ marginBottom: 20, opacity: 0.85 }}
+            width={110}
+            height={90}
+            style={{ marginBottom: 24 }}
           />
 
-          {/* Eyebrow */}
+          {/* Brand name */}
           <div
             style={{
-              fontFamily: 'sans-serif',
-              fontSize: 14,
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.25em',
-              color: '#b8944e',
-              marginBottom: 20,
-              display: 'flex',
-            }}
-          >
-            Private Water Access, Modernized
-          </div>
-
-          {/* Logo text */}
-          <div
-            style={{
-              fontSize: 82,
+              fontSize: 86,
               fontWeight: 700,
-              color: '#f0ead6',
-              letterSpacing: '-1.5px',
+              fontFamily: 'serif',
+              color: '#f5f0e0',
+              letterSpacing: '-2px',
               lineHeight: 1,
-              marginBottom: 24,
+              marginBottom: 16,
               display: 'flex',
+              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
             }}
           >
             AnglerPass
           </div>
 
-          {/* Divider */}
+          {/* Gold divider */}
           <div
             style={{
-              width: 60,
-              height: 1,
-              background: 'rgba(184,148,78,0.4)',
-              marginBottom: 24,
+              width: 80,
+              height: 2,
+              background: '#b8944e',
+              marginBottom: 20,
               display: 'flex',
             }}
           />
 
-          {/* Description */}
+          {/* Tagline — bold and visible */}
           <div
             style={{
               fontFamily: 'sans-serif',
-              fontSize: 22,
-              fontWeight: 400,
-              color: 'rgba(240,234,214,0.55)',
-              maxWidth: 680,
+              fontSize: 28,
+              fontWeight: 600,
+              color: '#f5f0e0',
+              letterSpacing: '0.08em',
               textAlign: 'center',
-              lineHeight: 1.6,
               display: 'flex',
+              textShadow: '0 1px 12px rgba(0,0,0,0.6)',
             }}
           >
-            The operating platform for private fly fishing. Manage properties, memberships, and fishing days — all in one place.
+            Private Water Access, Modernized
           </div>
 
-          {/* Three audience pills */}
+          {/* Sub-description */}
           <div
             style={{
-              display: 'flex',
-              gap: 16,
-              marginTop: 36,
               fontFamily: 'sans-serif',
+              fontSize: 17,
+              fontWeight: 400,
+              color: 'rgba(245,240,224,0.7)',
+              maxWidth: 600,
+              textAlign: 'center',
+              lineHeight: 1.6,
+              marginTop: 16,
+              display: 'flex',
+              textShadow: '0 1px 8px rgba(0,0,0,0.5)',
             }}
           >
-            {[
-              { label: 'Landowners', accent: false },
-              { label: 'Clubs', accent: false },
-              { label: 'Anglers', accent: true },
-            ].map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: '0.08em',
-                  color: item.accent ? '#f0ead6' : 'rgba(240,234,214,0.7)',
-                  padding: '8px 20px',
-                  borderRadius: 100,
-                  border: `1px solid ${item.accent ? 'rgba(184,148,78,0.35)' : 'rgba(240,234,214,0.12)'}`,
-                  display: 'flex',
-                }}
-              >
-                {item.label}
-              </div>
-            ))}
+            The platform for private fly fishing — properties, clubs, and anglers, all in one place.
           </div>
         </div>
 
-        {/* Bottom */}
+        {/* Bottom bar */}
         <div
           style={{
             position: 'absolute',
-            bottom: 32,
-            fontFamily: 'sans-serif',
-            fontSize: 13,
-            color: 'rgba(240,234,214,0.25)',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 50,
+            background: 'linear-gradient(180deg, transparent 0%, rgba(10,20,15,0.9) 100%)',
             display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            paddingBottom: 14,
           }}
         >
-          anglerpass.com
+          <div
+            style={{
+              fontFamily: 'sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'rgba(184,148,78,0.6)',
+              letterSpacing: '0.15em',
+              display: 'flex',
+            }}
+          >
+            anglerpass.com
+          </div>
         </div>
       </div>
     ),

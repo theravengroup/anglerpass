@@ -1,13 +1,39 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-let cached: string | null = null;
+let cachedLogo: string | null = null;
+let cachedFullLogo: string | null = null;
+const bgCache: Record<string, string> = {};
 
 export function getLogoDataUri(): string {
-  if (cached) return cached;
+  if (cachedLogo) return cachedLogo;
   const svg = readFileSync(
     join(process.cwd(), 'public/images/anglerpass-noword-logo.svg')
   );
-  cached = `data:image/svg+xml;base64,${svg.toString('base64')}`;
-  return cached;
+  cachedLogo = `data:image/svg+xml;base64,${svg.toString('base64')}`;
+  return cachedLogo;
+}
+
+export function getFullLogoDataUri(): string {
+  if (cachedFullLogo) return cachedFullLogo;
+  const svg = readFileSync(
+    join(process.cwd(), 'public/images/anglerpass-logo.svg')
+  );
+  cachedFullLogo = `data:image/svg+xml;base64,${svg.toString('base64')}`;
+  return cachedFullLogo;
+}
+
+/**
+ * Load a JPEG background image as a base64 data URI.
+ * Images are cached in memory after first read.
+ */
+export function getOgBackgroundDataUri(
+  name: 'hero' | 'virginia' | 'minnesota' | 'patagonia'
+): string {
+  if (bgCache[name]) return bgCache[name];
+  const jpg = readFileSync(
+    join(process.cwd(), `public/images/og/${name}-og.jpg`)
+  );
+  bgCache[name] = `data:image/jpeg;base64,${jpg.toString('base64')}`;
+  return bgCache[name];
 }

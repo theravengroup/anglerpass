@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
+import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -10,14 +11,33 @@ export async function GET(request: NextRequest) {
     searchParams.get('subtitle') ?? 'Private Water Fly Fishing Access';
   const type = searchParams.get('type') ?? 'default';
 
-  // Accent color by audience type
-  const accentMap: Record<string, string> = {
-    angler: '#9a7340',
-    club: '#3a6b7c',
-    landowner: '#1a3a2a',
-    default: '#b8944e',
+  const logoSrc = getLogoDataUri();
+
+  // Background + accent color by audience type
+  const configMap: Record<string, { bg: 'hero' | 'virginia' | 'minnesota' | 'patagonia'; accent: string; overlay: string }> = {
+    angler: {
+      bg: 'patagonia',
+      accent: '#b8944e',
+      overlay: 'linear-gradient(145deg, rgba(42,31,14,0.82) 0%, rgba(42,31,14,0.55) 40%, rgba(42,31,14,0.85) 100%)',
+    },
+    club: {
+      bg: 'minnesota',
+      accent: '#5a9aad',
+      overlay: 'linear-gradient(145deg, rgba(15,32,48,0.82) 0%, rgba(26,58,74,0.55) 40%, rgba(15,32,48,0.85) 100%)',
+    },
+    landowner: {
+      bg: 'virginia',
+      accent: '#4a7c5a',
+      overlay: 'linear-gradient(145deg, rgba(15,38,24,0.82) 0%, rgba(26,58,42,0.55) 40%, rgba(15,38,24,0.85) 100%)',
+    },
+    default: {
+      bg: 'hero',
+      accent: '#b8944e',
+      overlay: 'linear-gradient(180deg, rgba(10,20,15,0.75) 0%, rgba(10,20,15,0.55) 40%, rgba(10,20,15,0.80) 100%)',
+    },
   };
-  const accent = accentMap[type] ?? accentMap.default;
+  const config = configMap[type] ?? configMap.default;
+  const bgSrc = getOgBackgroundDataUri(config.bg);
 
   return new ImageResponse(
     (
@@ -26,16 +46,38 @@ export async function GET(request: NextRequest) {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background:
-            'linear-gradient(145deg, #0f2618 0%, #1a3a2a 40%, #0f2618 100%)',
           position: 'relative',
           overflow: 'hidden',
-          fontFamily: 'serif',
         }}
       >
+        {/* Cinematic background photo */}
+        <img
+          src={bgSrc}
+          width={1200}
+          height={630}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+
+        {/* Dark overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: config.overlay,
+            display: 'flex',
+          }}
+        />
+
         {/* Top accent bar */}
         <div
           style={{
@@ -44,21 +86,7 @@ export async function GET(request: NextRequest) {
             left: 0,
             right: 0,
             height: 4,
-            background: `linear-gradient(90deg, transparent 0%, ${accent} 50%, transparent 100%)`,
-            display: 'flex',
-          }}
-        />
-
-        {/* Radial glow */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background:
-              'radial-gradient(ellipse at 30% 20%, rgba(184,148,78,0.06) 0%, transparent 60%)',
+            background: `linear-gradient(90deg, transparent 0%, ${config.accent} 50%, transparent 100%)`,
             display: 'flex',
           }}
         />
@@ -69,38 +97,51 @@ export async function GET(request: NextRequest) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
             zIndex: 1,
-            maxWidth: 900,
-            padding: '0 60px',
+            padding: '0 80px',
           }}
         >
+          {/* Logo */}
+          <img
+            src={logoSrc}
+            width={80}
+            height={66}
+            style={{ marginBottom: 20 }}
+          />
+
           {/* Eyebrow */}
           <div
             style={{
               fontFamily: 'sans-serif',
               fontSize: 14,
-              fontWeight: 500,
-              textTransform: 'uppercase',
+              fontWeight: 600,
               letterSpacing: '0.25em',
-              color: accent,
-              marginBottom: 24,
+              color: config.accent,
+              marginBottom: 16,
               display: 'flex',
+              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
             }}
           >
-            AnglerPass
+            ANGLERPASS
           </div>
 
           {/* Title */}
           <div
             style={{
-              fontSize: title.length > 40 ? 48 : 60,
+              fontSize: title.length > 40 ? 46 : 58,
               fontWeight: 700,
-              color: '#f0ead6',
+              fontFamily: 'serif',
+              color: '#f5f0e0',
               letterSpacing: '-1px',
               lineHeight: 1.15,
               textAlign: 'center',
-              marginBottom: 20,
+              marginBottom: 16,
               display: 'flex',
+              textShadow: '0 2px 16px rgba(0,0,0,0.5)',
+              maxWidth: 900,
             }}
           >
             {title}
@@ -110,9 +151,9 @@ export async function GET(request: NextRequest) {
           <div
             style={{
               width: 60,
-              height: 1,
-              background: `${accent}66`,
-              marginBottom: 20,
+              height: 2,
+              background: config.accent,
+              marginBottom: 16,
               display: 'flex',
             }}
           />
@@ -122,59 +163,46 @@ export async function GET(request: NextRequest) {
             style={{
               fontFamily: 'sans-serif',
               fontSize: 20,
-              fontWeight: 400,
-              color: 'rgba(240,234,214,0.5)',
+              fontWeight: 500,
+              color: 'rgba(245,240,224,0.8)',
               textAlign: 'center',
               lineHeight: 1.6,
               display: 'flex',
+              textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+              maxWidth: 680,
             }}
           >
             {subtitle}
           </div>
         </div>
 
-        {/* Water wave decoration */}
+        {/* Bottom */}
         <div
           style={{
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            height: 60,
+            height: 50,
+            background: 'linear-gradient(180deg, transparent 0%, rgba(10,20,15,0.9) 100%)',
             display: 'flex',
-            overflow: 'hidden',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            paddingBottom: 14,
           }}
         >
-          <svg
-            width="1200"
-            height="60"
-            viewBox="0 0 1200 60"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+          <div
+            style={{
+              fontFamily: 'sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              color: `${config.accent}80`,
+              letterSpacing: '0.15em',
+              display: 'flex',
+            }}
           >
-            <path
-              d="M0 40 Q150 20 300 35 Q450 50 600 30 Q750 10 900 35 Q1050 60 1200 40 V60 H0 Z"
-              fill="rgba(58,107,124,0.08)"
-            />
-            <path
-              d="M0 45 Q150 30 300 42 Q450 54 600 38 Q750 22 900 42 Q1050 62 1200 45 V60 H0 Z"
-              fill="rgba(58,107,124,0.05)"
-            />
-          </svg>
-        </div>
-
-        {/* Bottom URL */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 20,
-            fontFamily: 'sans-serif',
-            fontSize: 13,
-            color: 'rgba(240,234,214,0.2)',
-            display: 'flex',
-          }}
-        >
-          anglerpass.com
+            anglerpass.com
+          </div>
         </div>
       </div>
     ),
