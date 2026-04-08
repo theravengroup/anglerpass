@@ -1,0 +1,74 @@
+import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
+import { getCreditPack } from "@/lib/constants/compass-usage";
+import { z } from "zod";
+
+const purchaseSchema = z.object({
+  packKey: z.string().min(1),
+});
+
+/**
+ * POST /api/compass/credits/purchase
+ * Creates a Stripe PaymentIntent for a credit pack purchase.
+ * Returns { clientSecret } for client-side confirmation.
+ */
+export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (!auth) {
+    return jsonError("Unauthorized", 401);
+  }
+
+  const body = await request.json().catch(() => null);
+  const parsed = purchaseSchema.safeParse(body);
+  if (!parsed.success) {
+    return jsonError("Invalid request: packKey is required", 400);
+  }
+
+  const pack = getCreditPack(parsed.data.packKey);
+  if (!pack) {
+    return jsonError("Invalid pack key", 400);
+  }
+
+  const stripe = getStripeServer();
+  const typedAdmin = createAdminClient();
+  const admin = createUntypedAdminClient();
+
+  // Get user email for Stripe customer
+  const { data: userData } = await typedAdmin.auth.admin.getUserById(auth.user.id);
+  const email = userData?.user?.email ?? "";
+
+  // Get or create Stripe customer
+  const customerId = await getOrCreateCustomer(
+    auth.user.id,
+    email,
+    userData?.user?.user_metadata?.display_name
+  );
+
+  // Create PaymentIntent
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: pack.priceCents,
+    currency: "usd",
+    customer: customerId,
+    capture_method: "automatic",
+    metadata: {
+      type: "compass_credit_purchase",
+      user_id: auth.user.id,
+      pack_key: pack.key,
+      messages: String(pack.messages),
+    },
+  });
+
+  // Record pending purchase
+  await admin.from("compass_credit_purchases").insert({
+    user_id: auth.user.id,
+    stripe_payment_intent_id: paymentIntent.id,
+    pack_key: pack.key,
+    messages_purchased: pack.messages,
+    amount_cents: pack.priceCents,
+    status: "pending",
+  });
+
+  return jsonOk({ clientSecret: paymentIntent.client_secret });
+}

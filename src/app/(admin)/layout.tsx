@@ -12,6 +12,7 @@ import {
   DollarSign,
   Shield,
   LifeBuoy,
+  Sparkles,
 } from "lucide-react";
 import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
 import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
@@ -77,6 +78,11 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Settings />,
   },
   {
+    label: "Compass AI",
+    href: "/admin/compass",
+    icon: <Sparkles />,
+  },
+  {
     label: "Audit Log",
     href: "/admin/audit-log",
     icon: <ScrollText />,
@@ -95,6 +101,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
   "/admin/support": "Support Tickets",
+  "/admin/compass": "Compass AI Usage",
 };
 
 export default async function AdminLayout({

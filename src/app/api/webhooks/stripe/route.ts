@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createHmac, timingSafeEqual } from "crypto";
 
 /**
@@ -49,12 +50,78 @@ function verifySignature(
 
 // ─── Event Handlers ────────────────────────────────────────────────
 
+async function handleCompassCreditPurchase(
+  paymentIntent: Record<string, unknown>
+) {
+  const admin = createUntypedAdminClient();
+  const metadata = paymentIntent.metadata as Record<string, string>;
+  const userId = metadata.user_id;
+  const packKey = metadata.pack_key;
+  const messages = parseInt(metadata.messages, 10);
+
+  if (!userId || !packKey || isNaN(messages)) {
+    console.error(
+      "[stripe-webhook] compass_credit_purchase missing metadata",
+      metadata
+    );
+    return;
+  }
+
+  // Update purchase record — idempotent (skip if already succeeded)
+  const { data: purchase } = await admin
+    .from("compass_credit_purchases")
+    .select("id, status")
+    .eq("stripe_payment_intent_id", paymentIntent.id as string)
+    .single();
+
+  if (purchase?.status === "succeeded") {
+    console.log(
+      `[stripe-webhook] compass credit purchase already fulfilled: ${purchase.id}`
+    );
+    return;
+  }
+
+  // Mark purchase as succeeded
+  await admin
+    .from("compass_credit_purchases")
+    .update({ status: "succeeded" })
+    .eq("stripe_payment_intent_id", paymentIntent.id as string);
+
+  // Add credits atomically
+  const { addCredits } = await import("@/lib/compass/usage");
+  await addCredits(userId, messages);
+
+  // Audit log — use typed admin for known tables
+  const typedAdmin = createAdminClient();
+  await typedAdmin.from("audit_log").insert({
+    action: "compass.credit_purchase.succeeded",
+    entity_type: "compass_credit_purchase",
+    entity_id: purchase?.id ?? (paymentIntent.id as string),
+    actor_id: userId,
+    new_data: {
+      pack_key: packKey,
+      messages,
+      amount_cents: paymentIntent.amount as number,
+    },
+  });
+
+  console.log(
+    `[stripe-webhook] compass credit purchase: user=${userId} pack=${packKey} messages=${messages}`
+  );
+}
+
 async function handlePaymentIntentSucceeded(
   paymentIntent: Record<string, unknown>
 ) {
   const admin = createAdminClient();
-  const bookingId = (paymentIntent.metadata as Record<string, string>)
-    ?.booking_id;
+  const metadata = paymentIntent.metadata as Record<string, string>;
+
+  // Route to compass credit handler if applicable
+  if (metadata?.type === "compass_credit_purchase") {
+    return handleCompassCreditPurchase(paymentIntent);
+  }
+
+  const bookingId = metadata?.booking_id;
 
   if (!bookingId) {
     console.log(

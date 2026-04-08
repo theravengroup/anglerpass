@@ -1,13 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import type { UIMessage } from "ai";
 import { Compass, Send, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CompassMessage from "./CompassMessage";
 import CompassSuggestionChips from "./CompassSuggestionChips";
+import CompassUsageBadge, { useCompassUsage } from "./CompassUsageBadge";
+import CompassCreditPurchase from "./CompassCreditPurchase";
 
 export default function CompassChat() {
   const transport = useMemo(
@@ -22,11 +23,28 @@ export default function CompassChat() {
     error,
   } = useChat({ transport });
 
+  const { usage, refreshUsage } = useCompassUsage();
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const isLoading = status === "submitted" || status === "streaming";
+
+  // Check if the error is a usage limit error
+  const isLimitError =
+    error?.message?.includes("compass_limit_reached") ||
+    error?.message?.includes("429");
+
+  // Refresh usage after each completed response
+  const prevMessageCountRef = useRef(messages.length);
+  useEffect(() => {
+    if (messages.length > prevMessageCountRef.current && status === "ready") {
+      refreshUsage();
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [messages.length, status, refreshUsage]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -70,12 +88,20 @@ export default function CompassChat() {
 
   return (
     <div className="flex h-full flex-col">
+      {/* Purchase modal */}
+      <CompassCreditPurchase
+        open={purchaseOpen}
+        onOpenChange={setPurchaseOpen}
+        onSuccess={refreshUsage}
+        suggestedPack={usage?.suggestedPack}
+      />
+
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-parchment px-4 py-3 sm:px-6">
         <div className="flex size-9 items-center justify-center rounded-full bg-bronze/10">
           <Compass className="size-5 text-bronze" />
         </div>
-        <div>
+        <div className="flex-1">
           <h2 className="font-heading text-lg font-semibold text-forest-deep">
             Compass
           </h2>
@@ -83,6 +109,14 @@ export default function CompassChat() {
             Your AI trip planner
           </p>
         </div>
+        <div className="hidden sm:block sm:w-48">
+          <CompassUsageBadge onBuyCredits={() => setPurchaseOpen(true)} />
+        </div>
+      </div>
+
+      {/* Mobile usage badge */}
+      <div className="border-b border-parchment px-4 py-2 sm:hidden">
+        <CompassUsageBadge onBuyCredits={() => setPurchaseOpen(true)} />
       </div>
 
       {/* Messages area */}
@@ -135,10 +169,29 @@ export default function CompassChat() {
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <div>
-              <p className="font-medium">Something went wrong</p>
-              <p className="text-xs text-red-600">
-                {error.message || "Please try again."}
-              </p>
+              {isLimitError ? (
+                <>
+                  <p className="font-medium">
+                    Monthly message limit reached
+                  </p>
+                  <p className="text-xs text-red-600">
+                    You&apos;ve used all your Compass messages this month.
+                  </p>
+                  <button
+                    onClick={() => setPurchaseOpen(true)}
+                    className="mt-2 rounded-md bg-bronze px-3 py-1.5 text-xs font-medium text-white hover:bg-bronze/90"
+                  >
+                    Get More Messages
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="font-medium">Something went wrong</p>
+                  <p className="text-xs text-red-600">
+                    {error.message || "Please try again."}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}

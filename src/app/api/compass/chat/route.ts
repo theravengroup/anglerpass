@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireAuth, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getUsageStatus, recordMessage } from "@/lib/compass/usage";
 import { getPropertyForecast } from "@/lib/weather";
 import { getStreamConditions } from "@/lib/compass/tools/usgs-stream";
 import { getSolunarData } from "@/lib/compass/tools/solunar";
@@ -1042,6 +1043,30 @@ export async function POST(request: Request) {
     );
   }
 
+  // Fetch user profile for role-based usage limits
+  const admin = createAdminClient();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("role, roles")
+    .eq("id", auth.user.id)
+    .single();
+
+  const userRoles: string[] = profile?.roles ?? [profile?.role ?? "angler"];
+
+  // Check usage quota
+  const usage = await getUsageStatus(auth.user.id, userRoles);
+  if (!usage.canSend) {
+    return Response.json(
+      {
+        error: "compass_limit_reached",
+        monthlyUsed: usage.monthlyUsed,
+        monthlyLimit: usage.monthlyLimit,
+        creditBalance: usage.creditBalance,
+      },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json();
   const messages = body.messages;
 
@@ -1057,6 +1082,10 @@ export async function POST(request: Request) {
     messages,
     tools,
     stopWhen: stepCountIs(5),
+    onFinish: () => {
+      // Fire-and-forget: record usage after successful response
+      recordMessage(auth.user.id, userRoles).catch(() => {});
+    },
   });
 
   return result.toUIMessageStreamResponse();

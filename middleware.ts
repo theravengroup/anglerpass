@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { updateSession } from "@/lib/supabase/middleware";
 import { getRoleHomePath } from "@/types/roles";
 
@@ -42,22 +43,32 @@ function isAuthRoute(pathname: string): boolean {
   return false;
 }
 
-// ─── Profile helper (single query, reused) ──────────────────────────
+// ─── Profile helper (service-role client to bypass RLS) ─────────────
+// The cookie-based client can fail to resolve auth.uid() in middleware,
+// causing profile queries to return null. Use the service-role client
+// which bypasses RLS entirely — same approach as getProfile().
 
 interface ProfileSlice {
   role: string;
   suspended_at: string | null;
 }
 
+function getMiddlewareAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
 async function fetchProfileSlice(
-  supabase: Awaited<ReturnType<typeof updateSession>>["supabase"],
   userId: string
 ): Promise<ProfileSlice | null> {
-  const { data, error } = await supabase
+  const admin = getMiddlewareAdminClient();
+  const { data, error } = await admin
     .from("profiles")
     .select("role, suspended_at")
     .eq("id", userId)
-    .returns<ProfileSlice[]>()
     .single();
 
   if (error) {
@@ -65,13 +76,13 @@ async function fetchProfileSlice(
     return null;
   }
 
-  return data;
+  return data as ProfileSlice | null;
 }
 
 // ─── Middleware ──────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
-  const { supabase, response, user } = await updateSession(request);
+  const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
   // ── Unauthenticated user → redirect to login ──
@@ -86,7 +97,7 @@ export async function middleware(request: NextRequest) {
 
   // ── Authenticated user on auth pages → redirect to role home ──
   if (isAuthRoute(pathname)) {
-    const profile = await fetchProfileSlice(supabase, user.id);
+    const profile = await fetchProfileSlice(user.id);
     // Only redirect if we have a confirmed profile; otherwise let them
     // stay on the auth page so the dashboard layout can handle setup.
     if (profile?.role) {
@@ -99,7 +110,7 @@ export async function middleware(request: NextRequest) {
 
   // ── Protected route checks (suspension, admin role) ──
   if (isProtectedRoute(pathname)) {
-    const profile = await fetchProfileSlice(supabase, user.id);
+    const profile = await fetchProfileSlice(user.id);
 
     // Suspended users → redirect (avoid loop on /suspended itself)
     if (profile?.suspended_at && pathname !== "/suspended") {
