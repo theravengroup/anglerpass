@@ -19,6 +19,7 @@ const TOC_ITEMS = [
   { href: '#access', label: 'Responsible Access' },
   { href: '#landowners', label: 'Supporting Landowners' },
   { href: '#community', label: 'Community Standards' },
+  { href: '#climate', label: 'Climate Action' },
   { href: '#future', label: 'Looking Ahead' },
 ];
 
@@ -319,6 +320,76 @@ export default function ConservationPage() {
                   We do not tolerate poaching, trespassing, littering, or deliberate
                   harm to fish or habitat. These behaviors result in immediate
                   suspension and permanent removal from the platform.
+                </p>
+              </section>
+
+              {/* Climate Action */}
+              <section id="climate" className="mb-14 scroll-mt-24">
+                <h2 className="font-heading text-[28px] font-semibold text-forest mb-4">
+                  Climate Action
+                </h2>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-4">
+                  Healthy fisheries depend on a stable climate. Rising water
+                  temperatures, shifting weather patterns, and changing hydrology
+                  directly threaten the cold-water ecosystems that wild trout and
+                  other species depend on. Conservation at the property level is
+                  essential &mdash; but the long-term future of these waters requires
+                  action on a larger scale.
+                </p>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-6">
+                  That is why AnglerPass contributes 0.5% of revenue to carbon
+                  removal through{' '}
+                  <a
+                    href="https://stripe.com/climate"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-river underline"
+                  >
+                    Stripe Climate
+                  </a>
+                  .
+                </p>
+                <div className="rounded-xl border border-parchment bg-white p-6 mb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-lg bg-forest/10">
+                      <svg className="size-5 text-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5a17.92 17.92 0 01-8.716-2.247m0 0A8.966 8.966 0 013 12c0-1.264.26-2.466.732-3.558" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-[18px] font-semibold text-forest mb-2">
+                        Stripe Climate
+                      </h3>
+                      <p className="text-[14px] leading-[1.7] text-text-secondary mb-3">
+                        Stripe Climate brings together the most promising carbon removal
+                        technologies with the businesses that want to fund them. A
+                        fraction of every dollar processed through AnglerPass goes
+                        directly to permanent carbon removal &mdash; technologies that
+                        pull CO&#8322; out of the atmosphere and lock it away for
+                        thousands of years.
+                      </p>
+                      <p className="text-[14px] leading-[1.7] text-text-secondary">
+                        These are not offsets. Carbon removal is different. Rather
+                        than paying someone to avoid future emissions, removal
+                        technologies actively extract carbon that is already in the
+                        atmosphere. Stripe Climate funds early-stage companies
+                        developing approaches like direct air capture, enhanced
+                        weathering, and ocean-based removal &mdash; the technologies
+                        scientists say we need to reach net zero.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-4">
+                  This is not a marketing gesture. It is built into our payment
+                  infrastructure and happens automatically on every transaction. As
+                  AnglerPass grows, so does our contribution to carbon removal.
+                </p>
+                <p className="text-[15px] leading-[1.8] text-text-secondary">
+                  We believe the companies that benefit from the natural world
+                  have a responsibility to protect it &mdash; not just at the
+                  streambank, but at the atmospheric level. Every booking on
+                  AnglerPass contributes to both.
                 </p>
               </section>
 

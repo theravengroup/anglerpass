@@ -609,6 +609,7 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .problem-grid{grid-template-columns:repeat(2,1fr)}
 .ai-offering{padding:40px 28px}
 .compass-grid{grid-template-columns:1fr}
+.compass-features{gap:16px}
 /* concierge grid removed */
 .why .container{grid-template-columns:1fr;gap:50px}
 .waitlist .container{grid-template-columns:1fr;gap:50px}
