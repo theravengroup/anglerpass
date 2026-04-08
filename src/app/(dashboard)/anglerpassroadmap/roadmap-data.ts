@@ -431,8 +431,51 @@ export const PHASES: RoadmapPhase[] = [
         ],
       },
       {
+        id: "p1-marketing-automation",
+        title: "1E: Marketing Automation (Built-In CRM)",
+        description: "Replace third-party marketing tools with a native campaign engine. Zero vendor cost, full data control, purpose-built for AnglerPass.",
+        items: [
+          {
+            id: "p1-ma-campaigns",
+            label: "Campaign engine with audience segments and trigger conditions",
+            detail: "Define campaigns targeting specific segments (role, activity, geography, club status). Trigger on signup, inactivity, post-trip, pre-renewal, abandoned onboarding.",
+            done: false,
+          },
+          {
+            id: "p1-ma-drip",
+            label: "Cron-driven drip sequence runner",
+            detail: "Daily cron evaluates all active campaigns, sends eligible emails via Resend. Multi-step sequences with delay logic and exit conditions.",
+            done: false,
+          },
+          {
+            id: "p1-ma-engagement",
+            label: "Engagement tracking (opens, clicks, bounces)",
+            detail: "Resend webhooks for delivery events stored in our database. Per-campaign and per-user engagement metrics.",
+            done: false,
+          },
+          {
+            id: "p1-ma-segments",
+            label: "Audience segmentation (role, activity, geography, membership status)",
+            detail: "Reusable segment definitions querying existing Supabase data. No external sync needed — all data already in our database.",
+            done: false,
+          },
+          {
+            id: "p1-ma-admin",
+            label: "Admin campaign dashboard (create, pause, view performance)",
+            detail: "Campaign list with status, send counts, open/click rates. Create new campaigns with segment picker and email template builder.",
+            done: false,
+          },
+          {
+            id: "p1-ma-reengagement",
+            label: "Pre-built campaigns (welcome series, re-engagement, seasonal, post-trip)",
+            detail: "Ship with default campaign templates for common lifecycle touchpoints. Admins can customize or create new ones.",
+            done: false,
+          },
+        ],
+      },
+      {
         id: "p1-affiliate",
-        title: "1E: Affiliate Program",
+        title: "1F: Affiliate Program",
         description: "Monetize Compass AI gear recommendations through affiliate partnerships.",
         items: [
           {
@@ -571,31 +614,6 @@ export const PHASES: RoadmapPhase[] = [
           { id: "p2-corp-billing", label: "Corporate billing (invoices, PO numbers, net-30 terms)", done: false },
           { id: "p2-corp-events", label: "Enterprise event booking (multi-property, catering, itinerary)", done: false },
           { id: "p2-corp-gifts", label: "Gift certificate programs (branded gift experiences)", done: false },
-        ],
-      },
-      {
-        id: "p2-marketing-automation",
-        title: "2H: Marketing Automation",
-        description: "Replace manual Resend emails with intelligent, behavior-driven campaigns.",
-        items: [
-          {
-            id: "p2-customerio",
-            label: "Customer.io integration",
-            detail: "Replace Resend-based welcome sequence with Customer.io for advanced drip campaigns, segmentation, and behavioral triggers.",
-            done: false,
-          },
-          {
-            id: "p2-drip-campaigns",
-            label: "Behavioral drip campaigns",
-            detail: "Trigger-based email sequences: abandoned onboarding, inactive re-engagement, post-trip follow-up.",
-            done: false,
-          },
-          {
-            id: "p2-segment-messaging",
-            label: "Segmented messaging",
-            detail: "Target users by role, activity level, geography, club membership status.",
-            done: false,
-          },
         ],
       },
     ],
