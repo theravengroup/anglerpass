@@ -142,31 +142,70 @@ export default function HowItWorksSection() {
 
             {/* Network visualization */}
             <div className="cross-club-visual" aria-hidden="true">
-              <svg viewBox="0 0 400 120" fill="none" className="cross-club-diagram">
-                {/* Connection lines */}
-                <line x1="80" y1="60" x2="200" y2="60" stroke="rgba(255,255,255,.2)" strokeWidth="1.5" strokeDasharray="6 4" />
-                <line x1="200" y1="60" x2="320" y2="60" stroke="rgba(255,255,255,.2)" strokeWidth="1.5" strokeDasharray="6 4" />
-                <line x1="80" y1="60" x2="200" y2="25" stroke="rgba(255,255,255,.12)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="320" y1="60" x2="200" y2="25" stroke="rgba(255,255,255,.12)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="80" y1="60" x2="200" y2="95" stroke="rgba(255,255,255,.12)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="320" y1="60" x2="200" y2="95" stroke="rgba(255,255,255,.12)" strokeWidth="1" strokeDasharray="4 4" />
+              <svg viewBox="0 0 480 140" fill="none" className="cross-club-diagram">
+                {/* Glow defs */}
+                <defs>
+                  <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(58,107,124,.25)" />
+                    <stop offset="100%" stopColor="rgba(58,107,124,0)" />
+                  </radialGradient>
+                  <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(154,115,64,.2)" />
+                    <stop offset="100%" stopColor="rgba(154,115,64,0)" />
+                  </radialGradient>
+                </defs>
 
-                {/* Outer nodes */}
-                <circle cx="200" cy="25" r="6" fill="rgba(154,115,64,.5)" stroke="var(--bronze)" strokeWidth="1.5" />
-                <circle cx="200" cy="95" r="6" fill="rgba(154,115,64,.5)" stroke="var(--bronze)" strokeWidth="1.5" />
+                {/* Background glow halos */}
+                <circle cx="80" cy="65" r="42" fill="url(#nodeGlow)" />
+                <circle cx="400" cy="65" r="42" fill="url(#nodeGlow)" />
+                <circle cx="240" cy="65" r="50" fill="url(#centerGlow)" />
 
-                {/* Main club nodes */}
-                <circle cx="80" cy="60" r="18" fill="rgba(58,107,124,.3)" stroke="var(--river)" strokeWidth="2" />
-                <circle cx="200" cy="60" r="22" fill="rgba(58,107,124,.4)" stroke="var(--river)" strokeWidth="2" />
-                <circle cx="320" cy="60" r="18" fill="rgba(58,107,124,.3)" stroke="var(--river)" strokeWidth="2" />
+                {/* Connection lines — main horizontal */}
+                <line x1="108" y1="65" x2="212" y2="65" stroke="rgba(255,255,255,.18)" strokeWidth="1.5" strokeDasharray="6 4" />
+                <line x1="268" y1="65" x2="372" y2="65" stroke="rgba(255,255,255,.18)" strokeWidth="1.5" strokeDasharray="6 4" />
 
-                {/* Labels */}
-                <text x="80" y="64" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">A</text>
-                <text x="200" y="64" textAnchor="middle" fill="white" fontSize="11" fontWeight="600">AP</text>
-                <text x="320" y="64" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">B</text>
+                {/* Connection lines — diagonals to angler nodes */}
+                <line x1="100" y1="50" x2="220" y2="25" stroke="rgba(255,255,255,.1)" strokeWidth="1" strokeDasharray="4 3" />
+                <line x1="380" y1="50" x2="260" y2="25" stroke="rgba(255,255,255,.1)" strokeWidth="1" strokeDasharray="4 3" />
+                <line x1="100" y1="80" x2="220" y2="110" stroke="rgba(255,255,255,.1)" strokeWidth="1" strokeDasharray="4 3" />
+                <line x1="380" y1="80" x2="260" y2="110" stroke="rgba(255,255,255,.1)" strokeWidth="1" strokeDasharray="4 3" />
+
+                {/* Angler nodes (bronze dots) */}
+                <circle cx="240" cy="22" r="7" fill="rgba(154,115,64,.4)" stroke="var(--bronze)" strokeWidth="1.5" />
+                <circle cx="240" cy="112" r="7" fill="rgba(154,115,64,.4)" stroke="var(--bronze)" strokeWidth="1.5" />
+                {/* Angler icon inside dots */}
+                <path d="M237.5 21a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0z" fill="var(--bronze)" opacity=".7" />
+                <path d="M237.5 111a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0z" fill="var(--bronze)" opacity=".7" />
+
+                {/* Angler labels */}
+                <text x="255" y="26" fill="var(--bronze)" fontSize="7" fontWeight="500" opacity=".7">ANGLER</text>
+                <text x="255" y="116" fill="var(--bronze)" fontSize="7" fontWeight="500" opacity=".7">ANGLER</text>
+
+                {/* Club A node */}
+                <circle cx="80" cy="65" r="26" fill="rgba(58,107,124,.2)" stroke="var(--river)" strokeWidth="2" />
+                <circle cx="80" cy="65" r="20" fill="rgba(58,107,124,.15)" stroke="rgba(255,255,255,.08)" strokeWidth="1" />
+                <text x="80" y="62" textAnchor="middle" fill="rgba(255,255,255,.45)" fontSize="7" fontWeight="600" letterSpacing=".5">CLUB</text>
+                <text x="80" y="73" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">A</text>
+
+                {/* Club B node */}
+                <circle cx="400" cy="65" r="26" fill="rgba(58,107,124,.2)" stroke="var(--river)" strokeWidth="2" />
+                <circle cx="400" cy="65" r="20" fill="rgba(58,107,124,.15)" stroke="rgba(255,255,255,.08)" strokeWidth="1" />
+                <text x="400" y="62" textAnchor="middle" fill="rgba(255,255,255,.45)" fontSize="7" fontWeight="600" letterSpacing=".5">CLUB</text>
+                <text x="400" y="73" textAnchor="middle" fill="white" fontSize="12" fontWeight="700">B</text>
+
+                {/* Center AnglerPass node — outer ring */}
+                <circle cx="240" cy="65" r="28" fill="rgba(58,107,124,.3)" stroke="var(--river)" strokeWidth="2" />
+
+                {/* AnglerPass logo (scaled to fit center node) */}
+                <g transform="translate(224, 49) scale(1.15)">
+                  <path d="M14 2C7.37 2 2 7.37 2 14s5.37 12 12 12 12-5.37 12-12S20.63 2 14 2z" stroke="white" strokeWidth="1.2" fill="none" opacity=".6" />
+                  <path d="M6 18c2-3 4-8 8-8s6 5 8 8" stroke="white" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity=".8" />
+                  <path d="M10 13c0-2 1.5-5 4-5s4 3 4 5" stroke="white" strokeWidth=".9" strokeLinecap="round" fill="none" opacity=".3" />
+                  <circle cx="14" cy="8" r="1.3" fill="white" opacity=".5" />
+                </g>
 
                 {/* Pulse rings on center */}
-                <circle cx="200" cy="60" r="22" fill="none" stroke="var(--river)" strokeWidth="1" opacity=".4" className="cross-club-pulse" />
+                <circle cx="240" cy="65" r="28" fill="none" stroke="var(--river)" strokeWidth="1" opacity=".4" className="cross-club-pulse" />
               </svg>
             </div>
 

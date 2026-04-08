@@ -231,8 +231,8 @@ body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite
 .cross-club-title{font-family:var(--heading);font-size:clamp(28px,3.5vw,38px);font-weight:600;color:#fff;letter-spacing:-.3px;margin-bottom:16px}
 .cross-club-lead{font-size:16px;line-height:1.75;color:rgba(255,255,255,.6);max-width:580px;margin:0 auto}
 .cross-club-visual{display:flex;justify-content:center;margin:8px 0 36px}
-.cross-club-diagram{width:100%;max-width:380px;height:auto}
-@keyframes crossClubPulse{0%{r:22;opacity:.4}100%{r:36;opacity:0}}
+.cross-club-diagram{width:100%;max-width:460px;height:auto}
+@keyframes crossClubPulse{0%{r:28;opacity:.4}100%{r:44;opacity:0}}
 .cross-club-pulse{animation:crossClubPulse 2.5s ease-out infinite}
 .cross-club-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:36px}
 .cross-club-benefit{padding:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:background .3s}
