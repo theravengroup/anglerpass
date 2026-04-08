@@ -59,8 +59,8 @@ export default function PressPage() {
             AnglerPass Press Resources
           </h1>
           <p className="mx-auto max-w-[560px] text-[17px] leading-[1.7] text-parchment/60">
-            Everything you need to cover the first marketplace for private water
-            fly fishing.
+            Everything you need to cover the first marketplace
+            for&nbsp;private&nbsp;water&nbsp;fly&nbsp;fishing.
           </p>
         </div>
       </section>

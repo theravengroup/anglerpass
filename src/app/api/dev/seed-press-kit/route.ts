@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createHash } from "crypto";
+import type { Database } from "@/types/supabase";
+
+type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"];
+type ClubInsert = Database["public"]["Tables"]["clubs"]["Insert"];
+type ClubPropertyAccessInsert = Database["public"]["Tables"]["club_property_access"]["Insert"];
+type ClubMembershipInsert = Database["public"]["Tables"]["club_memberships"]["Insert"];
+type BookingInsert = Database["public"]["Tables"]["bookings"]["Insert"];
 
 /** Deterministic UUID from a seed string — idempotent across runs */
 function sid(seed: string): string {
@@ -101,7 +108,7 @@ export async function GET() {
   const clubAdmin2 = fakeUsers.find((u) => u.name === "Mark Patterson")!;
 
   // ── Properties ──────────────────────────────────────────────────
-  const properties = [
+  const properties: PropertyInsert[] = [
     {
       id: sid("prop-elk-creek"),
       owner_id: DEV,
@@ -111,7 +118,7 @@ export async function GET() {
       location_description: "Paradise Valley, Montana",
       water_type: "spring_creek",
       species: ["brown_trout", "rainbow_trout"],
-      photos: [] as string[],
+      photos: [],
       max_rods: 4, max_guests: 6,
       rate_adult_full_day: 350, rate_adult_half_day: 200, half_day_allowed: true,
       water_miles: 3.2, latitude: 45.4, longitude: -110.65,
@@ -127,7 +134,7 @@ export async function GET() {
       location_description: "Hamilton, Montana",
       water_type: "river",
       species: ["rainbow_trout", "cutthroat_trout", "brown_trout"],
-      photos: [] as string[],
+      photos: [],
       max_rods: 6, max_guests: 8,
       rate_adult_full_day: 275, rate_adult_half_day: 175, half_day_allowed: true,
       water_miles: 2.1, latitude: 46.25, longitude: -114.16,
@@ -143,7 +150,7 @@ export async function GET() {
       location_description: "McCall, Idaho",
       water_type: "lake",
       species: ["rainbow_trout", "brook_trout"],
-      photos: [] as string[],
+      photos: [],
       max_rods: 4, max_guests: 6,
       rate_adult_full_day: 225, half_day_allowed: false,
       latitude: 44.73, longitude: -116.1,
@@ -152,7 +159,7 @@ export async function GET() {
     },
   ];
 
-  const otherProperties = [
+  const otherProperties: PropertyInsert[] = [
     {
       id: sid("prop-frying-pan"),
       owner_id: landowner2.id,
@@ -162,7 +169,7 @@ export async function GET() {
       location_description: "Basalt, Colorado",
       water_type: "tailwater",
       species: ["rainbow_trout", "brown_trout"],
-      photos: [] as string[],
+      photos: [],
       max_rods: 3, max_guests: 4,
       rate_adult_full_day: 425, rate_adult_half_day: 250, half_day_allowed: true,
       water_miles: 0.5, latitude: 39.37, longitude: -106.84,
@@ -178,7 +185,7 @@ export async function GET() {
       location_description: "Jackson, Wyoming",
       water_type: "stream",
       species: ["cutthroat_trout"],
-      photos: [] as string[],
+      photos: [],
       max_rods: 2, max_guests: 3,
       rate_adult_full_day: 300, half_day_allowed: false,
       latitude: 43.48, longitude: -110.76,
@@ -208,7 +215,7 @@ export async function GET() {
   }
 
   for (const p of allProperties) {
-    await admin.from("properties").upsert(p as Record<string, unknown>, { onConflict: "id" });
+    await admin.from("properties").upsert(p, { onConflict: "id" });
   }
 
   // ── Clubs ───────────────────────────────────────────────────────
@@ -223,7 +230,7 @@ export async function GET() {
     await admin.from("clubs").delete().eq("owner_id", clubAdmin2.id);
   }
 
-  await admin.from("clubs").insert({
+  const club1: ClubInsert = {
     id: CLUB1,
     owner_id: DEV,
     name: "Yellowstone Valley Anglers",
@@ -236,9 +243,10 @@ export async function GET() {
     stripe_subscription_id: "sub_demo_yva",
     stripe_connect_account_id: "acct_demo_yva",
     stripe_connect_onboarded: true,
-  } as Record<string, unknown>);
+  };
+  await admin.from("clubs").insert(club1);
 
-  await admin.from("clubs").insert({
+  const club2: ClubInsert = {
     id: CLUB2,
     owner_id: clubAdmin2.id,
     name: "Madison River Conservancy",
@@ -248,14 +256,15 @@ export async function GET() {
     initiation_fee: 250,
     annual_dues: 200,
     membership_application_required: true,
-  } as Record<string, unknown>);
+  };
+  await admin.from("clubs").insert(club2);
 
   // ── Club ↔ Property access ─────────────────────────────────────
-  const accessRecords = [
+  const accessRecords: ClubPropertyAccessInsert[] = [
     ...properties.map((p) => ({
       id: sid(`access-c1-${p.name}`),
       club_id: CLUB1,
-      property_id: p.id,
+      property_id: p.id!,
       status: "approved",
       requested_by: DEV,
       approved_at: new Date().toISOString(),
@@ -263,7 +272,7 @@ export async function GET() {
     ...otherProperties.map((p) => ({
       id: sid(`access-c2-${p.name}`),
       club_id: CLUB2,
-      property_id: p.id,
+      property_id: p.id!,
       status: "approved",
       requested_by: clubAdmin2.id,
       approved_at: new Date().toISOString(),
@@ -271,7 +280,7 @@ export async function GET() {
     {
       id: sid("access-c2-elk-cross"),
       club_id: CLUB2,
-      property_id: properties[0].id,
+      property_id: properties[0].id!,
       status: "approved",
       requested_by: clubAdmin2.id,
       approved_at: new Date().toISOString(),
@@ -280,7 +289,7 @@ export async function GET() {
 
   for (const a of accessRecords) {
     await admin.from("club_property_access").upsert(
-      a as Record<string, unknown>,
+      a,
       { onConflict: "club_id,property_id" }
     );
   }
@@ -293,13 +302,13 @@ export async function GET() {
   const daysAgo = (d: number) => new Date(now.getTime() - d * 86400000).toISOString();
 
   // Dev user: admin of club 1, member of club 2
-  const devClub1 = {
+  const devClub1: ClubMembershipInsert = {
     id: sid("mem-dev-c1"),
     club_id: CLUB1, user_id: DEV,
     role: "admin", status: "active", dues_status: "exempt",
     joined_at: daysAgo(180),
   };
-  const devClub2 = {
+  const devClub2: ClubMembershipInsert = {
     id: sid("mem-dev-c2"),
     club_id: CLUB2, user_id: DEV,
     role: "member", status: "active",
@@ -308,10 +317,10 @@ export async function GET() {
   };
 
   // Anglers in club 1
-  const anglerMems = anglers.map((a, i) => ({
-    id: sid(`mem-${a.email}-c1`),
+  const anglerMems: ClubMembershipInsert[] = anglers.map((a, i) => ({
     club_id: CLUB1, user_id: a.id,
-    role: "member" as const,
+    id: sid(`mem-${a.email}-c1`),
+    role: "member",
     status: i < 8 ? "active" : "pending",
     dues_status: i < 8 ? "active" : "none",
     dues_paid_through: i < 8 ? dpt : null,
@@ -319,10 +328,10 @@ export async function GET() {
   }));
 
   // Some anglers cross-club in club 2
-  const crossMems = anglers.slice(0, 3).map((a) => ({
-    id: sid(`mem-${a.email}-c2`),
+  const crossMems: ClubMembershipInsert[] = anglers.slice(0, 3).map((a) => ({
     club_id: CLUB2, user_id: a.id,
-    role: "member" as const,
+    id: sid(`mem-${a.email}-c2`),
+    role: "member",
     status: "active", dues_status: "active", dues_paid_through: dpt,
     joined_at: daysAgo(60),
   }));
@@ -330,7 +339,7 @@ export async function GET() {
   const allMems = [devClub1, devClub2, ...anglerMems, ...crossMems];
   for (const m of allMems) {
     await admin.from("club_memberships").upsert(
-      m as Record<string, unknown>,
+      m,
       { onConflict: "club_id,user_id" }
     );
   }
@@ -342,7 +351,7 @@ export async function GET() {
     await admin.from("bookings").delete().in("angler_id", [...demoAnglerIds, DEV]);
   }
 
-  const bookings: Record<string, unknown>[] = [];
+  const bookings: BookingInsert[] = [];
 
   function makeBooking(opts: {
     seed: string;
@@ -379,10 +388,10 @@ export async function GET() {
     const a = anglers[i % anglers.length];
     const p = properties[i % properties.length];
     const m = anglerMems.find((mem) => mem.user_id === a.id);
-    if (!m) return;
+    if (!m?.id) return;
     makeBooking({
       seed: `book-past-${i}`,
-      propId: p.id, anglerId: a.id, memId: m.id,
+      propId: p.id!, anglerId: a.id, memId: m.id,
       daysOffset: -d,
       status: i < 6 ? "completed" : "confirmed",
       rate: Number(p.rate_adult_full_day),
@@ -394,10 +403,10 @@ export async function GET() {
     const a = anglers[i + 2];
     const p = properties[i % properties.length];
     const m = anglerMems.find((mem) => mem.user_id === a.id);
-    if (!m) return;
+    if (!m?.id) return;
     makeBooking({
       seed: `book-future-${i}`,
-      propId: p.id, anglerId: a.id, memId: m.id,
+      propId: p.id!, anglerId: a.id, memId: m.id,
       daysOffset: d, status: "confirmed",
       rate: Number(p.rate_adult_full_day),
     });
@@ -413,7 +422,7 @@ export async function GET() {
   ].forEach((b, i) => {
     makeBooking({
       seed: `book-dev-${i}`,
-      propId: b.prop.id, anglerId: DEV, memId: devClub2.id,
+      propId: b.prop.id!, anglerId: DEV, memId: devClub2.id!,
       daysOffset: b.d, status: b.s,
       rate: Number(b.prop.rate_adult_full_day),
     });
