@@ -2196,6 +2196,7 @@ export type Database = {
           gate_code_required: boolean | null
           half_day_allowed: boolean | null
           id: string
+          knowledge_completeness: number
           latitude: number | null
           location_description: string | null
           lodging_available: boolean
@@ -2230,6 +2231,7 @@ export type Database = {
           gate_code_required?: boolean | null
           half_day_allowed?: boolean | null
           id?: string
+          knowledge_completeness?: number
           latitude?: number | null
           location_description?: string | null
           lodging_available?: boolean
@@ -2264,6 +2266,7 @@ export type Database = {
           gate_code_required?: boolean | null
           half_day_allowed?: boolean | null
           id?: string
+          knowledge_completeness?: number
           latitude?: number | null
           location_description?: string | null
           lodging_available?: boolean
@@ -2451,6 +2454,74 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_lodging_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_knowledge: {
+        Row: {
+          id: string
+          property_id: string
+          created_at: string
+          updated_at: string
+          water_characteristics: Json | null
+          species_detail: Json | null
+          hatches_and_patterns: Json | null
+          seasonal_conditions: Json | null
+          flow_and_gauge: Json | null
+          access_and_logistics: Json | null
+          regulations_and_rules: Json | null
+          equipment_recommendations: Json | null
+          safety_and_hazards: Json | null
+          amenities: Json | null
+          experience_profile: Json | null
+          pressure_and_crowding: Json | null
+          completeness_score: number
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          created_at?: string
+          updated_at?: string
+          water_characteristics?: Json | null
+          species_detail?: Json | null
+          hatches_and_patterns?: Json | null
+          seasonal_conditions?: Json | null
+          flow_and_gauge?: Json | null
+          access_and_logistics?: Json | null
+          regulations_and_rules?: Json | null
+          equipment_recommendations?: Json | null
+          safety_and_hazards?: Json | null
+          amenities?: Json | null
+          experience_profile?: Json | null
+          pressure_and_crowding?: Json | null
+          completeness_score?: number
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          created_at?: string
+          updated_at?: string
+          water_characteristics?: Json | null
+          species_detail?: Json | null
+          hatches_and_patterns?: Json | null
+          seasonal_conditions?: Json | null
+          flow_and_gauge?: Json | null
+          access_and_logistics?: Json | null
+          regulations_and_rules?: Json | null
+          equipment_recommendations?: Json | null
+          safety_and_hazards?: Json | null
+          amenities?: Json | null
+          experience_profile?: Json | null
+          pressure_and_crowding?: Json | null
+          completeness_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_knowledge_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: true
             referencedRelation: "properties"

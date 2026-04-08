@@ -16,6 +16,7 @@ import {
   Mail,
   MailCheck,
   Send,
+  BookOpen,
 } from "lucide-react";
 import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 import { FetchError } from "@/components/shared/FetchError";
@@ -462,6 +463,16 @@ function PropertyCard({
               <Icon className="size-3" />
               {config.label}
             </div>
+
+            {/* Knowledge Profile link for approved properties */}
+            {access.status === "approved" && (
+              <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                <Link href={`/club/properties/${property.id}/knowledge`}>
+                  <BookOpen className="mr-1 size-3" />
+                  Knowledge
+                </Link>
+              </Button>
+            )}
 
             {/* Actions for pending */}
             {access.status === "pending" && !isLoading && onApprove && onDecline && (

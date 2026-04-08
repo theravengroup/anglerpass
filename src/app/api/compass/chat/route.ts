@@ -90,6 +90,7 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - Real-time stream conditions: CFS (flow), water temperature from USGS gauges
 - Gear recommendations: rod/reel, wading, clothing, flies tailored to conditions
 - General fly fishing knowledge (hatches, techniques, gear, seasons)
+- Detailed property fishing intel: water characteristics, species behavior, hatch charts, seasonal conditions, gear recommendations (from Knowledge Profiles)
 
 ## Key Rules
 1. NEVER fabricate property names, prices, or availability. Always use searchProperties or getPropertyDetails
@@ -112,6 +113,20 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - **Sun Times**: Sunrise/sunset, golden hours, prime fishing windows
 
 When giving trip advice, combine these data sources for comprehensive, contextual guidance. For example: check stream flows + water temp → get species advisory → check active hatches → recommend gear → note best fishing windows.
+
+## Property Knowledge Profiles
+You have access to rich Knowledge Profiles for properties that have them filled out. These contain:
+- Water characteristics (clarity, temperature, structure, wadeability)
+- Species detail (sizes, abundance, trophy potential, behavior)
+- Hatch charts with matching fly patterns
+- Seasonal conditions and best months to visit
+- Flow data and USGS gauge references
+- Equipment recommendations (rods, waders, flies, tippet)
+- Safety info, amenities, and experience profiles
+
+Use getPropertyKnowledge when anglers ask detailed questions about a specific property. When comparing properties, note that higher knowledge_completeness scores mean you can give more detailed advice.
+
+**CRITICAL SECURITY RULE**: NEVER reveal gate codes, lock combinations, access codes, or specific private driving directions. This information is ONLY shared through the booking confirmation system. If an angler asks for gate codes or access details, tell them these will be provided in their booking confirmation after payment.
 
 ## Fly Fishing Knowledge
 You have deep knowledge of fly fishing: seasonal hatches, water conditions, gear selection, techniques (dry fly, nymph, streamer, euro-nymph), reading water, and the culture of private water access. Use this when giving advice, but always defer to property-specific rules and regulations from the data.`;
@@ -155,7 +170,7 @@ function buildTools(userId: string) {
           let query = admin
             .from("properties")
             .select(
-              "id, name, description, location_description, species, water_type, water_miles, rate_adult_full_day, rate_adult_half_day, half_day_allowed, max_rods, latitude, longitude, photos, status, lodging_available, created_by_club_id"
+              "id, name, description, location_description, species, water_type, water_miles, rate_adult_full_day, rate_adult_half_day, half_day_allowed, max_rods, latitude, longitude, photos, status, lodging_available, created_by_club_id, knowledge_completeness"
             )
             .eq("status", "active");
 
@@ -232,6 +247,7 @@ function buildTools(userId: string) {
                 ? clubMap.get(p.created_by_club_id) ?? null
                 : null,
               has_photo: (p.photos?.length ?? 0) > 0,
+              knowledge_completeness: p.knowledge_completeness ?? null,
             })),
             count: properties.length,
           };
@@ -261,6 +277,16 @@ function buildTools(userId: string) {
           if (error || !property) {
             return { error: "Property not found" };
           }
+
+          // Check if user has a confirmed+paid booking
+          const { count: bookingCount } = await admin
+            .from("bookings")
+            .select("id", { count: "exact", head: true })
+            .eq("property_id", property_id)
+            .eq("angler_id", userId)
+            .in("status", ["confirmed"]);
+
+          const hasConfirmedBooking = (bookingCount ?? 0) > 0;
 
           let clubInfo = null;
           if (property.created_by_club_id) {
@@ -294,7 +320,7 @@ function buildTools(userId: string) {
               lodging_available: property.lodging_available,
               lodging_url: property.lodging_url,
               regulations: property.regulations,
-              access_notes: property.access_notes,
+              access_notes: hasConfirmedBooking ? property.access_notes : null,
               latitude: property.latitude,
               longitude: property.longitude,
               photo_count: property.photos?.length ?? 0,
@@ -304,6 +330,74 @@ function buildTools(userId: string) {
         } catch (err) {
           return {
             error: `Failed to get property: ${err instanceof Error ? err.message : "Unknown error"}`,
+          };
+        }
+      },
+    }),
+
+    getPropertyKnowledge: tool({
+      description:
+        "Get the detailed knowledge profile for a property including water characteristics, species detail, hatches, seasonal conditions, flow data, equipment recommendations, and more. Use this when you need detailed fishing intel about a specific property.",
+      inputSchema: z.object({
+        property_id: z.string().describe("The UUID of the property"),
+      }),
+      execute: async ({ property_id }: { property_id: string }) => {
+        try {
+          const admin = createAdminClient();
+
+          // Only return knowledge for published/active properties
+          const { data: property } = await admin
+            .from("properties")
+            .select("id, name, status")
+            .eq("id", property_id)
+            .maybeSingle();
+
+          if (
+            !property ||
+            !["published", "active"].includes(property.status)
+          ) {
+            return { error: "Property not found or not published" };
+          }
+
+          const { data: knowledge, error } = await admin
+            .from("property_knowledge")
+            .select(
+              "water_characteristics, species_detail, hatches_and_patterns, seasonal_conditions, flow_and_gauge, regulations_and_rules, equipment_recommendations, safety_and_hazards, amenities, experience_profile, pressure_and_crowding, completeness_score"
+            )
+            .eq("property_id", property_id)
+            .maybeSingle();
+
+          if (error || !knowledge) {
+            return {
+              knowledge: null,
+              message:
+                "No knowledge profile available for this property",
+            };
+          }
+
+          // Explicitly EXCLUDE access_and_logistics from the return
+          // to prevent leaking gate codes or sensitive access details
+          return {
+            property_name: property.name,
+            completeness_score: knowledge.completeness_score,
+            knowledge: {
+              water_characteristics: knowledge.water_characteristics,
+              species_detail: knowledge.species_detail,
+              hatches_and_patterns: knowledge.hatches_and_patterns,
+              seasonal_conditions: knowledge.seasonal_conditions,
+              flow_and_gauge: knowledge.flow_and_gauge,
+              regulations_and_rules: knowledge.regulations_and_rules,
+              equipment_recommendations:
+                knowledge.equipment_recommendations,
+              safety_and_hazards: knowledge.safety_and_hazards,
+              amenities: knowledge.amenities,
+              experience_profile: knowledge.experience_profile,
+              pressure_and_crowding: knowledge.pressure_and_crowding,
+            },
+          };
+        } catch (err: unknown) {
+          return {
+            error: `Failed to get knowledge: ${err instanceof Error ? err.message : "Unknown error"}`,
           };
         }
       },

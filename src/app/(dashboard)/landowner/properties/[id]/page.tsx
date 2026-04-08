@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PropertyForm from "@/components/properties/PropertyForm";
 import type { PropertyFormData } from "@/lib/validations/properties";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { Loader2, AlertTriangle, BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import CalendarSubscription from "@/components/properties/CalendarSubscription";
 
 interface PropertyData extends PropertyFormData {
   id: string;
   status: string;
+  knowledge_completeness: number;
 }
 
 interface ModerationNote {
@@ -49,6 +52,7 @@ export default function PropertyDetailPage() {
         setProperty({
           id: data.id,
           status: data.status,
+          knowledge_completeness: data.knowledge_completeness ?? 0,
           name: data.name ?? "",
           description: data.description ?? "",
           location_description: data.location_description ?? "",
@@ -186,6 +190,35 @@ export default function PropertyDetailPage() {
       {property.status === "published" && (
         <CalendarSubscription propertyId={property.id} />
       )}
+
+      {/* Knowledge Profile CTA */}
+      <Card className="border-forest/20 bg-forest/5">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <BookOpen className="mt-0.5 size-5 shrink-0 text-forest" />
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  Property Knowledge Profile
+                </p>
+                <p className="text-sm text-text-secondary">
+                  The more you fill out, the more likely Compass AI will recommend your property to anglers.
+                  {property.knowledge_completeness > 0 && (
+                    <span className="ml-1 font-medium text-forest">
+                      {property.knowledge_completeness}% complete
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <Button asChild className="shrink-0 bg-forest text-white hover:bg-forest-deep">
+              <Link href={`/landowner/properties/${property.id}/knowledge`}>
+                {property.knowledge_completeness > 0 ? "Continue" : "Get Started"}
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <PropertyForm mode="edit" initialData={property} />
     </div>

@@ -17,6 +17,7 @@ import BookingForm from "@/components/angler/BookingForm";
 import PropertyReviewSection from "@/components/reviews/PropertyReviewSection";
 import PropertyWeather from "@/components/properties/PropertyWeather";
 import LodgingDisplay from "@/components/properties/LodgingDisplay";
+import KnowledgeDisplay from "@/components/properties/KnowledgeDisplay";
 import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
 import type { PropertyLodging } from "@/lib/constants/lodging";
 
@@ -51,6 +52,7 @@ interface PropertyDetail {
 export default function PropertyDetailPage() {
   const { id } = useParams();
   const [property, setProperty] = useState<PropertyDetail | null>(null);
+  const [knowledge, setKnowledge] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
 
@@ -65,6 +67,15 @@ export default function PropertyDetailPage() {
           );
           if (found) {
             setProperty(found);
+            // Fetch knowledge profile in parallel (non-blocking)
+            fetch(`/api/properties/${found.id}/knowledge`)
+              .then((r) => (r.ok ? r.json() : null))
+              .then((d) => {
+                if (d?.knowledge) setKnowledge(d.knowledge);
+              })
+              .catch(() => {
+                // Silent fail — knowledge is optional
+              });
           }
         }
       } catch {
@@ -253,6 +264,9 @@ export default function PropertyDetailPage() {
 
           {/* Verified trip reviews */}
           <PropertyReviewSection propertyId={property.id} />
+
+          {/* Property Knowledge Profile */}
+          <KnowledgeDisplay knowledge={knowledge} />
         </div>
 
         {/* Booking sidebar */}
