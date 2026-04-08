@@ -26,6 +26,7 @@ import {
   VALID_ROLES,
 } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface User {
   id: string;
@@ -130,6 +131,7 @@ export default function UsersPage() {
   }
 
   return (
+    <AdminPageGuard path="/admin/users">
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -401,5 +403,6 @@ export default function UsersPage() {
         </CardContent>
       </Card>
     </div>
+    </AdminPageGuard>
   );
 }

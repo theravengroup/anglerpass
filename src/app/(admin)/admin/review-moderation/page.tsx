@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -185,9 +186,11 @@ export default function ReviewModerationPage() {
 
   if (loading) {
     return (
+      <AdminPageGuard path="/admin/review-moderation">
       <div className="flex items-center justify-center py-20">
         <Loader2 className="size-6 animate-spin text-text-light" />
       </div>
+      </AdminPageGuard>
     );
   }
 
@@ -195,6 +198,7 @@ export default function ReviewModerationPage() {
 
   if (flags.length === 0) {
     return (
+      <AdminPageGuard path="/admin/review-moderation">
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
@@ -217,12 +221,14 @@ export default function ReviewModerationPage() {
           </p>
         </div>
       </div>
+      </AdminPageGuard>
     );
   }
 
   // ─── Queue ──────────────────────────────────────────────────────
 
   return (
+    <AdminPageGuard path="/admin/review-moderation">
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -452,5 +458,6 @@ export default function ReviewModerationPage() {
         })}
       </div>
     </div>
+    </AdminPageGuard>
   );
 }

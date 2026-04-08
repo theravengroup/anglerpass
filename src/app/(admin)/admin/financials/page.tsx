@@ -24,6 +24,7 @@ import { MonthlyRevenueTable } from "@/components/admin/MonthlyRevenueTable";
 import { TopPropertiesCard } from "@/components/admin/TopPropertiesCard";
 import { RecentTransactionsTable } from "@/components/admin/RecentTransactionsTable";
 import { FinancialSummaryCard } from "@/components/admin/FinancialSummaryCard";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 function buildExportRows(data: Financials): string[][] {
   return [
@@ -129,17 +130,21 @@ export default function AdminFinancialsPage() {
 
   if (loading) {
     return (
+      <AdminPageGuard path="/admin/financials">
       <div className="mx-auto flex max-w-6xl items-center justify-center py-24">
         <Loader2 className="size-6 animate-spin text-river" />
       </div>
+      </AdminPageGuard>
     );
   }
 
   if (error) {
     return (
+      <AdminPageGuard path="/admin/financials">
       <div className="mx-auto max-w-6xl">
         <FetchError message="Failed to load financial data." onRetry={load} />
       </div>
+      </AdminPageGuard>
     );
   }
 
@@ -206,6 +211,7 @@ export default function AdminFinancialsPage() {
   }
 
   return (
+    <AdminPageGuard path="/admin/financials">
     <div className="mx-auto max-w-6xl space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -287,5 +293,6 @@ export default function AdminFinancialsPage() {
 
       <FinancialSummaryCard />
     </div>
+    </AdminPageGuard>
   );
 }

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import TurnstileWidget from "@/components/shared/TurnstileWidget";
 
 const resetPasswordSchema = z
   .object({
@@ -26,6 +27,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const {
     register,
@@ -112,9 +114,11 @@ export default function ResetPasswordPage() {
           )}
         </div>
 
+        <TurnstileWidget onVerify={setTurnstileToken} />
+
         <Button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="h-11 w-full"
         >
           {isLoading ? (

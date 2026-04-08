@@ -12,6 +12,7 @@ import {
   FileText,
   Compass,
 } from "lucide-react";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface GuideProfile {
   id: string;
@@ -111,6 +112,7 @@ export default function AdminGuidesPage() {
   ];
 
   return (
+    <AdminPageGuard path="/admin/guides">
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
@@ -298,6 +300,7 @@ export default function AdminGuidesPage() {
         </div>
       )}
     </div>
+    </AdminPageGuard>
   );
 }
 

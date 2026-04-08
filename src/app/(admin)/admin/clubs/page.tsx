@@ -19,6 +19,7 @@ import {
   TreePine,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface Club {
   id: string;
@@ -82,6 +83,7 @@ export default function ClubsPage() {
   }, [page, search]);
 
   return (
+    <AdminPageGuard path="/admin/clubs">
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Header */}
       <div>
@@ -262,5 +264,6 @@ export default function ClubsPage() {
         </Card>
       )}
     </div>
+    </AdminPageGuard>
   );
 }

@@ -2,6 +2,7 @@ import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { leadSchema } from "@/lib/validations/leads";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
+import { verifyTurnstile } from "@/lib/api/turnstile";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -149,6 +150,12 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
+
+    const turnstileValid = await verifyTurnstile(body.turnstileToken);
+    if (!turnstileValid) {
+      return jsonError("CAPTCHA verification failed", 400);
+    }
+
     const result = leadSchema.safeParse(body);
 
     if (!result.success) {

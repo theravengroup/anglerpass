@@ -1,29 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PLATFORM_ROLES } from "@/lib/permissions/constants";
+import type { PlatformRole } from "@/lib/permissions/constants";
 
 const TEST_EMAIL = "dev-test@anglerpass.local";
 const TEST_PASSWORD = "dev-test-password-2024";
 
 /**
- * Dev-only login endpoint. Creates a test landowner user if needed,
+ * Dev-only login endpoint. Creates a test user if needed,
  * signs them in, sets auth cookies, and redirects to the dashboard.
  *
- * GET  /api/dev/login           → login as landowner
- * GET  /api/dev/login?role=club → login as club_admin
- * POST /api/dev/login           → { role: "landowner" }
+ * GET  /api/dev/login                        → login as landowner
+ * GET  /api/dev/login?role=admin             → login as super_admin
+ * GET  /api/dev/login?role=admin&staff=support_agent → login as support_agent
+ * POST /api/dev/login                        → { role: "landowner", staff: "support_agent" }
  */
 export async function GET(request: NextRequest) {
   const role = request.nextUrl.searchParams.get("role") ?? "landowner";
-  return devLogin(role);
+  const staff = request.nextUrl.searchParams.get("staff") ?? null;
+  return devLogin(role, staff);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const role = (body as { role?: string }).role ?? "landowner";
-  return devLogin(role);
+  const staff = (body as { staff?: string }).staff ?? null;
+  return devLogin(role, staff);
 }
 
-async function devLogin(role: string) {
+async function devLogin(role: string, staffRole: string | null) {
   if (process.env.NODE_ENV !== "development") {
     return Response.json({ error: "Not available" }, { status: 404 });
   }
@@ -80,6 +85,29 @@ async function devLogin(role: string) {
         { error: "Failed to set profile", detail: insertErr.message },
         { status: 500 }
       );
+    }
+  }
+
+  // Set platform_staff role for admin users
+  if (role === "admin") {
+    const resolvedStaffRole: PlatformRole =
+      staffRole && (PLATFORM_ROLES as readonly string[]).includes(staffRole)
+        ? (staffRole as PlatformRole)
+        : "super_admin";
+
+    // Try update first, then insert if no rows matched
+    const { data: updated } = await admin
+      .from("platform_staff")
+      .update({ role: resolvedStaffRole, revoked_at: null })
+      .eq("user_id", user.id)
+      .select();
+
+    if (!updated?.length) {
+      await admin.from("platform_staff").insert({
+        user_id: user.id,
+        role: resolvedStaffRole,
+        granted_by: user.id,
+      });
     }
   }
 

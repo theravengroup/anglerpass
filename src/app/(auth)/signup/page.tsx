@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import TurnstileWidget from "@/components/shared/TurnstileWidget";
 
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -54,6 +55,7 @@ function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const {
     register,
@@ -253,9 +255,11 @@ function SignupForm() {
           )}
         </div>
 
+        <TurnstileWidget onVerify={setTurnstileToken} />
+
         <Button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="h-11 w-full"
         >
           {isLoading ? (

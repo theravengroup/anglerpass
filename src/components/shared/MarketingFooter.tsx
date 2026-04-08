@@ -10,6 +10,7 @@ import {
   CONTACT_DEPARTMENTS,
   type ContactFormData,
 } from '@/lib/validations/contact';
+import TurnstileWidget from '@/components/shared/TurnstileWidget';
 
 /* ──────────────── Tailwind-based Modal Shell ──────────────── */
 
@@ -81,6 +82,7 @@ function ContactModal({
 
 function ContactForm({ onSuccess }: { onSuccess: () => void }) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const {
     register,
@@ -97,7 +99,7 @@ function ContactForm({ onSuccess }: { onSuccess: () => void }) {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, turnstileToken }),
       });
 
       if (!res.ok) {
@@ -219,11 +221,15 @@ function ContactForm({ onSuccess }: { onSuccess: () => void }) {
           </p>
         )}
 
+        <div className="mt-3">
+          <TurnstileWidget onVerify={setTurnstileToken} />
+        </div>
+
         <div className="mt-2">
           <button
             type="submit"
             className="w-full inline-flex items-center justify-center gap-2 px-6 py-[13px] rounded-full text-sm font-semibold text-white bg-forest transition-all duration-300 hover:bg-forest-deep hover:translate-y-[-2px] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-            disabled={status === 'submitting'}
+            disabled={status === 'submitting' || !turnstileToken}
           >
             {status === 'submitting' ? (
               <>

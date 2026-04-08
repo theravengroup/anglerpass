@@ -20,6 +20,7 @@ import {
   CalendarDays,
   FileText,
 } from "lucide-react";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface AuditEntry {
   id: number;
@@ -115,6 +116,7 @@ export default function AuditLogPage() {
   }
 
   return (
+    <AdminPageGuard path="/admin/audit-log">
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
@@ -289,5 +291,6 @@ export default function AuditLogPage() {
         </CardContent>
       </Card>
     </div>
+    </AdminPageGuard>
   );
 }

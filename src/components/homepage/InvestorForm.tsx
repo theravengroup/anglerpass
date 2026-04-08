@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import TurnstileWidget from '@/components/shared/TurnstileWidget';
 
 const schema = z.object({
   firstName: z.string().min(1, 'Required'),
@@ -17,6 +18,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function InvestorForm() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const { register, handleSubmit, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -28,7 +30,7 @@ export default function InvestorForm() {
       await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, type: 'investor', interestType: 'investor' }),
+        body: JSON.stringify({ ...data, type: 'investor', interestType: 'investor', turnstileToken }),
       });
     } catch {
       // silently handle
@@ -109,8 +111,11 @@ export default function InvestorForm() {
                 <label htmlFor="invMessage">Message <span style={{ fontWeight: 400, color: 'rgba(255,255,255,.3)' }}>(optional)</span></label>
                 <textarea id="invMessage" placeholder="What drew your interest in AnglerPass?" {...register('message')} />
               </div>
+              <div className="form-group">
+                <TurnstileWidget onVerify={setTurnstileToken} />
+              </div>
               <div className="form-submit">
-                <button type="submit" className="btn btn-bronze" disabled={status !== 'idle'}>
+                <button type="submit" className="btn btn-bronze" disabled={status !== 'idle' || !turnstileToken}>
                   {status === 'submitting' ? (
                     <>
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: 'spin .6s linear infinite' }}>

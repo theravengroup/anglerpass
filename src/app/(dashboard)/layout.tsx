@@ -34,7 +34,7 @@ const SHARED_ITEMS: SidebarItem[] = [
     icon: <LayoutDashboard />,
   },
   {
-    label: "Compass AI",
+    label: "AnglerPass Compass",
     href: "/compass",
     icon: <Sparkles />,
     badge: "AI",
@@ -242,6 +242,11 @@ export default async function DashboardLayout({
 
   if (!profile) {
     redirect("/login");
+  }
+
+  // Admin role has its own dedicated route group at /admin
+  if (profile.role === "admin") {
+    redirect("/admin");
   }
 
   const roleItems = ROLE_ITEMS[profile.role] ?? [];

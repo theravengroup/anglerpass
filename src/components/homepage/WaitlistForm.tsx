@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import TurnstileWidget from '@/components/shared/TurnstileWidget';
 
 const US_STATES = [
   'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
@@ -57,6 +58,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function WaitlistForm() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -75,6 +77,7 @@ export default function WaitlistForm() {
           ...data,
           interestType: data.role,
           type: 'waitlist',
+          turnstileToken,
         }),
       });
     } catch {
@@ -145,8 +148,11 @@ export default function WaitlistForm() {
           <label htmlFor="message">Anything else? <span style={{ fontWeight: 400, color: 'var(--text-light)' }}>(optional)</span></label>
           <textarea id="message" placeholder="Tell us about your interest in AnglerPass..." {...register('message')} />
         </div>
+        <div className="form-group">
+          <TurnstileWidget onVerify={setTurnstileToken} />
+        </div>
         <div className="form-submit">
-          <button type="submit" className="btn btn-primary" disabled={status !== 'idle'} style={status === 'success' ? { background: '#2a6b3a' } : undefined}>
+          <button type="submit" className="btn btn-primary" disabled={status !== 'idle' || !turnstileToken} style={status === 'success' ? { background: '#2a6b3a' } : undefined}>
             {status === 'submitting' && (
               <>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: 'spin .6s linear infinite' }}>

@@ -114,6 +114,13 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
     }
+
+    // Admin user on non-admin routes → redirect to admin panel
+    if (profile?.role === "admin" && !pathname.startsWith("/admin")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin";
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;

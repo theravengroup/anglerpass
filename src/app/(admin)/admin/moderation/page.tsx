@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 export const metadata = {
   title: "Moderation Queue",
@@ -44,6 +45,7 @@ export default async function ModerationPage() {
   const queue = properties ?? [];
 
   return (
+    <AdminPageGuard path="/admin/moderation">
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -134,5 +136,6 @@ export default async function ModerationPage() {
         </div>
       )}
     </div>
+    </AdminPageGuard>
   );
 }

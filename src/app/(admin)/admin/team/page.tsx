@@ -19,6 +19,7 @@ import {
   Clock,
   Users,
 } from "lucide-react";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface Admin {
   id: string;
@@ -117,6 +118,7 @@ export default function TeamPage() {
   }
 
   return (
+    <AdminPageGuard path="/admin/team">
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header */}
       <div>
@@ -303,5 +305,6 @@ export default function TeamPage() {
         </CardContent>
       </Card>
     </div>
+    </AdminPageGuard>
   );
 }

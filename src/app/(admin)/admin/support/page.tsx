@@ -43,6 +43,7 @@ import {
   STATUS_LABELS,
   PRIORITY_LABELS,
 } from "@/lib/validations/support-ticket";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface SupportTicket {
   id: string;
@@ -199,6 +200,7 @@ export default function AdminSupportPage() {
     data?.tickets.filter((t) => t.status === "in_progress").length ?? 0;
 
   return (
+    <AdminPageGuard path="/admin/support">
     <div className="mx-auto max-w-6xl space-y-6">
       {/* Page header */}
       <div>
@@ -600,5 +602,6 @@ export default function AdminSupportPage() {
         </SheetContent>
       </Sheet>
     </div>
+    </AdminPageGuard>
   );
 }

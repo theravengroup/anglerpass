@@ -20,6 +20,7 @@ import {
   Image,
   Network,
 } from "lucide-react";
+import AdminPageGuard from "@/components/admin/AdminPageGuard";
 
 interface SettingEntry {
   value: string | number | boolean;
@@ -258,16 +259,19 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
+      <AdminPageGuard path="/admin/settings">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-center py-24">
           <Loader2 className="size-6 animate-spin text-river" />
         </div>
       </div>
+      </AdminPageGuard>
     );
   }
 
   if (error) {
     return (
+      <AdminPageGuard path="/admin/settings">
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
@@ -291,6 +295,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+      </AdminPageGuard>
     );
   }
 
@@ -318,6 +323,7 @@ export default function SettingsPage() {
   }
 
   return (
+    <AdminPageGuard path="/admin/settings">
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header */}
       <div>
@@ -467,5 +473,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
     </div>
+    </AdminPageGuard>
   );
 }

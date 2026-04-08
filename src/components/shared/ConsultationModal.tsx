@@ -20,6 +20,7 @@ import {
   consultationSchema,
   type ConsultationFormData,
 } from "@/lib/validations/consultation";
+import TurnstileWidget from "@/components/shared/TurnstileWidget";
 
 export default function ConsultationModal({
   trigger,
@@ -30,6 +31,7 @@ export default function ConsultationModal({
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const {
     register,
@@ -46,7 +48,7 @@ export default function ConsultationModal({
       const res = await fetch("/api/consultation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, turnstileToken }),
       });
       if (!res.ok) {
         setStatus("error");
@@ -71,6 +73,7 @@ export default function ConsultationModal({
         if (!v) {
           setStatus("idle");
           reset();
+          setTurnstileToken(null);
         }
       }}
     >
@@ -200,10 +203,12 @@ export default function ConsultationModal({
                 </p>
               )}
 
+              <TurnstileWidget onVerify={setTurnstileToken} />
+
               <Button
                 type="submit"
                 className="w-full"
-                disabled={status === "submitting"}
+                disabled={status === "submitting" || !turnstileToken}
               >
                 {status === "submitting" ? (
                   <>

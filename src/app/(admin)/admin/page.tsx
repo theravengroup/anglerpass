@@ -29,6 +29,13 @@ import {
 } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
+import { useStaffRole } from "@/components/admin/StaffRoleProvider";
+import {
+  canSeeStatCard,
+  canSeeUserBreakdown,
+  canSeeRecentBookings,
+  canExportReports,
+} from "@/lib/permissions/admin-access";
 
 /** Plural labels for the admin role breakdown chart */
 const ROLE_LABELS_PLURAL: Record<string, string> = {
@@ -67,6 +74,7 @@ interface RecentBooking {
 }
 
 export default function AdminPage() {
+  const staffRole = useStaffRole();
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -136,7 +144,7 @@ export default function AdminPage() {
     );
   }
 
-  const stats = [
+  const allStats = [
     {
       label: "Total Users",
       value: String(data?.users_total ?? 0),
@@ -203,6 +211,11 @@ export default function AdminPage() {
     },
   ];
 
+  const stats = allStats.filter((s) => canSeeStatCard(staffRole, s.label));
+  const showUserBreakdown = canSeeUserBreakdown(staffRole);
+  const showRecentBookings = canSeeRecentBookings(staffRole);
+  const showExport = canExportReports(staffRole);
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
@@ -215,15 +228,17 @@ export default function AdminPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs"
-            onClick={handleExport}
-          >
-            <Download className="mr-1 size-3" />
-            Export Report
-          </Button>
+          {showExport && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={handleExport}
+            >
+              <Download className="mr-1 size-3" />
+              Export Report
+            </Button>
+          )}
           <div className="flex rounded-lg border border-stone-light/20">
             {PERIOD_OPTIONS.map((opt) => (
               <button
@@ -270,113 +285,119 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Users by Role */}
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Users by Role</CardTitle>
-            <CardDescription>Breakdown of registered accounts</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {Object.entries(data?.users_by_role ?? {})
-              .sort(([, a], [, b]) => b - a)
-              .map(([role, count]) => {
-                const pct =
-                  (data?.users_total ?? 0) > 0
-                    ? (count / data!.users_total) * 100
-                    : 0;
-                const colors: Record<string, string> = {
-                  angler: "bg-bronze",
-                  landowner: "bg-forest",
-                  club_admin: "bg-river",
-                  admin: "bg-charcoal",
-                };
-                return (
-                  <div key={role} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-text-primary">
-                        {ROLE_LABELS_PLURAL[role] ?? role}
-                      </span>
-                      <span className="text-text-secondary">
-                        {count} ({Math.round(pct)}%)
-                      </span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-offwhite">
-                      <div
-                        className={`h-full rounded-full transition-all ${colors[role] ?? "bg-charcoal"}`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            {Object.keys(data?.users_by_role ?? {}).length === 0 && (
-              <p className="py-4 text-center text-sm text-text-light">
-                No users yet.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      {(showUserBreakdown || showRecentBookings) && (
+        <div className={`grid gap-6 ${showUserBreakdown && showRecentBookings ? "lg:grid-cols-2" : ""}`}>
+          {/* Users by Role */}
+          {showUserBreakdown && (
+            <Card className="border-stone-light/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Users by Role</CardTitle>
+                <CardDescription>Breakdown of registered accounts</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Object.entries(data?.users_by_role ?? {})
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([role, count]) => {
+                    const pct =
+                      (data?.users_total ?? 0) > 0
+                        ? (count / data!.users_total) * 100
+                        : 0;
+                    const colors: Record<string, string> = {
+                      angler: "bg-bronze",
+                      landowner: "bg-forest",
+                      club_admin: "bg-river",
+                      admin: "bg-charcoal",
+                    };
+                    return (
+                      <div key={role} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-text-primary">
+                            {ROLE_LABELS_PLURAL[role] ?? role}
+                          </span>
+                          <span className="text-text-secondary">
+                            {count} ({Math.round(pct)}%)
+                          </span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-offwhite">
+                          <div
+                            className={`h-full rounded-full transition-all ${colors[role] ?? "bg-charcoal"}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                {Object.keys(data?.users_by_role ?? {}).length === 0 && (
+                  <p className="py-4 text-center text-sm text-text-light">
+                    No users yet.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Recent Bookings */}
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Recent Bookings</CardTitle>
-            <CardDescription>Latest platform activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {(data?.recent_bookings?.length ?? 0) === 0 ? (
-              <div className="flex flex-col items-center py-8 text-center">
-                <p className="text-sm text-text-secondary">
-                  No recent bookings to display.
-                </p>
-                <p className="mt-1 text-xs text-text-light">
-                  Activity will appear here as users book properties.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {data!.recent_bookings.map((b) => (
-                  <div
-                    key={b.id}
-                    className="flex items-center justify-between rounded-lg border border-stone-light/10 px-3 py-2.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-text-primary">
-                        {b.property_name ?? "Unknown"}
-                      </p>
-                      <p className="text-xs text-text-light">
-                        {b.angler_name ?? "Unknown"} ·{" "}
-                        {new Date(b.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-text-primary">
-                        ${b.total_amount}
-                      </span>
-                      <span
-                        className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          STATUS_BADGE_COLORS[b.status] ?? STATUS_BADGE_COLORS.pending
-                        }`}
-                      >
-                        {b.status === "confirmed" || b.status === "completed" ? (
-                          <CheckCircle2 className="size-3" />
-                        ) : (
-                          <Clock className="size-3" />
-                        )}
-                        {b.status}
-                      </span>
-                    </div>
+          {/* Recent Bookings */}
+          {showRecentBookings && (
+            <Card className="border-stone-light/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Recent Bookings</CardTitle>
+                <CardDescription>Latest platform activity</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(data?.recent_bookings?.length ?? 0) === 0 ? (
+                  <div className="flex flex-col items-center py-8 text-center">
+                    <p className="text-sm text-text-secondary">
+                      No recent bookings to display.
+                    </p>
+                    <p className="mt-1 text-xs text-text-light">
+                      Activity will appear here as users book properties.
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                ) : (
+                  <div className="space-y-3">
+                    {data!.recent_bookings.map((b) => (
+                      <div
+                        key={b.id}
+                        className="flex items-center justify-between rounded-lg border border-stone-light/10 px-3 py-2.5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-text-primary">
+                            {b.property_name ?? "Unknown"}
+                          </p>
+                          <p className="text-xs text-text-light">
+                            {b.angler_name ?? "Unknown"} ·{" "}
+                            {new Date(b.created_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-text-primary">
+                            ${b.total_amount}
+                          </span>
+                          <span
+                            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                              STATUS_BADGE_COLORS[b.status] ?? STATUS_BADGE_COLORS.pending
+                            }`}
+                          >
+                            {b.status === "confirmed" || b.status === "completed" ? (
+                              <CheckCircle2 className="size-3" />
+                            ) : (
+                              <Clock className="size-3" />
+                            )}
+                            {b.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
     </div>
   );
 }

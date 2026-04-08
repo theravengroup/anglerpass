@@ -13,11 +13,14 @@ import {
   Shield,
   LifeBuoy,
 } from "lucide-react";
-import DashboardShell from "@/components/shared/DashboardShell";
+import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
+import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
 import { getProfile } from "@/lib/auth/get-profile";
+import { getPlatformStaffRole } from "@/lib/permissions/db";
+import type { PlatformRole } from "@/lib/permissions/constants";
 import type { SidebarItem } from "@/components/shared/DashboardSidebar";
 
-const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
+const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
   {
     label: "Admin Home",
     href: "/admin",
@@ -110,15 +113,19 @@ export default async function AdminLayout({
     redirect("/dashboard");
   }
 
+  // Fetch platform staff role for permission filtering
+  const staffRecord = await getPlatformStaffRole(profile.id);
+  const staffRole: PlatformRole = (staffRecord?.role as PlatformRole) ?? "readonly_internal";
+
   return (
-    <DashboardShell
-      sidebarItems={ADMIN_SIDEBAR_ITEMS}
-      pageTitles={PAGE_TITLES}
-      defaultTitle="Admin Console"
-      adminBadge
-      user={profile}
-    >
-      {children}
-    </DashboardShell>
+    <StaffRoleProvider role={staffRole}>
+      <AdminShellFiltered
+        allItems={ALL_ADMIN_SIDEBAR_ITEMS}
+        pageTitles={PAGE_TITLES}
+        user={profile}
+      >
+        {children}
+      </AdminShellFiltered>
+    </StaffRoleProvider>
   );
 }

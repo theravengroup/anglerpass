@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import TurnstileWidget from "@/components/shared/TurnstileWidget";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -31,6 +32,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const {
     register,
@@ -160,9 +162,11 @@ function LoginForm() {
           )}
         </div>
 
+        <TurnstileWidget onVerify={setTurnstileToken} />
+
         <Button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !turnstileToken}
           className="h-11 w-full"
         >
           {isLoading ? (
