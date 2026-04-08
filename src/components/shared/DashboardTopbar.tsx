@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { Bell, LogOut, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RoleSwitcher from "@/components/shared/RoleSwitcher";
 import type { UserProfile } from "@/lib/auth/get-profile";
+import { useUnreadCount } from "@/hooks/use-unread-count";
 
 interface DashboardTopbarProps {
   pageTitle: string;
@@ -17,6 +19,7 @@ export default function DashboardTopbar({
   user,
 }: DashboardTopbarProps) {
   const displayName = user?.display_name || user?.email || "Account";
+  const { count: unreadCount } = useUnreadCount();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-stone-light/20 bg-offwhite px-4 lg:px-6">
@@ -47,14 +50,17 @@ export default function DashboardTopbar({
         )}
 
         <Button
+          asChild
           variant="ghost"
           size="icon-sm"
           className="relative text-text-secondary hover:text-text-primary"
         >
-          <Bell className="size-[18px]" />
-          <span className="sr-only">Notifications</span>
-          {/* Notification dot */}
-          <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-bronze" />
+          <Link href="/dashboard/notifications" aria-label="Notifications">
+            <Bell className="size-[18px]" />
+            {unreadCount > 0 && (
+              <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-bronze" />
+            )}
+          </Link>
         </Button>
 
         <div className="flex items-center gap-2">
