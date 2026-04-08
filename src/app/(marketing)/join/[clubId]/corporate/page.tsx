@@ -9,7 +9,7 @@ async function getClub(clubId: string) {
     const { data, error } = await admin
       .from("clubs")
       .select(
-        "id, name, description, location, initiation_fee, annual_dues, corporate_memberships_enabled, corporate_initiation_fee, membership_application_required"
+        "id, name, description, location, initiation_fee, annual_dues, corporate_memberships_enabled, corporate_initiation_fee, membership_application_required, stripe_dues_price_id"
       )
       .eq("id", clubId)
       .single();
@@ -194,7 +194,13 @@ export default async function CorporateJoinPage({
           </div>
 
           {/* Corporate Join CTA */}
-          <CorporateJoinCta clubId={club.id} clubName={club.name} />
+          <CorporateJoinCta
+            clubId={club.id}
+            clubName={club.name}
+            corporateInitiationFee={club.corporate_initiation_fee}
+            annualDues={club.annual_dues}
+            duesPriceId={club.stripe_dues_price_id ?? null}
+          />
 
           {/* Footer note */}
           <div className="mt-10 space-y-3 text-center">

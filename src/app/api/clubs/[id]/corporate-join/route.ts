@@ -96,7 +96,8 @@ export async function POST(
       const { data: updatedMembership, error: updateError } = await admin
         .from("club_memberships")
         .update({
-          status: club.membership_application_required ? "pending" : "active",
+          status: "pending",
+          dues_status: "pending",
           membership_type: "corporate",
           company_name,
           updated_at: new Date().toISOString(),
@@ -113,19 +114,18 @@ export async function POST(
       return jsonCreated({ membership: updatedMembership });
     }
 
-    // Create new corporate membership
-    const status = club.membership_application_required ? "pending" : "active";
+    // Create new corporate membership (pending until payment completes)
     const { data: membership, error: insertError } = await admin
       .from("club_memberships")
       .insert({
         club_id: clubId,
         user_id: auth.user.id,
         role: "member",
-        status,
+        status: "pending",
+        dues_status: "pending",
         membership_type: "corporate",
         company_name,
         invited_email: auth.user.email,
-        joined_at: status === "active" ? new Date().toISOString() : null,
       })
       .select()
       .single();

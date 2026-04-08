@@ -44,9 +44,28 @@ export async function POST(
       return jsonError("Invalid invitation token", 404);
     }
 
+    // Check expiration (30 days) before checking status
+    if (invitation.invited_at) {
+      const invitedAt = new Date(invitation.invited_at);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      if (invitedAt < thirtyDaysAgo) {
+        // Mark as expired
+        await admin
+          .from("corporate_invitations")
+          .update({ status: "expired" })
+          .eq("id", invitation.id);
+        return jsonError("This invitation has expired. Please contact your corporate sponsor for a new invitation.", 410);
+      }
+    }
+
     // Verify status is pending
     if (invitation.status !== "pending") {
       return jsonError("This invitation has already been used or has expired", 400);
+    }
+
+    // Verify email matches the logged-in user
+    if (user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
+      return jsonError("This invitation was sent to a different email address. Please sign in with the correct account.", 403);
     }
 
     // Verify club_id matches
@@ -77,20 +96,20 @@ export async function POST(
       return jsonError("Corporate membership not found", 404);
     }
 
-    // Create the employee membership
+    // Create the employee membership (pending until payment completes)
     const { data: membership, error: insertErr } = await admin
       .from("club_memberships")
       .insert({
         club_id: clubId,
         user_id: user.id,
         role: "member",
-        status: "active",
+        status: "pending",
+        dues_status: "pending",
         membership_type: "corporate_employee",
         company_name: corporateMembership.company_name,
         corporate_sponsor_id: corporateMembership.id,
         invited_email: invitation.email,
         invited_at: invitation.invited_at ?? new Date().toISOString(),
-        joined_at: new Date().toISOString(),
       })
       .select()
       .single();

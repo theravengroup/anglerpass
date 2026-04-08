@@ -22,6 +22,7 @@ import {
   Download,
   CheckCircle2,
   Clock,
+  Building2,
 } from "lucide-react";
 import { STATUS_BADGE_COLORS } from "@/lib/constants/status";
 import { WATER_TYPE_LABELS } from "@/lib/constants/water-types";
@@ -356,6 +357,41 @@ function ActiveDashboard({
           </Link>
         ))}
       </div>
+
+      {/* Corporate Management Card — prominent entry point */}
+      {corporateMembership && (
+        <Link href="/angler/corporate">
+          <Card className="border-bronze/20 bg-bronze/5 transition-colors hover:border-bronze/40">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-bronze/10">
+                    <Building2 className="size-5 text-bronze" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">
+                      {corporateMembership.company_name}
+                    </CardTitle>
+                    <CardDescription>
+                      Corporate membership · {corporateMembership.club_name}
+                    </CardDescription>
+                  </div>
+                </div>
+                <ArrowRight className="size-4 text-text-light" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-text-secondary">
+                Manage your corporate membership, invite employees, and track
+                your team&apos;s access.
+              </p>
+              <p className="mt-2 text-xs font-medium text-bronze">
+                Manage Corporate Membership →
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Corporate Employee Invitation Section */}
       {corporateMembership && (

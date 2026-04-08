@@ -29,7 +29,7 @@ async function getClub(clubId: string) {
     const admin = createAdminClient();
     const { data, error } = await admin
       .from("clubs")
-      .select("id, name, description, location, annual_dues")
+      .select("id, name, description, location, annual_dues, stripe_dues_price_id")
       .eq("id", clubId)
       .single();
 
@@ -310,6 +310,8 @@ export default async function EmployeeInvitePage({
             clubId={clubId}
             clubName={club.name}
             token={token}
+            annualDues={club.annual_dues}
+            duesPriceId={club.stripe_dues_price_id ?? null}
           />
 
           {/* Footer note */}

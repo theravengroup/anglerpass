@@ -14,6 +14,9 @@ const MembershipCheckoutSchema = z.object({
   clubId: z.string().uuid(),
   /** Stripe Price ID for the recurring dues (created by club admin) */
   duesPriceId: z.string().optional(),
+  membershipType: z.enum(["individual", "corporate", "corporate_employee"]).default("individual"),
+  invitationToken: z.string().optional(),
+  companyName: z.string().optional(),
 });
 
 /**
@@ -40,18 +43,62 @@ export async function POST(request: Request) {
       return jsonError("Invalid request body", 400);
     }
 
-    const { clubId, duesPriceId } = parsed.data;
+    const { clubId, duesPriceId, membershipType, invitationToken, companyName } = parsed.data;
     const admin = createAdminClient();
 
-    // Get the club's fee structure
+    // ── corporate_employee: validate invitation before anything else ──
+    let corporateSponsorId: string | undefined;
+    let resolvedCompanyName: string | undefined = companyName;
+
+    if (membershipType === "corporate_employee") {
+      if (!invitationToken) {
+        return jsonError("Invitation token is required for corporate employee memberships", 400);
+      }
+
+      const { data: invitation } = await admin
+        .from("corporate_invitations")
+        .select("id, status, club_id, corporate_member_id")
+        .eq("token", invitationToken)
+        .single();
+
+      if (!invitation) {
+        return jsonError("Invalid invitation token", 404);
+      }
+      if (invitation.status !== "pending") {
+        return jsonError("This invitation has already been used or has expired", 400);
+      }
+      if (invitation.club_id !== clubId) {
+        return jsonError("Club ID mismatch", 400);
+      }
+
+      // Look up the corporate sponsor's membership
+      const { data: sponsorMembership } = await admin
+        .from("club_memberships")
+        .select("id, company_name")
+        .eq("id", invitation.corporate_member_id)
+        .single();
+
+      if (!sponsorMembership) {
+        return jsonError("Corporate sponsor membership not found", 404);
+      }
+
+      corporateSponsorId = sponsorMembership.id;
+      resolvedCompanyName = sponsorMembership.company_name ?? undefined;
+    }
+
+    // ── Get the club's fee structure ──────────────────────────────────
     const { data: club } = await admin
       .from("clubs")
-      .select("id, name, initiation_fee, annual_dues")
+      .select("id, name, initiation_fee, annual_dues, corporate_initiation_fee, corporate_memberships_enabled")
       .eq("id", clubId)
       .single();
 
     if (!club) {
       return jsonError("Club not found", 404);
+    }
+
+    if (membershipType === "corporate" && !club.corporate_memberships_enabled) {
+      return jsonError("This club does not offer corporate memberships", 400);
     }
 
     // Check if user already has a membership with this club
@@ -89,15 +136,25 @@ export async function POST(request: Request) {
         .eq("id", auth.user.id);
     }
 
-    // Use existing pending membership (from join/approve flow) or create new one
+    // ── Use existing pending membership or create new one ─────────────
     let membershipId: string;
 
     if (existingMembership?.status === "pending") {
       membershipId = existingMembership.id;
-      // Update dues_status to pending for the checkout
+
       await admin
         .from("club_memberships")
-        .update({ dues_status: "pending", updated_at: new Date().toISOString() })
+        .update({
+          dues_status: "pending",
+          updated_at: new Date().toISOString(),
+          ...(membershipType !== "individual" && {
+            membership_type: membershipType,
+            ...(resolvedCompanyName ? { company_name: resolvedCompanyName } : {}),
+            ...(membershipType === "corporate_employee" && corporateSponsorId
+              ? { corporate_sponsor_id: corporateSponsorId }
+              : {}),
+          }),
+        })
         .eq("id", existingMembership.id);
     } else {
       const { data: membership, error: membershipError } = await admin
@@ -108,6 +165,9 @@ export async function POST(request: Request) {
           role: "member",
           status: "pending",
           dues_status: "pending",
+          membership_type: membershipType,
+          ...(resolvedCompanyName ? { company_name: resolvedCompanyName } : {}),
+          ...(corporateSponsorId ? { corporate_sponsor_id: corporateSponsorId } : {}),
         })
         .select("id")
         .single();
@@ -128,8 +188,17 @@ export async function POST(request: Request) {
       processingFee?: number;
     } = { membershipId };
 
-    // 1. Initiation fee PaymentIntent
-    const initiationFee = club.initiation_fee ?? 0;
+    // ── 1. Initiation fee PaymentIntent ───────────────────────────────
+    // Corporate employees skip initiation fee entirely
+    let initiationFee: number;
+    if (membershipType === "corporate_employee") {
+      initiationFee = 0;
+    } else if (membershipType === "corporate") {
+      initiationFee = club.corporate_initiation_fee ?? 0;
+    } else {
+      initiationFee = club.initiation_fee ?? 0;
+    }
+
     if (initiationFee > 0) {
       const processingFee = Math.round(initiationFee * MEMBERSHIP_PROCESSING_FEE_RATE * 100) / 100;
       const totalCents = Math.round((initiationFee + processingFee) * 100);
@@ -140,6 +209,7 @@ export async function POST(request: Request) {
         captureMethod: "automatic",
         metadata: {
           type: "membership_initiation",
+          membership_type: membershipType,
           club_id: clubId,
           membership_id: membershipId,
           user_id: auth.user.id,
@@ -153,16 +223,19 @@ export async function POST(request: Request) {
       result.processingFee = processingFee;
     }
 
-    // 2. Recurring dues Subscription
+    // ── 2. Recurring dues Subscription ───────────────────────────────
     if (duesPriceId) {
+      const subscriptionMetadata: Record<string, string> = {
+        type: "membership_dues",
+        membership_type: membershipType,
+        club_id: clubId,
+        membership_id: membershipId,
+      };
+
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: duesPriceId }],
-        metadata: {
-          type: "membership_dues",
-          club_id: clubId,
-          membership_id: membershipId,
-        },
+        metadata: subscriptionMetadata,
         payment_behavior: "default_incomplete",
         payment_settings: {
           save_default_payment_method: "on_subscription",
@@ -188,6 +261,22 @@ export async function POST(request: Request) {
         .eq("id", membershipId);
 
       result.duesAmount = club.annual_dues ?? 0;
+    }
+
+    // ── 3. Mark corporate employee invitation as accepted ─────────────
+    if (membershipType === "corporate_employee" && invitationToken) {
+      const { data: invitation } = await admin
+        .from("corporate_invitations")
+        .select("id")
+        .eq("token", invitationToken)
+        .single();
+
+      if (invitation) {
+        await admin
+          .from("corporate_invitations")
+          .update({ status: "accepted", accepted_at: new Date().toISOString() })
+          .eq("id", invitation.id);
+      }
     }
 
     return jsonOk(result);

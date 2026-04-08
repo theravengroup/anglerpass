@@ -678,6 +678,7 @@ export type Database = {
           rules: string | null
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
+          stripe_dues_price_id: string | null
           stripe_subscription_id: string | null
           subscription_tier: string
           updated_at: string
@@ -702,6 +703,7 @@ export type Database = {
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_dues_price_id?: string | null
           stripe_subscription_id?: string | null
           subscription_tier?: string
           updated_at?: string
@@ -726,6 +728,7 @@ export type Database = {
           rules?: string | null
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
+          stripe_dues_price_id?: string | null
           stripe_subscription_id?: string | null
           subscription_tier?: string
           updated_at?: string
