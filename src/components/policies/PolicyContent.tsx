@@ -246,9 +246,10 @@ export default function PolicyContent() {
             </thead>
             <tbody>
               {[
-                { window: '48+ hours before fishing date', refund: '100% refund' },
-                { window: 'Less than 48 hours, before the day of', refund: '50% refund' },
-                { window: 'Day of the reservation', refund: 'No refund' },
+                { window: 'More than 7 days before fishing date', refund: '100% refund' },
+                { window: '3–7 days before fishing date', refund: '75% refund' },
+                { window: '24 hours – 3 days before fishing date', refund: '50% refund' },
+                { window: 'Less than 24 hours before fishing date', refund: 'No refund' },
               ].map((row) => (
                 <tr key={row.window} className="border-t border-parchment">
                   <td className="p-3 px-5 text-[14px] text-text-secondary">
@@ -262,6 +263,12 @@ export default function PolicyContent() {
             </tbody>
           </table>
         </div>
+
+        <p className={textClass}>
+          A <strong>$15 late cancellation processing fee</strong> applies to all
+          cancellations made within 72 hours of the reservation date. This fee is
+          tracked on your account and reflected in your financial summary.
+        </p>
 
         <p className={textClass}>
           Refunds are processed back to the original payment method. Platform fees

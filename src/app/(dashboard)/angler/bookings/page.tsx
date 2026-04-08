@@ -49,6 +49,7 @@ interface RefundPreview {
   amount: number;
   label: string;
   hoursUntilBooking: number;
+  lateCancelFee: number;
 }
 
 export default function AnglerBookingsPage() {
@@ -288,11 +289,18 @@ export default function AnglerBookingsPage() {
                   </div>
                   <p className="mt-1 text-xs text-text-secondary">
                     {refundPreview.percentage === 100
-                      ? "You're cancelling more than 48 hours before the reservation."
-                      : refundPreview.percentage === 50
-                        ? "You're cancelling within 48 hours of the reservation."
-                        : "Same-day cancellations are not eligible for a refund."}
+                      ? "You're cancelling more than 7 days before the reservation."
+                      : refundPreview.percentage === 75
+                        ? "You're cancelling 3–7 days before the reservation."
+                        : refundPreview.percentage === 50
+                          ? "You're cancelling within 3 days of the reservation."
+                          : "Cancellations less than 24 hours before are not eligible for a refund."}
                   </p>
+                  {refundPreview.lateCancelFee > 0 && (
+                    <p className="mt-1 text-xs font-medium text-amber-700">
+                      A ${refundPreview.lateCancelFee} late cancellation fee applies (within 72 hours).
+                    </p>
+                  )}
                   {refundPreview.percentage < 100 && (
                     <p className="mt-1 text-xs text-text-light">
                       Original total: ${cancelDialogBooking.total_amount}

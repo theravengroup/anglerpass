@@ -132,7 +132,7 @@ const faqs = [
   },
   {
     q: 'What if an angler cancels?',
-    a: 'Our cancellation policy protects guides. Cancellations within 48 hours of the trip date result in a full payout to the guide. Earlier cancellations follow a tiered refund schedule.',
+    a: 'Our cancellation policy protects guides. Cancellations less than 24 hours before the trip or on the day of result in a full payout to the guide. Cancellations 24 hours to 3 days before pay 50% of your guide rate, and cancellations 3\u20137 days before pay 25%. A $15 late cancellation fee is assessed to the angler for any cancellation within 72 hours.',
   },
   {
     q: 'Do I need to be affiliated with a club?',
