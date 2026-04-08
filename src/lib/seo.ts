@@ -12,6 +12,8 @@ interface BuildMetadataOptions {
   description?: string;
   path?: string;
   image?: string;
+  /** Skip setting openGraph/twitter images — lets opengraph-image.tsx convention take over */
+  useFileConventionImage?: boolean;
   keywords?: string[];
 }
 
@@ -20,6 +22,7 @@ export function buildMetadata({
   description = DEFAULT_DESCRIPTION,
   path = '',
   image,
+  useFileConventionImage = false,
   keywords = [],
 }: BuildMetadataOptions = {}): Metadata {
   const url = `${SITE_URL}${path}`;
@@ -27,7 +30,7 @@ export function buildMetadata({
     ? image
     : `${SITE_URL}/og?title=${encodeURIComponent(title ?? SITE_NAME)}`;
 
-  return {
+  const meta: Metadata = {
     title: title ?? DEFAULT_TITLE,
     description,
     keywords,
@@ -40,13 +43,13 @@ export function buildMetadata({
       description,
       url,
       siteName: SITE_NAME,
-      images: [{ url: ogImage, width: 1200, height: 630 }],
+      ...(useFileConventionImage ? {} : { images: [{ url: ogImage, width: 1200, height: 630 }] }),
     },
     twitter: {
       card: 'summary_large_image',
       title: title ?? DEFAULT_TITLE,
       description,
-      images: [ogImage],
+      ...(useFileConventionImage ? {} : { images: [ogImage] }),
     },
     robots: {
       index: true,
@@ -60,6 +63,8 @@ export function buildMetadata({
       },
     },
   };
+
+  return meta;
 }
 
 export function buildJsonLd(data: Record<string, unknown>): string {
@@ -73,6 +78,7 @@ export const PAGES_SEO = {
     description:
       'AnglerPass connects fly anglers with exclusive private water access through trusted fishing clubs. Find and book private trout streams, rivers, and ranches. Club management tools for fly fishing organizations.',
     path: '',
+    useFileConventionImage: true,
     keywords: [
       'private water fly fishing',
       'fly fishing private access',
@@ -88,6 +94,7 @@ export const PAGES_SEO = {
     description:
       "Join a fly fishing club on AnglerPass and book exclusive access to private trout streams, rivers, and ranch ponds. Escape public water crowds. Fish where others can't.",
     path: '/anglers',
+    useFileConventionImage: true,
     keywords: [
       'book private fly fishing',
       'private water fly fishing access',
@@ -103,6 +110,7 @@ export const PAGES_SEO = {
     description:
       'AnglerPass gives fly fishing clubs tools to manage memberships, dues, corporate members, and private water property bookings — all in one platform. Grow your club. Earn from your water.',
     path: '/clubs',
+    useFileConventionImage: true,
     keywords: [
       'fly fishing club management software',
       'fly fishing club platform',
@@ -118,6 +126,7 @@ export const PAGES_SEO = {
     description:
       'Generate income from your private streams, rivers, and ponds. Partner with a fly fishing club on AnglerPass to manage bookings, vet anglers, and protect your property.',
     path: '/landowners',
+    useFileConventionImage: true,
     keywords: [
       'lease land for fly fishing',
       'allow fishing on private property',

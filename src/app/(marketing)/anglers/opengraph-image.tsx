@@ -3,7 +3,7 @@ import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
 
 export const alt = 'For Anglers — AnglerPass';
 export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+export const contentType = 'image/jpeg';
 
 export default async function Image() {
   const logoSrc = getLogoDataUri();
