@@ -151,6 +151,18 @@ export const PAGES_SEO = {
       'fly fishing booking fees',
     ],
   }),
+  press: buildMetadata({
+    title: 'Press | AnglerPass — Private Water Fly Fishing Marketplace',
+    description:
+      'Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and guides.',
+    path: '/press',
+    keywords: [
+      'anglerpass press',
+      'anglerpass media kit',
+      'private water fly fishing press release',
+      'fly fishing marketplace news',
+    ],
+  }),
 } as const;
 
 /** Internal linking map — topics to their canonical pages */
@@ -161,6 +173,7 @@ export const INTERNAL_LINKS: Record<string, string> = {
   'how it works': '/',
   pricing: '/pricing',
   about: '/about',
+  press: '/press',
   learn: '/learn',
   // State pages
   montana: '/fly-fishing/montana',

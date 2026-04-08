@@ -363,6 +363,14 @@ export default function MarketingFooter() {
                     Investors
                   </Link>
                 </li>
+                <li className="mb-1.5">
+                  <Link
+                    href="/press"
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
+                  >
+                    Press
+                  </Link>
+                </li>
               </ul>
             </div>
 
