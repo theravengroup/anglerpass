@@ -308,7 +308,7 @@ export default function LandownersPage() {
       </section>
 
       {/* Cross-club access */}
-      <section className="py-[100px] bg-parchment-light">
+      <section className="py-[100px] bg-white">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
           <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
             The Network
