@@ -110,7 +110,7 @@ const requirements = [
   'Valid state guide license',
   'Professional liability insurance',
   'Current first aid certification',
-  'Clean background (verified by AnglerPass)',
+  'Clean background (third-party background check required)',
 ];
 
 const faqs = [

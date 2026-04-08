@@ -18,6 +18,7 @@ export async function GET(request: Request) {
     const search = searchParams.get("search")?.trim() ?? "";
     const role = searchParams.get("role") ?? "";
     const status = searchParams.get("status") ?? "";
+    const hideInternal = searchParams.get("hide_internal") !== "false";
     const page = parsePositiveInt(searchParams.get("page"), 1, 1000);
     const sortBy = searchParams.get("sort") ?? "created_at";
     const ascending = searchParams.get("dir") === "asc";
@@ -67,21 +68,93 @@ export async function GET(request: Request) {
       }
     }
 
-    const enriched = (users ?? []).map((u) => ({
+    let enriched = (users ?? []).map((u) => ({
         ...u,
         email: emailMap[u.id] ?? null,
       })
     );
 
+    // Filter out @anglerpass.com internal accounts when requested (default: on)
+    let total = count ?? 0;
+    if (hideInternal) {
+      enriched = enriched.filter(
+        (u) => !u.email?.endsWith("@anglerpass.com") && !u.email?.endsWith("@anglerpass.local")
+      );
+      total = enriched.length;
+    }
+
     return jsonOk({
       users: enriched,
-      total: count ?? 0,
+      total,
       page,
       page_size: PAGE_SIZE,
-      total_pages: Math.ceil((count ?? 0) / PAGE_SIZE),
+      total_pages: Math.ceil(total / PAGE_SIZE),
     });
   } catch (err) {
     console.error("[admin/users] Error:", err);
+    return jsonError("Internal server error", 500);
+  }
+}
+
+// ─── DELETE: Remove a user entirely ─────────────────────────────────
+
+export async function DELETE(request: Request) {
+  try {
+    const auth = await requireAdmin();
+    if (!auth) return jsonError("Forbidden", 403);
+
+    const { user, admin } = auth;
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("user_id");
+
+    if (!userId) return jsonError("user_id is required", 400);
+
+    // Prevent self-deletion
+    if (userId === user.id) {
+      return jsonError("Cannot delete your own account", 400);
+    }
+
+    // Fetch target to verify they exist and log the deletion
+    const { data: target } = await admin
+      .from("profiles")
+      .select("id, role, display_name")
+      .eq("id", userId)
+      .single();
+
+    if (!target) return jsonError("User not found", 404);
+
+    // Delete profile first (cascade will handle related rows)
+    const { error: profileErr } = await admin
+      .from("profiles")
+      .delete()
+      .eq("id", userId);
+
+    if (profileErr) {
+      console.error("[admin/users] Profile delete error:", profileErr);
+      return jsonError("Failed to delete user profile", 500);
+    }
+
+    // Delete from Supabase Auth
+    const { error: authErr } = await admin.auth.admin.deleteUser(userId);
+
+    if (authErr) {
+      console.error("[admin/users] Auth delete error:", authErr);
+      return jsonError("Profile deleted but failed to remove auth account", 500);
+    }
+
+    // Audit log
+    await admin.from("audit_log").insert({
+      actor_id: user.id,
+      action: "user.deleted",
+      entity_type: "profile",
+      entity_id: userId,
+      old_data: { display_name: target.display_name, role: target.role } as Json,
+      new_data: null,
+    });
+
+    return jsonOk({ success: true, deleted: userId });
+  } catch (err) {
+    console.error("[admin/users] Delete error:", err);
     return jsonError("Internal server error", 500);
   }
 }

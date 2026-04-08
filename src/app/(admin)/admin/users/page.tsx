@@ -18,6 +18,8 @@ import {
   MoreHorizontal,
   Download,
   Eye,
+  Trash2,
+  EyeOff,
 } from "lucide-react";
 import { startImpersonation } from "@/lib/admin/actions/impersonation";
 import {
@@ -57,6 +59,7 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
+  const [hideInternal, setHideInternal] = useState(true);
   const [actionUser, setActionUser] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -68,6 +71,7 @@ export default function UsersPage() {
       if (search) params.set("search", search);
       if (roleFilter) params.set("role", roleFilter);
       if (statusFilter) params.set("status", statusFilter);
+      if (!hideInternal) params.set("hide_internal", "false");
 
       const res = await fetch(`/api/admin/users?${params}`);
       if (res.ok) {
@@ -83,7 +87,7 @@ export default function UsersPage() {
   useEffect(() => {
     const debounce = setTimeout(load, 300);
     return () => clearTimeout(debounce);
-  }, [page, search, roleFilter, statusFilter]);
+  }, [page, search, roleFilter, statusFilter, hideInternal]);
 
   async function handleAction(
     userId: string,
@@ -104,6 +108,31 @@ export default function UsersPage() {
       } else {
         const err = await res.json();
         alert(err.error ?? "Action failed");
+      }
+    } catch {
+      alert("An error occurred");
+    } finally {
+      setActionLoading(false);
+      setActionUser(null);
+    }
+  }
+
+  async function handleDelete(userId: string, displayName: string | null) {
+    const confirmed = confirm(
+      `Permanently delete user "${displayName ?? userId}"? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users?user_id=${userId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await load();
+      } else {
+        const err = await res.json();
+        alert(err.error ?? "Delete failed");
       }
     } catch {
       alert("An error occurred");
@@ -191,6 +220,22 @@ export default function UsersPage() {
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                onClick={() => {
+                  setHideInternal(!hideInternal);
+                  setPage(1);
+                }}
+                className={`flex h-9 items-center gap-1.5 rounded-md border px-3 text-sm transition-colors ${
+                  hideInternal
+                    ? "border-stone-light/25 bg-white text-text-secondary hover:bg-offwhite"
+                    : "border-forest/30 bg-forest/5 text-forest"
+                }`}
+                title={hideInternal ? "Internal @anglerpass.com accounts are hidden" : "Showing all accounts"}
+              >
+                <EyeOff className="size-3.5" />
+                {hideInternal ? "Internal hidden" : "Showing all"}
+              </button>
               <select
                 value={statusFilter}
                 onChange={(e) => {
@@ -362,6 +407,16 @@ export default function UsersPage() {
                             Suspend User
                           </button>
                         )}
+
+                        <div className="my-1 border-t border-stone-light/15" />
+                        <button
+                          onClick={() => handleDelete(u.id, u.display_name)}
+                          className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-red-600 hover:bg-red-50"
+                          disabled={actionLoading}
+                        >
+                          <Trash2 className="size-3.5" />
+                          Delete User
+                        </button>
                       </div>
                     )}
                   </span>
