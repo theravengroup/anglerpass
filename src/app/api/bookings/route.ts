@@ -219,6 +219,26 @@ export async function POST(request: Request) {
       }
     }
 
+    // ── Property availability check ─────────────────────────────
+    const { createUntypedAdminClient } = await import(
+      "@/lib/supabase/untyped-admin"
+    );
+    const untypedDb = createUntypedAdminClient();
+    const { data: blockedPropertyDates } = await untypedDb
+      .from("property_availability")
+      .select("date, status")
+      .eq("property_id", property_id)
+      .in("date", allDates)
+      .in("status", ["blocked", "maintenance"]);
+
+    if (blockedPropertyDates && blockedPropertyDates.length > 0) {
+      const blockedList = (blockedPropertyDates as Array<{ date: string }>).map((d) => d.date).join(", ");
+      return jsonError(
+        `This property is not available on the following date(s): ${blockedList}`,
+        409
+      );
+    }
+
     const isCrossClub = routing.isCrossClub;
 
     // ── Guide validation (optional add-on) ──────────────────────

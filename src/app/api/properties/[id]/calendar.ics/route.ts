@@ -60,6 +60,39 @@ export async function GET(
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
+    // Fetch blocked/maintenance dates for the next 6 months
+    const { createUntypedAdminClient } = await import(
+      "@/lib/supabase/untyped-admin"
+    );
+    const untypedDb = createUntypedAdminClient();
+    const sixMonthsOut = new Date();
+    sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
+    const { data: blockedDates } = await untypedDb
+      .from("property_availability")
+      .select("id, date, status, reason")
+      .eq("property_id", id)
+      .in("status", ["blocked", "maintenance"])
+      .gte("date", today)
+      .lte("date", sixMonthsOut.toISOString().split("T")[0])
+      .order("date");
+
+    // Build blocked date events
+    const blockedEvents = ((blockedDates ?? []) as Array<{ id: string; date: string; status: string; reason: string | null }>).map((blocked) => {
+      const label =
+        blocked.status === "maintenance" ? "Maintenance" : "Unavailable";
+      return {
+        uid: `blocked-${blocked.id}@anglerpass.com`,
+        summary: `${label}${blocked.reason ? ` — ${blocked.reason}` : ""}`,
+        description: `Property is ${label.toLowerCase()} on this date.`,
+        dtstart: toICalDate(blocked.date),
+        dtend: toICalDateEnd(blocked.date),
+        location: property.location_description ?? undefined,
+        status: "CANCELLED" as const,
+        created: today + "T00:00:00Z",
+        lastModified: today + "T00:00:00Z",
+      };
+    });
+
     const events = (bookings ?? []).map((booking) => {
       const anglerName =
         (booking.profiles as { display_name: string | null } | null)
@@ -84,7 +117,7 @@ export async function GET(
 
     const ical = generateICalFeed(
       `${property.name} — AnglerPass Bookings`,
-      events
+      [...events, ...blockedEvents]
     );
 
     return new Response(ical, {

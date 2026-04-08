@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PropertyForm from "@/components/properties/PropertyForm";
 import type { PropertyFormData } from "@/lib/validations/properties";
-import { Loader2, AlertTriangle, BookOpen } from "lucide-react";
+import { Loader2, AlertTriangle, BookOpen, CalendarDays } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -190,6 +190,30 @@ export default function PropertyDetailPage() {
       {property.status === "published" && (
         <CalendarSubscription propertyId={property.id} />
       )}
+
+      {/* Availability Calendar CTA */}
+      <Card className="border-river/20 bg-river/5">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <CalendarDays className="mt-0.5 size-5 shrink-0 text-river" />
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  Manage Availability
+                </p>
+                <p className="text-sm text-text-secondary">
+                  Block dates, schedule maintenance, and control when anglers can book this property.
+                </p>
+              </div>
+            </div>
+            <Button asChild className="shrink-0 bg-river text-white hover:bg-river/90">
+              <Link href={`/landowner/properties/${property.id}/availability`}>
+                Manage Calendar
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Knowledge Profile CTA */}
       <Card className="border-forest/20 bg-forest/5">

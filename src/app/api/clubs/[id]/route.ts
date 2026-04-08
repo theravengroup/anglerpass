@@ -81,6 +81,26 @@ export async function GET(
       .eq("club_id", id)
       .eq("status", "pending");
 
+    // Get upcoming bookings count (confirmed, future dates, via club property access)
+    const today = new Date().toISOString().split("T")[0];
+    const { data: clubPropertyIds } = await admin
+      .from("club_property_access")
+      .select("property_id")
+      .eq("club_id", id)
+      .eq("status", "approved");
+
+    let upcomingBookings = 0;
+    if (clubPropertyIds && clubPropertyIds.length > 0) {
+      const propIds = clubPropertyIds.map((p) => p.property_id);
+      const { count } = await admin
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .in("property_id", propIds)
+        .in("status", ["pending", "confirmed"])
+        .gte("booking_date", today);
+      upcomingBookings = count ?? 0;
+    }
+
     return jsonOk({
       club,
       stats: {
@@ -88,6 +108,7 @@ export async function GET(
         pending_members: pendingCount ?? 0,
         active_properties: propertyCount ?? 0,
         pending_properties: pendingPropertyCount ?? 0,
+        upcoming_bookings: upcomingBookings,
       },
     });
   } catch (err) {

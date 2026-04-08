@@ -48,6 +48,7 @@ interface ClubStats {
   pending_members: number;
   active_properties: number;
   pending_properties: number;
+  upcoming_bookings: number;
 }
 
 type ClubOnboardingState = "no_club" | "setup_incomplete" | "active";
@@ -257,12 +258,12 @@ function ActiveClubDashboard({
     },
     {
       label: "Upcoming Reservations",
-      value: "0",
-      description: "Scheduling coming soon",
+      value: String(stats?.upcoming_bookings ?? 0),
+      description: "Across all club properties",
       icon: CalendarDays,
       color: "text-river",
       bg: "bg-river/10",
-      href: "#",
+      href: "/club/properties",
     },
     {
       label: "Active Properties",
