@@ -2,6 +2,9 @@
 -- Rich structured data per property to feed Compass AI recommendations.
 -- Mirrors the property_lodging pattern: 1:1 relationship, JSONB sections.
 
+-- Clean up partial state from a previous failed attempt
+drop table if exists public.property_knowledge cascade;
+
 -- ═══════════════════════════════════════════════════════════════
 -- 1. property_knowledge table
 -- ═══════════════════════════════════════════════════════════════
@@ -55,7 +58,7 @@ create policy "Club staff can view club property knowledge"
   using (
     exists (
       select 1 from public.properties p
-      join public.club_members cm on cm.club_id = p.created_by_club_id
+      join public.club_memberships cm on cm.club_id = p.created_by_club_id
       where p.id = property_knowledge.property_id
       and cm.user_id = auth.uid()
       and cm.status = 'active'
@@ -101,7 +104,7 @@ create policy "Club staff can create club property knowledge"
   with check (
     exists (
       select 1 from public.properties p
-      join public.club_members cm on cm.club_id = p.created_by_club_id
+      join public.club_memberships cm on cm.club_id = p.created_by_club_id
       where p.id = property_knowledge.property_id
       and cm.user_id = auth.uid()
       and cm.status = 'active'
@@ -125,7 +128,7 @@ create policy "Club staff can update club property knowledge"
   using (
     exists (
       select 1 from public.properties p
-      join public.club_members cm on cm.club_id = p.created_by_club_id
+      join public.club_memberships cm on cm.club_id = p.created_by_club_id
       where p.id = property_knowledge.property_id
       and cm.user_id = auth.uid()
       and cm.status = 'active'
