@@ -100,9 +100,6 @@ async function linkPendingMemberships(
         .eq("id", membership.id);
     }
 
-    console.log(
-      `[auth/callback] Linked ${pendingMemberships.length} pending membership(s) for ${email}`
-    );
   } catch (err) {
     // Don't fail the auth flow if linking fails
     console.error("[auth/callback] Error linking memberships:", err);

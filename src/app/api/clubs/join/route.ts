@@ -1,6 +1,7 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { z } from "zod";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -127,33 +128,22 @@ export async function POST(request: Request) {
     }
 
     // Resolve referral code if provided
-    // Uses raw PostgREST because referral_code column is added by migration 00041
     let referredBy: string | null = null;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const db = createUntypedAdminClient();
 
-    if (referral_code && supabaseUrl && serviceKey) {
+    if (referral_code) {
       try {
-        const refUrl = new URL(`${supabaseUrl}/rest/v1/club_memberships`);
-        refUrl.searchParams.set("select", "id,user_id");
-        refUrl.searchParams.set("referral_code", `eq.${referral_code}`);
-        refUrl.searchParams.set("club_id", `eq.${club_id}`);
-        refUrl.searchParams.set("status", "eq.active");
-        refUrl.searchParams.set("limit", "1");
+        const { data: referrerRows } = await db
+          .from("club_memberships")
+          .select("id, user_id")
+          .eq("referral_code", referral_code)
+          .eq("club_id", club_id)
+          .eq("status", "active")
+          .limit(1);
 
-        const refRes = await fetch(refUrl.toString(), {
-          headers: {
-            apikey: serviceKey,
-            Authorization: `Bearer ${serviceKey}`,
-          },
-        });
-
-        if (refRes.ok) {
-          const rows = await refRes.json();
-          const referrer = rows?.[0];
-          if (referrer && referrer.user_id !== user.id) {
-            referredBy = referrer.id;
-          }
+        const referrer = (referrerRows as { id: string; user_id: string }[] | null)?.[0];
+        if (referrer && referrer.user_id !== user.id) {
+          referredBy = referrer.id;
         }
       } catch (err) {
         console.error("[clubs/join] Referral lookup error:", err);
@@ -174,50 +164,20 @@ export async function POST(request: Request) {
       insertPayload.referred_by = referredBy;
     }
 
-    // Insert via raw PostgREST to include referred_by column
+    // Insert membership (use untyped client to include referred_by column)
     let newMembershipId: string | null = null;
 
-    if (referredBy && supabaseUrl && serviceKey) {
-      // Use raw insert when we have referral data (to include referred_by column)
-      const insertRes = await fetch(`${supabaseUrl}/rest/v1/club_memberships`, {
-        method: "POST",
-        headers: {
-          apikey: serviceKey,
-          Authorization: `Bearer ${serviceKey}`,
-          "Content-Type": "application/json",
-          Prefer: "return=representation",
-        },
-        body: JSON.stringify(insertPayload),
-      });
+    const { data: insertedRows, error: insertError } = await db
+      .from("club_memberships")
+      .insert(insertPayload)
+      .select("id");
 
-      if (!insertRes.ok) {
-        console.error("[clubs/join] Insert error:", await insertRes.text());
-        return jsonError("Failed to submit join request", 500);
-      }
-
-      const inserted = await insertRes.json();
-      newMembershipId = inserted?.[0]?.id ?? null;
-    } else {
-      // Standard typed insert when no referral
-      const { data: newMembership, error: insertError } = await admin
-        .from("club_memberships")
-        .insert({
-          club_id,
-          user_id: user.id,
-          role: "member",
-          status: "pending",
-          invited_email: user.email,
-        })
-        .select("id")
-        .single();
-
-      if (insertError) {
-        console.error("[clubs/join] Insert error:", insertError);
-        return jsonError("Failed to submit join request", 500);
-      }
-
-      newMembershipId = newMembership?.id ?? null;
+    if (insertError) {
+      console.error("[clubs/join] Insert error:", insertError);
+      return jsonError("Failed to submit join request", 500);
     }
+
+    newMembershipId = (insertedRows as { id: string }[] | null)?.[0]?.id ?? null;
 
     // Create membership_application record for clubs that require vetting
     if (club.membership_application_required !== false) {
@@ -240,43 +200,27 @@ export async function POST(request: Request) {
     }
 
     // Create pending referral credit if referred
-    if (referredBy && newMembershipId && supabaseUrl && serviceKey) {
+    if (referredBy && newMembershipId) {
       try {
-        // Look up club referral settings
-        const settingsUrl = new URL(`${supabaseUrl}/rest/v1/clubs`);
-        settingsUrl.searchParams.set("select", "referral_program_enabled,referral_reward");
-        settingsUrl.searchParams.set("id", `eq.${club_id}`);
-        settingsUrl.searchParams.set("limit", "1");
+        const { data: clubSettings } = await db
+          .from("clubs")
+          .select("referral_program_enabled, referral_reward")
+          .eq("id", club_id)
+          .single();
 
-        const settingsRes = await fetch(settingsUrl.toString(), {
-          headers: {
-            apikey: serviceKey,
-            Authorization: `Bearer ${serviceKey}`,
-          },
-        });
+        const settings = clubSettings as {
+          referral_program_enabled: boolean;
+          referral_reward: number;
+        } | null;
 
-        if (settingsRes.ok) {
-          const clubs = await settingsRes.json();
-          const clubSettings = clubs?.[0];
-
-          if (clubSettings?.referral_program_enabled && Number(clubSettings.referral_reward) > 0) {
-            await fetch(`${supabaseUrl}/rest/v1/referral_credits`, {
-              method: "POST",
-              headers: {
-                apikey: serviceKey,
-                Authorization: `Bearer ${serviceKey}`,
-                "Content-Type": "application/json",
-                Prefer: "return=minimal",
-              },
-              body: JSON.stringify({
-                club_id,
-                referrer_membership_id: referredBy,
-                referred_membership_id: newMembershipId,
-                amount: Number(clubSettings.referral_reward),
-                status: "pending",
-              }),
-            });
-          }
+        if (settings?.referral_program_enabled && Number(settings.referral_reward) > 0) {
+          await db.from("referral_credits").insert({
+            club_id,
+            referrer_membership_id: referredBy,
+            referred_membership_id: newMembershipId,
+            amount: Number(settings.referral_reward),
+            status: "pending",
+          });
         }
       } catch (err) {
         console.error("[clubs/join] Referral credit creation error:", err);

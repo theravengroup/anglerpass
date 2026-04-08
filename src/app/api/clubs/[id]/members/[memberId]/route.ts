@@ -1,5 +1,6 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
 import { notifyMemberApproved } from "@/lib/notifications";
@@ -133,30 +134,18 @@ export async function PATCH(
       );
 
       // Transition referral credit from pending → earned
-      // Uses raw PostgREST to avoid type issues (table added by migration 00041)
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      if (supabaseUrl && serviceKey) {
-        fetch(
-          `${supabaseUrl}/rest/v1/referral_credits?referred_membership_id=eq.${memberId}&status=eq.pending`,
-          {
-            method: "PATCH",
-            headers: {
-              apikey: serviceKey,
-              Authorization: `Bearer ${serviceKey}`,
-              "Content-Type": "application/json",
-              Prefer: "return=minimal",
-            },
-            body: JSON.stringify({
-              status: "earned",
-              earned_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            }),
-          }
-        ).catch((err) =>
-          console.error("[clubs/members] Referral credit update error:", err)
-        );
-      }
+      const db = createUntypedAdminClient();
+      db.from("referral_credits")
+        .update({
+          status: "earned",
+          earned_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("referred_membership_id", memberId)
+        .eq("status", "pending")
+        .then(({ error: creditErr }) => {
+          if (creditErr) console.error("[clubs/members] Referral credit update error:", creditErr);
+        });
     }
 
     return jsonOk({ membership: updated });

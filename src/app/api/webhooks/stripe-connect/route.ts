@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     console.error("[stripe-connect-webhook] Update errors:", errors);
   }
 
-  console.log(
+  console.info(
     `[stripe-connect-webhook] account.updated: ${accountId} charges_enabled=${chargesEnabled}`
   );
 

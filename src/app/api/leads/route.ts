@@ -175,7 +175,7 @@ export async function POST(request: Request) {
       supabaseUrl === "your-supabase-url" ||
       serviceRoleKey === "your-supabase-service-role-key"
     ) {
-      console.log("[leads] Supabase not configured. Lead captured:", {
+      console.info("[leads] Supabase not configured. Lead captured:", {
         firstName,
         lastName,
         email,

@@ -75,9 +75,6 @@ async function handleCompassCreditPurchase(
     .single();
 
   if (purchase?.status === "succeeded") {
-    console.log(
-      `[stripe-webhook] compass credit purchase already fulfilled: ${purchase.id}`
-    );
     return;
   }
 
@@ -105,9 +102,6 @@ async function handleCompassCreditPurchase(
     },
   });
 
-  console.log(
-    `[stripe-webhook] compass credit purchase: user=${userId} pack=${packKey} messages=${messages}`
-  );
 }
 
 async function handlePaymentIntentSucceeded(
@@ -124,9 +118,6 @@ async function handlePaymentIntentSucceeded(
   const bookingId = metadata?.booking_id;
 
   if (!bookingId) {
-    console.log(
-      "[stripe-webhook] payment_intent.succeeded without booking_id metadata, skipping"
-    );
     return;
   }
 
@@ -159,9 +150,6 @@ async function handlePaymentIntentSucceeded(
     },
   });
 
-  console.log(
-    `[stripe-webhook] payment_intent.succeeded: booking=${bookingId}`
-  );
 }
 
 async function handlePaymentIntentFailed(
@@ -219,9 +207,6 @@ async function handlePaymentIntentFailed(
     },
   });
 
-  console.log(
-    `[stripe-webhook] payment_intent.payment_failed: booking=${bookingId}`
-  );
 }
 
 async function handleInvoicePaid(invoice: Record<string, unknown>) {
@@ -238,9 +223,6 @@ async function handleInvoicePaid(invoice: Record<string, unknown>) {
     .single();
 
   if (!membership) {
-    console.log(
-      `[stripe-webhook] invoice.paid: no membership found for subscription ${subscriptionId}`
-    );
     return;
   }
 
@@ -296,9 +278,6 @@ async function handleInvoicePaid(invoice: Record<string, unknown>) {
     },
   });
 
-  console.log(
-    `[stripe-webhook] invoice.paid: membership=${membership.id} amount=${amountPaid}`
-  );
 }
 
 async function handleInvoicePaymentFailed(
@@ -351,9 +330,6 @@ async function handleInvoicePaymentFailed(
     },
   });
 
-  console.log(
-    `[stripe-webhook] invoice.payment_failed: membership=${membership.id} grace_ends=${gracePeriodEnds.toISOString().split("T")[0]}`
-  );
 }
 
 async function handleSubscriptionCreated(
@@ -384,9 +360,6 @@ async function handleSubscriptionCreated(
     },
   });
 
-  console.log(
-    `[stripe-webhook] subscription.created: membership=${membershipId}`
-  );
 }
 
 async function handleSubscriptionUpdated(
@@ -440,9 +413,6 @@ async function handleSubscriptionUpdated(
     },
   });
 
-  console.log(
-    `[stripe-webhook] subscription.updated: membership=${membership.id} status=${status}`
-  );
 }
 
 async function handleSubscriptionDeleted(
@@ -485,9 +455,6 @@ async function handleSubscriptionDeleted(
     new_data: { subscription_id: subscriptionId },
   });
 
-  console.log(
-    `[stripe-webhook] subscription.deleted: membership=${membership.id}`
-  );
 }
 
 async function handleChargeDisputeCreated(
@@ -508,7 +475,7 @@ async function handleChargeDisputeCreated(
     },
   });
 
-  console.log(
+  console.info(
     `[stripe-webhook] dispute.created: ${dispute.id} reason=${dispute.reason} amount=${dispute.amount}`
   );
 }
@@ -553,7 +520,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (existing) {
-    console.log(`[stripe-webhook] Duplicate event ${event.id}, skipping`);
+    console.info(`[stripe-webhook] Duplicate event ${event.id}, skipping`);
     return NextResponse.json({ received: true });
   }
 
@@ -586,7 +553,7 @@ export async function POST(request: NextRequest) {
         await handleChargeDisputeCreated(obj);
         break;
       default:
-        console.log(`[stripe-webhook] Unhandled event type: ${event.type}`);
+        console.info(`[stripe-webhook] Unhandled event type: ${event.type}`);
     }
 
     // Mark event as processed

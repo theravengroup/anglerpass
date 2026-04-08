@@ -227,9 +227,6 @@ export async function sendWelcomeEmail(
       .update({ welcome_email_step: emailNumber } as Record<string, unknown>)
       .eq("id", userId);
 
-    console.log(
-      `[welcome-emails] Sent email ${emailNumber} to ${email} (role: ${role})`
-    );
     return true;
   } catch (err) {
     console.error("[welcome-emails] Send error:", err);

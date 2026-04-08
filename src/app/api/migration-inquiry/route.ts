@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       supabaseUrl === "your-supabase-url" ||
       serviceRoleKey === "your-supabase-service-role-key"
     ) {
-      console.log(
+      console.info(
         "[migration-inquiry] Supabase not configured. Inquiry captured:",
         data
       );

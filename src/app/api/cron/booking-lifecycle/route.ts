@@ -229,7 +229,7 @@ export async function POST(request: Request) {
     results.thankYous.errors++;
   }
 
-  console.log("[cron/booking-lifecycle] Results:", JSON.stringify(results));
+  console.info("[cron/booking-lifecycle] Results:", JSON.stringify(results));
 
   return jsonOk({
     message: "Booking lifecycle emails processed",

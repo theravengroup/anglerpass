@@ -1,39 +1,7 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { referralSettingsSchema } from "@/lib/validations/clubs";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-/** Helper: raw PostgREST GET */
-async function pgGet(path: string) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-    },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-/** Helper: raw PostgREST PATCH */
-async function pgPatch(
-  table: string,
-  filter: string,
-  body: Record<string, unknown>
-) {
-  return fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
-    method: "PATCH",
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(body),
-  });
-}
 
 // GET: Retrieve referral program settings for a club
 export async function GET(
@@ -51,42 +19,50 @@ export async function GET(
       return jsonError("Unauthorized", 401);
     }
 
-    // Get club with referral settings
-    const clubs = await pgGet(
-      `clubs?select=id,owner_id,referral_program_enabled,referral_reward,initiation_fee&id=eq.${id}&limit=1`
-    );
-    const club = clubs?.[0];
+    const db = createUntypedAdminClient();
 
-    if (!club) {
+    // Get club with referral settings
+    const { data: club, error: clubErr } = await db
+      .from("clubs")
+      .select("id, owner_id, referral_program_enabled, referral_reward, initiation_fee")
+      .eq("id", id)
+      .single();
+
+    if (clubErr || !club) {
       return jsonError("Club not found", 404);
     }
 
-    if (club.owner_id !== user.id) {
+    if ((club as { owner_id: string }).owner_id !== user.id) {
       return jsonError("Forbidden", 403);
     }
 
     // Get referral stats
-    const allCredits = await pgGet(
-      `referral_credits?select=id,amount,status&club_id=eq.${id}`
+    const { data: allCredits } = await db
+      .from("referral_credits")
+      .select("id, amount, status")
+      .eq("club_id", id);
+
+    const credits = (allCredits ?? []) as { id: string; amount: number; status: string }[];
+    const totalReferrals = credits.length;
+    const earnedCredits = credits.filter(
+      (c) => c.status === "earned" || c.status === "paid_out"
+    );
+    const earnedReferrals = earnedCredits.length;
+    const totalPaid = earnedCredits.reduce(
+      (sum, c) => sum + Number(c.amount),
+      0
     );
 
-    const credits = allCredits ?? [];
-    const totalReferrals = credits.length;
-    const earnedReferrals = credits.filter(
-      (c: { status: string }) =>
-        c.status === "earned" || c.status === "paid_out"
-    ).length;
-    const totalPaid = credits
-      .filter(
-        (c: { status: string }) =>
-          c.status === "earned" || c.status === "paid_out"
-      )
-      .reduce((sum: number, c: { amount: number }) => sum + Number(c.amount), 0);
+    const typedClub = club as {
+      referral_program_enabled: boolean | null;
+      referral_reward: number | null;
+      initiation_fee: number | null;
+    };
 
     return jsonOk({
-      referral_program_enabled: club.referral_program_enabled ?? false,
-      referral_reward: Number(club.referral_reward ?? 0),
-      initiation_fee: Number(club.initiation_fee ?? 0),
+      referral_program_enabled: typedClub.referral_program_enabled ?? false,
+      referral_reward: Number(typedClub.referral_reward ?? 0),
+      initiation_fee: Number(typedClub.initiation_fee ?? 0),
       stats: {
         total_referrals: totalReferrals,
         earned_referrals: earnedReferrals,
@@ -115,17 +91,22 @@ export async function PATCH(
       return jsonError("Unauthorized", 401);
     }
 
-    // Get club
-    const clubs = await pgGet(
-      `clubs?select=id,owner_id,initiation_fee&id=eq.${id}&limit=1`
-    );
-    const club = clubs?.[0];
+    const db = createUntypedAdminClient();
 
-    if (!club) {
+    // Get club
+    const { data: club, error: clubErr } = await db
+      .from("clubs")
+      .select("id, owner_id, initiation_fee")
+      .eq("id", id)
+      .single();
+
+    if (clubErr || !club) {
       return jsonError("Club not found", 404);
     }
 
-    if (club.owner_id !== user.id) {
+    const typedClub = club as { owner_id: string; initiation_fee: number | null };
+
+    if (typedClub.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
     }
 
@@ -137,23 +118,29 @@ export async function PATCH(
     }
 
     // Validate reward doesn't exceed initiation fee
-    const initiationFee = Number(club.initiation_fee ?? 0);
+    const initiationFee = Number(typedClub.initiation_fee ?? 0);
     if (
       parsed.data.referral_program_enabled &&
       parsed.data.referral_reward > 0 &&
       initiationFee > 0 &&
       parsed.data.referral_reward > initiationFee
     ) {
-      return jsonError(`Referral reward ($${parsed.data.referral_reward}) cannot exceed the initiation fee ($${initiationFee}).`, 400);
+      return jsonError(
+        `Referral reward ($${parsed.data.referral_reward}) cannot exceed the initiation fee ($${initiationFee}).`,
+        400
+      );
     }
 
-    const res = await pgPatch("clubs", `id=eq.${id}`, {
-      referral_program_enabled: parsed.data.referral_program_enabled,
-      referral_reward: parsed.data.referral_reward,
-    });
+    const { error: updateErr } = await db
+      .from("clubs")
+      .update({
+        referral_program_enabled: parsed.data.referral_program_enabled,
+        referral_reward: parsed.data.referral_reward,
+      })
+      .eq("id", id);
 
-    if (!res.ok) {
-      console.error("[referral-settings] Update error:", await res.text());
+    if (updateErr) {
+      console.error("[referral-settings] Update error:", updateErr);
       return jsonError("Failed to update settings", 500);
     }
 

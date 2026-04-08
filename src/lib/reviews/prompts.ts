@@ -481,9 +481,6 @@ async function sendSmsMessage(
     .single();
 
   if (!consentProfile?.sms_consent) {
-    console.log(
-      `[review-prompts] SMS (${promptType}) skipped for ${ctx.anglerId}: no SMS consent`
-    );
     await logPrompt(admin, ctx, promptType, "sms", "skipped", "No SMS consent (TCPA)");
     return false;
   }
@@ -493,9 +490,6 @@ async function sendSmsMessage(
   const fromNumber = process.env.TWILIO_FROM_NUMBER;
 
   if (!accountSid || !authToken || !fromNumber) {
-    console.log(
-      `[review-prompts] SMS (${promptType}) would send to ${phone}: ${message}`
-    );
     await logPrompt(admin, ctx, promptType, "sms", "skipped", "Twilio not configured");
     return false;
   }

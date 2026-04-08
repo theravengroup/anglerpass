@@ -1,20 +1,7 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createClient } from "@/lib/supabase/server";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-/** Helper: raw PostgREST GET */
-async function pgGet(path: string) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-    },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 
 // GET: Retrieve referral credit history
 export async function GET(
@@ -32,80 +19,106 @@ export async function GET(
       return jsonError("Unauthorized", 401);
     }
 
-    // Check if user is club owner
-    const clubs = await pgGet(
-      `clubs?select=id,owner_id&id=eq.${clubId}&limit=1`
-    );
-    const club = clubs?.[0];
+    const admin = createAdminClient();
+    const db = createUntypedAdminClient();
 
-    if (!club) {
+    // Check if user is club owner
+    const { data: club, error: clubErr } = await admin
+      .from("clubs")
+      .select("id, owner_id")
+      .eq("id", clubId)
+      .single();
+
+    if (clubErr || !club) {
       return jsonError("Club not found", 404);
     }
 
     const isOwner = club.owner_id === user.id;
 
     // Get the user's membership in this club
-    const memberships = await pgGet(
-      `club_memberships?select=id&club_id=eq.${clubId}&user_id=eq.${user.id}&status=eq.active&limit=1`
-    );
-    const membership = memberships?.[0];
+    const { data: membership } = await admin
+      .from("club_memberships")
+      .select("id")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .maybeSingle();
 
     if (!isOwner && !membership) {
       return jsonError("Forbidden", 403);
     }
 
     // Build query for credits
-    let filter = `club_id=eq.${clubId}&order=created_at.desc&limit=50`;
+    let query = db
+      .from("referral_credits")
+      .select("id, amount, status, earned_at, paid_out_at, created_at, referred_membership_id")
+      .eq("club_id", clubId)
+      .order("created_at", { ascending: false })
+      .limit(50);
 
     // Non-owners only see their own credits
     if (!isOwner && membership) {
-      filter += `&referrer_membership_id=eq.${membership.id}`;
+      query = query.eq("referrer_membership_id", membership.id);
     }
 
-    const credits = await pgGet(
-      `referral_credits?select=id,amount,status,earned_at,paid_out_at,created_at,referred_membership_id&${filter}`
-    );
+    const { data: credits } = await query;
 
-    // Enrich credits with referred member names
-    const enrichedCredits = await Promise.all(
-      (credits ?? []).map(
-        async (credit: {
-          id: string;
-          amount: number;
-          status: string;
-          earned_at: string | null;
-          paid_out_at: string | null;
-          created_at: string;
-          referred_membership_id: string;
-        }) => {
-          let referredMemberName = "New member";
+    // Batch-fetch referred member names (avoids N+1)
+    const referredMembershipIds = (
+      (credits ?? []) as { referred_membership_id: string }[]
+    ).map((c) => c.referred_membership_id);
 
-          // Look up the referred membership's profile
-          const refMembers = await pgGet(
-            `club_memberships?select=user_id&id=eq.${credit.referred_membership_id}&limit=1`
-          );
-          const refMember = refMembers?.[0];
+    const nameMap: Record<string, string> = {};
 
-          if (refMember?.user_id) {
-            const profiles = await pgGet(
-              `profiles?select=display_name&id=eq.${refMember.user_id}&limit=1`
-            );
-            referredMemberName =
-              profiles?.[0]?.display_name ?? "New member";
-          }
+    if (referredMembershipIds.length > 0) {
+      const { data: memberships } = await admin
+        .from("club_memberships")
+        .select("id, user_id")
+        .in("id", referredMembershipIds);
 
-          return {
-            id: credit.id,
-            amount: credit.amount,
-            status: credit.status,
-            earned_at: credit.earned_at,
-            paid_out_at: credit.paid_out_at,
-            created_at: credit.created_at,
-            referred_member_name: referredMemberName,
-          };
+      const membershipUserMap: Record<string, string> = {};
+      for (const m of memberships ?? []) {
+        if (m.user_id) membershipUserMap[m.id] = m.user_id;
+      }
+
+      const userIds = Object.values(membershipUserMap);
+
+      if (userIds.length > 0) {
+        const { data: profiles } = await admin
+          .from("profiles")
+          .select("id, display_name")
+          .in("id", userIds);
+
+        const profileMap: Record<string, string> = {};
+        for (const p of profiles ?? []) {
+          profileMap[p.id] = p.display_name ?? "New member";
         }
-      )
-    );
+
+        for (const [membershipId, userId] of Object.entries(membershipUserMap)) {
+          nameMap[membershipId] = profileMap[userId] ?? "New member";
+        }
+      }
+    }
+
+    const enrichedCredits = (
+      (credits ?? []) as {
+        id: string;
+        amount: number;
+        status: string;
+        earned_at: string | null;
+        paid_out_at: string | null;
+        created_at: string;
+        referred_membership_id: string;
+      }[]
+    ).map((credit) => ({
+      id: credit.id,
+      amount: credit.amount,
+      status: credit.status,
+      earned_at: credit.earned_at,
+      paid_out_at: credit.paid_out_at,
+      created_at: credit.created_at,
+      referred_member_name: nameMap[credit.referred_membership_id] ?? "New member",
+    }));
 
     return jsonOk({ credits: enrichedCredits });
   } catch (err) {

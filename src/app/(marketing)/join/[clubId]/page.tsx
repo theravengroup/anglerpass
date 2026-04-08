@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { notFound } from "next/navigation";
 import JoinCta from "./JoinCta";
 
@@ -24,38 +25,30 @@ async function getClub(clubId: string) {
 
 /**
  * Look up the referrer's display name by referral code.
- * Uses raw SQL via Supabase's PostgREST to query the referral_code column
- * (added by migration 00041). Returns null gracefully if the column
- * doesn't exist yet or the code is invalid.
  */
 async function getReferrer(clubId: string, referralCode: string) {
   if (!referralCode) return null;
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!supabaseUrl || !serviceKey) return null;
+    const db = createUntypedAdminClient();
+    const typedAdmin = createAdminClient();
 
-    // Query club_memberships for the referral_code, joined with profiles
-    const url = new URL(`${supabaseUrl}/rest/v1/club_memberships`);
-    url.searchParams.set("select", "id,profiles!club_memberships_user_id_fkey(display_name)");
-    url.searchParams.set("referral_code", `eq.${referralCode}`);
-    url.searchParams.set("club_id", `eq.${clubId}`);
-    url.searchParams.set("status", `eq.active`);
-    url.searchParams.set("limit", "1");
+    const { data: rows } = await db
+      .from("club_memberships")
+      .select("id, user_id")
+      .eq("referral_code", referralCode)
+      .eq("club_id", clubId)
+      .eq("status", "active")
+      .limit(1);
 
-    const res = await fetch(url.toString(), {
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-      },
-    });
+    const membership = (rows as { id: string; user_id: string }[] | null)?.[0];
+    if (!membership) return null;
 
-    if (!res.ok) return null;
+    const { data: profile } = await typedAdmin
+      .from("profiles")
+      .select("display_name")
+      .eq("id", membership.user_id)
+      .single();
 
-    const rows = await res.json();
-    if (!rows?.length) return null;
-
-    const profile = rows[0]?.profiles;
     return {
       name: profile?.display_name ?? "A member",
     };

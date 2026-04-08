@@ -1,6 +1,8 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { referralInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { generateReferralCode, buildReferralLink } from "@/lib/referral";
@@ -11,38 +13,6 @@ const resend = process.env.RESEND_API_KEY
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-/** Helper: raw PostgREST GET */
-async function pgGet(path: string) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-    },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-/** Helper: raw PostgREST PATCH */
-async function pgPatch(
-  table: string,
-  filter: string,
-  body: Record<string, unknown>
-) {
-  return fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
-    method: "PATCH",
-    headers: {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(body),
-  });
-}
 
 // POST: Send a referral invite email
 export async function POST(
@@ -63,29 +33,45 @@ export async function POST(
       return jsonError("Unauthorized", 401);
     }
 
-    // Verify club exists and has referral program enabled
-    const clubs = await pgGet(
-      `clubs?select=id,name,referral_program_enabled,referral_reward&id=eq.${clubId}&limit=1`
-    );
-    const club = clubs?.[0];
+    const db = createUntypedAdminClient();
+    const admin = createAdminClient();
 
-    if (!club) {
+    // Verify club exists and has referral program enabled
+    const { data: club, error: clubErr } = await db
+      .from("clubs")
+      .select("id, name, referral_program_enabled, referral_reward")
+      .eq("id", clubId)
+      .single();
+
+    if (clubErr || !club) {
       return jsonError("Club not found", 404);
     }
 
-    if (!club.referral_program_enabled) {
+    const typedClub = club as {
+      id: string;
+      name: string;
+      referral_program_enabled: boolean;
+      referral_reward: number;
+    };
+
+    if (!typedClub.referral_program_enabled) {
       return jsonError("Referral program is not enabled for this club", 400);
     }
 
     // Verify caller is an active member with referral_code
-    const memberships = await pgGet(
-      `club_memberships?select=id,referral_code&club_id=eq.${clubId}&user_id=eq.${user.id}&status=eq.active&limit=1`
-    );
-    const membership = memberships?.[0];
+    const { data: membership, error: memErr } = await db
+      .from("club_memberships")
+      .select("id, referral_code")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .single();
 
-    if (!membership) {
+    if (memErr || !membership) {
       return jsonError("You must be an active member of this club to send referrals", 403);
     }
+
+    const typedMembership = membership as { id: string; referral_code: string | null };
 
     // Parse input
     const body = await request.json();
@@ -96,18 +82,17 @@ export async function POST(
     }
 
     // Generate referral code if the member doesn't have one yet
-    let referralCode: string | null = membership.referral_code;
+    let referralCode: string | null = typedMembership.referral_code;
 
     if (!referralCode) {
       for (let attempt = 0; attempt < 3; attempt++) {
         referralCode = generateReferralCode();
-        const res = await pgPatch(
-          "club_memberships",
-          `id=eq.${membership.id}`,
-          { referral_code: referralCode }
-        );
+        const { error: updateErr } = await db
+          .from("club_memberships")
+          .update({ referral_code: referralCode })
+          .eq("id", typedMembership.id);
 
-        if (res.ok) break;
+        if (!updateErr) break;
 
         if (attempt < 2) {
           referralCode = null;
@@ -125,10 +110,13 @@ export async function POST(
     const referralLink = buildReferralLink(clubId, referralCode);
 
     // Get referrer's display name
-    const profiles = await pgGet(
-      `profiles?select=display_name&id=eq.${user.id}&limit=1`
-    );
-    const referrerName = profiles?.[0]?.display_name ?? "A member";
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .single();
+
+    const referrerName = profile?.display_name ?? "A member";
 
     // Send email
     if (resend) {
@@ -139,7 +127,7 @@ export async function POST(
         : "";
 
       const rewardLine =
-        Number(club.referral_reward) > 0
+        Number(typedClub.referral_reward) > 0
           ? `<p style="font-size: 14px; line-height: 1.7; color: #5a5a52;">
               As a referred member, your sponsor earns a referral reward &mdash; and you get a warm welcome from someone who already knows the club.
             </p>`
@@ -148,12 +136,12 @@ export async function POST(
       await resend.emails.send({
         from: "AnglerPass <hello@anglerpass.com>",
         to: parsed.data.email,
-        subject: `${referrerName} invited you to join ${club.name} on AnglerPass`,
+        subject: `${referrerName} invited you to join ${typedClub.name} on AnglerPass`,
         html: `
 <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
-  <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">You&rsquo;ve been invited to ${club.name}</h2>
+  <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">You&rsquo;ve been invited to ${typedClub.name}</h2>
   <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
-    <strong>${referrerName}</strong> thinks you&rsquo;d be a great fit for <strong>${club.name}</strong> on AnglerPass &mdash;
+    <strong>${referrerName}</strong> thinks you&rsquo;d be a great fit for <strong>${typedClub.name}</strong> on AnglerPass &mdash;
     a platform for managing private fly fishing access.
   </p>
   ${personalMessage}
@@ -164,7 +152,7 @@ export async function POST(
   <div style="margin: 32px 0;">
     <a href="${referralLink}"
        style="display: inline-block; padding: 14px 32px; background: #1a3a2a; color: #fff; text-decoration: none; border-radius: 6px; font-family: sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.3px;">
-      Join ${club.name} &rarr;
+      Join ${typedClub.name} &rarr;
     </a>
   </div>
   <p style="font-size: 14px; line-height: 1.7; color: #9a9a8e;">
@@ -203,24 +191,32 @@ export async function GET(
       return jsonError("Unauthorized", 401);
     }
 
-    // Verify active membership
-    const memberships = await pgGet(
-      `club_memberships?select=id,referral_code&club_id=eq.${clubId}&user_id=eq.${user.id}&status=eq.active&limit=1`
-    );
-    const membership = memberships?.[0];
+    const db = createUntypedAdminClient();
 
-    if (!membership) {
+    // Verify active membership
+    const { data: membership, error: memErr } = await db
+      .from("club_memberships")
+      .select("id, referral_code")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .single();
+
+    if (memErr || !membership) {
       return jsonError("Not an active member", 403);
     }
 
+    const typedMembership = membership as { id: string; referral_code: string | null };
+
     // Generate code if needed
-    let referralCode: string | null = membership.referral_code;
+    let referralCode: string | null = typedMembership.referral_code;
 
     if (!referralCode) {
       referralCode = generateReferralCode();
-      await pgPatch("club_memberships", `id=eq.${membership.id}`, {
-        referral_code: referralCode,
-      });
+      await db
+        .from("club_memberships")
+        .update({ referral_code: referralCode })
+        .eq("id", typedMembership.id);
     }
 
     return jsonOk({
