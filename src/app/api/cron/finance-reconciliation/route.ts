@@ -94,6 +94,36 @@ export async function POST(request: Request) {
     };
   }
 
+  // 4. Verify Connect transfers (last 7 days)
+  try {
+    const { verifyConnectTransfers } = await import(
+      "@/lib/finance/connect-verification"
+    );
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const verification = await verifyConnectTransfers(sevenDaysAgo, new Date());
+    results.connect_verification = verification;
+  } catch (err) {
+    console.error("[finance-cron] Connect transfer verification failed:", err);
+    results.connect_verification = {
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+
+  // 5. Generate and send finance alerts
+  try {
+    const { generateFinanceAlerts, sendFinanceAlerts, sendDailyCashSummary } =
+      await import("@/lib/finance/alerts");
+    const alerts = await generateFinanceAlerts();
+    const sent = await sendFinanceAlerts(alerts);
+    await sendDailyCashSummary();
+    results.alerts = { generated: alerts.length, sent };
+  } catch (err) {
+    console.error("[finance-cron] Alert generation failed:", err);
+    results.alerts = {
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+
   return jsonOk({ results });
 }
 

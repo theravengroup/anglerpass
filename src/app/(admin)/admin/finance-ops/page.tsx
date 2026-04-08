@@ -15,6 +15,8 @@ import {
   Building2,
 } from "lucide-react";
 import AdminPageGuard from "@/components/admin/AdminPageGuard";
+import PayoutDrilldown from "@/components/admin/PayoutDrilldown";
+import MonthlyReportCard from "@/components/admin/MonthlyReportCard";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -176,6 +178,7 @@ function FinanceOpsContent() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState<string | null>(null);
+  const [selectedPayoutId, setSelectedPayoutId] = useState<string | null>(null);
 
   async function fetchData() {
     setLoading(true);
@@ -378,6 +381,9 @@ function FinanceOpsContent() {
         </section>
       )}
 
+      {/* Monthly Report */}
+      <MonthlyReportCard />
+
       {/* Recent Payouts */}
       <section>
         <h2 className="mb-3 text-lg font-semibold text-text-primary">
@@ -403,8 +409,12 @@ function FinanceOpsContent() {
               </thead>
               <tbody className="divide-y divide-stone-light">
                 {data.payouts.map((p) => (
-                  <tr key={p.id} className="hover:bg-parchment/50">
-                    <td className="px-4 py-2 font-mono text-xs text-text-secondary">
+                  <tr
+                    key={p.id}
+                    className="cursor-pointer hover:bg-parchment/50"
+                    onClick={() => setSelectedPayoutId(p.id)}
+                  >
+                    <td className="px-4 py-2 font-mono text-xs text-river underline">
                       {p.stripe_payout_id.slice(0, 20)}…
                     </td>
                     <td className="px-4 py-2 text-right font-mono font-medium text-text-primary">
@@ -432,6 +442,14 @@ function FinanceOpsContent() {
           </div>
         )}
       </section>
+
+      {/* Payout Drilldown Modal */}
+      {selectedPayoutId && (
+        <PayoutDrilldown
+          payoutId={selectedPayoutId}
+          onClose={() => setSelectedPayoutId(null)}
+        />
+      )}
     </div>
   );
 }
