@@ -83,10 +83,11 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
     return emptyLandownerFinancials();
   }
 
+  // Fetch ALL bookings (including cancelled) for complete financial picture
   const { data: allBookings } = await admin
     .from("bookings")
     .select(
-      "id, status, booking_date, created_at, base_rate, platform_fee, club_commission, landowner_payout, cross_club_fee, total_amount, rod_count, property_id, booking_group_id, properties(name), profiles!bookings_angler_id_fkey(display_name)"
+      "id, status, payment_status, booking_date, created_at, base_rate, platform_fee, club_commission, landowner_payout, cross_club_fee, total_amount, rod_count, property_id, booking_group_id, guide_id, guide_rate, guide_payout, guide_service_fee, refund_amount, refund_percentage, late_cancel_fee, properties(name), profiles!bookings_angler_id_fkey(display_name)"
     )
     .in("property_id", propertyIds)
     .order("created_at", { ascending: false });
@@ -103,6 +104,59 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
   const periodEarnings = sumField(periodCompleted, "landowner_payout");
   const totalCommissionsPaid = sumField(completed, "club_commission");
   const totalBaseRate = sumField(completed, "base_rate");
+
+  // Held funds — bookings with payment captured but not yet paid out
+  const heldBookings = bookings.filter(
+    (b: { payment_status: string; status: string }) =>
+      (b.payment_status === "hold" || b.payment_status === "succeeded") &&
+      (b.status === "confirmed" || b.status === "completed")
+  );
+  const heldFundsTotal = sumField(heldBookings, "landowner_payout");
+  const awaitingCapture = bookings.filter(
+    (b: { payment_status: string; status: string }) =>
+      b.payment_status === "hold" && b.status === "completed"
+  ).length;
+
+  // Refund tracking — cancelled bookings with refunds
+  const cancelledBookings = bookings.filter(
+    (b: { status: string }) => b.status === "cancelled"
+  );
+  const totalRefunds = sumField(cancelledBookings, "refund_amount");
+  const periodCancelled = cancelledBookings.filter(
+    (b: { created_at: string }) => b.created_at >= since
+  );
+  const periodRefunds = sumField(periodCancelled, "refund_amount");
+
+  // Guide involvement tracking
+  const guidedBookings = completed.filter(
+    (b: { guide_id: string | null }) => b.guide_id
+  );
+  const totalGuideRate = sumField(guidedBookings, "guide_rate");
+  const totalGuidePayout = sumField(guidedBookings, "guide_payout");
+
+  // YTD / Quarterly earnings for tax purposes
+  const now = new Date();
+  const yearStart = new Date(now.getFullYear(), 0, 1).toISOString();
+  const ytdBookings = completed.filter(
+    (b: { created_at: string }) => b.created_at >= yearStart
+  );
+  const ytdEarnings = sumField(ytdBookings, "landowner_payout");
+
+  // Quarterly breakdown for current year
+  const quarters = [0, 3, 6, 9].map((startMonth) => {
+    const qStart = new Date(now.getFullYear(), startMonth, 1).toISOString();
+    const qEnd = new Date(now.getFullYear(), startMonth + 3, 1).toISOString();
+    const qBookings = completed.filter(
+      (b: { created_at: string }) => b.created_at >= qStart && b.created_at < qEnd
+    );
+    return {
+      quarter: `Q${Math.floor(startMonth / 3) + 1} ${now.getFullYear()}`,
+      earnings: sumField(qBookings, "landowner_payout"),
+      gross: sumField(qBookings, "base_rate"),
+      commissions: sumField(qBookings, "club_commission"),
+      bookings: qBookings.length,
+    };
+  });
 
   // Earnings by property
   const propMap: Record<string, { name: string; base_rate: number; club_commission: number; landowner_payout: number; bookings: number }> = {};
@@ -128,11 +182,27 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
     total_commissions_paid: totalCommissionsPaid,
     total_bookings: completed.length,
     period_bookings: periodCompleted.length,
+    // New: held funds
+    held_funds_total: heldFundsTotal,
+    awaiting_capture: awaitingCapture,
+    // New: refund tracking
+    total_refunds: totalRefunds,
+    period_refunds: periodRefunds,
+    total_cancellations: cancelledBookings.length,
+    period_cancellations: periodCancelled.length,
+    // New: guide split visibility
+    guided_bookings_count: guidedBookings.length,
+    total_guide_rate: totalGuideRate,
+    total_guide_payout: totalGuidePayout,
+    // New: tax-ready data
+    ytd_earnings: ytdEarnings,
+    quarterly_earnings: quarters,
     earnings_by_property: Object.values(propMap).sort((a, b) => b.landowner_payout - a.landowner_payout),
     monthly_earnings: monthly,
     recent_transactions: bookings.slice(0, 20).map((b: Record<string, unknown>) => ({
       id: b.id,
       status: b.status,
+      payment_status: b.payment_status,
       booking_date: b.booking_date,
       property_name: (b.properties as { name: string } | null)?.name,
       angler_name: (b.profiles as { display_name: string | null } | null)?.display_name,
@@ -140,6 +210,9 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
       club_commission: b.club_commission,
       landowner_payout: b.landowner_payout,
       rod_count: b.rod_count,
+      guide_rate: b.guide_rate,
+      guide_payout: b.guide_payout,
+      refund_amount: b.refund_amount,
       created_at: b.created_at,
     })),
   };
@@ -153,6 +226,17 @@ function emptyLandownerFinancials() {
     total_commissions_paid: 0,
     total_bookings: 0,
     period_bookings: 0,
+    held_funds_total: 0,
+    awaiting_capture: 0,
+    total_refunds: 0,
+    period_refunds: 0,
+    total_cancellations: 0,
+    period_cancellations: 0,
+    guided_bookings_count: 0,
+    total_guide_rate: 0,
+    total_guide_payout: 0,
+    ytd_earnings: 0,
+    quarterly_earnings: [],
     earnings_by_property: [],
     monthly_earnings: [],
     recent_transactions: [],
@@ -165,17 +249,30 @@ function emptyLandownerFinancials() {
 
  
 async function getClubFinancials(admin: any, userId: string, since: string) {
-  // Find user's club
-  const { data: clubs } = await admin
+  // Find user's club (also check membership-based admin access)
+  const { data: ownedClubs } = await admin
     .from("clubs")
     .select("id, name")
     .eq("owner_id", userId);
 
-  if (!clubs?.length) {
-    return emptyClubFinancials();
+  let clubId: string | null = null;
+  if (ownedClubs?.length) {
+    clubId = ownedClubs[0].id;
+  } else {
+    // Check if user is an admin/manager of a club
+    const { data: adminMembership } = await admin
+      .from("club_memberships")
+      .select("club_id")
+      .eq("user_id", userId)
+      .in("role", ["admin", "manager", "owner"])
+      .limit(1)
+      .maybeSingle();
+    clubId = adminMembership?.club_id ?? null;
   }
 
-  const clubId = clubs[0].id;
+  if (!clubId) {
+    return emptyClubFinancials();
+  }
 
   // Get properties associated with this club
   const { data: clubProperties } = await admin
@@ -186,21 +283,24 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
 
   const propertyIds = (clubProperties ?? []).map((cp: { property_id: string }) => cp.property_id);
 
-  // Club commission from bookings on club properties
-  let bookings: Record<string, unknown>[] = [];
+  // Club commission from ALL bookings on club properties (including cancelled for refund tracking)
+  let allBookings: Record<string, unknown>[] = [];
   if (propertyIds.length > 0) {
     const { data: bookingData } = await admin
       .from("bookings")
       .select(
-        "id, status, booking_date, created_at, club_commission, base_rate, total_amount, rod_count, property_id, booking_group_id, properties(name), profiles!bookings_angler_id_fkey(display_name)"
+        "id, status, booking_date, created_at, club_commission, base_rate, total_amount, rod_count, property_id, booking_group_id, refund_amount, refund_percentage, club_membership_id, properties(name), profiles!bookings_angler_id_fkey(display_name)"
       )
       .in("property_id", propertyIds)
-      .in("status", ["confirmed", "completed"])
       .order("created_at", { ascending: false });
 
-    bookings = bookingData ?? [];
+    allBookings = bookingData ?? [];
   }
 
+  const bookings = allBookings.filter(
+    (b: Record<string, unknown>) =>
+      (b.status as string) === "confirmed" || (b.status as string) === "completed"
+  );
   const periodBookings = bookings.filter(
     (b: Record<string, unknown>) => (b.created_at as string) >= since
   );
@@ -208,7 +308,26 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
   const totalCommission = sumField(bookings, "club_commission");
   const periodCommission = sumField(periodBookings, "club_commission");
 
-  // Membership payments
+  // Refund impact on club revenue
+  const cancelledBookings = allBookings.filter(
+    (b: Record<string, unknown>) => (b.status as string) === "cancelled"
+  );
+  const lostCommissionFromCancellations = sumField(cancelledBookings, "club_commission");
+  const periodCancelled = cancelledBookings.filter(
+    (b: Record<string, unknown>) => (b.created_at as string) >= since
+  );
+
+  // Cross-club referral revenue — bookings where members of OTHER clubs book this club's properties
+  const crossClubBookings = bookings.filter((b: Record<string, unknown>) => {
+    // If the booking has a club_membership_id that belongs to a different club, it's cross-club
+    return b.club_membership_id !== null;
+  });
+  // We track home club referral on the booking side — here we show bookings from external members
+  const crossClubReferralBookings = crossClubBookings.length;
+  // The $5/rod referral that the home club earns is separate. For the property club,
+  // the cross-club bookings still earn the normal $5/rod commission — so we highlight the volume.
+
+  // Membership payments — with initiation vs dues breakdown
   const { data: membershipPayments } = await admin
     .from("membership_payments")
     .select("id, amount, club_amount, club_payout, processing_fee, type, status, created_at, profiles(display_name)")
@@ -230,12 +349,42 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     0
   );
 
-  // Active members count
-  const { count: activeMembers } = await admin
-    .from("club_memberships")
-    .select("id", { count: "exact", head: true })
-    .eq("club_id", clubId)
-    .eq("status", "active");
+  // Initiation vs dues breakdown
+  const initiationPayments = payments.filter((p: Record<string, unknown>) => p.type === "initiation_fee");
+  const duesPayments = payments.filter((p: Record<string, unknown>) => p.type === "annual_dues");
+  const totalInitiationRevenue = initiationPayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.club_payout as number) ?? (p.club_amount as number) ?? 0), 0
+  );
+  const totalDuesRevenue = duesPayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.club_payout as number) ?? (p.club_amount as number) ?? 0), 0
+  );
+
+  // Member dues health — membership status breakdown
+  const [
+    { count: activeMembersCount },
+    { count: pastDueMembersCount },
+    { count: gracePeriodCount },
+    { count: lapsedCount },
+  ] = await Promise.all([
+    admin.from("club_memberships").select("id", { count: "exact", head: true })
+      .eq("club_id", clubId).eq("status", "active"),
+    admin.from("club_memberships").select("id", { count: "exact", head: true })
+      .eq("club_id", clubId).eq("dues_status", "past_due"),
+    admin.from("club_memberships").select("id", { count: "exact", head: true })
+      .eq("club_id", clubId).eq("dues_status", "grace_period"),
+    admin.from("club_memberships").select("id", { count: "exact", head: true })
+      .eq("club_id", clubId).eq("status", "lapsed"),
+  ]);
+
+  // Monthly membership revenue (separate from commission trend)
+  const monthlyMembership: Record<string, number> = {};
+  for (const p of payments) {
+    const dateStr = p.created_at as string;
+    if (!dateStr) continue;
+    const month = dateStr.slice(0, 7);
+    monthlyMembership[month] = (monthlyMembership[month] ?? 0) +
+      ((p.club_payout as number) ?? (p.club_amount as number) ?? 0);
+  }
 
   // Commission by property
   const propMap: Record<string, { name: string; commission: number; bookings: number }> = {};
@@ -257,9 +406,30 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     total_membership_revenue: totalMembershipRevenue,
     period_membership_revenue: periodMembershipRevenue,
     total_revenue: totalCommission + totalMembershipRevenue,
-    active_members: activeMembers ?? 0,
+    active_members: activeMembersCount ?? 0,
     total_bookings: bookings.length,
     period_bookings: periodBookings.length,
+    // New: initiation vs dues breakdown
+    total_initiation_revenue: totalInitiationRevenue,
+    total_dues_revenue: totalDuesRevenue,
+    // New: member dues health
+    member_dues_health: {
+      active: activeMembersCount ?? 0,
+      past_due: pastDueMembersCount ?? 0,
+      grace_period: gracePeriodCount ?? 0,
+      lapsed: lapsedCount ?? 0,
+    },
+    // New: refund impact
+    total_cancellations: cancelledBookings.length,
+    period_cancellations: periodCancelled.length,
+    lost_commission_from_cancellations: lostCommissionFromCancellations,
+    // New: cross-club booking volume
+    cross_club_booking_count: crossClubReferralBookings,
+    // New: monthly membership trend
+    monthly_membership: Object.entries(monthlyMembership)
+      .map(([month, amount]) => ({ month, amount: Math.round(amount * 100) / 100 }))
+      .sort((a, b) => a.month.localeCompare(b.month))
+      .slice(-12),
     commission_by_property: Object.values(propMap).sort((a, b) => b.commission - a.commission),
     monthly_commission: monthly,
     recent_transactions: bookings.slice(0, 20).map((b: Record<string, unknown>) => ({
@@ -294,6 +464,14 @@ function emptyClubFinancials() {
     active_members: 0,
     total_bookings: 0,
     period_bookings: 0,
+    total_initiation_revenue: 0,
+    total_dues_revenue: 0,
+    member_dues_health: { active: 0, past_due: 0, grace_period: 0, lapsed: 0 },
+    total_cancellations: 0,
+    period_cancellations: 0,
+    lost_commission_from_cancellations: 0,
+    cross_club_booking_count: 0,
+    monthly_membership: [],
     commission_by_property: [],
     monthly_commission: [],
     recent_transactions: [],
@@ -307,16 +485,19 @@ function emptyClubFinancials() {
 
  
 async function getAnglerFinancials(admin: any, userId: string, since: string) {
-  const { data: allBookings } = await admin
+  // Fetch ALL bookings including cancelled (for refund tracking)
+  const { data: allBookingsRaw } = await admin
     .from("bookings")
     .select(
-      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, guide_rate, guide_service_fee, total_amount, rod_count, booking_group_id, properties(name)"
+      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, guide_rate, guide_service_fee, total_amount, rod_count, booking_group_id, refund_amount, refund_percentage, late_cancel_fee, staff_discount_amount, properties(name)"
     )
     .eq("angler_id", userId)
-    .in("status", ["confirmed", "completed"])
     .order("created_at", { ascending: false });
 
-  const bookings = allBookings ?? [];
+  const allBookings = allBookingsRaw ?? [];
+  const bookings = allBookings.filter(
+    (b: { status: string }) => b.status === "confirmed" || b.status === "completed"
+  );
   const periodBookings = bookings.filter(
     (b: { created_at: string }) => b.created_at >= since
   );
@@ -325,12 +506,31 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
   const periodSpent = sumField(periodBookings, "total_amount");
   const totalRodFees = sumField(bookings, "base_rate");
   const totalPlatformFees = sumField(bookings, "platform_fee");
-  const totalGuideFees = bookings.reduce(
-    (sum: number, b: Record<string, unknown>) =>
-      sum + ((b.guide_rate as number) ?? 0) + ((b.guide_service_fee as number) ?? 0),
-    0
-  );
+  const totalGuideRates = sumField(bookings, "guide_rate");
+  const totalGuideServiceFees = sumField(bookings, "guide_service_fee");
+  const totalGuideFees = totalGuideRates + totalGuideServiceFees;
   const totalCrossClubFees = sumField(bookings, "cross_club_fee");
+
+  // New: refund tracking — cancelled bookings
+  const cancelledBookings = allBookings.filter(
+    (b: { status: string }) => b.status === "cancelled"
+  );
+  const totalRefundsReceived = sumField(cancelledBookings, "refund_amount");
+  const periodCancelled = cancelledBookings.filter(
+    (b: { created_at: string }) => b.created_at >= since
+  );
+  const periodRefunds = sumField(periodCancelled, "refund_amount");
+
+  // New: late cancellation fees
+  const totalLateCancelFees = sumField(cancelledBookings, "late_cancel_fee");
+  const periodLateCancelFees = sumField(periodCancelled, "late_cancel_fee");
+
+  // New: staff discount savings
+  const totalDiscountSavings = sumField(bookings, "staff_discount_amount");
+
+  // New: cost-per-trip metrics
+  const costPerTrip = bookings.length > 0 ? totalSpent / bookings.length : 0;
+  const avgRodFee = bookings.length > 0 ? totalRodFees / bookings.length : 0;
 
   // Spending by property
   const propMap: Record<string, { name: string; total_amount: number; bookings: number }> = {};
@@ -343,19 +543,32 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
     propMap[pname].bookings += 1;
   }
 
-  // Membership payments
+  // Membership payments — with initiation vs dues split and processing fee
   const { data: membershipPayments } = await admin
     .from("membership_payments")
-    .select("id, amount, total_charged, type, status, created_at, clubs(name)")
+    .select("id, amount, total_charged, processing_fee, type, status, created_at, clubs(name)")
     .eq("user_id", userId)
     .eq("status", "succeeded")
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(50);
 
   const payments = membershipPayments ?? [];
   const totalMembershipDues = payments.reduce(
     (sum: number, p: Record<string, unknown>) => sum + ((p.total_charged as number) ?? (p.amount as number) ?? 0),
     0
+  );
+
+  // Initiation vs dues breakdown
+  const initiationPayments = payments.filter((p: Record<string, unknown>) => p.type === "initiation_fee");
+  const duesOnlyPayments = payments.filter((p: Record<string, unknown>) => p.type === "annual_dues");
+  const totalInitiationFees = initiationPayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.total_charged as number) ?? (p.amount as number) ?? 0), 0
+  );
+  const totalAnnualDues = duesOnlyPayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.total_charged as number) ?? (p.amount as number) ?? 0), 0
+  );
+  const totalProcessingFees = payments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.processing_fee as number) ?? 0), 0
   );
 
   const monthly = aggregateMonthly(bookings, "total_amount");
@@ -366,13 +579,32 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
     total_rod_fees: totalRodFees,
     total_platform_fees: totalPlatformFees,
     total_guide_fees: totalGuideFees,
+    total_guide_rates: totalGuideRates,
+    total_guide_service_fees: totalGuideServiceFees,
     total_cross_club_fees: totalCrossClubFees,
     total_membership_dues: totalMembershipDues,
     total_bookings: bookings.length,
     period_bookings: periodBookings.length,
+    // New: initiation vs dues breakdown
+    total_initiation_fees: totalInitiationFees,
+    total_annual_dues: totalAnnualDues,
+    total_processing_fees: totalProcessingFees,
+    // New: refund tracking
+    total_refunds_received: totalRefundsReceived,
+    period_refunds: periodRefunds,
+    total_cancellations: cancelledBookings.length,
+    period_cancellations: periodCancelled.length,
+    // New: late cancel fees
+    total_late_cancel_fees: totalLateCancelFees,
+    period_late_cancel_fees: periodLateCancelFees,
+    // New: discount savings
+    total_discount_savings: totalDiscountSavings,
+    // New: cost metrics
+    cost_per_trip: Math.round(costPerTrip * 100) / 100,
+    avg_rod_fee: Math.round(avgRodFee * 100) / 100,
     spending_by_property: Object.values(propMap).sort((a, b) => b.total_amount - a.total_amount),
     monthly_spending: monthly,
-    recent_transactions: bookings.slice(0, 20).map((b: Record<string, unknown>) => ({
+    recent_transactions: allBookings.slice(0, 25).map((b: Record<string, unknown>) => ({
       id: b.id,
       status: b.status,
       booking_date: b.booking_date,
@@ -383,12 +615,15 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
       guide_service_fee: b.guide_service_fee,
       cross_club_fee: b.cross_club_fee,
       total_amount: b.total_amount,
+      refund_amount: b.refund_amount,
+      late_cancel_fee: b.late_cancel_fee,
       created_at: b.created_at,
     })),
     membership_payments: payments.map((p: Record<string, unknown>) => ({
       id: p.id,
       type: p.type,
       amount: p.total_charged ?? p.amount,
+      processing_fee: p.processing_fee,
       club_name: (p.clubs as { name: string } | null)?.name,
       created_at: p.created_at,
     })),

@@ -19,6 +19,10 @@ import {
   Users,
   BarChart3,
   CreditCard,
+  AlertTriangle,
+  XCircle,
+  Network,
+  ShieldAlert,
 } from "lucide-react";
 import { PERIOD_OPTIONS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
@@ -57,6 +61,13 @@ interface Transaction {
   created_at: string;
 }
 
+interface MemberDuesHealth {
+  active: number;
+  past_due: number;
+  grace_period: number;
+  lapsed: number;
+}
+
 interface Financials {
   total_commission: number;
   period_commission: number;
@@ -66,6 +77,14 @@ interface Financials {
   active_members: number;
   total_bookings: number;
   period_bookings: number;
+  total_initiation_revenue: number;
+  total_dues_revenue: number;
+  member_dues_health: MemberDuesHealth;
+  total_cancellations: number;
+  period_cancellations: number;
+  lost_commission_from_cancellations: number;
+  cross_club_booking_count: number;
+  monthly_membership: MonthlyData[];
   commission_by_property: PropertyCommission[];
   monthly_commission: MonthlyData[];
   recent_transactions: Transaction[];
@@ -106,8 +125,17 @@ export default function ClubFinancialsPage() {
     const rows: string[][] = [
       ["Revenue Source", "Amount"],
       ["Booking Commissions (Total)", data.total_commission.toFixed(2)],
+      ["Initiation Fee Revenue", data.total_initiation_revenue.toFixed(2)],
+      ["Annual Dues Revenue", data.total_dues_revenue.toFixed(2)],
       ["Membership Revenue (Total)", data.total_membership_revenue.toFixed(2)],
       ["Combined Revenue", data.total_revenue.toFixed(2)],
+      ["Lost Commission from Cancellations", data.lost_commission_from_cancellations.toFixed(2)],
+      [],
+      ["Member Dues Health", "Count"],
+      ["Active", String(data.member_dues_health.active)],
+      ["Past Due", String(data.member_dues_health.past_due)],
+      ["Grace Period", String(data.member_dues_health.grace_period)],
+      ["Lapsed", String(data.member_dues_health.lapsed)],
       [],
       ["Property", "Commission", "Bookings"],
       ...data.commission_by_property.map((p) => [
@@ -183,6 +211,9 @@ export default function ClubFinancialsPage() {
   const maxCommission = Math.max(
     ...(data?.commission_by_property.map((p) => p.commission) ?? [1])
   );
+
+  const duesHealth = data?.member_dues_health ?? { active: 0, past_due: 0, grace_period: 0, lapsed: 0 };
+  const hasAtRiskMembers = duesHealth.past_due > 0 || duesHealth.grace_period > 0 || duesHealth.lapsed > 0;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -261,6 +292,168 @@ export default function ClubFinancialsPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Member Dues Health + Membership Revenue Breakdown */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Member Dues Health */}
+        <Card className={`border-stone-light/20 ${hasAtRiskMembers ? "border-river/30" : ""}`}>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldAlert className="size-4 text-river" />
+              Member Dues Health
+            </CardTitle>
+            <CardDescription>
+              Current standing of member dues payments
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-forest/20 bg-forest/5 p-3">
+                <p className="text-2xl font-semibold text-forest">{duesHealth.active}</p>
+                <p className="text-xs text-text-secondary">Active &amp; Current</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${duesHealth.past_due > 0 ? "border-river/30 bg-river/5" : "border-stone-light/20 bg-offwhite/50"}`}>
+                <p className={`text-2xl font-semibold ${duesHealth.past_due > 0 ? "text-river" : "text-text-light"}`}>
+                  {duesHealth.past_due}
+                </p>
+                <p className="text-xs text-text-secondary">Past Due</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${duesHealth.grace_period > 0 ? "border-bronze/30 bg-bronze/5" : "border-stone-light/20 bg-offwhite/50"}`}>
+                <p className={`text-2xl font-semibold ${duesHealth.grace_period > 0 ? "text-bronze" : "text-text-light"}`}>
+                  {duesHealth.grace_period}
+                </p>
+                <p className="text-xs text-text-secondary">Grace Period</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${duesHealth.lapsed > 0 ? "border-red-300 bg-red-50" : "border-stone-light/20 bg-offwhite/50"}`}>
+                <p className={`text-2xl font-semibold ${duesHealth.lapsed > 0 ? "text-red-600" : "text-text-light"}`}>
+                  {duesHealth.lapsed}
+                </p>
+                <p className="text-xs text-text-secondary">Lapsed</p>
+              </div>
+            </div>
+            {hasAtRiskMembers && (
+              <p className="flex items-center gap-1.5 text-xs text-river">
+                <AlertTriangle className="size-3" />
+                {duesHealth.past_due + duesHealth.grace_period} member{duesHealth.past_due + duesHealth.grace_period !== 1 ? "s" : ""} need{duesHealth.past_due + duesHealth.grace_period === 1 ? "s" : ""} attention.
+                <Link href="/club/members" className="underline">
+                  View members
+                </Link>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Membership Revenue Breakdown */}
+        <Card className="border-stone-light/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CreditCard className="size-4 text-bronze" />
+              Membership Revenue Breakdown
+            </CardTitle>
+            <CardDescription>
+              Initiation fees vs. annual dues
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">Initiation Fees</span>
+                <span className="text-sm font-medium text-text-primary">
+                  ${(data?.total_initiation_revenue ?? 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">Annual Dues</span>
+                <span className="text-sm font-medium text-text-primary">
+                  ${(data?.total_dues_revenue ?? 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="border-t border-stone-light/20 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-text-primary">Total Membership Revenue</span>
+                  <span className="text-sm font-semibold text-river">
+                    ${(data?.total_membership_revenue ?? 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {(data?.monthly_membership.length ?? 0) > 0 && (
+              <div className="pt-2">
+                <p className="mb-2 text-xs text-text-light">Monthly membership revenue trend</p>
+                <MonthlyBarChart data={data!.monthly_membership} color="bg-bronze" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Cancellation Impact + Cross-Club Activity */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Cancellation / Refund Impact */}
+        {(data?.total_cancellations ?? 0) > 0 && (
+          <Card className="border-stone-light/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <XCircle className="size-4 text-red-500" />
+                Cancellation Impact
+              </CardTitle>
+              <CardDescription>
+                Revenue lost from cancelled bookings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border border-stone-light/20 bg-offwhite/50 p-3">
+                  <p className="text-xl font-semibold text-text-primary">
+                    {data?.total_cancellations ?? 0}
+                  </p>
+                  <p className="text-xs text-text-secondary">Total Cancellations</p>
+                </div>
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                  <p className="text-xl font-semibold text-red-600">
+                    -${(data?.lost_commission_from_cancellations ?? 0).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-text-secondary">Lost Commission</p>
+                </div>
+              </div>
+              {(data?.period_cancellations ?? 0) > 0 && (
+                <p className="text-xs text-text-light">
+                  {data?.period_cancellations} cancellation{data?.period_cancellations !== 1 ? "s" : ""} in the last {days} days.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Cross-Club Network Activity */}
+        {(data?.cross_club_booking_count ?? 0) > 0 && (
+          <Card className="border-stone-light/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Network className="size-4 text-river" />
+                Cross-Club Network
+              </CardTitle>
+              <CardDescription>
+                Bookings from members of other clubs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg border border-river/20 bg-river/5 p-4">
+                <p className="text-2xl font-semibold text-river">
+                  {data?.cross_club_booking_count ?? 0}
+                </p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  Cross-club bookings on your properties
+                </p>
+                <p className="mt-2 text-xs text-text-light">
+                  Your club earns the standard $5/rod commission on these bookings.
+                  The visiting angler&apos;s home club earns a $5/rod referral fee.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -365,8 +558,14 @@ export default function ClubFinancialsPage() {
                       <td className="py-2.5 pr-4 font-medium text-text-primary">
                         {p.member_name ?? "—"}
                       </td>
-                      <td className="py-2.5 pr-4 capitalize text-text-secondary">
-                        {(p.type ?? "payment").replace(/_/g, " ")}
+                      <td className="py-2.5 pr-4">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                          p.type === "initiation_fee"
+                            ? "bg-river/10 text-river"
+                            : "bg-bronze/10 text-bronze"
+                        }`}>
+                          {p.type === "initiation_fee" ? "Initiation" : "Annual Dues"}
+                        </span>
                       </td>
                       <td className="py-2.5 text-right font-medium text-river">
                         ${(p.amount ?? 0).toLocaleString()}
@@ -449,7 +648,9 @@ export default function ClubFinancialsPage() {
             associated properties. This commission comes from the
             landowner&apos;s listed rate — it is not an additional charge to the
             angler. Membership fees (initiation and annual dues) are set by you
-            and collected through AnglerPass. Payouts are processed via Stripe.
+            and collected through AnglerPass. When members of other clubs book
+            your properties through the Cross-Club Network, your club still earns
+            the standard $5/rod commission. Payouts are processed via Stripe.
           </p>
         </CardContent>
       </Card>

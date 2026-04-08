@@ -20,6 +20,11 @@ import {
   Percent,
   Network,
   MapPin,
+  XCircle,
+  AlertTriangle,
+  TrendingDown,
+  Sparkles,
+  Calculator,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -53,6 +58,8 @@ interface Transaction {
   guide_service_fee: number;
   cross_club_fee: number;
   total_amount: number;
+  refund_amount: number;
+  late_cancel_fee: number;
   created_at: string;
 }
 
@@ -60,6 +67,7 @@ interface MembershipPayment {
   id: string;
   type: string;
   amount: number;
+  processing_fee: number;
   club_name: string | null;
   created_at: string;
 }
@@ -70,10 +78,24 @@ interface Financials {
   total_rod_fees: number;
   total_platform_fees: number;
   total_guide_fees: number;
+  total_guide_rates: number;
+  total_guide_service_fees: number;
   total_cross_club_fees: number;
   total_membership_dues: number;
   total_bookings: number;
   period_bookings: number;
+  total_initiation_fees: number;
+  total_annual_dues: number;
+  total_processing_fees: number;
+  total_refunds_received: number;
+  period_refunds: number;
+  total_cancellations: number;
+  period_cancellations: number;
+  total_late_cancel_fees: number;
+  period_late_cancel_fees: number;
+  total_discount_savings: number;
+  cost_per_trip: number;
+  avg_rod_fee: number;
   spending_by_property: PropertySpending[];
   monthly_spending: MonthlyData[];
   recent_transactions: Transaction[];
@@ -115,10 +137,26 @@ export default function AnglerFinancialsPage() {
       ["Category", "Amount"],
       ["Rod Fees", data.total_rod_fees.toFixed(2)],
       ["Platform Fees (15%)", data.total_platform_fees.toFixed(2)],
-      ["Guide Fees", data.total_guide_fees.toFixed(2)],
+      ["Guide Rates", data.total_guide_rates.toFixed(2)],
+      ["Guide Service Fees (10%)", data.total_guide_service_fees.toFixed(2)],
       ["Cross-Club Fees", data.total_cross_club_fees.toFixed(2)],
-      ["Membership Dues", data.total_membership_dues.toFixed(2)],
       ["Total Spent on Bookings", data.total_spent.toFixed(2)],
+      [],
+      ["Membership Breakdown", "Amount"],
+      ["Initiation Fees", data.total_initiation_fees.toFixed(2)],
+      ["Annual Dues", data.total_annual_dues.toFixed(2)],
+      ["Processing Fees (3.5%)", data.total_processing_fees.toFixed(2)],
+      ["Total Membership", data.total_membership_dues.toFixed(2)],
+      [],
+      ["Refunds & Fees", "Amount"],
+      ["Total Refunds Received", data.total_refunds_received.toFixed(2)],
+      ["Late Cancellation Fees", data.total_late_cancel_fees.toFixed(2)],
+      ["Staff Discount Savings", data.total_discount_savings.toFixed(2)],
+      [],
+      ["Trip Metrics", "Value"],
+      ["Average Cost per Trip", data.cost_per_trip.toFixed(2)],
+      ["Average Rod Fee", data.avg_rod_fee.toFixed(2)],
+      ["Total Trips", String(data.total_bookings)],
       [],
       ["Property", "Total Spent", "Bookings"],
       ...data.spending_by_property.map((p) => [
@@ -127,7 +165,7 @@ export default function AnglerFinancialsPage() {
         String(p.bookings),
       ]),
       [],
-      ["Date", "Property", "Rod Fee", "Platform Fee", "Guide", "Cross-Club", "Total"],
+      ["Date", "Property", "Rod Fee", "Platform Fee", "Guide", "Cross-Club", "Total", "Refund", "Late Fee", "Status"],
       ...data.recent_transactions.map((t) => [
         t.booking_date,
         t.property_name ?? "",
@@ -136,6 +174,9 @@ export default function AnglerFinancialsPage() {
         String((t.guide_rate ?? 0) + (t.guide_service_fee ?? 0)),
         String(t.cross_club_fee ?? 0),
         String(t.total_amount),
+        String(t.refund_amount ?? 0),
+        String(t.late_cancel_fee ?? 0),
+        t.status,
       ]),
     ];
     downloadCSV(rows, `anglerpass-spending-${new Date().toISOString().slice(0, 10)}.csv`);
@@ -196,7 +237,8 @@ export default function AnglerFinancialsPage() {
   const feeBreakdown = [
     { label: "Rod Fees", amount: data?.total_rod_fees ?? 0, color: "bg-forest" },
     { label: "Platform Fees", amount: data?.total_platform_fees ?? 0, color: "bg-river" },
-    { label: "Guide Fees", amount: data?.total_guide_fees ?? 0, color: "bg-charcoal" },
+    { label: "Guide Rates", amount: data?.total_guide_rates ?? 0, color: "bg-charcoal" },
+    { label: "Guide Service Fees", amount: data?.total_guide_service_fees ?? 0, color: "bg-charcoal/60" },
     { label: "Cross-Club Fees", amount: data?.total_cross_club_fees ?? 0, color: "bg-bronze" },
   ].filter((f) => f.amount > 0);
 
@@ -205,6 +247,10 @@ export default function AnglerFinancialsPage() {
   const maxSpending = Math.max(
     ...(data?.spending_by_property.map((p) => p.total_amount) ?? [1])
   );
+
+  const hasRefunds = (data?.total_refunds_received ?? 0) > 0;
+  const hasLateFees = (data?.total_late_cancel_fees ?? 0) > 0;
+  const hasDiscounts = (data?.total_discount_savings ?? 0) > 0;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -280,6 +326,110 @@ export default function AnglerFinancialsPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Cost Metrics + Refunds/Fees Row */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Trip Cost Metrics */}
+        <Card className="border-stone-light/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Calculator className="size-4 text-bronze" />
+              Trip Metrics
+            </CardTitle>
+            <CardDescription>
+              Average cost analysis across your trips
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-bronze/20 bg-bronze/5 p-3">
+                <p className="text-2xl font-semibold text-bronze">
+                  ${(data?.cost_per_trip ?? 0).toLocaleString()}
+                </p>
+                <p className="text-xs text-text-secondary">Avg Cost per Trip</p>
+              </div>
+              <div className="rounded-lg border border-forest/20 bg-forest/5 p-3">
+                <p className="text-2xl font-semibold text-forest">
+                  ${(data?.avg_rod_fee ?? 0).toLocaleString()}
+                </p>
+                <p className="text-xs text-text-secondary">Avg Rod Fee</p>
+              </div>
+            </div>
+            {(data?.total_bookings ?? 0) > 0 && (
+              <p className="mt-3 text-xs text-text-light">
+                Based on {data?.total_bookings} trip{data?.total_bookings !== 1 ? "s" : ""}.
+                Rod fees make up {feeTotal > 0 ? Math.round(((data?.total_rod_fees ?? 0) / feeTotal) * 100) : 0}%
+                of your total booking costs.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Refunds, Late Fees & Savings */}
+        {(hasRefunds || hasLateFees || hasDiscounts) && (
+          <Card className="border-stone-light/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <TrendingDown className="size-4 text-river" />
+                Refunds, Fees &amp; Savings
+              </CardTitle>
+              <CardDescription>
+                Cancellation refunds, late fees, and discounts
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {hasRefunds && (
+                <div className="flex items-center justify-between rounded-lg border border-forest/20 bg-forest/5 p-3">
+                  <div className="flex items-center gap-2">
+                    <XCircle className="size-4 text-forest" />
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Refunds Received</p>
+                      <p className="text-xs text-text-light">
+                        From {data?.total_cancellations ?? 0} cancellation{data?.total_cancellations !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-lg font-semibold text-forest">
+                    +${(data?.total_refunds_received ?? 0).toLocaleString()}
+                  </p>
+                </div>
+              )}
+              {hasLateFees && (
+                <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="size-4 text-red-500" />
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Late Cancel Fees</p>
+                      <p className="text-xs text-text-light">
+                        $15 per late cancellation (within 72 hrs)
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-lg font-semibold text-red-600">
+                    -${(data?.total_late_cancel_fees ?? 0).toLocaleString()}
+                  </p>
+                </div>
+              )}
+              {hasDiscounts && (
+                <div className="flex items-center justify-between rounded-lg border border-river/20 bg-river/5 p-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="size-4 text-river" />
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">Staff Discount Savings</p>
+                      <p className="text-xs text-text-light">
+                        50% own-club, 25% cross-club
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-lg font-semibold text-river">
+                    -${(data?.total_discount_savings ?? 0).toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -377,17 +527,36 @@ export default function AnglerFinancialsPage() {
         </Card>
       </div>
 
-      {/* Membership Payments */}
+      {/* Membership Payments — with initiation vs dues and processing fee */}
       {(data?.membership_payments.length ?? 0) > 0 && (
         <Card className="border-stone-light/20">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="size-4 text-charcoal" />
-              Membership Payments
-            </CardTitle>
-            <CardDescription>
-              Club initiation fees and annual dues
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CreditCard className="size-4 text-charcoal" />
+                  Membership Payments
+                </CardTitle>
+                <CardDescription>
+                  Club initiation fees and annual dues
+                </CardDescription>
+              </div>
+              {((data?.total_initiation_fees ?? 0) > 0 || (data?.total_annual_dues ?? 0) > 0) && (
+                <div className="flex items-center gap-4 text-xs text-text-light">
+                  <span>
+                    Initiation: <strong className="text-text-secondary">${(data?.total_initiation_fees ?? 0).toLocaleString()}</strong>
+                  </span>
+                  <span>
+                    Dues: <strong className="text-text-secondary">${(data?.total_annual_dues ?? 0).toLocaleString()}</strong>
+                  </span>
+                  {(data?.total_processing_fees ?? 0) > 0 && (
+                    <span>
+                      Processing: <strong className="text-text-secondary">${(data?.total_processing_fees ?? 0).toLocaleString()}</strong>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -397,7 +566,8 @@ export default function AnglerFinancialsPage() {
                     <th className="pb-2 pr-4">Date</th>
                     <th className="pb-2 pr-4">Club</th>
                     <th className="pb-2 pr-4">Type</th>
-                    <th className="pb-2 text-right">Amount</th>
+                    <th className="pb-2 pr-4 text-right">Amount</th>
+                    <th className="pb-2 text-right">Processing</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-light/10">
@@ -413,11 +583,22 @@ export default function AnglerFinancialsPage() {
                       <td className="py-2.5 pr-4 font-medium text-text-primary">
                         {p.club_name ?? "—"}
                       </td>
-                      <td className="py-2.5 pr-4 capitalize text-text-secondary">
-                        {(p.type ?? "payment").replace(/_/g, " ")}
+                      <td className="py-2.5 pr-4">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                          p.type === "initiation_fee"
+                            ? "bg-river/10 text-river"
+                            : "bg-bronze/10 text-bronze"
+                        }`}>
+                          {p.type === "initiation_fee" ? "Initiation" : "Annual Dues"}
+                        </span>
                       </td>
-                      <td className="py-2.5 text-right font-medium text-text-primary">
+                      <td className="py-2.5 pr-4 text-right font-medium text-text-primary">
                         ${(p.amount ?? 0).toLocaleString()}
+                      </td>
+                      <td className="py-2.5 text-right text-text-light">
+                        {(p.processing_fee ?? 0) > 0
+                          ? `$${(p.processing_fee ?? 0).toLocaleString()}`
+                          : "—"}
                       </td>
                     </tr>
                   ))}
@@ -428,12 +609,12 @@ export default function AnglerFinancialsPage() {
         </Card>
       )}
 
-      {/* Recent Booking Transactions */}
+      {/* Recent Booking Transactions — now includes cancelled with refund info */}
       <Card className="border-stone-light/20">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Booking Transaction History</CardTitle>
           <CardDescription>
-            Detailed fee breakdown for each trip
+            Detailed fee breakdown for each trip, including cancellations
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -451,46 +632,78 @@ export default function AnglerFinancialsPage() {
                     <th className="pb-2 pr-4 text-right">Rod Fee</th>
                     <th className="pb-2 pr-4 text-right">Platform</th>
                     <th className="pb-2 pr-4 text-right">Guide</th>
-                    <th className="pb-2 text-right">Total</th>
+                    <th className="pb-2 pr-4 text-right">Total</th>
+                    <th className="pb-2 text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-light/10">
-                  {data!.recent_transactions.map((t) => (
-                    <tr key={t.id}>
-                      <td className="py-2.5 pr-4 text-text-secondary">
-                        {new Date(t.booking_date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td className="py-2.5 pr-4 font-medium text-text-primary">
-                        {t.property_name}
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-text-secondary">
-                        ${t.base_rate}
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-text-light">
-                        ${t.platform_fee}
-                        {(t.cross_club_fee ?? 0) > 0 && (
-                          <span
-                            className="ml-1 inline-flex items-center text-[10px] text-bronze"
-                            title="Cross-club fee"
-                          >
-                            <Network className="mr-0.5 size-2.5" />+$
-                            {t.cross_club_fee}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-text-secondary">
-                        {(t.guide_rate ?? 0) > 0
-                          ? `$${t.guide_rate + (t.guide_service_fee ?? 0)}`
-                          : "—"}
-                      </td>
-                      <td className="py-2.5 text-right font-medium text-text-primary">
-                        ${t.total_amount}
-                      </td>
-                    </tr>
-                  ))}
+                  {data!.recent_transactions.map((t) => {
+                    const isCancelled = t.status === "cancelled";
+                    return (
+                      <tr key={t.id} className={isCancelled ? "opacity-60" : ""}>
+                        <td className="py-2.5 pr-4 text-text-secondary">
+                          {new Date(t.booking_date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </td>
+                        <td className="py-2.5 pr-4 font-medium text-text-primary">
+                          {t.property_name}
+                        </td>
+                        <td className="py-2.5 pr-4 text-right text-text-secondary">
+                          ${t.base_rate}
+                        </td>
+                        <td className="py-2.5 pr-4 text-right text-text-light">
+                          ${t.platform_fee}
+                          {(t.cross_club_fee ?? 0) > 0 && (
+                            <span
+                              className="ml-1 inline-flex items-center text-[10px] text-bronze"
+                              title="Cross-club fee"
+                            >
+                              <Network className="mr-0.5 size-2.5" />+$
+                              {t.cross_club_fee}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 pr-4 text-right text-text-secondary">
+                          {(t.guide_rate ?? 0) > 0
+                            ? `$${t.guide_rate + (t.guide_service_fee ?? 0)}`
+                            : "—"}
+                        </td>
+                        <td className="py-2.5 pr-4 text-right font-medium text-text-primary">
+                          {isCancelled ? (
+                            <span className="text-red-500 line-through">${t.total_amount}</span>
+                          ) : (
+                            `$${t.total_amount}`
+                          )}
+                        </td>
+                        <td className="py-2.5 text-right">
+                          {isCancelled ? (
+                            <div className="space-y-0.5">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                                <XCircle className="size-3" />
+                                cancelled
+                              </span>
+                              {(t.refund_amount ?? 0) > 0 && (
+                                <p className="text-[10px] text-forest">
+                                  +${t.refund_amount} refund
+                                </p>
+                              )}
+                              {(t.late_cancel_fee ?? 0) > 0 && (
+                                <p className="text-[10px] text-red-500">
+                                  -${t.late_cancel_fee} late fee
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="inline-flex rounded-full bg-forest/10 px-2 py-0.5 text-xs font-medium text-forest">
+                              {t.status}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -509,8 +722,11 @@ export default function AnglerFinancialsPage() {
             cover payment processing and platform operation. If you book through
             the Cross-Club Network (a property outside your home club), a
             $25/rod cross-club access fee applies ($20 to AnglerPass, $5 to your
-            home club). Guide fees include a 10% service fee. Your
-            club membership dues are set by your club and collected separately.
+            home club). Guide fees include the guide&apos;s rate plus a 10% service fee.
+            Club membership dues include initiation fees (one-time) and annual dues,
+            plus a 3.5% processing fee. Cancellation refunds follow a graduated
+            policy: 100% if 7+ days out, 75% if 3–7 days, 50% if 1–3 days, 0% under
+            24 hours. A $15 late cancellation fee applies within 72 hours.
           </p>
         </CardContent>
       </Card>
