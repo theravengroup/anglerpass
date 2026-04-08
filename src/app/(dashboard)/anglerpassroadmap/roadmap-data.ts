@@ -105,6 +105,7 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-book-cancel", label: "Booking cancellation with tiered refund policy", done: true },
           { id: "c-book-fees", label: "Fee calculation engine (platform, cross-club, guide, staff discounts)", done: true },
           { id: "c-book-lodging", label: "Multi-day booking with lodging toggle", done: true },
+          { id: "c-book-gate-codes", label: "Gate code delivery automation (morning-of email with access notes)", done: true },
         ],
       },
       {
@@ -365,7 +366,7 @@ export const PHASES: RoadmapPhase[] = [
       {
         id: "p1-trust",
         title: "1C: Trust Signals",
-        description: "Landowners will not open their gates without trust. Anglers won't pay without confidence. Includes the full guide verification system (Checkr background checks, Stripe payment, credential tracking).",
+        description: "Landowners will not open their gates without trust. Anglers won't pay without confidence.",
         items: [
           {
             id: "p1-about",
@@ -389,36 +390,6 @@ export const PHASES: RoadmapPhase[] = [
             id: "p1-security",
             label: "Security & privacy page",
             detail: "Covered by existing /privacy, /terms, and /policies pages.",
-            done: true,
-          },
-          {
-            id: "p1-guide-verification",
-            label: "Guide verification system (Checkr + Stripe)",
-            detail: "7-phase mandatory verification: $49 fee via Stripe, Checkr background checks (hosted flow), credential uploads, admin review, auto-verify logic. Status model: draft → pending → verified → live (+ rejected, suspended).",
-            done: true,
-          },
-          {
-            id: "p1-guide-webhooks",
-            label: "Checkr & Stripe verification webhooks",
-            detail: "Stripe webhook triggers Checkr candidate creation after payment. Checkr webhook processes report.completed and report.suspended events. Auto-transitions guide to verified when all conditions pass.",
-            done: true,
-          },
-          {
-            id: "p1-guide-credentials",
-            label: "Credential expiration monitoring",
-            detail: "Daily cron checks license, insurance, and first aid cert expiry dates. Sends warnings at 60/30/7 days. Auto-suspends on expiry, auto-reinstates when renewed.",
-            done: true,
-          },
-          {
-            id: "p1-guide-admin",
-            label: "Admin guide review dashboard",
-            detail: "Admin endpoints and UI to approve (make_live), reject, suspend, and request info from guides. Background check results visible to admin before final approval.",
-            done: true,
-          },
-          {
-            id: "p1-guide-verification-ui",
-            label: "Guide verification progress page",
-            detail: "5-step progress tracker in guide dashboard: Profile & Documents → Fee Payment → Background Check → Admin Review → Live. Status banners for rejection and suspension.",
             done: true,
           },
         ],
@@ -588,7 +559,6 @@ export const PHASES: RoadmapPhase[] = [
           { id: "p2-beats", label: "Property sections / beats (independently bookable)", done: false },
           { id: "p2-pricing-intel", label: "Pricing intelligence (compare rates to similar properties)", done: false },
           { id: "p2-demand-signals", label: "Demand signals (view counts, search appearances, favorites)", done: false },
-          { id: "p2-gate-codes", label: "Gate code delivery automation (time-limited, booking-day)", detail: "Landowners enter gate codes on property profile. Booking lifecycle cron emails gate code + access notes to anglers morning-of.", done: true },
           { id: "p2-request-book-v2", label: "Request-to-book approval queue with auto-confirm rules", done: false },
           { id: "p2-geo-club-match", label: "Geo-based club matching (auto-suggest nearby clubs when listing a property)", done: false },
           { id: "p2-structured-rules", label: "Structured access rules (barbless, wade-only, check-in times)", done: false },
