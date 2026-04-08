@@ -457,6 +457,23 @@ async function handleSubscriptionDeleted(
 
 }
 
+// ─── Payout Handlers (Finance Ops Layer) ──────────────────────────
+
+async function handlePayoutCreated(payoutObj: Record<string, unknown>) {
+  const { ingestPayout } = await import("@/lib/finance/stripe-payouts");
+  await ingestPayout(payoutObj);
+}
+
+async function handlePayoutPaid(payoutObj: Record<string, unknown>) {
+  const { markPayoutPaid } = await import("@/lib/finance/stripe-payouts");
+  await markPayoutPaid(payoutObj);
+}
+
+async function handlePayoutFailed(payoutObj: Record<string, unknown>) {
+  const { markPayoutFailed } = await import("@/lib/finance/stripe-payouts");
+  await markPayoutFailed(payoutObj);
+}
+
 async function handleChargeDisputeCreated(
   dispute: Record<string, unknown>
 ) {
@@ -551,6 +568,15 @@ export async function POST(request: NextRequest) {
         break;
       case "charge.dispute.created":
         await handleChargeDisputeCreated(obj);
+        break;
+      case "payout.created":
+        await handlePayoutCreated(obj);
+        break;
+      case "payout.paid":
+        await handlePayoutPaid(obj);
+        break;
+      case "payout.failed":
+        await handlePayoutFailed(obj);
         break;
       default:
         console.info(`[stripe-webhook] Unhandled event type: ${event.type}`);

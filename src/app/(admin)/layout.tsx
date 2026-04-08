@@ -10,6 +10,7 @@ import {
   Building2,
   Compass,
   DollarSign,
+  Landmark,
   Shield,
   LifeBuoy,
   Sparkles,
@@ -59,6 +60,11 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <DollarSign />,
   },
   {
+    label: "Finance Ops",
+    href: "/admin/finance-ops",
+    icon: <Landmark />,
+  },
+  {
     label: "Team",
     href: "/admin/team",
     icon: <UserPlus />,
@@ -102,6 +108,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/users": "User Management",
   "/admin/clubs": "Club Oversight",
   "/admin/financials": "Platform Financials",
+  "/admin/finance-ops": "Finance Operations",
   "/admin/team": "Team Management",
   "/admin/platform-staff": "Platform Staff Roles",
   "/admin/settings": "Platform Settings",

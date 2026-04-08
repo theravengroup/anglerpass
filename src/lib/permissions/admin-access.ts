@@ -75,6 +75,10 @@ export const ADMIN_PAGE_ACCESS: Record<string, PlatformRole[]> = {
     "ops_admin",
     "support_agent",
   ],
+  "/admin/finance-ops": [
+    "super_admin",
+    "finance_admin",
+  ],
   "/admin/compass": [
     "super_admin",
     "ops_admin",
