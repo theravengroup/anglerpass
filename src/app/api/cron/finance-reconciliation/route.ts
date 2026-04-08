@@ -124,6 +124,26 @@ export async function POST(request: Request) {
     };
   }
 
+  // 6. Send email digest (daily always, weekly on Mondays)
+  try {
+    const { sendDailyDigest, sendWeeklyDigest } = await import(
+      "@/lib/finance/email-digest"
+    );
+    const dailySent = await sendDailyDigest();
+    results.daily_digest = { sent: dailySent };
+
+    const dayOfWeek = new Date().getDay();
+    if (dayOfWeek === 1) {
+      const weeklySent = await sendWeeklyDigest();
+      results.weekly_digest = { sent: weeklySent };
+    }
+  } catch (err) {
+    console.error("[finance-cron] Email digest failed:", err);
+    results.email_digest = {
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+
   return jsonOk({ results });
 }
 

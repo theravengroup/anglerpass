@@ -17,6 +17,10 @@ import {
 import AdminPageGuard from "@/components/admin/AdminPageGuard";
 import PayoutDrilldown from "@/components/admin/PayoutDrilldown";
 import MonthlyReportCard from "@/components/admin/MonthlyReportCard";
+import RevenueStreamsCard from "@/components/admin/RevenueStreamsCard";
+import CashFlowCard from "@/components/admin/CashFlowCard";
+import ExceptionAgingCard from "@/components/admin/ExceptionAgingCard";
+import FinanceExportButton from "@/components/admin/FinanceExportButton";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -271,13 +275,16 @@ function FinanceOpsContent() {
           <h2 className="text-lg font-semibold text-text-primary">
             System Sync Status
           </h2>
-          <button
-            onClick={fetchData}
-            className="inline-flex items-center gap-1.5 rounded-md bg-parchment px-3 py-1.5 text-sm text-text-primary hover:bg-parchment-light"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
-          </button>
+          <div className="flex gap-2">
+            <FinanceExportButton />
+            <button
+              onClick={fetchData}
+              className="inline-flex items-center gap-1.5 rounded-md bg-parchment px-3 py-1.5 text-sm text-text-primary hover:bg-parchment-light"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {data.sync_status.map((s) => (
@@ -380,6 +387,15 @@ function FinanceOpsContent() {
           </div>
         </section>
       )}
+
+      {/* Revenue + Cash Flow (side by side on large screens) */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RevenueStreamsCard />
+        <CashFlowCard />
+      </div>
+
+      {/* Exception Aging */}
+      <ExceptionAgingCard />
 
       {/* Monthly Report */}
       <MonthlyReportCard />
