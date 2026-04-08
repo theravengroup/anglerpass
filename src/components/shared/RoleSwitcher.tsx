@@ -12,6 +12,7 @@ import {
   Check,
   Loader2,
   Compass,
+  ShieldCheck,
 } from "lucide-react";
 
 const ROLE_CONFIG: Record<
@@ -45,6 +46,13 @@ const ROLE_CONFIG: Record<
     color: "text-charcoal",
     bg: "bg-charcoal/10",
     home: "/guide",
+  },
+  admin: {
+    label: "Admin",
+    icon: ShieldCheck,
+    color: "text-red-600",
+    bg: "bg-red-50",
+    home: "/admin",
   },
 };
 

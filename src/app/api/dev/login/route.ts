@@ -58,9 +58,14 @@ async function devLogin(role: string) {
   });
 
   // Ensure profile exists with the requested role
+  // Admin gets all roles so they can switch; others get just their role
+  const allRoles = role === "admin"
+    ? ["admin", "landowner", "club_admin", "angler", "guide"]
+    : [role];
+
   const { error: updateErr } = await admin
     .from("profiles")
-    .update({ display_name: "Dev Test User", role, roles: [role] })
+    .update({ display_name: "Dev Test User", role, roles: allRoles })
     .eq("id", user.id);
 
   if (updateErr) {
@@ -68,7 +73,7 @@ async function devLogin(role: string) {
       id: user.id,
       display_name: "Dev Test User",
       role,
-      roles: [role],
+      roles: allRoles,
     });
     if (insertErr) {
       return Response.json(

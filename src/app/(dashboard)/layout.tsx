@@ -15,6 +15,7 @@ import {
   UserCircle,
   Calendar,
   Shield,
+  ShieldCheck,
   UserPlus,
   Gift,
   ClipboardList,
@@ -250,6 +251,15 @@ export default async function DashboardLayout({
     ...roleItems,
     ...SHARED_ITEMS.slice(2), // Notifications, Settings
   ];
+
+  // Add Admin Panel link for users with admin role
+  if (profile.roles.includes("admin") && profile.role !== "admin") {
+    sidebarItems.push({
+      label: "Admin Panel",
+      href: "/admin",
+      icon: <ShieldCheck />,
+    });
+  }
 
   return (
     <ImpersonationWrapper>
