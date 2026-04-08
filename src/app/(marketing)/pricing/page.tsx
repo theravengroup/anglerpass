@@ -183,7 +183,7 @@ export default function PricingPage() {
                 </div>
               </div>
               <p className="text-[13px] text-text-secondary mt-2">
-                The hosting club already receives its $5/rod commission from the rod fee &mdash; same as any booking.
+                The hosting club still receives its standard $5/rod commission from the rod fee &mdash; same as any booking.
               </p>
             </div>
 
