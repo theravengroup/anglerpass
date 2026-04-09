@@ -91,7 +91,12 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <CalendarDays />,
   },
   {
-    label: "Campaigns",
+    label: "CRM",
+    href: "/admin/crm",
+    icon: <Mail />,
+  },
+  {
+    label: "Campaigns (Legacy)",
     href: "/admin/campaigns",
     icon: <Mail />,
   },
@@ -121,7 +126,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/audit-log": "Audit Log",
   "/admin/support": "Support Tickets",
   "/admin/bookings": "Booking Management",
-  "/admin/campaigns": "Marketing Automation",
+  "/admin/crm": "Marketing Automation",
+  "/admin/campaigns": "Campaigns (Legacy)",
   "/admin/compass": "Compass AI Usage",
 };
 
