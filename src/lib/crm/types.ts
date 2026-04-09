@@ -308,6 +308,109 @@ export interface FrequencyCap {
   updated_at: string;
 }
 
+// ─── Workflows ─────────────────────────────────────────────────────
+
+export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
+
+export type WorkflowNodeType =
+  | "trigger"
+  | "send_email"
+  | "delay"
+  | "condition"
+  | "split"
+  | "end";
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description: string | null;
+  status: WorkflowStatus;
+  trigger_event: CrmTriggerEvent | null;
+  segment_id: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  activated_at: string | null;
+  paused_at: string | null;
+}
+
+export interface WorkflowNode {
+  id: string;
+  workflow_id: string;
+  type: WorkflowNodeType;
+  label: string;
+  config: WorkflowNodeConfig;
+  position_x: number;
+  position_y: number;
+  created_at: string;
+}
+
+export interface WorkflowEdge {
+  id: string;
+  workflow_id: string;
+  source_node_id: string;
+  target_node_id: string;
+  source_handle: string;
+  created_at: string;
+}
+
+/** Node config varies by type */
+export type WorkflowNodeConfig =
+  | TriggerNodeConfig
+  | SendEmailNodeConfig
+  | DelayNodeConfig
+  | ConditionNodeConfig
+  | SplitNodeConfig
+  | EndNodeConfig;
+
+export interface TriggerNodeConfig {
+  event?: CrmTriggerEvent;
+  segment_id?: string;
+}
+
+export interface SendEmailNodeConfig {
+  subject?: string;
+  html_body?: string;
+  from_name?: string;
+  from_email?: string;
+  topic_id?: string;
+}
+
+export interface DelayNodeConfig {
+  duration: number;
+  unit: "minutes" | "hours" | "days";
+}
+
+export interface ConditionNodeConfig {
+  field: string;
+  operator: "eq" | "neq" | "gt" | "lt" | "contains" | "exists";
+  value: string;
+}
+
+export interface SplitNodeConfig {
+  /** Percentage for the "A" path (0-100). B path gets the remainder. */
+  split_percent: number;
+}
+
+export interface EndNodeConfig {
+  reason?: string;
+}
+
+export type WorkflowEnrollmentStatus = "active" | "completed" | "paused" | "exited";
+
+export interface WorkflowEnrollment {
+  id: string;
+  workflow_id: string;
+  user_id: string | null;
+  email: string;
+  current_node_id: string | null;
+  status: WorkflowEnrollmentStatus;
+  wait_until: string | null;
+  enrolled_at: string;
+  completed_at: string | null;
+  last_processed_at: string | null;
+}
+
 // ─── Email Template Variables ───────────────────────────────────────
 
 export interface EmailTemplateVars {
