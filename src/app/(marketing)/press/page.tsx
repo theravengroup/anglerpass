@@ -242,7 +242,7 @@ export default function PressPage() {
           <div className="reveal grid grid-cols-1 gap-10 lg:grid-cols-[300px_1fr]">
             <div className="relative aspect-[3/4] overflow-hidden rounded-[14px] border border-parchment">
               <Image
-                src="/images/press/team/dan-jahn-founder-headshot-webres.webp"
+                src="/images/team/dan-jahn-founder-headshot-webres.webp"
                 alt="Dan Jahn, Founder of AnglerPass"
                 fill
                 className="object-cover"

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
@@ -21,26 +22,31 @@ const TEAM_MEMBERS = [
     name: 'Dan Jahn',
     title: 'Founder + CEO',
     slug: 'dan-jahn',
+    photo: '/images/team/dan-jahn-founder-headshot-webres.webp',
   },
   {
     name: 'Marcus Johnstone',
     title: 'Director of Technology',
     slug: 'marcus-johnstone',
+    photo: null,
   },
   {
     name: 'Casey Prather',
     title: 'Director of Strategic Partnerships',
     slug: 'casey-prather',
+    photo: null,
   },
   {
     name: 'Nate Vigil',
     title: 'Director of Marketplace Operations',
     slug: 'nate-vigil',
+    photo: null,
   },
   {
     name: 'Dan Haskin',
     title: 'Outreach Coordinator',
     slug: 'dan-haskin',
+    photo: null,
   },
 ] as const;
 
@@ -70,20 +76,30 @@ export default function TeamPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {TEAM_MEMBERS.map((member) => (
               <div key={member.slug} className="flex flex-col items-center text-center">
-                {/* Headshot placeholder */}
+                {/* Headshot */}
                 <div className="size-[180px] rounded-full bg-parchment border-2 border-parchment-light mb-6 flex items-center justify-center overflow-hidden">
-                  <svg
-                    className="size-16 text-stone-light/60"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
+                  {member.photo ? (
+                    <Image
+                      src={member.photo}
+                      alt={`${member.name}, ${member.title}`}
+                      width={180}
+                      height={180}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <svg
+                      className="size-16 text-stone-light/60"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  )}
                 </div>
 
                 {/* Name + Title */}
