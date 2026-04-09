@@ -5,25 +5,14 @@
 
 import "server-only";
 
-import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getResend } from "@/lib/email";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
 import { crmTable } from "@/lib/crm/admin-queries";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
 import type { TemplateData } from "@/lib/crm/template-engine";
-
-// ─── Resend Client ──────────────────────────────────────────────────
-
-let _resend: Resend | null = null;
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
-  return _resend;
-}
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 // ─── Types ──────────────────────────────────────────────────────────
 

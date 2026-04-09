@@ -1,13 +1,9 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { consultationSchema } from "@/lib/validations/consultation";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyTurnstile } from "@/lib/api/turnstile";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 export async function POST(request: Request) {
   const limited = rateLimit("consultation", getClientIp(request), 3, 60_000);
@@ -48,6 +44,7 @@ export async function POST(request: Request) {
     }
 
     // Send emails via Resend
+    const resend = getResend();
     if (resend) {
       try {
         // Confirmation to requester

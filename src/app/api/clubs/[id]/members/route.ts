@@ -1,13 +1,9 @@
 import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberInviteSchema } from "@/lib/validations/clubs";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 /**
  * Check if the user is a club owner or active staff member.
@@ -246,6 +242,7 @@ async function sendMemberInviteEmail(
   needsSignup: boolean,
   role: string
 ) {
+  const resend = getResend();
   if (!resend) return;
 
   try {

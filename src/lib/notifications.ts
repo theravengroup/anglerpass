@@ -4,20 +4,10 @@
  * Used by API routes (server-side only) via the admin Supabase client.
  */
 
-import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getResend } from "@/lib/email";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
-
-// Lazy-initialize Resend client to avoid holding a connection when not needed
-let _resend: Resend | null = null;
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
-  return _resend;
-}
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 // ─── Types ──────────────────────────────────────────────────────────
 

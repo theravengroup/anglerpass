@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
@@ -8,13 +8,7 @@ import {
   requireClubRole,
 } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 const inviteSchema = z.object({
   landowner_email: z.string().email("Valid email is required"),
@@ -111,6 +105,7 @@ export async function POST(
   }
 
   // Send invitation email
+  const resend = getResend();
   if (resend) {
     try {
       const claimUrl = `${SITE_URL}/claim/${invitation.token}`;

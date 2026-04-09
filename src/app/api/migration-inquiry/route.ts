@@ -1,11 +1,7 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { migrationInquirySchema } from "@/lib/validations/migration-inquiry";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const DATA_SOURCE_LABELS: Record<string, string> = {
   "excel-sheets": "Excel or Google Sheets",
@@ -86,6 +82,7 @@ export async function POST(request: Request) {
 
     // Send emails via Resend
     try {
+      const resend = getResend();
       if (resend) {
         // Confirmation to submitter
         await resend.emails.send({

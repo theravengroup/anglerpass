@@ -3,9 +3,8 @@ import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
 import { crmTable } from "@/lib/crm/admin-queries";
 import { buildCrmEmailHtml } from "@/lib/crm/email-sender";
 import { testSendSchema } from "@/lib/validations/campaigns";
-import { Resend } from "resend";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { getResend } from "@/lib/email";
+import { SITE_URL } from "@/lib/constants";
 
 /**
  * POST /api/admin/campaigns/[id]/test-send
@@ -23,7 +22,8 @@ export async function POST(
 
   const { id } = await params;
 
-  if (!process.env.RESEND_API_KEY) {
+  const resend = getResend();
+  if (!resend) {
     return jsonError("Resend not configured", 500);
   }
 
@@ -87,8 +87,6 @@ export async function POST(
   });
 
   // Send via Resend directly (no tracking, no suppression checks)
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
   try {
     const sendResult = await resend.emails.send({
       from: `${(c.from_name as string) ?? "AnglerPass"} <${(c.from_email as string) ?? "hello@anglerpass.com"}>`,

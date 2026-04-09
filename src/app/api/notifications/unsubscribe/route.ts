@@ -1,9 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 import { NextRequest, NextResponse } from "next/server";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 /**
  * GET /api/notifications/unsubscribe?token=xxx

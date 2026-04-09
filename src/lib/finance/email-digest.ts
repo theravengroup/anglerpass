@@ -5,17 +5,10 @@ import "server-only";
  * to finance staff using the Resend API.
  */
 
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  return new Resend(process.env.RESEND_API_KEY);
-}
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 function formatUsd(amount: number): string {
   return new Intl.NumberFormat("en-US", {

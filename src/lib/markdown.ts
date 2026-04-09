@@ -1,3 +1,5 @@
+import DOMPurify from "isomorphic-dompurify";
+
 /** Inline markdown: bold, links */
 function inline(text: string): string {
   return text
@@ -11,9 +13,12 @@ function inline(text: string): string {
     );
 }
 
-/** Simple markdown-to-HTML converter for headings, paragraphs, and unordered lists */
+/**
+ * Simple markdown-to-HTML converter for headings, paragraphs, and unordered lists.
+ * Output is sanitized with DOMPurify to prevent XSS.
+ */
 export function renderMarkdown(content: string): string {
-  return content
+  const raw = content
     .split('\n\n')
     .map((block) => {
       const trimmed = block.trim();
@@ -42,4 +47,10 @@ export function renderMarkdown(content: string): string {
       return `<p class="text-[16px] leading-[1.75] text-text-secondary mb-4">${inline(trimmed)}</p>`;
     })
     .join('\n');
+
+  return DOMPurify.sanitize(raw, {
+    ALLOWED_TAGS: ['h2', 'h3', 'p', 'ul', 'li', 'a', 'strong'],
+    ALLOWED_ATTR: ['class', 'href'],
+    ALLOW_ARIA_ATTR: false,
+  });
 }

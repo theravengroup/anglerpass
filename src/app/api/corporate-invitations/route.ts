@@ -1,16 +1,10 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { corporateInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 // ─── GET: Fetch invitations for a corporate member ─────────────────
 
@@ -240,6 +234,7 @@ async function sendCorporateInviteEmail(opts: {
   annualDues: number | null;
   token: string;
 }) {
+  const resend = getResend();
   if (!resend) return;
 
   const joinUrl = `${SITE_URL}/join/${opts.clubId}/invite/${opts.token}`;

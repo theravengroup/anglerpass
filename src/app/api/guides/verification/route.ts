@@ -2,11 +2,10 @@ import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
+import { SITE_URL } from "@/lib/constants";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 const STRIPE_SECRET = () => process.env.STRIPE_SECRET_KEY!;
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
 async function stripePost(path: string, body: Record<string, string>) {
   const res = await fetch(`${STRIPE_API}${path}`, {

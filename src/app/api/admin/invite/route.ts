@@ -1,12 +1,8 @@
 import { z } from "zod";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import type { Json } from "@/types/supabase";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const inviteSchema = z.object({
   email: z.email("A valid email is required"),
@@ -204,6 +200,7 @@ async function sendInviteEmail(
   inviterName: string,
   isExistingUser: boolean
 ) {
+  const resend = getResend();
   if (!resend) {
     console.warn("[admin/invite] Resend not configured, skipping email");
     return;

@@ -1,18 +1,12 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { SITE_URL } from "@/lib/constants";
+import { getResend } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { referralInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { generateReferralCode, buildReferralLink } from "@/lib/referral";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
 // POST: Send a referral invite email
 export async function POST(
@@ -119,6 +113,7 @@ export async function POST(
     const referrerName = profile?.display_name ?? "A member";
 
     // Send email
+    const resend = getResend();
     if (resend) {
       const personalMessage = parsed.data.message
         ? `<p style="font-size: 16px; line-height: 1.7; color: #5a5a52; font-style: italic; border-left: 3px solid #8b6914; padding-left: 16px; margin: 24px 0;">

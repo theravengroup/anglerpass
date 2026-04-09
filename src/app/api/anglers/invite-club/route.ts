@@ -1,13 +1,9 @@
 import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const inviteSchema = z.object({
   club_name: z.string().min(1, "Club name is required").max(200),
@@ -81,6 +77,7 @@ export async function POST(request: Request) {
     }
 
     // Send invitation email via Resend
+    const resend = getResend();
     if (resend) {
       try {
         const siteUrl =

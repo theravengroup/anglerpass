@@ -1,13 +1,7 @@
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError } from "@/lib/api/helpers";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 // Nudge schedule: 3, 7, 14 days after invitation
 const NUDGE_SCHEDULE_DAYS = [3, 7, 14];
@@ -69,6 +63,7 @@ export async function POST(request: Request) {
     const claimUrl = `${SITE_URL}/claim/${inv.token}`;
 
     // Send nudge email
+    const resend = getResend();
     if (resend) {
       try {
         await resend.emails.send({

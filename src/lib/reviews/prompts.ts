@@ -1,8 +1,9 @@
 import "server-only";
 
-import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getResend } from "@/lib/email";
 import { REVIEW_WINDOW_DAYS, LANDOWNER_FAULTS } from "@/lib/validations/reviews";
+import { SITE_URL } from "@/lib/constants";
 
 // ─── Constants ──────────────────────────────────────────────────────
 
@@ -21,18 +22,6 @@ const PROMPT_TYPES = [
 ] as const;
 
 type PromptType = (typeof PROMPT_TYPES)[number];
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
-
-// ─── Resend Client ──────────────────────────────────────────────────
-
-let _resend: Resend | null = null;
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
-  return _resend;
-}
 
 // ─── Types ──────────────────────────────────────────────────────────
 

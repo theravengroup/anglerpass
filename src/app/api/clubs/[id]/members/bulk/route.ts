@@ -1,13 +1,9 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const MAX_EMAILS = 200;
 
@@ -57,6 +53,7 @@ async function sendMemberInviteEmail(
   needsSignup: boolean,
   role: string
 ) {
+  const resend = getResend();
   if (!resend) return;
 
   try {

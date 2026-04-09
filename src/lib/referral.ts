@@ -2,6 +2,8 @@
  * Referral code generation and link building utilities.
  */
 
+import { SITE_URL } from "@/lib/constants";
+
 const REFERRAL_CODE_LENGTH = 8;
 
 /** Character set excluding ambiguous characters (0/O, 1/l/I) */
@@ -18,9 +20,6 @@ export function generateReferralCode(): string {
     .map((v) => CHARSET[v % CHARSET.length])
     .join("");
 }
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
 /**
  * Build the full referral join link for a club.

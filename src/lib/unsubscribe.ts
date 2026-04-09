@@ -9,10 +9,19 @@
 
 import { createHmac } from "crypto";
 
-const SECRET =
-  process.env.UNSUBSCRIBE_SECRET ??
-  process.env.SUPABASE_SERVICE_ROLE_KEY ??
-  "fallback-dev-secret";
+function getSecret(): string {
+  const secret =
+    process.env.UNSUBSCRIBE_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!secret) {
+    if (process.env.NODE_ENV === "development") return "dev-only-secret";
+    throw new Error(
+      "Missing UNSUBSCRIBE_SECRET or SUPABASE_SERVICE_ROLE_KEY — cannot sign unsubscribe tokens"
+    );
+  }
+  return secret;
+}
+
+const SECRET = getSecret();
 
 function sign(userId: string): string {
   return createHmac("sha256", SECRET).update(userId).digest("base64url");

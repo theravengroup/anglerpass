@@ -1,13 +1,9 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { leadSchema } from "@/lib/validations/leads";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { verifyTurnstile } from "@/lib/api/turnstile";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
@@ -37,6 +33,7 @@ async function sendWaitlistEmails(data: {
   roleResponse?: string;
   message?: string;
 }) {
+  const resend = getResend();
   if (!resend) return;
 
   const name = data.firstName;
@@ -90,6 +87,7 @@ async function sendInvestorEmails(data: {
   investorType?: string;
   message?: string;
 }) {
+  const resend = getResend();
   if (!resend) return;
 
   const name = data.firstName;

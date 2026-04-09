@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
@@ -6,13 +6,7 @@ import {
   requireAuth,
   requireClubRole,
 } from "@/lib/api/helpers";
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 /**
  * POST /api/properties/[id]/resend-invitation
@@ -64,6 +58,7 @@ export async function POST(
     .eq("id", invitation.id);
 
   // Send reminder email
+  const resend = getResend();
   if (resend) {
     try {
       const claimUrl = `${SITE_URL}/claim/${invitation.token}`;
