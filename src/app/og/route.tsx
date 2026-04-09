@@ -1,6 +1,6 @@
-import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
+import { jpegOgImage } from '@/lib/og-jpeg';
 
 export const runtime = 'nodejs';
 
@@ -39,8 +39,7 @@ export async function GET(request: NextRequest) {
   const config = configMap[type] ?? configMap.default;
   const bgSrc = getOgBackgroundDataUri(config.bg);
 
-  return new ImageResponse(
-    (
+  return jpegOgImage(
       <div
         style={{
           width: '100%',
@@ -204,8 +203,7 @@ export async function GET(request: NextRequest) {
             anglerpass.com
           </div>
         </div>
-      </div>
-    ),
+      </div>,
     { width: 1200, height: 630 }
   );
 }
