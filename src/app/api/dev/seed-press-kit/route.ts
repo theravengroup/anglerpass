@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 import { createHash } from "crypto";
 import type { Database } from "@/types/supabase";
 
@@ -29,7 +29,7 @@ function sid(seed: string): string {
  */
 export async function GET() {
   if (process.env.NODE_ENV !== "development") {
-    return NextResponse.json({ error: "Not available" }, { status: 404 });
+    return jsonError("Not available", 404);
   }
 
   const admin = createAdminClient();
@@ -40,10 +40,7 @@ export async function GET() {
     (u) => u.email === "dev-test@anglerpass.local"
   );
   if (!devUser) {
-    return NextResponse.json(
-      { error: "Dev test user not found. Hit /api/dev/login first." },
-      { status: 400 }
-    );
+    return jsonError("Dev test user not found. Hit /api/dev/login first.", 400);
   }
   const DEV = devUser.id;
 
@@ -434,7 +431,7 @@ export async function GET() {
     if (!error) inserted++;
   }
 
-  return NextResponse.json({
+  return jsonOk({
     success: true,
     seeded: {
       profiles: fakeUsers.length,

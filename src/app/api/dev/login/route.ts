@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { jsonError } from "@/lib/api/helpers";
 import { PLATFORM_ROLES } from "@/lib/permissions/constants";
 import type { PlatformRole } from "@/lib/permissions/constants";
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
 
 async function devLogin(role: string, staffRole: string | null) {
   if (process.env.NODE_ENV !== "development") {
-    return Response.json({ error: "Not available" }, { status: 404 });
+    return jsonError("Not available", 404);
   }
 
   const admin = createAdminClient();
@@ -49,10 +50,7 @@ async function devLogin(role: string, staffRole: string | null) {
       });
 
     if (createErr || !created.user) {
-      return Response.json(
-        { error: "Failed to create test user", detail: createErr?.message },
-        { status: 500 }
-      );
+      return jsonError(`Failed to create test user: ${createErr?.message}`, 500);
     }
     user = created.user;
   }
@@ -81,10 +79,7 @@ async function devLogin(role: string, staffRole: string | null) {
       roles: allRoles,
     });
     if (insertErr) {
-      return Response.json(
-        { error: "Failed to set profile", detail: insertErr.message },
-        { status: 500 }
-      );
+      return jsonError(`Failed to set profile: ${insertErr.message}`, 500);
     }
   }
 
@@ -129,10 +124,7 @@ async function devLogin(role: string, staffRole: string | null) {
 
   if (!signInRes.ok) {
     const err = await signInRes.text();
-    return Response.json(
-      { error: "Failed to sign in", detail: err },
-      { status: 500 }
-    );
+    return jsonError(`Failed to sign in: ${err}`, 500);
   }
 
   const tokens = await signInRes.json();

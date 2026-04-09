@@ -36,6 +36,15 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
+      // Validate Turnstile token server-side before proceeding
+      const { verifyTurnstileToken } = await import("@/lib/turnstile");
+      const turnstileError = await verifyTurnstileToken(turnstileToken);
+      if (turnstileError) {
+        setError(turnstileError);
+        setIsLoading(false);
+        return;
+      }
+
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 
@@ -127,7 +136,7 @@ export default function ForgotPasswordPage() {
             aria-invalid={!!errors.email}
           />
           {errors.email && (
-            <p className="text-xs text-red-600">{errors.email.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">{errors.email.message}</p>
           )}
         </div>
 

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { jsonError, jsonOk } from "@/lib/api/helpers";
 
 /**
  * Dev-only endpoint that creates platform staff users for each role.
@@ -41,7 +41,7 @@ const STAFF_USERS = [
 
 export async function GET() {
   if (process.env.NODE_ENV !== "development") {
-    return Response.json({ error: "Not available" }, { status: 404 });
+    return jsonError("Not available", 404);
   }
 
   const admin = createAdminClient();
@@ -134,5 +134,5 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ results });
+  return jsonOk({ results });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -29,20 +29,17 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleAnchorClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      if (href.startsWith('#')) {
-        e.preventDefault();
-        const el = document.querySelector(href);
-        if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY - 72;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
-        setMobileOpen(false);
+  function handleAnchorClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const el = document.querySelector(href);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - 72;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
-    },
-    []
-  );
+      setMobileOpen(false);
+    }
+  }
 
   return (
     <nav id="mainNav" className={scrolled || !isHomepage ? 'scrolled' : ''}>

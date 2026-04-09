@@ -47,6 +47,15 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
+      // Validate Turnstile token server-side before proceeding
+      const { verifyTurnstileToken } = await import("@/lib/turnstile");
+      const turnstileError = await verifyTurnstileToken(turnstileToken);
+      if (turnstileError) {
+        setError(turnstileError);
+        setIsLoading(false);
+        return;
+      }
+
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 

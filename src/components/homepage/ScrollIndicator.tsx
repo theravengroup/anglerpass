@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ScrollIndicator() {
   const [hidden, setHidden] = useState(false);
@@ -14,13 +14,13 @@ export default function ScrollIndicator() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleClick = useCallback(() => {
+  function handleClick() {
     const el = document.querySelector('#problem');
     if (el) {
       const top = el.getBoundingClientRect().top + window.scrollY - 72;
       window.scrollTo({ top, behavior: 'smooth' });
     }
-  }, []);
+  }
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { escapeIlike, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -59,8 +59,8 @@ export async function GET(request: Request) {
     }
 
     if (q) {
-      // Sanitize search term: strip PostgREST filter operators to prevent injection
-      const sanitized = q.replace(/[.,%()]/g, " ").trim();
+      // Escape ilike wildcards, then strip PostgREST filter operators
+      const sanitized = escapeIlike(q).replace(/[.,()]/g, " ").trim();
       if (sanitized) {
         query = query.or(
           `name.ilike.%${sanitized}%,location_description.ilike.%${sanitized}%,description.ilike.%${sanitized}%`
