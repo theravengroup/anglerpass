@@ -315,6 +315,8 @@ export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 export type WorkflowNodeType =
   | "trigger"
   | "send_email"
+  | "send_sms"
+  | "notify"
   | "delay"
   | "condition"
   | "split"
@@ -358,6 +360,8 @@ export interface WorkflowEdge {
 export type WorkflowNodeConfig =
   | TriggerNodeConfig
   | SendEmailNodeConfig
+  | SendSmsNodeConfig
+  | NotifyNodeConfig
   | DelayNodeConfig
   | ConditionNodeConfig
   | SplitNodeConfig
@@ -374,6 +378,17 @@ export interface SendEmailNodeConfig {
   from_name?: string;
   from_email?: string;
   topic_id?: string;
+}
+
+export interface SendSmsNodeConfig {
+  message?: string;
+}
+
+export interface NotifyNodeConfig {
+  title?: string;
+  body?: string;
+  action_url?: string;
+  category?: "general" | "marketing" | "booking" | "system" | "workflow";
 }
 
 export interface DelayNodeConfig {
@@ -409,6 +424,43 @@ export interface WorkflowEnrollment {
   enrolled_at: string;
   completed_at: string | null;
   last_processed_at: string | null;
+}
+
+// ─── Notifications ─────────────────────────────────────────────────
+
+export type NotificationCategory = "general" | "marketing" | "booking" | "system" | "workflow";
+
+export interface CrmNotification {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string | null;
+  action_url: string | null;
+  category: NotificationCategory;
+  is_read: boolean;
+  read_at: string | null;
+  source_type: "system" | "workflow" | "campaign" | "manual";
+  source_id: string | null;
+  created_at: string;
+}
+
+// ─── SMS ───────────────────────────────────────────────────────────
+
+export type SmsStatus = "queued" | "sent" | "delivered" | "failed";
+
+export interface CrmSmsSend {
+  id: string;
+  user_id: string | null;
+  phone_number: string;
+  message: string;
+  status: SmsStatus;
+  provider_id: string | null;
+  error_message: string | null;
+  source_type: "workflow" | "campaign" | "api" | "system";
+  source_id: string | null;
+  sent_at: string | null;
+  delivered_at: string | null;
+  created_at: string;
 }
 
 // ─── Email Template Variables ───────────────────────────────────────

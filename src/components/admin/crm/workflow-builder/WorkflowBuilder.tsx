@@ -322,6 +322,10 @@ function getDefaultConfig(type: WorkflowNodeType): Record<string, unknown> {
   switch (type) {
     case "send_email":
       return { subject: "", html_body: "", from_name: "AnglerPass" };
+    case "send_sms":
+      return { message: "" };
+    case "notify":
+      return { title: "", body: "", action_url: "", category: "workflow" };
     case "delay":
       return { duration: 1, unit: "days" };
     case "condition":

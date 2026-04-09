@@ -136,6 +136,20 @@ function NodeConfigSummary({ node }: { node: WfNode }) {
           {(c.subject as string) || "No subject set"}
         </p>
       );
+    case "send_sms":
+      return (
+        <p className="mt-0.5 truncate text-[10px] text-text-light">
+          {(c.message as string)
+            ? (c.message as string).substring(0, 40) + ((c.message as string).length > 40 ? "..." : "")
+            : "No message set"}
+        </p>
+      );
+    case "notify":
+      return (
+        <p className="mt-0.5 truncate text-[10px] text-text-light">
+          {(c.title as string) || "No title set"}
+        </p>
+      );
     case "delay": {
       const dur = (c.duration as number) ?? 1;
       const unit = (c.unit as string) ?? "days";

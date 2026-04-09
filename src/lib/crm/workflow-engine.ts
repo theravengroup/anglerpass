@@ -17,9 +17,13 @@ import { crmTable } from "@/lib/crm/admin-queries";
 import { sendCrmEmail } from "@/lib/crm/email-sender";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
+import { sendSms, canReceiveSms } from "@/lib/crm/sms-sender";
+import { createNotification } from "@/lib/crm/notifications";
 import type {
   WorkflowNodeType,
   SendEmailNodeConfig,
+  SendSmsNodeConfig,
+  NotifyNodeConfig,
   DelayNodeConfig,
   ConditionNodeConfig,
   SplitNodeConfig,
@@ -226,6 +230,12 @@ async function executeNode(
     case "send_email":
       return executeSendEmail(admin, enrollment, node);
 
+    case "send_sms":
+      return executeSendSms(admin, enrollment, node);
+
+    case "notify":
+      return executeNotify(admin, enrollment, node);
+
     case "delay":
       return executeDelay(admin, enrollment, node);
 
@@ -335,6 +345,131 @@ async function executeSendEmail(
       error: result.error,
     });
   }
+
+  return { action: "advance", handle: "default" };
+}
+
+// ─── Send SMS Node ─────────────────────────────────────────────────
+
+async function executeSendSms(
+  admin: SupabaseClient,
+  enrollment: EnrollmentRow,
+  node: NodeRow
+): Promise<NodeResult> {
+  const config = node.config as unknown as SendSmsNodeConfig;
+
+  if (!config.message) {
+    await logWorkflowStep(admin, enrollment, node, "skipped", {
+      reason: "missing_message",
+    });
+    return { action: "advance", handle: "default" };
+  }
+
+  if (!enrollment.user_id) {
+    await logWorkflowStep(admin, enrollment, node, "skipped", {
+      reason: "no_user_id",
+    });
+    return { action: "advance", handle: "default" };
+  }
+
+  // Check if user can receive SMS
+  const smsCheck = await canReceiveSms(admin, enrollment.user_id);
+  if (!smsCheck.allowed || !smsCheck.phoneNumber) {
+    await logWorkflowStep(admin, enrollment, node, "skipped", {
+      reason: "sms_not_available",
+    });
+    return { action: "advance", handle: "default" };
+  }
+
+  // Resolve display name for template
+  let displayName: string | undefined;
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("display_name")
+    .eq("id", enrollment.user_id)
+    .maybeSingle();
+  displayName = (profile as Record<string, unknown> | null)?.display_name as string | undefined;
+
+  const result = await sendSms(admin, {
+    userId: enrollment.user_id,
+    phoneNumber: smsCheck.phoneNumber,
+    message: config.message,
+    sourceType: "workflow",
+    sourceId: enrollment.workflow_id,
+    templateContext: {
+      userId: enrollment.user_id,
+      email: enrollment.email,
+      displayName,
+    },
+    templateExtras: enrollment.context_data ?? undefined,
+  });
+
+  if (result.success) {
+    await logWorkflowStep(admin, enrollment, node, "sms_sent", {
+      send_id: result.sendId,
+      phone: smsCheck.phoneNumber,
+    });
+  } else {
+    await logWorkflowStep(admin, enrollment, node, "sms_failed", {
+      send_id: result.sendId,
+      error: result.error,
+    });
+  }
+
+  return { action: "advance", handle: "default" };
+}
+
+// ─── Notify Node (In-App) ──────────────────────────────────────────
+
+async function executeNotify(
+  admin: SupabaseClient,
+  enrollment: EnrollmentRow,
+  node: NodeRow
+): Promise<NodeResult> {
+  const config = node.config as unknown as NotifyNodeConfig;
+
+  if (!config.title) {
+    await logWorkflowStep(admin, enrollment, node, "skipped", {
+      reason: "missing_title",
+    });
+    return { action: "advance", handle: "default" };
+  }
+
+  if (!enrollment.user_id) {
+    await logWorkflowStep(admin, enrollment, node, "skipped", {
+      reason: "no_user_id",
+    });
+    return { action: "advance", handle: "default" };
+  }
+
+  // Resolve display name for template
+  let displayName: string | undefined;
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("display_name")
+    .eq("id", enrollment.user_id)
+    .maybeSingle();
+  displayName = (profile as Record<string, unknown> | null)?.display_name as string | undefined;
+
+  const notifId = await createNotification(admin, {
+    userId: enrollment.user_id,
+    title: config.title,
+    body: config.body,
+    actionUrl: config.action_url,
+    category: config.category ?? "workflow",
+    sourceType: "workflow",
+    sourceId: enrollment.workflow_id,
+    templateContext: {
+      userId: enrollment.user_id,
+      email: enrollment.email,
+      displayName,
+    },
+    templateExtras: enrollment.context_data ?? undefined,
+  });
+
+  await logWorkflowStep(admin, enrollment, node, "notified", {
+    notification_id: notifId,
+  });
 
   return { action: "advance", handle: "default" };
 }

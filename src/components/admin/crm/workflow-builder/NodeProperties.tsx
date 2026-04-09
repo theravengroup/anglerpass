@@ -61,6 +61,12 @@ export default function NodeProperties({
       {node.type === "send_email" && (
         <SendEmailProps config={c} onUpdate={onUpdate} />
       )}
+      {node.type === "send_sms" && (
+        <SendSmsProps config={c} onUpdate={onUpdate} />
+      )}
+      {node.type === "notify" && (
+        <NotifyProps config={c} onUpdate={onUpdate} />
+      )}
       {node.type === "delay" && (
         <DelayProps config={c} onUpdate={onUpdate} />
       )}
@@ -151,6 +157,106 @@ function SendEmailProps({
           placeholder="AnglerPass"
           className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary placeholder:text-text-light"
         />
+      </div>
+    </div>
+  );
+}
+
+// ─── Send SMS Properties ──────────────────────────────────────────
+
+function SendSmsProps({
+  config,
+  onUpdate,
+}: {
+  config: Record<string, unknown>;
+  onUpdate: (c: Record<string, unknown>) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="mb-1 block text-xs text-text-secondary">
+          Message
+        </label>
+        <textarea
+          value={(config.message as string) ?? ""}
+          onChange={(e) => onUpdate({ ...config, message: e.target.value })}
+          rows={4}
+          placeholder="Hi {{ user.name }}, your booking is confirmed!"
+          className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary placeholder:text-text-light"
+        />
+        <p className="mt-1 text-[10px] text-text-light">
+          Max 1600 chars. Supports Liquid templates.
+        </p>
+      </div>
+      <div className="rounded-md bg-amber-50 p-2">
+        <p className="text-[10px] text-amber-700">
+          SMS requires user to have a phone number and SMS&nbsp;opt-in enabled.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Notify (In-App) Properties ───────────────────────────────────
+
+function NotifyProps({
+  config,
+  onUpdate,
+}: {
+  config: Record<string, unknown>;
+  onUpdate: (c: Record<string, unknown>) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="mb-1 block text-xs text-text-secondary">Title</label>
+        <input
+          type="text"
+          value={(config.title as string) ?? ""}
+          onChange={(e) => onUpdate({ ...config, title: e.target.value })}
+          placeholder="Welcome to AnglerPass!"
+          className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary placeholder:text-text-light"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs text-text-secondary">
+          Body (optional)
+        </label>
+        <textarea
+          value={(config.body as string) ?? ""}
+          onChange={(e) => onUpdate({ ...config, body: e.target.value })}
+          rows={3}
+          placeholder="Here's how to get started..."
+          className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary placeholder:text-text-light"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs text-text-secondary">
+          Action URL (optional)
+        </label>
+        <input
+          type="text"
+          value={(config.action_url as string) ?? ""}
+          onChange={(e) => onUpdate({ ...config, action_url: e.target.value })}
+          placeholder="/dashboard or https://..."
+          className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary placeholder:text-text-light"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs text-text-secondary">
+          Category
+        </label>
+        <select
+          value={(config.category as string) ?? "workflow"}
+          onChange={(e) => onUpdate({ ...config, category: e.target.value })}
+          className="w-full rounded-md border border-stone-light/30 px-3 py-1.5 text-sm text-text-primary"
+        >
+          <option value="general">General</option>
+          <option value="marketing">Marketing</option>
+          <option value="booking">Booking</option>
+          <option value="system">System</option>
+          <option value="workflow">Workflow</option>
+        </select>
       </div>
     </div>
   );
