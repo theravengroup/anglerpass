@@ -1,24 +1,54 @@
-import DOMPurify from "isomorphic-dompurify";
-
-/** Inline markdown: bold, links */
-function inline(text: string): string {
+/**
+ * Sanitize a string for safe insertion into HTML.
+ * Escapes &, <, >, ", and ' to prevent XSS.
+ */
+function escapeHtml(text: string): string {
   return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Validate and sanitize a URL for use in href attributes.
+ * Only allows http, https, and mailto protocols.
+ */
+function sanitizeHref(url: string): string {
+  const trimmed = url.trim();
+  if (
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("mailto:") ||
+    trimmed.startsWith("/")
+  ) {
+    return escapeHtml(trimmed);
+  }
+  return "#";
+}
+
+/** Inline markdown: bold, links. All text is escaped for XSS safety. */
+function inline(text: string): string {
+  return escapeHtml(text)
     .replace(
       /\*\*(.+?)\*\*/g,
       '<strong class="text-forest font-semibold">$1</strong>'
     )
     .replace(
       /\[(.+?)\]\((.+?)\)/g,
-      '<a href="$2" class="text-river underline hover:text-forest transition-colors">$1</a>'
+      (_match, label: string, url: string) =>
+        `<a href="${sanitizeHref(url)}" class="text-river underline hover:text-forest transition-colors">${label}</a>`
     );
 }
 
 /**
  * Simple markdown-to-HTML converter for headings, paragraphs, and unordered lists.
- * Output is sanitized with DOMPurify to prevent XSS.
+ * All user-derived text is HTML-escaped. URLs are validated against an allowlist
+ * of safe protocols (https, http, mailto, relative paths).
  */
 export function renderMarkdown(content: string): string {
-  const raw = content
+  return content
     .split('\n\n')
     .map((block) => {
       const trimmed = block.trim();
@@ -47,10 +77,4 @@ export function renderMarkdown(content: string): string {
       return `<p class="text-[16px] leading-[1.75] text-text-secondary mb-4">${inline(trimmed)}</p>`;
     })
     .join('\n');
-
-  return DOMPurify.sanitize(raw, {
-    ALLOWED_TAGS: ['h2', 'h3', 'p', 'ul', 'li', 'a', 'strong'],
-    ALLOWED_ATTR: ['class', 'href'],
-    ALLOW_ARIA_ATTR: false,
-  });
 }
