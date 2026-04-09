@@ -24,30 +24,35 @@ const TEAM_MEMBERS = [
     title: 'Founder + CEO',
     slug: 'dan-jahn',
     photo: '/images/team/dan-jahn.webp',
+    bio: 'Dan Jahn built AnglerPass together with some lifelong fly-fishing friends who run one of the country\u2019s most respected fly-fishing clubs. A leadership coach, author, and speaker whose work spans 68 countries, and founder and owner of a 30+ year technology consulting firm, Dan built AnglerPass after years of seeing high-quality private water sit underutilized while capable anglers couldn\u2019t access it. His background in building and leading organizations across business, education, and the arts\u00a0\u2014 combined with three decades of technology consulting\u00a0\u2014 gave him both the industry perspective and the technical instinct to build the platform that fly-fishing\u2019s private-water ecosystem has been\u00a0missing.',
   },
   {
     name: 'Marcus Johnstone',
     title: 'Director of Technology',
     slug: 'marcus-johnstone',
     photo: null,
+    bio: null,
   },
   {
     name: 'Casey Prather',
     title: 'Director of Strategic Partnerships',
     slug: 'casey-prather',
-    photo: null,
+    photo: '/images/team/casey-prather.webp',
+    bio: 'Casey Prather is the President and Director of Operations for Rocky Mountain Angling Club. Born and raised in Northern Colorado, Casey has spent 25 years working in the fishing industry in multiple facets. When not out fly fishing, Casey can be found working his bird dogs or spending time with his family. As an accomplished fly tyer, Casey lives by the motto \u201cif it swims, I want to throw a fly at it,\u201d which has led him through many angling adventures across the world. Guided by a commitment to conservation and a dedication to the club\u2019s landowners and members, Casey\u2019s focus is on providing access to quality water while preserving the environments that make the sport\u00a0unique.',
   },
   {
     name: 'Nate Vigil',
-    title: 'Director of Marketplace Operations',
+    title: 'Director of Platform Operations',
     slug: 'nate-vigil',
-    photo: null,
+    photo: '/images/team/nate-vigil.webp',
+    bio: 'Nate Vigil is the Vice President of Member Services at the Rocky Mountain Angling Club. Born and raised in Colorado, Nate has cultivated a lifelong passion for the outdoors, with fly fishing at its center for over 20 years. He began his career in the industry as a fishing sales associate and has spent the past decade connecting private landowners with passionate anglers. Driven by a commitment to conservation, Nate strives to create meaningful access to quality waters while preserving the landscapes that make the sport so\u00a0special.',
   },
   {
     name: 'Dan Haskin',
     title: 'Outreach Coordinator',
     slug: 'dan-haskin',
-    photo: null,
+    photo: '/images/team/dan-haskin.webp',
+    bio: 'Grounded in years of hands-on experience in the outdoor industry, Dan focuses on helping people build confidence in new forms of recreation\u00a0\u2014 especially on and around the water. Whether connecting anglers to new opportunities or introducing beginners to the sport, his work centers on making outdoor access more approachable, practical, and\u00a0rewarding.',
   },
 ] as const;
 
@@ -71,14 +76,17 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* Team Grid */}
+      {/* Team Members */}
       <section className="py-[100px] bg-offwhite">
-        <div className="max-w-[1000px] mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {TEAM_MEMBERS.map((member) => (
-              <div key={member.slug} className="flex flex-col items-center text-center">
-                {/* Headshot */}
-                <div className="size-[180px] rounded-full bg-parchment border-2 border-parchment-light mb-6 flex items-center justify-center overflow-hidden">
+        <div className="max-w-[900px] mx-auto px-8 space-y-16">
+          {TEAM_MEMBERS.map((member) => (
+            <div
+              key={member.slug}
+              className="grid grid-cols-1 gap-8 md:grid-cols-[200px_1fr] md:gap-10"
+            >
+              {/* Headshot */}
+              <div className="flex justify-center md:justify-start">
+                <div className="size-[180px] shrink-0 rounded-full bg-parchment border-2 border-parchment-light flex items-center justify-center overflow-hidden">
                   {member.photo ? (
                     <Image
                       src={member.photo}
@@ -102,25 +110,32 @@ export default function TeamPage() {
                     </svg>
                   )}
                 </div>
+              </div>
 
-                {/* Name + Title */}
-                <h2 className="font-heading text-[22px] font-semibold text-forest tracking-[-0.2px] mb-1">
+              {/* Name + Title + Bio */}
+              <div className="text-center md:text-left">
+                <h2 className="font-heading text-[24px] font-semibold text-forest tracking-[-0.2px] mb-1">
                   {member.name}
                 </h2>
-                <p className="text-[13px] font-mono uppercase tracking-[0.12em] text-bronze mb-4">
+                <p className="text-[12px] font-mono uppercase tracking-[0.15em] text-bronze mb-4">
                   {member.title}
                 </p>
 
-                {/* Bio placeholder */}
-                <div className="space-y-2">
-                  <div className="h-3 w-full rounded bg-stone-light/15" />
-                  <div className="h-3 w-[90%] mx-auto rounded bg-stone-light/15" />
-                  <div className="h-3 w-[95%] mx-auto rounded bg-stone-light/15" />
-                  <div className="h-3 w-[70%] mx-auto rounded bg-stone-light/15" />
-                </div>
+                {member.bio ? (
+                  <p className="text-[15px] leading-[1.75] text-text-secondary">
+                    {member.bio}
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-w-[400px] mx-auto md:mx-0">
+                    <div className="h-3 w-full rounded bg-stone-light/15" />
+                    <div className="h-3 w-[90%] rounded bg-stone-light/15" />
+                    <div className="h-3 w-[95%] rounded bg-stone-light/15" />
+                    <div className="h-3 w-[70%] rounded bg-stone-light/15" />
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
