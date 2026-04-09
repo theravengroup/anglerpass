@@ -19,6 +19,7 @@ import CampaignStatusBadge from "@/components/admin/crm/CampaignStatusBadge";
 import CampaignTypeBadge from "@/components/admin/crm/CampaignTypeBadge";
 import CrmStatsCards from "@/components/admin/crm/CrmStatsCards";
 import EmailBuilder from "@/components/admin/crm/email-builder/EmailBuilder";
+import EmailQualityPanel from "@/components/admin/crm/EmailQualityPanel";
 import type {
   CampaignStatus,
   CampaignType,
@@ -696,6 +697,13 @@ function StepCard({
                   onChange={setHtmlBody}
                 />
               </div>
+              {/* Quality Panel */}
+              <EmailQualityPanel
+                subject={subject}
+                htmlBody={htmlBody}
+                fromName="AnglerPass"
+                fromEmail="hello@anglerpass.com"
+              />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setEditing(false)}
