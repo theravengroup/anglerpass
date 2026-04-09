@@ -19,6 +19,7 @@ import CampaignStatusBadge from "@/components/admin/crm/CampaignStatusBadge";
 import CampaignTypeBadge from "@/components/admin/crm/CampaignTypeBadge";
 import CrmStatsCards from "@/components/admin/crm/CrmStatsCards";
 import SegmentRuleBuilder from "@/components/admin/crm/SegmentRuleBuilder";
+import EmailBuilder from "@/components/admin/crm/email-builder/EmailBuilder";
 import type {
   CampaignStatus,
   CampaignType,
@@ -623,14 +624,12 @@ function StepCard({
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs text-text-secondary">
-                  HTML Body
+                <label className="mb-2 block text-xs text-text-secondary">
+                  Email Body
                 </label>
-                <textarea
-                  value={htmlBody}
-                  onChange={(e) => setHtmlBody(e.target.value)}
-                  rows={8}
-                  className="w-full rounded-md border border-stone-light/30 px-3 py-2 font-mono text-xs text-text-primary"
+                <EmailBuilder
+                  initialHtml={htmlBody}
+                  onChange={setHtmlBody}
                 />
               </div>
               <div className="flex justify-end gap-2">
