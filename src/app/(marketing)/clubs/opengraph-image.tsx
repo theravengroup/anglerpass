@@ -1,5 +1,5 @@
-import { ImageResponse } from 'next/og';
 import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
+import { jpegOgImage } from '@/lib/og-jpeg';
 
 export const alt = 'For Clubs — AnglerPass';
 export const size = { width: 1200, height: 630 };
@@ -9,8 +9,7 @@ export default async function Image() {
   const logoSrc = getLogoDataUri();
   const bgSrc = getOgBackgroundDataUri('minnesota');
 
-  return new ImageResponse(
-    (
+  return jpegOgImage(
       <div
         style={{
           width: '100%',
@@ -172,8 +171,7 @@ export default async function Image() {
             anglerpass.com
           </div>
         </div>
-      </div>
-    ),
-    { ...size }
+      </div>,
+    size
   );
 }
