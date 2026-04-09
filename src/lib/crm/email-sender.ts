@@ -155,6 +155,9 @@ export function buildCrmEmailHtml(payload: CrmEmailPayload): string {
 
   const rawHtml = `
 <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #1e1e1a;">
+  <a href="${SITE_URL}" style="display: block; margin-bottom: 24px; text-decoration: none;">
+    <img src="${SITE_URL}/images/anglerpass-email-logo.png" alt="AnglerPass" width="160" style="display: block; width: 160px; height: auto; border: 0;" />
+  </a>
   <p style="font-size: 16px; line-height: 1.7; color: #5a5a52;">
     Hi ${displayName},
   </p>

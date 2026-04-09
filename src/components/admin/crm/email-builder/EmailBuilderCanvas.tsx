@@ -106,6 +106,12 @@ export default function EmailBuilderCanvas({
     >
       {/* Email header preview */}
       <div className="border-b border-stone-light/10 bg-offwhite/50 px-6 py-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/anglerpass-email-logo.png"
+          alt="AnglerPass"
+          className="mb-4 block h-auto w-[160px]"
+        />
         <p className="font-heading text-base text-text-secondary">
           Hi {"{{display_name}}"},
         </p>
