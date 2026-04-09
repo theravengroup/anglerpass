@@ -70,7 +70,7 @@ export default function TeamPage() {
             The People Behind<br />AnglerPass
           </h1>
           <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto">
-            A team of builders, anglers, and outdoor industry veterans working
+            A team of technologists, anglers, and outdoor industry veterans working
             to modernize private fly fishing&nbsp;access.
           </p>
         </div>
