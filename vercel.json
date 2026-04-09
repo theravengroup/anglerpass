@@ -38,11 +38,11 @@
     },
     {
       "path": "/api/cron/crm-sender",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/cron/crm-drip",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 13 * * *"
     },
     {
       "path": "/api/cron/crm-stats",
@@ -50,7 +50,7 @@
     },
     {
       "path": "/api/cron/crm-workflow-runner",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 14 * * *"
     }
   ]
 }
