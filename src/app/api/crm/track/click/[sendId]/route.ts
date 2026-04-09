@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { crmTable } from "@/lib/crm/admin-queries";
+import { recordEngagement } from "@/lib/crm/send-time-optimizer";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
@@ -56,7 +57,7 @@ async function recordClick(
 
   // Validate send exists
   const { data: send } = await sends
-    .select("id, click_count, clicked_at")
+    .select("id, click_count, clicked_at, recipient_email")
     .eq("id", sendId)
     .maybeSingle();
 
@@ -80,4 +81,10 @@ async function recordClick(
   }
 
   await sends.update(updates).eq("id", sendId);
+
+  // Record engagement window for send-time optimization
+  const email = (send as Record<string, unknown>).recipient_email as string | undefined;
+  if (email) {
+    recordEngagement(admin, email, "click").catch(() => {});
+  }
 }

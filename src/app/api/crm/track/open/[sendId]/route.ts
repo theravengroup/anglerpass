@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { crmTable } from "@/lib/crm/admin-queries";
+import { recordEngagement } from "@/lib/crm/send-time-optimizer";
 
 /** 1x1 transparent GIF (43 bytes) */
 const TRACKING_PIXEL = Buffer.from(
@@ -44,7 +45,7 @@ async function recordOpen(sendId: string, request: NextRequest) {
 
   // Validate send exists
   const { data: send } = await sends
-    .select("id, open_count, opened_at")
+    .select("id, open_count, opened_at, recipient_email")
     .eq("id", sendId)
     .maybeSingle();
 
@@ -67,4 +68,10 @@ async function recordOpen(sendId: string, request: NextRequest) {
   }
 
   await sends.update(updates).eq("id", sendId);
+
+  // Record engagement window for send-time optimization
+  const email = (send as Record<string, unknown>).recipient_email as string | undefined;
+  if (email) {
+    recordEngagement(admin, email, "open").catch(() => {});
+  }
 }

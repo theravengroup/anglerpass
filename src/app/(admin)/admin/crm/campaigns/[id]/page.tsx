@@ -47,6 +47,7 @@ interface CampaignDetail {
   segment_id: string | null;
   topic_id: string | null;
   trigger_event: CrmTriggerEvent | null;
+  send_time_strategy: string | null;
   created_at: string;
   started_at: string | null;
   steps: StepRow[];
@@ -92,6 +93,7 @@ export default function CrmCampaignDetailPage() {
   const [triggerEvent, setTriggerEvent] = useState<CrmTriggerEvent | "">("");
   const [topicId, setTopicId] = useState<string>("");
   const [topicOptions, setTopicOptions] = useState<TopicOption[]>([]);
+  const [sendTimeStrategy, setSendTimeStrategy] = useState("immediate");
 
   // Stats
   const [stats, setStats] = useState({
@@ -123,6 +125,7 @@ export default function CrmCampaignDetailPage() {
       setReplyTo(c.reply_to ?? "");
       setTriggerEvent(c.trigger_event ?? "");
       setTopicId(c.topic_id ?? "");
+      setSendTimeStrategy(c.send_time_strategy ?? "immediate");
 
       // Load topics for the dropdown
       const topicsRes = await fetch("/api/admin/crm/topics");
@@ -179,6 +182,7 @@ export default function CrmCampaignDetailPage() {
           reply_to: replyTo || null,
           trigger_event: triggerEvent || undefined,
           topic_id: topicId || null,
+          send_time_strategy: sendTimeStrategy,
         }),
       });
       load();
@@ -440,6 +444,23 @@ export default function CrmCampaignDetailPage() {
                 </select>
                 <p className="mt-1 text-[10px] text-text-light">
                   Only send to users subscribed to this topic
+                </p>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-text-secondary">
+                  Send Timing
+                </label>
+                <select
+                  value={sendTimeStrategy}
+                  onChange={(e) => setSendTimeStrategy(e.target.value)}
+                  className="w-full rounded-md border border-stone-light/30 px-3 py-2 text-sm text-text-primary"
+                >
+                  <option value="immediate">Immediate</option>
+                  <option value="timezone_optimal">Timezone Optimal (10am local)</option>
+                  <option value="engagement_optimal">Engagement Optimal (best hour per user)</option>
+                </select>
+                <p className="mt-1 text-[10px] text-text-light">
+                  When to deliver emails to each recipient
                 </p>
               </div>
               <div className="col-span-2">
