@@ -1,0 +1,236 @@
+import "server-only";
+
+import { NextRequest, NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { crmTable } from "@/lib/crm/admin-queries";
+import { sendCrmEmail } from "@/lib/crm/email-sender";
+import { runPreSendChecks } from "@/lib/crm/subscription-checks";
+import { z } from "zod";
+
+// ─── POST /api/crm/send ───────────────────────────────────────────
+// API-triggered email send. Used by server code to send one-off or
+// transactional emails through the CRM system with full tracking,
+// template rendering, subscription checks, and frequency caps.
+//
+// Auth: Requires CRON_SECRET or internal service key.
+
+const sendSchema = z.object({
+  // Recipient — one of these required
+  to: z.string().email().optional(),
+  user_id: z.string().uuid().optional(),
+
+  // Content
+  subject: z.string().min(1).max(500),
+  html_body: z.string().min(1).max(200_000),
+  from_name: z.string().max(100).default("AnglerPass"),
+  from_email: z.string().email().default("hello@anglerpass.com"),
+  reply_to: z.string().email().optional(),
+
+  // Optional: link to a campaign for tracking
+  campaign_id: z.string().uuid().optional(),
+  step_id: z.string().uuid().optional(),
+
+  // Template data for Liquid rendering
+  data: z.record(z.string(), z.unknown()).optional(),
+
+  // Topic slug for subscription checking
+  topic_slug: z.string().optional(),
+
+  // CTA
+  cta_label: z.string().max(100).optional(),
+  cta_url: z.string().max(2000).optional(),
+
+  // Skip pre-send checks (for transactional emails)
+  skip_checks: z.boolean().default(false),
+}).refine(
+  (d) => d.to || d.user_id,
+  { message: "Either 'to' (email) or 'user_id' is required" }
+);
+
+export async function POST(req: NextRequest) {
+  // Auth: service-to-service via CRON_SECRET or admin session
+  const authHeader = req.headers.get("authorization");
+  const isCronAuth = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!isCronAuth) {
+    // Fall back to admin session check
+    const { requireAdmin } = await import("@/lib/api/helpers");
+    const auth = await requireAdmin();
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const result = sendSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: result.error.issues[0]?.message ?? "Invalid input" },
+      { status: 400 }
+    );
+  }
+
+  const input = result.data;
+  const admin = createAdminClient();
+
+  // Resolve email from user_id if needed
+  let email = input.to;
+  let userId = input.user_id;
+  let recipientName: string | undefined;
+
+  if (userId && !email) {
+    const { data: { user } } = await admin.auth.admin.getUserById(userId);
+    if (!user?.email) {
+      return NextResponse.json(
+        { error: "User not found or has no email" },
+        { status: 404 }
+      );
+    }
+    email = user.email;
+  }
+
+  if (!email) {
+    return NextResponse.json(
+      { error: "Could not resolve recipient email" },
+      { status: 400 }
+    );
+  }
+
+  // Look up user profile for name
+  if (userId) {
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("display_name")
+      .eq("id", userId)
+      .maybeSingle();
+    recipientName = profile?.display_name ?? undefined;
+  } else {
+    // Try to find user by email
+    const { data: { users } } = await admin.auth.admin.listUsers();
+    const matchedUser = users?.find((u) => u.email === email);
+    if (matchedUser) {
+      userId = matchedUser.id;
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("display_name")
+        .eq("id", userId)
+        .maybeSingle();
+      recipientName = profile?.display_name ?? undefined;
+    }
+  }
+
+  // Resolve topic from slug for subscription checking
+  let campaignId = input.campaign_id;
+
+  if (input.topic_slug && !input.skip_checks) {
+    // Find or create a virtual campaign linkage for topic checking
+    const { data: topic } = await crmTable(admin, "crm_subscription_topics")
+      .select("id")
+      .eq("slug", input.topic_slug)
+      .maybeSingle();
+
+    if (topic && campaignId) {
+      // Ensure campaign has this topic
+      await crmTable(admin, "campaigns")
+        .update({ topic_id: (topic as Record<string, unknown>).id })
+        .eq("id", campaignId);
+    }
+  }
+
+  // Run pre-send checks unless skipped (transactional)
+  if (!input.skip_checks) {
+    const check = await runPreSendChecks(admin, {
+      recipientEmail: email,
+      recipientId: userId,
+      recipientType: userId ? "user" : "lead",
+      campaignId: campaignId ?? "api-send",
+    });
+
+    if (!check.allowed) {
+      return NextResponse.json(
+        {
+          sent: false,
+          reason: check.reason,
+          message: `Email not sent: ${check.reason}`,
+        },
+        { status: 200 }
+      );
+    }
+  }
+
+  // Create a send record for tracking
+  const sendRecord = {
+    campaign_id: campaignId ?? null,
+    step_id: input.step_id ?? null,
+    recipient_id: userId ?? null,
+    recipient_email: email,
+    recipient_type: userId ? "user" : "lead",
+    lead_id: null,
+    status: "queued",
+    created_at: new Date().toISOString(),
+  } as Record<string, unknown>;
+
+  const { data: send, error: sendError } = await crmTable(admin, "campaign_sends")
+    .insert(sendRecord)
+    .select("id")
+    .single();
+
+  if (sendError || !send) {
+    // If we can't create a tracking record (e.g., no campaign_id for FK),
+    // still send but without tracking
+    const sendId = crypto.randomUUID();
+    const sendResult = await sendCrmEmail(admin, {
+      sendId,
+      to: email,
+      subject: input.subject,
+      htmlBody: input.html_body,
+      fromName: input.from_name,
+      fromEmail: input.from_email,
+      replyTo: input.reply_to,
+      ctaLabel: input.cta_label,
+      ctaUrl: input.cta_url,
+      recipientName,
+      userId: userId ?? undefined,
+      templateData: input.data,
+    });
+
+    return NextResponse.json({
+      sent: sendResult.success,
+      message_id: sendResult.messageId,
+      tracked: false,
+      error: sendResult.error,
+    });
+  }
+
+  const sendId = (send as Record<string, unknown>).id as string;
+
+  // Send the email
+  const sendResult = await sendCrmEmail(admin, {
+    sendId,
+    to: email,
+    subject: input.subject,
+    htmlBody: input.html_body,
+    fromName: input.from_name,
+    fromEmail: input.from_email,
+    replyTo: input.reply_to,
+    ctaLabel: input.cta_label,
+    ctaUrl: input.cta_url,
+    recipientName,
+    userId: userId ?? undefined,
+    templateData: input.data,
+  });
+
+  return NextResponse.json({
+    sent: sendResult.success,
+    send_id: sendId,
+    message_id: sendResult.messageId,
+    tracked: true,
+    error: sendResult.error,
+  });
+}

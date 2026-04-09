@@ -10,6 +10,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
 import { crmTable } from "@/lib/crm/admin-queries";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
+import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
+import type { TemplateData } from "@/lib/crm/template-engine";
 
 // ─── Resend Client ──────────────────────────────────────────────────
 
@@ -37,6 +39,8 @@ export interface CrmEmailPayload {
   ctaUrl?: string;
   recipientName?: string;
   userId?: string;
+  /** Extra template data for Liquid-style rendering */
+  templateData?: TemplateData;
 }
 
 export interface CrmSendResult {
@@ -136,8 +140,23 @@ export function buildCrmEmailHtml(payload: CrmEmailPayload): string {
     ? getUnsubscribeUrl(payload.userId)
     : `${SITE_URL}/api/notifications/unsubscribe`;
 
-  // Process the body — replace template variables
-  let body = payload.htmlBody;
+  // Build template context — merges standard vars with custom data
+  const templateCtx = buildTemplateData(
+    {
+      userId: payload.userId,
+      email: payload.to,
+      displayName: payload.recipientName,
+    },
+    {
+      ...payload.templateData,
+      unsubscribe_url: unsubscribeUrl,
+    }
+  );
+
+  // Process the body through Liquid-style template engine
+  let body = renderTemplate(payload.htmlBody, templateCtx);
+
+  // Backwards compat: also replace legacy {{var}} patterns
   body = body.replace(/\{\{display_name\}\}/g, displayName);
   body = body.replace(/\{\{email\}\}/g, escapeHtml(payload.to));
   body = body.replace(/\{\{site_url\}\}/g, SITE_URL);
@@ -211,10 +230,21 @@ export async function sendCrmEmail(
   try {
     const html = buildCrmEmailHtml(payload);
 
+    // Render subject line through template engine too
+    const templateCtx = buildTemplateData(
+      {
+        userId: payload.userId,
+        email: payload.to,
+        displayName: payload.recipientName,
+      },
+      payload.templateData
+    );
+    const renderedSubject = renderTemplate(payload.subject, templateCtx);
+
     const result = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
       to: payload.to,
-      subject: payload.subject,
+      subject: renderedSubject,
       html,
       replyTo: payload.replyTo,
       headers: {
@@ -265,7 +295,7 @@ export async function processSendBatch(
   // Fetch queued sends that are due
   const { data: queued } = await crmTable(admin, "campaign_sends")
     .select(
-      "id, campaign_id, step_id, recipient_id, recipient_email, recipient_type, lead_id, drip_scheduled_for"
+      "id, campaign_id, step_id, recipient_id, recipient_email, recipient_type, lead_id, drip_scheduled_for, template_data"
     )
     .eq("status", "queued")
     .or("drip_scheduled_for.is.null,drip_scheduled_for.lte.now()")
@@ -331,6 +361,12 @@ export async function processSendBatch(
       recipientName = profile?.display_name ?? undefined;
     }
 
+    // Parse template_data if present
+    const templateData =
+      send.template_data && typeof send.template_data === "object"
+        ? (send.template_data as Record<string, unknown>)
+        : undefined;
+
     const result = await sendCrmEmail(admin, {
       sendId: send.id,
       to: send.recipient_email,
@@ -343,6 +379,7 @@ export async function processSendBatch(
       ctaUrl: step.cta_url ?? undefined,
       recipientName,
       userId: send.recipient_id ?? undefined,
+      templateData,
     });
 
     if (result.success) {

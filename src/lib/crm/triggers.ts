@@ -15,10 +15,11 @@ import { crmTable } from "@/lib/crm/admin-queries";
 import { userMatchesSegment } from "@/lib/crm/segment-evaluator";
 import type { CrmTriggerEvent, Campaign, CampaignStep } from "@/lib/crm/types";
 
-interface TriggerContext {
+export interface TriggerContext {
   userId?: string;
   email?: string;
   leadId?: string;
+  /** Custom data passed through to Liquid templates as top-level variables */
   metadata?: Record<string, unknown>;
 }
 
