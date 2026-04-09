@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 
 const faqItems = [
   {
@@ -41,9 +41,9 @@ export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const answerRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const toggle = useCallback((index: number) => {
+  function toggle(index: number) {
     setOpenIndex((prev) => (prev === index ? null : index));
-  }, []);
+  }
 
   return (
     <section className="faq" id="faq">

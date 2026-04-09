@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 let cachedLogo: string | null = null;
-let cachedFullLogo: string | null = null;
 const bgCache: Record<string, string> = {};
 
 export function getLogoDataUri(): string {
@@ -12,15 +11,6 @@ export function getLogoDataUri(): string {
   );
   cachedLogo = `data:image/svg+xml;base64,${svg.toString('base64')}`;
   return cachedLogo;
-}
-
-export function getFullLogoDataUri(): string {
-  if (cachedFullLogo) return cachedFullLogo;
-  const svg = readFileSync(
-    join(process.cwd(), 'public/images/anglerpass-logo.svg')
-  );
-  cachedFullLogo = `data:image/svg+xml;base64,${svg.toString('base64')}`;
-  return cachedFullLogo;
 }
 
 /**

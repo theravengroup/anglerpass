@@ -42,6 +42,15 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
+      // Validate Turnstile token server-side before proceeding
+      const { verifyTurnstileToken } = await import("@/lib/turnstile");
+      const turnstileError = await verifyTurnstileToken(turnstileToken);
+      if (turnstileError) {
+        setError(turnstileError);
+        setIsLoading(false);
+        return;
+      }
+
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 
@@ -93,7 +102,7 @@ export default function ResetPasswordPage() {
             aria-invalid={!!errors.password}
           />
           {errors.password && (
-            <p className="text-xs text-red-600">{errors.password.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">{errors.password.message}</p>
           )}
         </div>
 
@@ -108,7 +117,7 @@ export default function ResetPasswordPage() {
             aria-invalid={!!errors.confirmPassword}
           />
           {errors.confirmPassword && (
-            <p className="text-xs text-red-600">
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">
               {errors.confirmPassword.message}
             </p>
           )}

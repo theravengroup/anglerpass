@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function FloatingCta() {
   const [visible, setVisible] = useState(false);
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     const el = document.querySelector('#waitlist');
     if (el) {
       const top = el.getBoundingClientRect().top + window.scrollY - 72;
       window.scrollTo({ top, behavior: 'smooth' });
     }
-  }, []);
+  }
 
   useEffect(() => {
     const hero = document.getElementById('hero');

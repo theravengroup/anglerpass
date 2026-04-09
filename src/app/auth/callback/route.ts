@@ -28,7 +28,13 @@ export async function GET(request: Request) {
         }
 
         // Determine redirect destination
-        let destination = next;
+        // Validate `next` to prevent open redirect attacks
+        const isSafeRedirect =
+          next != null &&
+          next.startsWith("/") &&
+          !next.startsWith("//") &&
+          !next.includes("://");
+        let destination = isSafeRedirect ? next : null;
         if (!destination) {
           if (user) {
             const { data: profile } = await supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -81,6 +81,15 @@ function SignupForm() {
     setIsLoading(true);
 
     try {
+      // Validate Turnstile token server-side before proceeding
+      const { verifyTurnstileToken } = await import("@/lib/turnstile");
+      const turnstileError = await verifyTurnstileToken(turnstileToken);
+      if (turnstileError) {
+        setError(turnstileError);
+        setIsLoading(false);
+        return;
+      }
+
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 
@@ -189,7 +198,7 @@ function SignupForm() {
               aria-invalid={!!errors.firstName}
             />
             {errors.firstName && (
-              <p className="text-xs text-red-600">
+              <p className="text-xs text-red-600" role="alert" aria-live="polite">
                 {errors.firstName.message}
               </p>
             )}
@@ -217,7 +226,7 @@ function SignupForm() {
             aria-invalid={!!errors.email}
           />
           {errors.email && (
-            <p className="text-xs text-red-600">{errors.email.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">{errors.email.message}</p>
           )}
         </div>
 
@@ -232,7 +241,7 @@ function SignupForm() {
             aria-invalid={!!errors.password}
           />
           {errors.password && (
-            <p className="text-xs text-red-600">{errors.password.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">{errors.password.message}</p>
           )}
         </div>
 
@@ -251,7 +260,7 @@ function SignupForm() {
             </SelectContent>
           </Select>
           {errors.role && (
-            <p className="text-xs text-red-600">{errors.role.message}</p>
+            <p className="text-xs text-red-600" role="alert" aria-live="polite">{errors.role.message}</p>
           )}
         </div>
 
