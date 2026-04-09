@@ -9,6 +9,7 @@ import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
 import { crmTable } from "@/lib/crm/admin-queries";
+import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 
 // ─── Resend Client ──────────────────────────────────────────────────
 
@@ -164,9 +165,9 @@ export function buildCrmEmailHtml(payload: CrmEmailPayload): string {
   ${body}
   ${ctaHtml}
   <p style="font-size: 13px; line-height: 1.6; color: #9a9a8e; margin-top: 32px;">
-    <a href="${unsubscribeUrl}" style="color: #9a9a8e; text-decoration: underline;">Unsubscribe from marketing emails</a>
+    <a href="${unsubscribeUrl}" style="color: #9a9a8e; text-decoration: underline;">Unsubscribe from all</a>
     &middot;
-    <a href="${SITE_URL}/dashboard/settings" style="color: #9a9a8e; text-decoration: underline;">Email preferences</a>
+    <a href="${SITE_URL}/email-preferences" style="color: #9a9a8e; text-decoration: underline;">Manage email preferences</a>
   </p>
   <p style="font-size: 13px; color: #9a9a8e; margin-top: 24px;">&mdash; The AnglerPass Team</p>
   <p style="font-size: 11px; color: #c0c0b8; margin-top: 16px;">
@@ -284,22 +285,20 @@ export async function processSendBatch(
   const campaignsTable = crmTable(admin, "campaigns");
 
   for (const send of queued) {
-    // Check suppression list
-    const suppressed = await isSuppressed(admin, send.recipient_email);
-    if (suppressed) {
-      await sendsTable.update({ status: "skipped" }).eq("id", send.id);
+    // Run all pre-send checks (suppression, opt-out, topic subs, frequency caps)
+    const check = await runPreSendChecks(admin, {
+      recipientEmail: send.recipient_email,
+      recipientId: send.recipient_id ?? undefined,
+      recipientType: send.recipient_type,
+      campaignId: send.campaign_id,
+    });
+
+    if (!check.allowed) {
+      await sendsTable
+        .update({ status: "skipped", bounce_reason: check.reason ?? "pre-send check failed" })
+        .eq("id", send.id);
       skipped++;
       continue;
-    }
-
-    // Check marketing opt-out for users
-    if (send.recipient_type === "user" && send.recipient_id) {
-      const optedOut = await hasMarketingOptOut(admin, send.recipient_id);
-      if (optedOut) {
-        await sendsTable.update({ status: "skipped" }).eq("id", send.id);
-        skipped++;
-        continue;
-      }
     }
 
     // Load campaign + step for email content

@@ -29,6 +29,12 @@ import { TRIGGER_EVENT_LABELS } from "@/lib/crm/types";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
+interface TopicOption {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface CampaignDetail {
   id: string;
   name: string;
@@ -39,6 +45,7 @@ interface CampaignDetail {
   from_email: string;
   reply_to: string | null;
   segment_id: string | null;
+  topic_id: string | null;
   trigger_event: CrmTriggerEvent | null;
   created_at: string;
   started_at: string | null;
@@ -83,6 +90,8 @@ export default function CrmCampaignDetailPage() {
   const [fromEmail, setFromEmail] = useState("hello@anglerpass.com");
   const [replyTo, setReplyTo] = useState("");
   const [triggerEvent, setTriggerEvent] = useState<CrmTriggerEvent | "">("");
+  const [topicId, setTopicId] = useState<string>("");
+  const [topicOptions, setTopicOptions] = useState<TopicOption[]>([]);
 
   // Stats
   const [stats, setStats] = useState({
@@ -113,6 +122,20 @@ export default function CrmCampaignDetailPage() {
       setFromEmail(c.from_email);
       setReplyTo(c.reply_to ?? "");
       setTriggerEvent(c.trigger_event ?? "");
+      setTopicId(c.topic_id ?? "");
+
+      // Load topics for the dropdown
+      const topicsRes = await fetch("/api/admin/crm/topics");
+      if (topicsRes.ok) {
+        const topicsData = await topicsRes.json();
+        setTopicOptions(
+          (topicsData.topics ?? []).map((t: Record<string, unknown>) => ({
+            id: t.id,
+            name: t.name,
+            slug: t.slug,
+          }))
+        );
+      }
 
       // Load stats
       const statsRes = await fetch(`/api/admin/campaigns?limit=1`);
@@ -155,6 +178,7 @@ export default function CrmCampaignDetailPage() {
           from_email: fromEmail,
           reply_to: replyTo || null,
           trigger_event: triggerEvent || undefined,
+          topic_id: topicId || null,
         }),
       });
       load();
@@ -398,6 +422,26 @@ export default function CrmCampaignDetailPage() {
                   </select>
                 </div>
               )}
+              <div>
+                <label className="mb-1 block text-xs text-text-secondary">
+                  Email Topic
+                </label>
+                <select
+                  value={topicId}
+                  onChange={(e) => setTopicId(e.target.value)}
+                  className="w-full rounded-md border border-stone-light/30 px-3 py-2 text-sm text-text-primary"
+                >
+                  <option value="">No topic (sends to all)</option>
+                  {topicOptions.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] text-text-light">
+                  Only send to users subscribed to this topic
+                </p>
+              </div>
               <div className="col-span-2">
                 <label className="mb-1 block text-xs text-text-secondary">
                   Description

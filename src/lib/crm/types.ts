@@ -157,6 +157,7 @@ export interface Campaign {
   reply_to: string | null;
   segment_id: string | null;
   trigger_event: CrmTriggerEvent | null;
+  topic_id: string | null;
   trigger_config: Record<string, unknown>;
   is_prebuilt: boolean;
   prebuilt_key: string | null;
@@ -272,6 +273,39 @@ export interface CrmRecipient {
   display_name: string | null;
   recipient_type: RecipientType;
   lead_id: string | null;
+}
+
+// ─── Subscription Topics ───────────────────────────────────────────
+
+export interface SubscriptionTopic {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  is_required: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserTopicSubscription {
+  id: string;
+  user_id: string;
+  topic_id: string;
+  subscribed: boolean;
+  updated_at: string;
+}
+
+export interface FrequencyCap {
+  id: string;
+  name: string;
+  max_sends: number;
+  window_hours: number;
+  applies_to: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // ─── Email Template Variables ───────────────────────────────────────

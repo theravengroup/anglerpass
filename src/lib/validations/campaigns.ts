@@ -83,6 +83,7 @@ export const createCampaignSchema = z
     from_email: z.string().email().default("hello@anglerpass.com"),
     reply_to: z.string().email().optional(),
     segment_id: z.string().uuid().optional(),
+    topic_id: z.string().uuid().optional(),
     trigger_event: triggerEventSchema.optional(),
     trigger_config: z.record(z.string(), z.unknown()).default({}),
   })
@@ -98,6 +99,7 @@ export const updateCampaignSchema = z.object({
   from_email: z.string().email().optional(),
   reply_to: z.string().email().nullable().optional(),
   segment_id: z.string().uuid().nullable().optional(),
+  topic_id: z.string().uuid().nullable().optional(),
   trigger_event: triggerEventSchema.optional(),
   trigger_config: z.record(z.string(), z.unknown()).optional(),
 });
