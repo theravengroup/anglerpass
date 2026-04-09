@@ -47,6 +47,10 @@
     {
       "path": "/api/cron/crm-stats",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/crm-workflow-runner",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

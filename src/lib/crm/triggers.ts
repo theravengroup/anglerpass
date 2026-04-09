@@ -13,6 +13,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuppressed, hasMarketingOptOut } from "@/lib/crm/email-sender";
 import { crmTable } from "@/lib/crm/admin-queries";
 import { userMatchesSegment } from "@/lib/crm/segment-evaluator";
+import { enrollInWorkflows } from "@/lib/crm/workflow-engine";
 import type { CrmTriggerEvent, Campaign, CampaignStep } from "@/lib/crm/types";
 
 export interface TriggerContext {
@@ -51,6 +52,17 @@ export async function fireCrmTrigger(
 
     if (context.userId && (await hasMarketingOptOut(admin, context.userId))) {
       return;
+    }
+
+    // Enroll into matching visual workflows
+    try {
+      await enrollInWorkflows(admin, event, {
+        userId: context.userId,
+        email,
+        metadata: context.metadata,
+      });
+    } catch (wfErr) {
+      console.error(`[crm/triggers] Workflow enrollment error for ${event}:`, wfErr);
     }
 
     // Find active triggered campaigns for this event
