@@ -6,6 +6,7 @@ import {
   notifyBookingGateCode,
   notifyBookingThankYou,
 } from "@/lib/notifications";
+import { fireCrmTrigger } from "@/lib/crm/triggers";
 
 /**
  * POST: Booking lifecycle emails — runs daily via Vercel Cron.
@@ -217,6 +218,14 @@ export async function POST(request: Request) {
             bookingId: booking.id,
             guideName: booking.guide_profiles?.display_name ?? undefined,
           });
+
+          // Fire CRM trigger for booking completion
+          fireCrmTrigger("booking_completed", {
+            userId: booking.angler_id,
+          }).catch((err) =>
+            console.error("[cron/booking-lifecycle] CRM trigger error:", err)
+          );
+
           results.thankYous.sent++;
         } catch (err) {
           console.error("[cron/booking-lifecycle] Thank-you send error:", err);

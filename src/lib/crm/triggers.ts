@@ -12,6 +12,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuppressed, hasMarketingOptOut } from "@/lib/crm/email-sender";
 import { crmTable } from "@/lib/crm/admin-queries";
+import { userMatchesSegment } from "@/lib/crm/segment-evaluator";
 import type { CrmTriggerEvent, Campaign, CampaignStep } from "@/lib/crm/types";
 
 interface TriggerContext {
@@ -35,8 +36,14 @@ export async function fireCrmTrigger(
   try {
     const admin = createAdminClient();
 
-    // Pre-flight: check suppression and opt-out
-    const email = context.email;
+    // Pre-flight: resolve email from userId if not provided
+    let email = context.email;
+    if (!email && context.userId) {
+      const { data: { user } } = await admin.auth.admin.getUserById(
+        context.userId
+      );
+      email = user?.email ?? undefined;
+    }
     if (!email) return;
 
     if (await isSuppressed(admin, email)) return;
@@ -56,8 +63,23 @@ export async function fireCrmTrigger(
     if (!campaigns || campaigns.length === 0) return;
 
     for (const campaign of campaigns) {
-      // TODO: Phase 2 — evaluate segment match if campaign has a segment_id
-      // Once segment engine is built, add segment evaluation here.
+      // Evaluate segment match if campaign targets a specific segment
+      if (campaign.segment_id && context.userId) {
+        try {
+          const matches = await userMatchesSegment(
+            admin,
+            context.userId,
+            campaign.segment_id
+          );
+          if (!matches) continue;
+        } catch (err) {
+          console.error(
+            `[crm/triggers] Segment evaluation failed for campaign ${campaign.id}:`,
+            err
+          );
+          continue; // Skip this campaign on segment errors
+        }
+      }
 
       // Check if already enrolled
       const { data: existing } = await crmTable(admin, "campaign_enrollments")

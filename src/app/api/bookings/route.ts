@@ -8,6 +8,7 @@ import { notifyBookingCreated, notifyBookingConfirmed, notifyGuideBookingCreated
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { auditBookingAction, AuditAction } from "@/lib/permissions";
 import { checkConcurrentLimit, checkPropertyLimit } from "@/lib/bookings/limits";
+import { fireCrmTrigger } from "@/lib/crm/triggers";
 
 /**
  * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
@@ -425,6 +426,12 @@ export async function POST(request: Request) {
         bookingId: booking.id,
       }).catch((err) => console.error("[bookings] Guide notification error:", err));
     }
+
+    // Fire CRM trigger for booking creation
+    fireCrmTrigger("booking_created", {
+      userId: user.id,
+      email: user.email ?? undefined,
+    }).catch((err) => console.error("[bookings] CRM trigger error:", err));
 
     // Audit log
     auditBookingAction({

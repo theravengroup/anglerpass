@@ -35,6 +35,14 @@
     {
       "path": "/api/cron/corporate-invitation-expiry",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/crm-sender",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/crm-drip",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

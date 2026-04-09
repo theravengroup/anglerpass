@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { leadSchema } from "@/lib/validations/leads";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { verifyTurnstile } from "@/lib/api/turnstile";
+import { fireCrmTrigger } from "@/lib/crm/triggers";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -204,6 +205,12 @@ export async function POST(request: Request) {
         return jsonError("Failed to save lead", 500);
       }
     }
+
+    // Fire CRM trigger for new leads
+    fireCrmTrigger("lead_created", {
+      email,
+      metadata: { interestType, source, type },
+    }).catch((err) => console.error("[leads] CRM trigger error:", err));
 
     // Send emails via Resend (even on duplicate DB entries — they may not have received the email)
     try {

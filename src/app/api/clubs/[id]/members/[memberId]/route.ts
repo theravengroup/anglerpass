@@ -4,6 +4,7 @@ import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createClient } from "@/lib/supabase/server";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
 import { notifyMemberApproved } from "@/lib/notifications";
+import { fireCrmTrigger } from "@/lib/crm/triggers";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -131,6 +132,13 @@ export async function PATCH(
         clubId: id,
       }).catch((err) =>
         console.error("[clubs/members] Notification error:", err)
+      );
+
+      // Fire CRM trigger for membership activation
+      fireCrmTrigger("membership_joined", {
+        userId: membership.user_id,
+      }).catch((err) =>
+        console.error("[clubs/members] CRM trigger error:", err)
       );
 
       // Transition referral credit from pending → earned

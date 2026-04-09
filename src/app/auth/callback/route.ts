@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRoleHomePath } from "@/types/roles";
 import { sendWelcomeEmail } from "@/lib/welcome-emails";
+import { fireCrmTrigger } from "@/lib/crm/triggers";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -25,6 +26,14 @@ export async function GET(request: Request) {
 
           // Send welcome email 1 for new signups (step = 0 means never sent)
           await sendWelcomeEmailIfNew(user.id);
+
+          // Fire CRM trigger for new signups
+          fireCrmTrigger("user_signup", {
+            userId: user.id,
+            email: user.email ?? undefined,
+          }).catch((err) =>
+            console.error("[auth/callback] CRM trigger error:", err)
+          );
         }
 
         // Determine redirect destination
