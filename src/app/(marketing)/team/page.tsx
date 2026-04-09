@@ -22,7 +22,7 @@ const TEAM_MEMBERS = [
     name: 'Dan Jahn',
     title: 'Founder + CEO',
     slug: 'dan-jahn',
-    photo: '/images/team/dan-jahn-founder-headshot-webres.webp',
+    photo: '/images/team/dan-jahn.webp',
   },
   {
     name: 'Marcus Johnstone',
