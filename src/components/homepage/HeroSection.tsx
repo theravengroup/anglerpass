@@ -12,13 +12,13 @@ const headlineWords = [
 ];
 
 export default function HeroSection() {
-  const heroBgImgRef = useRef<HTMLImageElement>(null);
+  const heroBgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
-      if (heroBgImgRef.current) {
+      if (heroBgRef.current) {
         const scrollY = window.scrollY;
-        heroBgImgRef.current.style.transform = `translate3d(0, ${scrollY * 0.35}px, 0) scale(1.05)`;
+        heroBgRef.current.style.transform = `translate3d(0, ${scrollY * 0.35}px, 0) scale(1.05)`;
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -28,14 +28,24 @@ export default function HeroSection() {
   return (
     <section className="hero" id="hero">
       <div className="hero-bg">
-        { }
-        <img
-          ref={heroBgImgRef}
-          src="/images/hero.webp"
-          alt="Fly fishing at sunrise on a private Rocky Mountain river"
-          id="heroBgImg"
-          style={{ width: '100%', height: '120%', objectFit: 'cover', objectPosition: 'center 40%', willChange: 'transform', transform: 'scale(1.05)' }}
-        />
+        <div ref={heroBgRef} className="hero-bg-media">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/hero-video-poster.jpg"
+            aria-hidden="true"
+            className="hero-bg-video"
+          >
+            <source src="/images/hero-video.mp4" type="video/mp4" />
+          </video>
+          <img
+            src="/images/hero-video-poster.jpg"
+            alt="Fly fishing at sunrise on a private Rocky Mountain river"
+            className="hero-bg-poster"
+          />
+        </div>
         <div className="hero-bg-overlay"></div>
         <div className="hero-bg-grain"></div>
       </div>

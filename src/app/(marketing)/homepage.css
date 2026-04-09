@@ -87,8 +87,12 @@ body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite
 /* ═══ HERO ═══ */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 0 100px;overflow:hidden}
 .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
-.hero-bg img{width:100%;height:120%;object-fit:cover;object-position:center 40%;will-change:transform;transform:scale(1.05)}
-.hero-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,34,25,.55) 0%,rgba(15,34,25,.48) 30%,rgba(15,34,25,.50) 60%,rgba(15,34,25,.70) 100%);z-index:1}
+.hero-bg-media{width:100%;height:120%;will-change:transform;transform:scale(1.05);position:relative}
+.hero-bg-video{width:100%;height:100%;object-fit:cover;object-position:center 40%;position:absolute;inset:0}
+.hero-bg-poster{width:100%;height:100%;object-fit:cover;object-position:center 40%;position:absolute;inset:0}
+@media (min-width:769px){.hero-bg-poster{display:none}}
+@media (max-width:768px){.hero-bg-video{display:none}}
+.hero-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,34,25,.55) 0%,rgba(15,34,25,.48) 30%,rgba(15,34,25,.50) 60%,rgba(15,34,25,.70) 100%),linear-gradient(to bottom right,rgba(15,34,25,.35) 0%,transparent 60%);z-index:1}
 .hero-bg-grain{display:none}
 .hero .container{position:relative;z-index:3;display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
 .hero-content{max-width:580px}
@@ -110,7 +114,7 @@ body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite
 
 /* Hero Mockup */
 .hero-visual{position:relative;opacity:0;animation:heroMockupIn 1.2s cubic-bezier(.22,1,.36,1) .6s both}
-@keyframes heroMockupIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes heroMockupIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:.85;transform:translateY(0) scale(1)}}
 .hero-mockup{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.1);overflow:hidden;position:relative}
 .mockup-topbar{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--forest-deep)}
 .mockup-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12)}
