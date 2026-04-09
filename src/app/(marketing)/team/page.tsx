@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { SITE_URL } from '@/lib/seo';
+import CareersModal from '@/components/shared/CareersModal';
 
 export const metadata: Metadata = {
   title: 'Our Team | AnglerPass',
@@ -134,22 +135,22 @@ export default function TeamPage() {
             you share our passion for fly fishing and technology, we&rsquo;d
             love to&nbsp;hear&nbsp;from&nbsp;you.
           </p>
-          <a
-            href="#"
-            onClick={undefined}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-md text-sm font-medium bg-forest text-white no-underline transition-all duration-300 hover:bg-forest-deep hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            Get in Touch
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 8h10m0 0L9 4m4 4L9 12"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+          <CareersModal
+            trigger={
+              <button className="inline-flex items-center gap-2 px-8 py-4 rounded-md text-sm font-medium bg-forest text-white no-underline transition-all duration-300 hover:bg-forest-deep hover:-translate-y-0.5 hover:shadow-lg">
+                Get in Touch
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M3 8h10m0 0L9 4m4 4L9 12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            }
+          />
         </div>
       </section>
     </>
