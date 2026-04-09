@@ -155,6 +155,17 @@ export const PAGES_SEO = {
       'fly fishing booking fees',
     ],
   }),
+  team: buildMetadata({
+    title: 'Our Team | AnglerPass',
+    description:
+      'Meet the team behind AnglerPass — the platform modernizing private fly fishing access for landowners, clubs, and anglers.',
+    path: '/team',
+    keywords: [
+      'anglerpass team',
+      'fly fishing startup team',
+      'private water platform founders',
+    ],
+  }),
   press: buildMetadata({
     title: 'Press | AnglerPass — Private Water Fly Fishing Marketplace',
     description:
@@ -177,6 +188,7 @@ export const INTERNAL_LINKS: Record<string, string> = {
   'how it works': '/',
   pricing: '/pricing',
   about: '/about',
+  team: '/team',
   press: '/press',
   learn: '/learn',
   // State pages

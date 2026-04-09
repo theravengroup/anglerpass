@@ -340,6 +340,14 @@ export default function MarketingFooter() {
                 </li>
                 <li className="mb-1.5">
                   <Link
+                    href="/team"
+                    className="text-[13px] text-white/40 no-underline transition-colors duration-300"
+                  >
+                    Team
+                  </Link>
+                </li>
+                <li className="mb-1.5">
+                  <Link
                     href="/#faq"
                     className="text-[13px] text-white/40 no-underline transition-colors duration-300"
                   >
