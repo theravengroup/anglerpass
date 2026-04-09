@@ -1,5 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { createClient } from "@/lib/supabase/server";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_PHOTOS } from "@/lib/validations/properties";
 
@@ -7,14 +6,11 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB server-side limit
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -50,7 +46,7 @@ export async function POST(request: Request) {
     // Path: {user_id}/{property_id}/{timestamp}-{random}.webp
     const fileName = `${user.id}/${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await admin.storage
       .from("property-photos")
       .upload(fileName, file, {
         contentType: "image/webp",
@@ -65,7 +61,7 @@ export async function POST(request: Request) {
     // Get public URL
     const {
       data: { publicUrl },
-    } = supabase.storage.from("property-photos").getPublicUrl(fileName);
+    } = admin.storage.from("property-photos").getPublicUrl(fileName);
 
     return jsonOk({ url: publicUrl });
   } catch (err) {

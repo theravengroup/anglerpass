@@ -1,6 +1,5 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { delegateInviteSchema } from "@/lib/validations/permissions";
 import { auditLog, AuditAction } from "@/lib/permissions";
 
@@ -12,14 +11,11 @@ import { auditLog, AuditAction } from "@/lib/permissions";
  */
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { searchParams } = new URL(request.url);
     const view = searchParams.get("view");
@@ -95,14 +91,11 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = delegateInviteSchema.safeParse(body);

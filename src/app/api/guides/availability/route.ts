@@ -1,19 +1,15 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { guideAvailabilitySchema } from "@/lib/validations/guides";
 
 // GET: Fetch guide's availability for a date range
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
     const { searchParams } = new URL(request.url);
@@ -68,14 +64,11 @@ export async function GET(request: Request) {
 // PUT: Bulk set dates as available or blocked
 export async function PUT(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = guideAvailabilitySchema.safeParse(body);

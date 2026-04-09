@@ -1,19 +1,15 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { reviewSchema } from "@/lib/validations/guides";
 
 // GET: Fetch reviews
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { searchParams } = new URL(request.url);
     const guideId = searchParams.get("guide_id");
@@ -121,14 +117,11 @@ export async function GET(request: Request) {
 // POST: Submit a review
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = reviewSchema.safeParse(body);

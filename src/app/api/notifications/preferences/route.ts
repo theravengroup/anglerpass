@@ -1,6 +1,5 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 const VALID_PREFS = [
   "email_booking_requested",
@@ -15,14 +14,11 @@ const VALID_PREFS = [
 // GET: Get current user's notification preferences
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 
@@ -51,14 +47,11 @@ export async function GET() {
 // PATCH: Update notification preferences
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
 

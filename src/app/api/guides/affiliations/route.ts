@@ -1,20 +1,16 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { guideAffiliationSchema } from "@/lib/validations/guides";
 import { notifyGuideAffiliationRequested } from "@/lib/notifications";
 
 // GET: List current guide's affiliations with club details
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 
@@ -51,14 +47,11 @@ export async function GET() {
 // POST: Request affiliation with a club
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = guideAffiliationSchema.safeParse(body);

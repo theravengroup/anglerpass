@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -9,25 +8,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   DollarSign,
   TrendingUp,
-  ArrowLeft,
   Loader2,
-  Download,
   Users,
-  BarChart3,
   CreditCard,
-  AlertTriangle,
-  XCircle,
-  Network,
-  ShieldAlert,
 } from "lucide-react";
-import { PERIOD_OPTIONS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
 import PayoutSetup from "@/components/shared/PayoutSetup";
+import FinancialsHeader from "@/components/shared/FinancialsHeader";
+import StatCardGrid from "@/components/shared/StatCardGrid";
+import type { StatCardItem } from "@/components/shared/StatCardGrid";
+import PropertyBarList from "@/components/shared/PropertyBarList";
+import MonthlyBarChart from "@/components/shared/MonthlyBarChart";
+import FeeExplanationCard from "@/components/shared/FeeExplanationCard";
+import CancellationsRefundsCard from "@/components/shared/CancellationsRefundsCard";
+import MemberDuesHealthCard from "@/components/clubs/MemberDuesHealthCard";
+import MembershipRevenueBreakdown from "@/components/clubs/MembershipRevenueBreakdown";
+import CrossClubNetworkCard from "@/components/clubs/CrossClubNetworkCard";
+import ClubMembershipPaymentsTable from "@/components/clubs/ClubMembershipPaymentsTable";
+import ClubTransactionHistory from "@/components/clubs/ClubTransactionHistory";
 
 interface PropertyCommission {
   name: string;
@@ -173,7 +175,7 @@ export default function ClubFinancialsPage() {
     );
   }
 
-  const stats = [
+  const stats: StatCardItem[] = [
     {
       label: "Total Revenue",
       value: `$${(data?.total_revenue ?? 0).toLocaleString()}`,
@@ -208,300 +210,61 @@ export default function ClubFinancialsPage() {
     },
   ];
 
-  const maxCommission = Math.max(
-    ...(data?.commission_by_property.map((p) => p.commission) ?? [1])
-  );
-
-  const duesHealth = data?.member_dues_health ?? { active: 0, past_due: 0, grace_period: 0, lapsed: 0 };
-  const hasAtRiskMembers = duesHealth.past_due > 0 || duesHealth.grace_period > 0 || duesHealth.lapsed > 0;
-
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/club">
-            <Button variant="ghost" size="sm" className="text-text-secondary">
-              <ArrowLeft className="mr-1 size-4" />
-              Dashboard
-            </Button>
-          </Link>
-          <div>
-            <h2 className="font-heading text-2xl font-semibold text-text-primary">
-              Club Financials
-            </h2>
-            <p className="mt-0.5 text-sm text-text-secondary">
-              Commission income, membership revenue, and payout tracking.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs"
-            onClick={exportCSV}
-          >
-            <Download className="mr-1 size-3" />
-            Export CSV
-          </Button>
-          <div className="flex rounded-lg border border-stone-light/20">
-            {PERIOD_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setDays(opt.value)}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
-                  days === opt.value
-                    ? "bg-river text-white"
-                    : "text-text-secondary hover:bg-offwhite"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <FinancialsHeader
+        backHref="/club"
+        title="Club Financials"
+        subtitle="Commission income, membership revenue, and payout tracking."
+        days={days}
+        onDaysChange={setDays}
+        onExport={exportCSV}
+        activeBg="bg-river"
+      />
 
-      {/* Payout Setup */}
       <PayoutSetup type="club" />
+      <StatCardGrid stats={stats} />
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="border-stone-light/20">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardDescription className="text-text-secondary">
-                  {stat.label}
-                </CardDescription>
-                <div
-                  className={`flex size-9 items-center justify-center rounded-lg ${stat.bg}`}
-                >
-                  <stat.icon className={`size-[18px] ${stat.color}`} />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-semibold tracking-tight text-text-primary">
-                {stat.value}
-              </p>
-              <p className="mt-1 text-xs text-text-light">
-                {stat.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Member Dues Health + Membership Revenue Breakdown */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Member Dues Health */}
-        <Card className={`border-stone-light/20 ${hasAtRiskMembers ? "border-river/30" : ""}`}>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldAlert className="size-4 text-river" />
-              Member Dues Health
-            </CardTitle>
-            <CardDescription>
-              Current standing of member dues payments
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-forest/20 bg-forest/5 p-3">
-                <p className="text-2xl font-semibold text-forest">{duesHealth.active}</p>
-                <p className="text-xs text-text-secondary">Active &amp; Current</p>
-              </div>
-              <div className={`rounded-lg border p-3 ${duesHealth.past_due > 0 ? "border-river/30 bg-river/5" : "border-stone-light/20 bg-offwhite/50"}`}>
-                <p className={`text-2xl font-semibold ${duesHealth.past_due > 0 ? "text-river" : "text-text-light"}`}>
-                  {duesHealth.past_due}
-                </p>
-                <p className="text-xs text-text-secondary">Past Due</p>
-              </div>
-              <div className={`rounded-lg border p-3 ${duesHealth.grace_period > 0 ? "border-bronze/30 bg-bronze/5" : "border-stone-light/20 bg-offwhite/50"}`}>
-                <p className={`text-2xl font-semibold ${duesHealth.grace_period > 0 ? "text-bronze" : "text-text-light"}`}>
-                  {duesHealth.grace_period}
-                </p>
-                <p className="text-xs text-text-secondary">Grace Period</p>
-              </div>
-              <div className={`rounded-lg border p-3 ${duesHealth.lapsed > 0 ? "border-red-300 bg-red-50" : "border-stone-light/20 bg-offwhite/50"}`}>
-                <p className={`text-2xl font-semibold ${duesHealth.lapsed > 0 ? "text-red-600" : "text-text-light"}`}>
-                  {duesHealth.lapsed}
-                </p>
-                <p className="text-xs text-text-secondary">Lapsed</p>
-              </div>
-            </div>
-            {hasAtRiskMembers && (
-              <p className="flex items-center gap-1.5 text-xs text-river">
-                <AlertTriangle className="size-3" />
-                {duesHealth.past_due + duesHealth.grace_period} member{duesHealth.past_due + duesHealth.grace_period !== 1 ? "s" : ""} need{duesHealth.past_due + duesHealth.grace_period === 1 ? "s" : ""} attention.
-                <Link href="/club/members" className="underline">
-                  View members
-                </Link>
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Membership Revenue Breakdown */}
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="size-4 text-bronze" />
-              Membership Revenue Breakdown
-            </CardTitle>
-            <CardDescription>
-              Initiation fees vs. annual dues
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-text-secondary">Initiation Fees</span>
-                <span className="text-sm font-medium text-text-primary">
-                  ${(data?.total_initiation_revenue ?? 0).toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-text-secondary">Annual Dues</span>
-                <span className="text-sm font-medium text-text-primary">
-                  ${(data?.total_dues_revenue ?? 0).toLocaleString()}
-                </span>
-              </div>
-              <div className="border-t border-stone-light/20 pt-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-text-primary">Total Membership Revenue</span>
-                  <span className="text-sm font-semibold text-river">
-                    ${(data?.total_membership_revenue ?? 0).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-            {(data?.monthly_membership.length ?? 0) > 0 && (
-              <div className="pt-2">
-                <p className="mb-2 text-xs text-text-light">Monthly membership revenue trend</p>
-                <MonthlyBarChart data={data!.monthly_membership} color="bg-bronze" />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Cancellation Impact + Cross-Club Activity */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Cancellation / Refund Impact */}
-        {(data?.total_cancellations ?? 0) > 0 && (
-          <Card className="border-stone-light/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <XCircle className="size-4 text-red-500" />
-                Cancellation Impact
-              </CardTitle>
-              <CardDescription>
-                Revenue lost from cancelled bookings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg border border-stone-light/20 bg-offwhite/50 p-3">
-                  <p className="text-xl font-semibold text-text-primary">
-                    {data?.total_cancellations ?? 0}
-                  </p>
-                  <p className="text-xs text-text-secondary">Total Cancellations</p>
-                </div>
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                  <p className="text-xl font-semibold text-red-600">
-                    -${(data?.lost_commission_from_cancellations ?? 0).toLocaleString()}
-                  </p>
-                  <p className="text-xs text-text-secondary">Lost Commission</p>
-                </div>
-              </div>
-              {(data?.period_cancellations ?? 0) > 0 && (
-                <p className="text-xs text-text-light">
-                  {data?.period_cancellations} cancellation{data?.period_cancellations !== 1 ? "s" : ""} in the last {days} days.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cross-Club Network Activity */}
-        {(data?.cross_club_booking_count ?? 0) > 0 && (
-          <Card className="border-stone-light/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Network className="size-4 text-river" />
-                Cross-Club Network
-              </CardTitle>
-              <CardDescription>
-                Bookings from members of other clubs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg border border-river/20 bg-river/5 p-4">
-                <p className="text-2xl font-semibold text-river">
-                  {data?.cross_club_booking_count ?? 0}
-                </p>
-                <p className="mt-1 text-sm text-text-secondary">
-                  Cross-club bookings on your properties
-                </p>
-                <p className="mt-2 text-xs text-text-light">
-                  Your club earns the standard $5/rod commission on these bookings.
-                  The visiting angler&apos;s home club earns a $5/rod referral fee.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <MemberDuesHealthCard
+          duesHealth={data?.member_dues_health ?? { active: 0, past_due: 0, grace_period: 0, lapsed: 0 }}
+        />
+        <MembershipRevenueBreakdown
+          totalInitiationRevenue={data?.total_initiation_revenue ?? 0}
+          totalDuesRevenue={data?.total_dues_revenue ?? 0}
+          totalMembershipRevenue={data?.total_membership_revenue ?? 0}
+          monthlyMembership={data?.monthly_membership ?? []}
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Commission by Property */}
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">
-              Commission by Property
-            </CardTitle>
-            <CardDescription>$5/rod earned per booking</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(data?.commission_by_property.length ?? 0) === 0 ? (
-              <p className="py-6 text-center text-sm text-text-light">
-                No commission data yet.
-              </p>
-            ) : (
-              data!.commission_by_property.map((prop) => {
-                const pct =
-                  maxCommission > 0
-                    ? (prop.commission / maxCommission) * 100
-                    : 0;
-                return (
-                  <div key={prop.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-text-primary">
-                        {prop.name}
-                      </span>
-                      <span className="text-text-secondary">
-                        ${prop.commission.toLocaleString()} · {prop.bookings}{" "}
-                        booking{prop.bookings !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-offwhite">
-                      {/* Dynamic width requires inline style -- percentage computed from data */}
-                      <div
-                        className="h-full rounded-full bg-river transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
+        <CancellationsRefundsCard
+          title="Cancellation Impact"
+          description="Revenue lost from cancelled bookings"
+          totalCancellations={data?.total_cancellations ?? 0}
+          totalAmount={-(data?.lost_commission_from_cancellations ?? 0)}
+          amountLabel="Lost Commission"
+          periodCancellations={data?.period_cancellations ?? 0}
+          days={days}
+        />
+        <CrossClubNetworkCard
+          crossClubBookingCount={data?.cross_club_booking_count ?? 0}
+        />
+      </div>
 
-        {/* Monthly Commission Trend */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PropertyBarList
+          title="Commission by Property"
+          description="$5/rod earned per booking"
+          items={(data?.commission_by_property ?? []).map((p) => ({
+            name: p.name,
+            value: p.commission,
+            detail: `$${p.commission.toLocaleString()} \u00B7 ${p.bookings} booking${p.bookings !== 1 ? "s" : ""}`,
+          }))}
+          barColor="bg-river"
+          emptyMessage="No commission data yet."
+        />
+
         <Card className="border-stone-light/20">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Monthly Commission</CardTitle>
@@ -513,187 +276,24 @@ export default function ClubFinancialsPage() {
                 No monthly data yet.
               </p>
             ) : (
-              <MonthlyBarChart
-                data={data!.monthly_commission}
-                color="bg-river"
-              />
+              <MonthlyBarChart data={data!.monthly_commission} color="bg-river" />
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Membership Payments */}
-      {(data?.recent_membership_payments.length ?? 0) > 0 && (
-        <Card className="border-stone-light/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="size-4 text-bronze" />
-              Recent Membership Payments
-            </CardTitle>
-            <CardDescription>
-              Initiation fees and annual dues collected
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-light/20 text-left text-xs text-text-light">
-                    <th className="pb-2 pr-4">Date</th>
-                    <th className="pb-2 pr-4">Member</th>
-                    <th className="pb-2 pr-4">Type</th>
-                    <th className="pb-2 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-light/10">
-                  {data!.recent_membership_payments.map((p) => (
-                    <tr key={p.id}>
-                      <td className="py-2.5 pr-4 text-text-secondary">
-                        {new Date(p.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="py-2.5 pr-4 font-medium text-text-primary">
-                        {p.member_name ?? "—"}
-                      </td>
-                      <td className="py-2.5 pr-4">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          p.type === "initiation_fee"
-                            ? "bg-river/10 text-river"
-                            : "bg-bronze/10 text-bronze"
-                        }`}>
-                          {p.type === "initiation_fee" ? "Initiation" : "Annual Dues"}
-                        </span>
-                      </td>
-                      <td className="py-2.5 text-right font-medium text-river">
-                        ${(p.amount ?? 0).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ClubMembershipPaymentsTable payments={data?.recent_membership_payments ?? []} />
+      <ClubTransactionHistory transactions={data?.recent_transactions ?? []} />
 
-      {/* Recent Booking Transactions */}
-      <Card className="border-stone-light/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <BarChart3 className="size-4 text-forest" />
-            Booking Commission History
-          </CardTitle>
-          <CardDescription>
-            Commission earned from property bookings
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {(data?.recent_transactions.length ?? 0) === 0 ? (
-            <p className="py-6 text-center text-sm text-text-light">
-              No booking transactions yet.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-light/20 text-left text-xs text-text-light">
-                    <th className="pb-2 pr-4">Date</th>
-                    <th className="pb-2 pr-4">Property</th>
-                    <th className="pb-2 pr-4">Angler</th>
-                    <th className="pb-2 pr-4 text-right">Rods</th>
-                    <th className="pb-2 text-right">Commission</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-light/10">
-                  {data!.recent_transactions.map((t) => (
-                    <tr key={t.id}>
-                      <td className="py-2.5 pr-4 text-text-secondary">
-                        {new Date(t.booking_date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td className="py-2.5 pr-4 font-medium text-text-primary">
-                        {t.property_name}
-                      </td>
-                      <td className="py-2.5 pr-4 text-text-secondary">
-                        {t.angler_name ?? "—"}
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-text-secondary">
-                        {t.rod_count}
-                      </td>
-                      <td className="py-2.5 text-right font-medium text-river">
-                        ${t.club_commission}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Fee Explanation */}
-      <Card className="border-stone-light/20 bg-offwhite/50">
-        <CardContent className="py-5">
-          <p className="text-xs leading-relaxed text-text-light">
-            <strong className="text-text-secondary">
-              How club revenue works:
-            </strong>{" "}
-            Your club earns a $5/rod commission on every booking made at your
-            associated properties. This commission comes from the
-            landowner&apos;s listed rate — it is not an additional charge to the
-            angler. Membership fees (initiation and annual dues) are set by you
-            and collected through AnglerPass. When members of other clubs book
-            your properties through the Cross-Club Network, your club still earns
-            the standard $5/rod commission. Payouts are processed via Stripe.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-/* ── Mini bar chart component ── */
-function MonthlyBarChart({
-  data,
-  color,
-}: {
-  data: MonthlyData[];
-  color: string;
-}) {
-  const max = Math.max(...data.map((d) => d.amount), 1);
-
-  return (
-    <div className="flex h-[120px] items-end gap-1.5">
-      {data.map((d) => {
-        const pct = (d.amount / max) * 100;
-        const label = new Date(d.month + "-01").toLocaleDateString("en-US", {
-          month: "short",
-        });
-        return (
-          <div
-            key={d.month}
-            className="group flex flex-1 flex-col items-center gap-1"
-          >
-            <span className="text-[10px] text-text-light opacity-0 transition-opacity group-hover:opacity-100">
-              ${d.amount.toLocaleString()}
-            </span>
-            <div className="w-full overflow-hidden rounded-t">
-              {/* Dynamic height requires inline style -- percentage computed from data */}
-              <div
-                className={`w-full min-h-[2px] rounded-t ${color} transition-all`}
-                style={{ height: `${Math.max(pct, 2)}%` }}
-              />
-            </div>
-            <span className="text-[10px] text-text-light">{label}</span>
-          </div>
-        );
-      })}
+      <FeeExplanationCard label="How club revenue works:">
+        Your club earns a $5/rod commission on every booking made at your
+        associated properties. This commission comes from the
+        landowner&apos;s listed rate &mdash; it is not an additional charge to
+        the angler. Membership fees (initiation and annual dues) are set by you
+        and collected through AnglerPass. When members of other clubs book your
+        properties through the Cross-Club Network, your club still earns the
+        standard $5/rod commission. Payouts are processed via&nbsp;Stripe.
+      </FeeExplanationCard>
     </div>
   );
 }

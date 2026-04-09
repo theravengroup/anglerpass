@@ -162,9 +162,7 @@ export async function PATCH(
   const body = await request.json();
   const admin = createAdminClient();
 
-  // Get current user for audit
-  const supabase = await (await import("@/lib/supabase/server")).createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use authenticated user from requireAuth above
 
   try {
     // Add tags
@@ -178,7 +176,7 @@ export async function PATCH(
             {
               user_id: id,
               tag: normalizedTag,
-              added_by: user?.id ?? null,
+              added_by: authResult.user.id,
             },
             { onConflict: "user_id,tag" }
           );

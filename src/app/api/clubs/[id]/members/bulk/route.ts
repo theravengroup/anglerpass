@@ -1,7 +1,6 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -120,20 +119,17 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
 
     // Verify user is club owner or staff
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 
@@ -211,7 +207,7 @@ export async function POST(
           continue;
         }
 
-        await sendMemberInviteEmail(email, auth.club.name, false, "member");
+        await sendMemberInviteEmail(email, clubAuth.club.name, false, "member");
         invited++;
       } else {
         // No user account — check for existing invite by email
@@ -238,7 +234,7 @@ export async function POST(
           continue;
         }
 
-        await sendMemberInviteEmail(email, auth.club.name, true, "member");
+        await sendMemberInviteEmail(email, clubAuth.club.name, true, "member");
         invited++;
       }
     }

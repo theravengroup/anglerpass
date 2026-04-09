@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { createClient } from "@/lib/supabase/server";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createConnectAccount,
@@ -93,14 +92,11 @@ async function resolveEntity(
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const type = body.type as EntityType;
@@ -149,14 +145,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") as EntityType;

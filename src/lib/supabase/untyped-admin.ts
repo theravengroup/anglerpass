@@ -29,8 +29,3 @@ export function createUntypedAdminClient() {
     },
   });
 }
-
-/**
- * @deprecated Use `createUntypedAdminClient()` instead.
- */
-export const createCompassAdminClient = createUntypedAdminClient;

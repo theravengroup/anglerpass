@@ -1,7 +1,6 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
-import { createClient } from "@/lib/supabase/server";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
 import { notifyMemberApproved } from "@/lib/notifications";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
@@ -47,20 +46,17 @@ export async function PATCH(
 ) {
   try {
     const { id, memberId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
 
     // Verify user is club owner or staff
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 
@@ -82,7 +78,7 @@ export async function PATCH(
     }
 
     // Staff cannot modify other staff members — only the owner can
-    if (!auth.isOwner && membership.role === "staff") {
+    if (!clubAuth.isOwner && membership.role === "staff") {
       return jsonError("Only the club owner can manage staff members", 403);
     }
 
@@ -128,7 +124,7 @@ export async function PATCH(
     ) {
       notifyMemberApproved(admin, {
         userId: membership.user_id,
-        clubName: auth.club.name,
+        clubName: clubAuth.club.name,
         clubId: id,
       }).catch((err) =>
         console.error("[clubs/members] Notification error:", err)
@@ -170,20 +166,17 @@ export async function DELETE(
 ) {
   try {
     const { id, memberId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
 
     // Verify user is club owner or staff
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 
@@ -204,7 +197,7 @@ export async function DELETE(
     }
 
     // Staff cannot remove other staff — only the owner can
-    if (!auth.isOwner && membership.role === "staff") {
+    if (!clubAuth.isOwner && membership.role === "staff") {
       return jsonError("Only the club owner can remove staff members", 403);
     }
 

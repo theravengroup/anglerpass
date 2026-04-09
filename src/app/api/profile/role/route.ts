@@ -1,5 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { createClient } from "@/lib/supabase/server";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -20,14 +19,11 @@ export async function PATCH(request: Request) {
   if (limited) return limited;
 
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const parsed = switchRoleSchema.safeParse(body);
@@ -79,14 +75,11 @@ export async function PATCH(request: Request) {
 // POST: Add a new role to the user's roles array
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const parsed = addRoleSchema.safeParse(body);

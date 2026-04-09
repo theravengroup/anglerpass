@@ -1,6 +1,5 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -45,18 +44,15 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 

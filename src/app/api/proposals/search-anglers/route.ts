@@ -1,18 +1,14 @@
-import { jsonError, jsonOk, escapeIlike } from "@/lib/api/helpers";
+import { jsonError, jsonOk, escapeIlike, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 // GET: Search for anglers by name (guide-only)
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 

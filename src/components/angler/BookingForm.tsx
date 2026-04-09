@@ -1,24 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Loader2,
-  CalendarDays,
-  CheckCircle2,
-  Send,
-} from "lucide-react";
+import { Loader2, CalendarDays, Send } from "lucide-react";
 import {
   calculateFeeBreakdown,
   ROD_NOMENCLATURE,
@@ -26,6 +11,8 @@ import {
 import GuidesSection from "./GuidesSection";
 import FeeBreakdown from "./FeeBreakdown";
 import BookingPaymentForm from "./BookingPaymentForm";
+import BookingSuccessCard from "./BookingSuccessCard";
+import BookingFormFields from "./BookingFormFields";
 
 interface MatchedGuide {
   id: string;
@@ -207,38 +194,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   }
 
   if (bookingSuccess) {
-    return (
-      <Card className="border-forest/20 bg-forest/5">
-        <CardContent className="flex flex-col items-center py-8">
-          <CheckCircle2 className="size-10 text-forest" />
-          <h3 className="mt-3 text-base font-medium text-text-primary">
-            Booking Confirmed!
-          </h3>
-          <p className="mt-1 text-center text-sm text-text-secondary">
-            Your booking is confirmed. Access details are available in your bookings.
-            {selectedGuide && (
-              <> Your guide {selectedGuide.display_name} will be in touch before your trip.</>
-            )}
-          </p>
-          <div className="mt-4 flex gap-2">
-            <Link href="/angler/bookings">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-forest text-forest"
-              >
-                View My Bookings
-              </Button>
-            </Link>
-            <Link href="/angler/discover">
-              <Button variant="outline" size="sm">
-                Keep Browsing
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <BookingSuccessCard guideName={selectedGuide?.display_name} />;
   }
 
   return (
@@ -259,170 +215,29 @@ export default function BookingForm({ property, initialMembership }: BookingForm
         <p className="text-[11px] text-text-light">{ROD_NOMENCLATURE}</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Date range */}
-        <div className="space-y-2">
-          <Label>Dates</Label>
-          <div className="flex gap-2">
-            <div className="flex-1 space-y-1">
-              <span className="text-xs text-text-light">Start</span>
-              <Input
-                id="start_date"
-                type="date"
-                min={minDate}
-                value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  if (!endDate || e.target.value > endDate) {
-                    setEndDate(e.target.value);
-                  }
-                }}
-                disabled={submitting}
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <span className="text-xs text-text-light">End</span>
-              <Input
-                id="end_date"
-                type="date"
-                min={startDate || minDate}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                disabled={submitting || !startDate}
-              />
-            </div>
-          </div>
-          {startDate && numberOfDays > 1 && (
-            <p className="text-xs font-medium text-bronze">
-              {numberOfDays} day{numberOfDays > 1 ? "s" : ""} selected
-            </p>
-          )}
-        </div>
-
-        {/* Duration */}
-        {property.half_day_allowed && (
-          <div className="space-y-2">
-            <Label>Duration</Label>
-            <Select
-              value={duration}
-              onValueChange={setDuration}
-              disabled={submitting}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="full_day">Full Day</SelectItem>
-                <SelectItem value="half_day">Half Day</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        {/* Anglers (rods) */}
-        <div className="space-y-2">
-          <Label htmlFor="party_size">
-            Anglers (Rods)
-            {property.max_rods && (
-              <span className="ml-1 font-normal text-text-light">
-                max {property.max_rods}
-              </span>
-            )}
-          </Label>
-          <Input
-            id="party_size"
-            type="number"
-            min={1}
-            max={property.max_rods ?? 20}
-            value={partySize}
-            onChange={(e) => setPartySize(parseInt(e.target.value) || 1)}
-            disabled={submitting}
-          />
-          <p className="text-xs text-text-light">
-            Only you (the booking member) need to be a club member.
-            Your fishing companions do not need memberships.
-          </p>
-        </div>
-
-        {/* Non-fishing guests */}
-        <div className="space-y-2">
-          <Label htmlFor="non_fishing_guests">
-            Non-Fishing Guests
-            <span className="ml-1 font-normal text-text-light">(no rod fee)</span>
-          </Label>
-          <Input
-            id="non_fishing_guests"
-            type="number"
-            min={0}
-            max={
-              property.max_guests
-                ? Math.max(0, property.max_guests - partySize)
-                : 50
-            }
-            value={nonFishingGuests}
-            onChange={(e) => setNonFishingGuests(parseInt(e.target.value) || 0)}
-            disabled={submitting}
-          />
-          <p className="text-xs text-text-light">
-            Family or friends who won&apos;t be fishing. No charge, but
-            they count toward the property&apos;s total guest limit
-            {property.max_guests ? ` of ${property.max_guests}` : ""}.
-          </p>
-        </div>
-
-        {/* Total people summary */}
-        {partySize + nonFishingGuests > 1 && (
-          <div className="rounded-md bg-offwhite/80 px-3 py-2 text-xs text-text-secondary">
-            <span className="font-medium text-text-primary">
-              Total party: {partySize + nonFishingGuests} people
-            </span>
-            {" — "}
-            {partySize} angler{partySize > 1 ? "s" : ""} +{" "}
-            {nonFishingGuests} non-fishing guest
-            {nonFishingGuests !== 1 ? "s" : ""}
-          </div>
-        )}
-
-        {/* Club membership (if multiple) */}
-        {property.accessible_through.length > 1 && (
-          <div className="space-y-2">
-            <Label>Book Through</Label>
-            <Select
-              value={selectedMembership}
-              onValueChange={setSelectedMembership}
-              disabled={submitting}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select club" />
-              </SelectTrigger>
-              <SelectContent>
-                {property.accessible_through.map((club) => (
-                  <SelectItem
-                    key={club.membership_id}
-                    value={club.membership_id}
-                  >
-                    {club.club_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        {/* Message */}
-        <div className="space-y-2">
-          <Label htmlFor="message">
-            Message to Landowner{" "}
-            <span className="text-text-light">(optional)</span>
-          </Label>
-          <textarea
-            id="message"
-            className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            placeholder="Introduce yourself, mention your experience..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            disabled={submitting}
-          />
-        </div>
+        <BookingFormFields
+          startDate={startDate}
+          endDate={endDate}
+          duration={duration}
+          partySize={partySize}
+          nonFishingGuests={nonFishingGuests}
+          selectedMembership={selectedMembership}
+          message={message}
+          submitting={submitting}
+          minDate={minDate}
+          numberOfDays={numberOfDays}
+          property={property}
+          onStartDateChange={(val) => {
+            setStartDate(val);
+            if (!endDate || val > endDate) setEndDate(val);
+          }}
+          onEndDateChange={setEndDate}
+          onDurationChange={setDuration}
+          onPartySizeChange={setPartySize}
+          onNonFishingGuestsChange={setNonFishingGuests}
+          onMembershipChange={setSelectedMembership}
+          onMessageChange={setMessage}
+        />
 
         {/* Guide add-on */}
         {startDate && (

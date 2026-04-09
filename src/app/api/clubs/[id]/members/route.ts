@@ -1,7 +1,6 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { clubMemberInviteSchema } from "@/lib/validations/clubs";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -47,20 +46,17 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
 
     // Verify user is club owner or staff
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 
@@ -117,20 +113,17 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authResult = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!authResult) return jsonError("Unauthorized", 401);
+
+    const { user } = authResult;
 
     const admin = createAdminClient();
 
     // Verify user is club owner or staff
-    const auth = await verifyClubManager(admin, id, user.id);
-    if (!auth) {
+    const clubAuth = await verifyClubManager(admin, id, user.id);
+    if (!clubAuth) {
       return jsonError("Forbidden", 403);
     }
 
@@ -138,7 +131,7 @@ export async function POST(
     const result = clubMemberInviteSchema.safeParse(body);
 
     // Staff can only invite members, not other staff
-    if (!auth.isOwner && result.success && result.data.role === "staff") {
+    if (!clubAuth.isOwner && result.success && result.data.role === "staff") {
       return jsonError("Only the club owner can invite staff members", 403);
     }
 
@@ -191,7 +184,7 @@ export async function POST(
         return jsonError("Failed to create membership", 500);
       }
 
-      await sendMemberInviteEmail(email, auth.club.name, false, role);
+      await sendMemberInviteEmail(email, clubAuth.club.name, false, role);
 
       return jsonCreated({ membership });
     }
@@ -227,7 +220,7 @@ export async function POST(
       return jsonError("Failed to create membership", 500);
     }
 
-    await sendMemberInviteEmail(email, auth.club.name, true, role);
+    await sendMemberInviteEmail(email, clubAuth.club.name, true, role);
 
     return jsonCreated({ membership });
   } catch (err) {

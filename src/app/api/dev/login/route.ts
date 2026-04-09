@@ -155,7 +155,7 @@ async function devLogin(role: string, staffRole: string | null) {
   // Redirect to the role's dashboard
   const redirectPath = role === "club_admin" ? "/club" : `/${role}`;
   const response = NextResponse.redirect(
-    new URL(redirectPath, `http://localhost:3001`)
+    new URL(redirectPath, process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000")
   );
 
   // Set chunked cookies

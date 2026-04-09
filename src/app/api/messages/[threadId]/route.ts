@@ -1,6 +1,5 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Fetch messages in a thread (paginated)
@@ -10,14 +9,11 @@ export async function GET(
 ) {
   try {
     const { threadId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 
@@ -80,14 +76,11 @@ export async function POST(
 
   try {
     const { threadId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 

@@ -1,6 +1,5 @@
-import { jsonCreated, jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { bookingSchema } from "@/lib/validations/bookings";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
@@ -34,14 +33,11 @@ export async function POST(request: Request) {
   if (limited) return limited;
 
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = bookingSchema.safeParse(body);
@@ -473,14 +469,11 @@ export async function POST(request: Request) {
 // GET: List bookings for the current user
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role"); // "angler" or "landowner"

@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { onBehalfBookingSchema } from "@/lib/validations/permissions";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import {
@@ -9,7 +8,7 @@ import {
 } from "@/lib/notifications";
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { authorize, P, auditBookingAction, AuditAction } from "@/lib/permissions";
-import { jsonError, jsonCreated } from "@/lib/api/helpers";
+import { jsonError, jsonCreated, requireAuth} from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 /**
@@ -26,14 +25,11 @@ export async function POST(request: Request) {
   if (limited) return limited;
 
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = onBehalfBookingSchema.safeParse(body);

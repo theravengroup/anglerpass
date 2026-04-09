@@ -1,0 +1,42 @@
+"use client";
+
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+export default function DashboardError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
+  return (
+    <div className="mx-auto flex max-w-lg flex-col items-center py-24 text-center">
+      <div className="flex size-14 items-center justify-center rounded-full bg-bronze/10">
+        <AlertTriangle className="size-7 text-bronze" />
+      </div>
+      <h2 className="mt-5 font-heading text-xl font-semibold text-text-primary">
+        Something went wrong
+      </h2>
+      <p className="mt-2 text-sm text-text-secondary">
+        We hit an unexpected error loading this page. It&rsquo;s been logged
+        and we&rsquo;re looking into&nbsp;it.
+      </p>
+      <div className="mt-6 flex gap-3">
+        <Button onClick={reset} variant="outline" size="sm">
+          Try Again
+        </Button>
+        <Link href="/dashboard">
+          <Button size="sm">Back to Dashboard</Button>
+        </Link>
+      </div>
+    </div>
+  );
+}

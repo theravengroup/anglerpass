@@ -1,5 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { createClient } from "@/lib/supabase/server";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { delegateUpdateSchema } from "@/lib/validations/permissions";
 import { auditLog, AuditAction } from "@/lib/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -14,14 +13,11 @@ type RouteContext = { params: Promise<{ id: string }> };
 export async function PATCH(request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const result = delegateUpdateSchema.safeParse(body);
@@ -86,14 +82,11 @@ export async function PATCH(request: Request, context: RouteContext) {
 export async function DELETE(request: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { data: existing, error: fetchError } = await createAdminClient().from("angler_delegates")
       .select("id, angler_id, delegate_id, access_level, status")

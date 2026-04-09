@@ -1,6 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireClubManager, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireClubManager, jsonOk, jsonError, requireAuth} from "@/lib/api/helpers";
 import { agreementActionSchema } from "@/lib/validations/clubs";
 
 // PATCH: Accept or revoke a cross-club agreement
@@ -10,14 +9,11 @@ export async function PATCH(
 ) {
   try {
     const { id: clubId, agreementId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 

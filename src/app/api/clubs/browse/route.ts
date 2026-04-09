@@ -1,18 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { escapeIlike, jsonError, jsonOk } from "@/lib/api/helpers";
+import { escapeIlike, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 
 // GET: Browse/search clubs (for anglers looking to join)
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() ?? "";

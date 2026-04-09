@@ -1,6 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireClubManager, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
+import { requireClubManager, jsonOk, jsonCreated, jsonError, requireAuth} from "@/lib/api/helpers";
 import { proposeAgreementSchema } from "@/lib/validations/clubs";
 
 // GET: List all cross-club agreements for a club
@@ -10,14 +9,11 @@ export async function GET(
 ) {
   try {
     const { id: clubId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 
@@ -105,14 +101,11 @@ export async function POST(
 ) {
   try {
     const { id: clubId } = await params;
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 

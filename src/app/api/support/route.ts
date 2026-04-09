@@ -19,9 +19,6 @@ export async function POST(request: Request) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid request", 400);
   }
 
-  // TODO: Fire email notification via Supabase Edge Function or Customer.io
-  // when support ticket is submitted. Trigger: support_tickets INSERT.
-
   const db = createUntypedAdminClient();
   const { data: ticket, error } = await db
     .from("support_tickets")

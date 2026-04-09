@@ -1,5 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
-import { createClient } from "@/lib/supabase/server";
+import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { profileUpdateSchema } from "@/lib/validations/profile";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -7,14 +6,11 @@ import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 // GET: Fetch current user's full profile
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const admin = createAdminClient();
 
@@ -59,14 +55,11 @@ export async function PATCH(request: Request) {
   if (limited) return limited;
 
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await requireAuth();
 
-    if (!user) {
-      return jsonError("Unauthorized", 401);
-    }
+    if (!auth) return jsonError("Unauthorized", 401);
+
+    const { user } = auth;
 
     const body = await request.json();
     const parsed = profileUpdateSchema.safeParse(body);
