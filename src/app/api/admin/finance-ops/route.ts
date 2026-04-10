@@ -1,5 +1,5 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/admin/finance-ops
@@ -15,7 +15,7 @@ export async function GET() {
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Fetch all data in parallel
   const [payoutsRes, accountsRes, exceptionsRes, syncRes, snapshotRes] =
@@ -81,7 +81,7 @@ export async function PATCH(request: Request) {
     return jsonError("Missing exception_id or action", 400);
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const { data, error } = await db
     .from("finance_reconciliation_exceptions")

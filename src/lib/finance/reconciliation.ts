@@ -7,7 +7,7 @@ import "server-only";
  * Creates exceptions for unmatched or anomalous items.
  */
 
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ const ESCALATION_DAYS = 5;
 export async function attemptPayoutMatch(
   payoutId: string
 ): Promise<string | null> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const { data: payout } = await db
     .from("finance_stripe_payouts")
@@ -123,7 +123,7 @@ export async function attemptPayoutMatch(
 export async function attemptDepositMatch(
   mercuryTxnId: string
 ): Promise<string | null> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const { data: txn } = await db
     .from("finance_mercury_transactions")
@@ -187,7 +187,7 @@ export async function runDailySweep(): Promise<{
   rematched: number;
   exceptions_created: number;
 }> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   let rematched = 0;
   let exceptions_created = 0;
 
@@ -282,7 +282,7 @@ interface CreateExceptionOpts {
 }
 
 export async function createException(opts: CreateExceptionOpts) {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   await db.from("finance_reconciliation_exceptions").insert({
     type: opts.type,
     severity: opts.severity,
@@ -303,7 +303,7 @@ export async function updateSyncStatus(
   recordsSynced: number,
   error?: string
 ) {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   await db
     .from("finance_sync_status")
     .update({

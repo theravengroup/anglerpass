@@ -1,6 +1,6 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import type { Database } from "@/types/supabase";
 import { z } from "zod";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
 
     // Resolve referral code if provided
     let referredBy: string | null = null;
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
 
     if (referral_code) {
       try {
@@ -147,20 +147,16 @@ export async function POST(request: Request) {
     }
 
     // Create new membership request
-    const insertPayload: Record<string, unknown> = {
+    const insertPayload: Database["public"]["Tables"]["club_memberships"]["Insert"] = {
       club_id,
       user_id: user.id,
       role: "member",
       status: "pending",
       invited_email: user.email,
+      ...(referredBy ? { referred_by: referredBy } : {}),
     };
 
-    // Add referred_by if resolved (column added by migration 00041)
-    if (referredBy) {
-      insertPayload.referred_by = referredBy;
-    }
-
-    // Insert membership (use untyped client to include referred_by column)
+    // Insert membership
     let newMembershipId: string | null = null;
 
     const { data: insertedRows, error: insertError } = await db

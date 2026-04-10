@@ -1,7 +1,7 @@
 import "server-only";
 
 import { requireAuth, jsonCreated, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { supportTicketSchema } from "@/lib/validations/support-ticket";
 
 /**
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid request", 400);
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data: ticket, error } = await db
     .from("support_tickets")
     .insert({

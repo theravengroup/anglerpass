@@ -1,7 +1,7 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError, parsePositiveInt } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/admin/impersonation
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const pageSize = parsePositiveInt(searchParams.get("page_size"), 25, 100);
   const activeOnly = searchParams.get("active") === "true";
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   let query = db
     .from("impersonation_sessions")

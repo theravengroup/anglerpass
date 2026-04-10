@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
   const { id } = await params;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data, error } = await db
     .from("compass_conversations")
     .select("id, title, messages, created_at, updated_at")
@@ -71,7 +71,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     updates.messages = JSON.parse(JSON.stringify(parsed.data.messages));
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Verify ownership
   const { data: existing } = await db

@@ -1,5 +1,5 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/admin/finance-ops/exceptions?status=open&sort=age
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const status = searchParams.get("status") ?? "open";
   const showAll = searchParams.get("all") === "true";
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   let query = db
     .from("finance_reconciliation_exceptions")

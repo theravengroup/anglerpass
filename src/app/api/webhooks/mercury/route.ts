@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isStripeDeposit } from "@/lib/mercury/client";
 import {
   attemptDepositMatch,
@@ -40,7 +40,7 @@ function verifyMercurySignature(
 async function handleTransactionCreated(
   transaction: Record<string, unknown>
 ) {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const txnId = transaction.id as string;
   const accountId = transaction.accountId as string;
@@ -131,7 +131,7 @@ async function handleTransactionCreated(
 async function handleBalanceUpdated(
   data: Record<string, unknown>
 ) {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const accountId = data.accountId as string;
   const availableBalance = (data.availableBalance as number) ?? 0;
   const currentBalance = (data.currentBalance as number) ?? 0;

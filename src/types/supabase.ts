@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       angler_club_invitations: {
@@ -189,6 +164,60 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_standing: {
+        Row: {
+          cancellation_score: number
+          cancellation_score_updated_at: string | null
+          concurrent_cap: number
+          created_at: string
+          id: string
+          reason: string | null
+          standing: string
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          cancellation_score?: number
+          cancellation_score_updated_at?: string | null
+          concurrent_cap?: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          standing?: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          cancellation_score?: number
+          cancellation_score_updated_at?: string | null
+          concurrent_cap?: number
+          created_at?: string
+          id?: string
+          reason?: string | null
+          standing?: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_standing_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_standing_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           amount_cents: number | null
@@ -220,6 +249,7 @@ export type Database = {
           is_cross_club: boolean
           landowner_notes: string | null
           landowner_payout: number
+          late_cancel_fee: number | null
           lodging_checkin_date: string | null
           lodging_checkout_date: string | null
           lodging_nightly_rate: number | null
@@ -274,6 +304,7 @@ export type Database = {
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          late_cancel_fee?: number | null
           lodging_checkin_date?: string | null
           lodging_checkout_date?: string | null
           lodging_nightly_rate?: number | null
@@ -328,6 +359,7 @@ export type Database = {
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          late_cancel_fee?: number | null
           lodging_checkin_date?: string | null
           lodging_checkout_date?: string | null
           lodging_nightly_rate?: number | null
@@ -415,6 +447,315 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: true
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_enrollments: {
+        Row: {
+          campaign_id: string
+          completed_at: string | null
+          current_step: number
+          enrolled_at: string
+          id: string
+          last_step_sent_at: string | null
+          lead_id: string | null
+          next_step_due_at: string | null
+          recipient_email: string
+          recipient_id: string | null
+          recipient_type: string
+          status: string
+        }
+        Insert: {
+          campaign_id: string
+          completed_at?: string | null
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_step_sent_at?: string | null
+          lead_id?: string | null
+          next_step_due_at?: string | null
+          recipient_email: string
+          recipient_id?: string | null
+          recipient_type?: string
+          status?: string
+        }
+        Update: {
+          campaign_id?: string
+          completed_at?: string | null
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_step_sent_at?: string | null
+          lead_id?: string | null
+          next_step_due_at?: string | null
+          recipient_email?: string
+          recipient_id?: string | null
+          recipient_type?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_enrollments_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_enrollments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_enrollments_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_sends: {
+        Row: {
+          bounce_reason: string | null
+          bounced_at: string | null
+          campaign_id: string
+          click_count: number
+          clicked_at: string | null
+          created_at: string
+          delivered_at: string | null
+          drip_scheduled_for: string | null
+          id: string
+          lead_id: string | null
+          open_count: number
+          opened_at: string | null
+          recipient_email: string
+          recipient_id: string | null
+          recipient_type: string
+          resend_message_id: string | null
+          sent_at: string | null
+          status: string
+          step_id: string
+          template_data: Json | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id: string
+          click_count?: number
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          drip_scheduled_for?: string | null
+          id?: string
+          lead_id?: string | null
+          open_count?: number
+          opened_at?: string | null
+          recipient_email: string
+          recipient_id?: string | null
+          recipient_type?: string
+          resend_message_id?: string | null
+          sent_at?: string | null
+          status?: string
+          step_id: string
+          template_data?: Json | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id?: string
+          click_count?: number
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          drip_scheduled_for?: string | null
+          id?: string
+          lead_id?: string | null
+          open_count?: number
+          opened_at?: string | null
+          recipient_email?: string
+          recipient_id?: string | null
+          recipient_type?: string
+          resend_message_id?: string | null
+          sent_at?: string | null
+          status?: string
+          step_id?: string
+          template_data?: Json | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_sends_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_sends_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_sends_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_steps: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          cta_label: string | null
+          cta_url: string | null
+          delay_minutes: number
+          html_body: string
+          id: string
+          plain_body: string | null
+          step_order: number
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          delay_minutes?: number
+          html_body: string
+          id?: string
+          plain_body?: string | null
+          step_order?: number
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          cta_label?: string | null
+          cta_url?: string | null
+          delay_minutes?: number
+          html_body?: string
+          id?: string
+          plain_body?: string | null
+          step_order?: number
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_steps_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          from_email: string
+          from_name: string
+          id: string
+          is_prebuilt: boolean
+          name: string
+          prebuilt_key: string | null
+          reply_to: string | null
+          segment_id: string | null
+          send_time_strategy: string | null
+          started_at: string | null
+          status: string
+          topic_id: string | null
+          trigger_config: Json
+          trigger_event: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          from_email?: string
+          from_name?: string
+          id?: string
+          is_prebuilt?: boolean
+          name: string
+          prebuilt_key?: string | null
+          reply_to?: string | null
+          segment_id?: string | null
+          send_time_strategy?: string | null
+          started_at?: string | null
+          status?: string
+          topic_id?: string | null
+          trigger_config?: Json
+          trigger_event?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          from_email?: string
+          from_name?: string
+          id?: string
+          is_prebuilt?: boolean
+          name?: string
+          prebuilt_key?: string | null
+          reply_to?: string | null
+          segment_id?: string | null
+          send_time_strategy?: string | null
+          started_at?: string | null
+          status?: string
+          topic_id?: string | null
+          trigger_config?: Json
+          trigger_event?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaigns_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaigns_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "crm_subscription_topics"
             referencedColumns: ["id"]
           },
         ]
@@ -744,6 +1085,146 @@ export type Database = {
           },
         ]
       }
+      compass_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          messages: Json
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compass_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compass_credit_purchases: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          messages_purchased: number
+          pack_key: string
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          messages_purchased: number
+          pack_key: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          messages_purchased?: number
+          pack_key?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compass_credit_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compass_credits: {
+        Row: {
+          balance: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compass_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compass_usage: {
+        Row: {
+          created_at: string
+          id: string
+          message_count: number
+          period: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_count?: number
+          period: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_count?: number
+          period?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compass_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultation_requests: {
         Row: {
           created_at: string
@@ -827,6 +1308,725 @@ export type Database = {
             columns: ["corporate_member_id"]
             isOneToOne: false
             referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_contact_activity: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          metadata: Json | null
+          source_id: string | null
+          source_type: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          source_type?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          source_type?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      crm_contact_tags: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          tag: string
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          tag: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          tag?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crm_conversions: {
+        Row: {
+          attributed_campaign_id: string | null
+          attributed_send_id: string | null
+          attributed_workflow_id: string | null
+          attribution_type: string | null
+          attribution_window_hours: number | null
+          created_at: string
+          currency: string | null
+          email: string
+          event_category: string
+          event_name: string
+          id: string
+          properties: Json | null
+          user_id: string | null
+          value_cents: number | null
+        }
+        Insert: {
+          attributed_campaign_id?: string | null
+          attributed_send_id?: string | null
+          attributed_workflow_id?: string | null
+          attribution_type?: string | null
+          attribution_window_hours?: number | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          event_category?: string
+          event_name: string
+          id?: string
+          properties?: Json | null
+          user_id?: string | null
+          value_cents?: number | null
+        }
+        Update: {
+          attributed_campaign_id?: string | null
+          attributed_send_id?: string | null
+          attributed_workflow_id?: string | null
+          attribution_type?: string | null
+          attribution_window_hours?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          event_category?: string
+          event_name?: string
+          id?: string
+          properties?: Json | null
+          user_id?: string | null
+          value_cents?: number | null
+        }
+        Relationships: []
+      }
+      crm_dashboard_snapshots: {
+        Row: {
+          active_campaigns: number
+          active_workflows: number
+          bounces_30d: number
+          bounces_7d: number
+          click_rate_7d: number
+          clicks_30d: number
+          clicks_7d: number
+          clicks_by_day: Json
+          created_at: string
+          delivered_30d: number
+          delivered_7d: number
+          id: string
+          open_rate_7d: number
+          opens_30d: number
+          opens_7d: number
+          opens_by_day: Json
+          sends_30d: number
+          sends_7d: number
+          sends_by_day: Json
+          snapshot_date: string
+          top_campaigns: Json
+          total_contacts: number
+          total_leads: number
+          unsubscribes_30d: number
+          unsubscribes_7d: number
+        }
+        Insert: {
+          active_campaigns?: number
+          active_workflows?: number
+          bounces_30d?: number
+          bounces_7d?: number
+          click_rate_7d?: number
+          clicks_30d?: number
+          clicks_7d?: number
+          clicks_by_day?: Json
+          created_at?: string
+          delivered_30d?: number
+          delivered_7d?: number
+          id?: string
+          open_rate_7d?: number
+          opens_30d?: number
+          opens_7d?: number
+          opens_by_day?: Json
+          sends_30d?: number
+          sends_7d?: number
+          sends_by_day?: Json
+          snapshot_date: string
+          top_campaigns?: Json
+          total_contacts?: number
+          total_leads?: number
+          unsubscribes_30d?: number
+          unsubscribes_7d?: number
+        }
+        Update: {
+          active_campaigns?: number
+          active_workflows?: number
+          bounces_30d?: number
+          bounces_7d?: number
+          click_rate_7d?: number
+          clicks_30d?: number
+          clicks_7d?: number
+          clicks_by_day?: Json
+          created_at?: string
+          delivered_30d?: number
+          delivered_7d?: number
+          id?: string
+          open_rate_7d?: number
+          opens_30d?: number
+          opens_7d?: number
+          opens_by_day?: Json
+          sends_30d?: number
+          sends_7d?: number
+          sends_by_day?: Json
+          snapshot_date?: string
+          top_campaigns?: Json
+          total_contacts?: number
+          total_leads?: number
+          unsubscribes_30d?: number
+          unsubscribes_7d?: number
+        }
+        Relationships: []
+      }
+      crm_engagement_windows: {
+        Row: {
+          click_count: number
+          day_of_week: number
+          email: string
+          hour_utc: number
+          id: string
+          open_count: number
+          score: number
+          updated_at: string
+        }
+        Insert: {
+          click_count?: number
+          day_of_week: number
+          email: string
+          hour_utc: number
+          id?: string
+          open_count?: number
+          score?: number
+          updated_at?: string
+        }
+        Update: {
+          click_count?: number
+          day_of_week?: number
+          email?: string
+          hour_utc?: number
+          id?: string
+          open_count?: number
+          score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      crm_frequency_caps: {
+        Row: {
+          applies_to: string
+          created_at: string
+          id: string
+          is_active: boolean
+          max_sends: number
+          name: string
+          updated_at: string
+          window_hours: number
+        }
+        Insert: {
+          applies_to?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_sends?: number
+          name: string
+          updated_at?: string
+          window_hours?: number
+        }
+        Update: {
+          applies_to?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_sends?: number
+          name?: string
+          updated_at?: string
+          window_hours?: number
+        }
+        Relationships: []
+      }
+      crm_notifications: {
+        Row: {
+          action_url: string | null
+          body: string | null
+          category: string
+          created_at: string
+          id: string
+          is_read: boolean
+          read_at: string | null
+          source_id: string | null
+          source_type: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          read_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          read_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crm_send_schedule: {
+        Row: {
+          created_at: string
+          id: string
+          recipient_email: string
+          scheduled_for: string
+          send_id: string | null
+          status: string
+          strategy: string
+          workflow_enrollment_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipient_email: string
+          scheduled_for: string
+          send_id?: string | null
+          status?: string
+          strategy?: string
+          workflow_enrollment_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipient_email?: string
+          scheduled_for?: string
+          send_id?: string | null
+          status?: string
+          strategy?: string
+          workflow_enrollment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_send_schedule_send_id_fkey"
+            columns: ["send_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_sends"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_send_schedule_workflow_enrollment_id_fkey"
+            columns: ["workflow_enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_sms_sends: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          message: string
+          phone_number: string
+          provider_id: string | null
+          sent_at: string | null
+          source_id: string | null
+          source_type: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message: string
+          phone_number: string
+          provider_id?: string | null
+          sent_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message?: string
+          phone_number?: string
+          provider_id?: string | null
+          sent_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      crm_subscription_topics: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          is_default: boolean
+          is_required: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          is_required?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_default?: boolean
+          is_required?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      crm_user_topic_subscriptions: {
+        Row: {
+          id: string
+          subscribed: boolean
+          topic_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          subscribed?: boolean
+          topic_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          subscribed?: boolean
+          topic_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_user_topic_subscriptions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "crm_subscription_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_workflow_edges: {
+        Row: {
+          created_at: string
+          id: string
+          source_handle: string | null
+          source_node_id: string
+          target_node_id: string
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          source_handle?: string | null
+          source_node_id: string
+          target_node_id: string
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          source_handle?: string | null
+          source_node_id?: string
+          target_node_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_workflow_edges_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_workflow_edges_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_workflow_edges_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_workflow_enrollments: {
+        Row: {
+          completed_at: string | null
+          context_data: Json | null
+          current_node_id: string | null
+          email: string
+          enrolled_at: string
+          id: string
+          last_processed_at: string | null
+          status: string
+          user_id: string | null
+          wait_until: string | null
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context_data?: Json | null
+          current_node_id?: string | null
+          email: string
+          enrolled_at?: string
+          id?: string
+          last_processed_at?: string | null
+          status?: string
+          user_id?: string | null
+          wait_until?: string | null
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          context_data?: Json | null
+          current_node_id?: string | null
+          email?: string
+          enrolled_at?: string
+          id?: string
+          last_processed_at?: string | null
+          status?: string
+          user_id?: string | null
+          wait_until?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_workflow_enrollments_current_node_id_fkey"
+            columns: ["current_node_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_workflow_enrollments_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_workflow_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          enrollment_id: string
+          id: string
+          node_id: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          enrollment_id: string
+          id?: string
+          node_id?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          enrollment_id?: string
+          id?: string
+          node_id?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_workflow_logs_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_workflow_logs_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflow_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_workflow_logs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_workflow_nodes: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          label: string
+          position_x: number
+          position_y: number
+          type: string
+          workflow_id: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          id?: string
+          label?: string
+          position_x?: number
+          position_y?: number
+          type: string
+          workflow_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          label?: string
+          position_x?: number
+          position_y?: number
+          type?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_workflow_nodes_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "crm_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_workflows: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          paused_at: string | null
+          segment_id: string | null
+          send_time_strategy: string | null
+          status: string
+          trigger_event: string | null
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          paused_at?: string | null
+          segment_id?: string | null
+          send_time_strategy?: string | null
+          status?: string
+          trigger_event?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          paused_at?: string | null
+          segment_id?: string | null
+          send_time_strategy?: string | null
+          status?: string
+          trigger_event?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_workflows_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "segments"
             referencedColumns: ["id"]
           },
         ]
@@ -965,6 +2165,464 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_suppression_list: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          reason: string
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          reason: string
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          reason?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      engagement_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          ip_address: unknown
+          send_id: string
+          url: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          ip_address?: unknown
+          send_id: string
+          url?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown
+          send_id?: string
+          url?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_events_send_id_fkey"
+            columns: ["send_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_sends"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_daily_snapshots: {
+        Row: {
+          booking_count: number
+          compass_credit_revenue: number
+          created_at: string
+          dispute_count: number
+          gross_processed: number
+          id: string
+          membership_revenue: number
+          mercury_balance: number
+          net_revenue: number
+          open_exceptions: number
+          payouts_arrived: number
+          payouts_created: number
+          refunds_issued: number
+          snapshot_date: string
+          stripe_available_balance: number
+          stripe_fees: number
+          stripe_pending_balance: number
+        }
+        Insert: {
+          booking_count?: number
+          compass_credit_revenue?: number
+          created_at?: string
+          dispute_count?: number
+          gross_processed?: number
+          id?: string
+          membership_revenue?: number
+          mercury_balance?: number
+          net_revenue?: number
+          open_exceptions?: number
+          payouts_arrived?: number
+          payouts_created?: number
+          refunds_issued?: number
+          snapshot_date: string
+          stripe_available_balance?: number
+          stripe_fees?: number
+          stripe_pending_balance?: number
+        }
+        Update: {
+          booking_count?: number
+          compass_credit_revenue?: number
+          created_at?: string
+          dispute_count?: number
+          gross_processed?: number
+          id?: string
+          membership_revenue?: number
+          mercury_balance?: number
+          net_revenue?: number
+          open_exceptions?: number
+          payouts_arrived?: number
+          payouts_created?: number
+          refunds_issued?: number
+          snapshot_date?: string
+          stripe_available_balance?: number
+          stripe_fees?: number
+          stripe_pending_balance?: number
+        }
+        Relationships: []
+      }
+      finance_mercury_accounts: {
+        Row: {
+          account_number_last4: string | null
+          available_balance: number
+          current_balance: number
+          id: string
+          kind: string
+          last_snapshot_at: string
+          mercury_account_id: string
+          name: string
+        }
+        Insert: {
+          account_number_last4?: string | null
+          available_balance?: number
+          current_balance?: number
+          id?: string
+          kind?: string
+          last_snapshot_at?: string
+          mercury_account_id: string
+          name: string
+        }
+        Update: {
+          account_number_last4?: string | null
+          available_balance?: number
+          current_balance?: number
+          id?: string
+          kind?: string
+          last_snapshot_at?: string
+          mercury_account_id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      finance_mercury_transactions: {
+        Row: {
+          amount: number
+          bank_description: string | null
+          counterparty_name: string | null
+          created_at: string
+          external_memo: string | null
+          id: string
+          is_stripe_deposit: boolean
+          matched_at: string | null
+          matched_payout_id: string | null
+          mercury_account_id: string
+          mercury_category: string | null
+          mercury_txn_id: string
+          note: string | null
+          posted_at: string | null
+          reconciliation_status: string
+          status: string
+          synced_at: string
+        }
+        Insert: {
+          amount: number
+          bank_description?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          external_memo?: string | null
+          id?: string
+          is_stripe_deposit?: boolean
+          matched_at?: string | null
+          matched_payout_id?: string | null
+          mercury_account_id: string
+          mercury_category?: string | null
+          mercury_txn_id: string
+          note?: string | null
+          posted_at?: string | null
+          reconciliation_status?: string
+          status?: string
+          synced_at?: string
+        }
+        Update: {
+          amount?: number
+          bank_description?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          external_memo?: string | null
+          id?: string
+          is_stripe_deposit?: boolean
+          matched_at?: string | null
+          matched_payout_id?: string | null
+          mercury_account_id?: string
+          mercury_category?: string | null
+          mercury_txn_id?: string
+          note?: string | null
+          posted_at?: string | null
+          reconciliation_status?: string
+          status?: string
+          synced_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_mercury_transactions_matched_payout_id_fkey"
+            columns: ["matched_payout_id"]
+            isOneToOne: false
+            referencedRelation: "finance_stripe_payouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_reconciliation_exceptions: {
+        Row: {
+          actual_amount: number | null
+          created_at: string
+          description: string
+          expected_amount: number | null
+          id: string
+          mercury_txn_id: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          stripe_payout_id: string | null
+          type: string
+        }
+        Insert: {
+          actual_amount?: number | null
+          created_at?: string
+          description: string
+          expected_amount?: number | null
+          id?: string
+          mercury_txn_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          stripe_payout_id?: string | null
+          type: string
+        }
+        Update: {
+          actual_amount?: number | null
+          created_at?: string
+          description?: string
+          expected_amount?: number | null
+          id?: string
+          mercury_txn_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          stripe_payout_id?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      finance_stripe_balance_txns: {
+        Row: {
+          amount: number
+          available_on: string | null
+          booking_id: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          fee: number
+          id: string
+          metadata: Json | null
+          net: number
+          reporting_category: string | null
+          source_id: string | null
+          source_type: string | null
+          stripe_balance_txn_id: string
+          stripe_payout_id: string | null
+          synced_at: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          available_on?: string | null
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          fee?: number
+          id?: string
+          metadata?: Json | null
+          net: number
+          reporting_category?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          stripe_balance_txn_id: string
+          stripe_payout_id?: string | null
+          synced_at?: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          available_on?: string | null
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          fee?: number
+          id?: string
+          metadata?: Json | null
+          net?: number
+          reporting_category?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          stripe_balance_txn_id?: string
+          stripe_payout_id?: string | null
+          synced_at?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_stripe_balance_txns_stripe_payout_id_fkey"
+            columns: ["stripe_payout_id"]
+            isOneToOne: false
+            referencedRelation: "finance_stripe_payouts"
+            referencedColumns: ["stripe_payout_id"]
+          },
+        ]
+      }
+      finance_stripe_payouts: {
+        Row: {
+          amount: number
+          arrival_date: string | null
+          balance_transaction_id: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          failed_at: string | null
+          failure_code: string | null
+          failure_message: string | null
+          fee_amount: number | null
+          gross_amount: number | null
+          id: string
+          item_count: number | null
+          matched_at: string | null
+          matched_mercury_txn_id: string | null
+          metadata: Json | null
+          method: string
+          paid_at: string | null
+          reconciliation_status: string
+          refund_amount: number | null
+          status: string
+          stripe_payout_id: string
+          synced_at: string
+          trace_id: string | null
+        }
+        Insert: {
+          amount: number
+          arrival_date?: string | null
+          balance_transaction_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          failed_at?: string | null
+          failure_code?: string | null
+          failure_message?: string | null
+          fee_amount?: number | null
+          gross_amount?: number | null
+          id?: string
+          item_count?: number | null
+          matched_at?: string | null
+          matched_mercury_txn_id?: string | null
+          metadata?: Json | null
+          method?: string
+          paid_at?: string | null
+          reconciliation_status?: string
+          refund_amount?: number | null
+          status?: string
+          stripe_payout_id: string
+          synced_at?: string
+          trace_id?: string | null
+        }
+        Update: {
+          amount?: number
+          arrival_date?: string | null
+          balance_transaction_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          failed_at?: string | null
+          failure_code?: string | null
+          failure_message?: string | null
+          fee_amount?: number | null
+          gross_amount?: number | null
+          id?: string
+          item_count?: number | null
+          matched_at?: string | null
+          matched_mercury_txn_id?: string | null
+          metadata?: Json | null
+          method?: string
+          paid_at?: string | null
+          reconciliation_status?: string
+          refund_amount?: number | null
+          status?: string
+          stripe_payout_id?: string
+          synced_at?: string
+          trace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_matched_mercury_txn"
+            columns: ["matched_mercury_txn_id"]
+            isOneToOne: false
+            referencedRelation: "finance_mercury_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_sync_status: {
+        Row: {
+          id: string
+          last_error: string | null
+          last_sync_at: string | null
+          last_sync_status: string
+          next_sync_at: string | null
+          records_synced: number | null
+          system: string
+        }
+        Insert: {
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          last_sync_status?: string
+          next_sync_at?: string | null
+          records_synced?: number | null
+          system: string
+        }
+        Update: {
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          last_sync_status?: string
+          next_sync_at?: string | null
+          records_synced?: number | null
+          system?: string
+        }
+        Relationships: []
       }
       guide_availability: {
         Row: {
@@ -1528,6 +3186,63 @@ export type Database = {
         }
         Relationships: []
       }
+      impersonation_sessions: {
+        Row: {
+          admin_email: string
+          admin_id: string
+          ended_at: string | null
+          id: string
+          is_active: boolean
+          session_token: string
+          started_at: string
+          target_role: string
+          target_user_email: string
+          target_user_id: string
+          target_user_name: string | null
+        }
+        Insert: {
+          admin_email: string
+          admin_id: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          session_token: string
+          started_at?: string
+          target_role: string
+          target_user_email: string
+          target_user_id: string
+          target_user_name?: string | null
+        }
+        Update: {
+          admin_email?: string
+          admin_id?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          session_token?: string
+          started_at?: string
+          target_role?: string
+          target_user_email?: string
+          target_user_id?: string
+          target_user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impersonation_sessions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "impersonation_sessions_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string | null
@@ -1928,6 +3643,7 @@ export type Database = {
           email_booking_confirmed: boolean
           email_booking_declined: boolean
           email_booking_requested: boolean
+          email_marketing: boolean
           email_member_approved: boolean
           email_member_invited: boolean
           email_property_access: boolean
@@ -1941,6 +3657,7 @@ export type Database = {
           email_booking_confirmed?: boolean
           email_booking_declined?: boolean
           email_booking_requested?: boolean
+          email_marketing?: boolean
           email_member_approved?: boolean
           email_member_invited?: boolean
           email_property_access?: boolean
@@ -1954,6 +3671,7 @@ export type Database = {
           email_booking_confirmed?: boolean
           email_booking_declined?: boolean
           email_booking_requested?: boolean
+          email_marketing?: boolean
           email_member_approved?: boolean
           email_member_invited?: boolean
           email_property_access?: boolean
@@ -2121,6 +3839,7 @@ export type Database = {
           id: string
           location: string | null
           phone: string | null
+          phone_number: string | null
           role: string
           roles: string[] | null
           sms_consent: boolean
@@ -2128,11 +3847,13 @@ export type Database = {
           sms_consent_ip: string | null
           sms_consent_revoked_at: string | null
           sms_consent_text: string | null
+          sms_opt_in: boolean
           stripe_connect_account_id: string | null
           stripe_connect_onboarded: boolean
           stripe_customer_id: string | null
           suspended_at: string | null
           suspended_reason: string | null
+          timezone: string | null
           updated_at: string | null
           welcome_email_step: number
         }
@@ -2146,6 +3867,7 @@ export type Database = {
           id: string
           location?: string | null
           phone?: string | null
+          phone_number?: string | null
           role?: string
           roles?: string[] | null
           sms_consent?: boolean
@@ -2153,11 +3875,13 @@ export type Database = {
           sms_consent_ip?: string | null
           sms_consent_revoked_at?: string | null
           sms_consent_text?: string | null
+          sms_opt_in?: boolean
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
+          timezone?: string | null
           updated_at?: string | null
           welcome_email_step?: number
         }
@@ -2171,6 +3895,7 @@ export type Database = {
           id?: string
           location?: string | null
           phone?: string | null
+          phone_number?: string | null
           role?: string
           roles?: string[] | null
           sms_consent?: boolean
@@ -2178,11 +3903,13 @@ export type Database = {
           sms_consent_ip?: string | null
           sms_consent_revoked_at?: string | null
           sms_consent_text?: string | null
+          sms_opt_in?: boolean
           stripe_connect_account_id?: string | null
           stripe_connect_onboarded?: boolean
           stripe_customer_id?: string | null
           suspended_at?: string | null
           suspended_reason?: string | null
+          timezone?: string | null
           updated_at?: string | null
           welcome_email_step?: number
         }
@@ -2191,6 +3918,7 @@ export type Database = {
       properties: {
         Row: {
           access_notes: string | null
+          advance_booking_days: number | null
           coordinates: string | null
           created_at: string | null
           created_by_club_id: string | null
@@ -2199,12 +3927,13 @@ export type Database = {
           gate_code_required: boolean | null
           half_day_allowed: boolean | null
           id: string
-          knowledge_completeness: number
+          knowledge_completeness: number | null
           latitude: number | null
           location_description: string | null
           lodging_available: boolean
           lodging_url: string | null
           longitude: number | null
+          max_bookings_per_member_per_month: number | null
           max_guests: number | null
           max_rods: number | null
           name: string
@@ -2226,6 +3955,7 @@ export type Database = {
         }
         Insert: {
           access_notes?: string | null
+          advance_booking_days?: number | null
           coordinates?: string | null
           created_at?: string | null
           created_by_club_id?: string | null
@@ -2234,12 +3964,13 @@ export type Database = {
           gate_code_required?: boolean | null
           half_day_allowed?: boolean | null
           id?: string
-          knowledge_completeness?: number
+          knowledge_completeness?: number | null
           latitude?: number | null
           location_description?: string | null
           lodging_available?: boolean
           lodging_url?: string | null
           longitude?: number | null
+          max_bookings_per_member_per_month?: number | null
           max_guests?: number | null
           max_rods?: number | null
           name: string
@@ -2261,6 +3992,7 @@ export type Database = {
         }
         Update: {
           access_notes?: string | null
+          advance_booking_days?: number | null
           coordinates?: string | null
           created_at?: string | null
           created_by_club_id?: string | null
@@ -2269,12 +4001,13 @@ export type Database = {
           gate_code_required?: boolean | null
           half_day_allowed?: boolean | null
           id?: string
-          knowledge_completeness?: number
+          knowledge_completeness?: number | null
           latitude?: number | null
           location_description?: string | null
           lodging_available?: boolean
           lodging_url?: string | null
           longitude?: number | null
+          max_bookings_per_member_per_month?: number | null
           max_guests?: number | null
           max_rods?: number | null
           name?: string
@@ -2307,6 +4040,57 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_availability: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          property_id: string
+          reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          property_id: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          property_id?: string
+          reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_availability_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_availability_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
@@ -2370,6 +4154,74 @@ export type Database = {
             foreignKeyName: "property_claim_invitations_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_knowledge: {
+        Row: {
+          access_and_logistics: Json | null
+          amenities: Json | null
+          completeness_score: number
+          created_at: string
+          equipment_recommendations: Json | null
+          experience_profile: Json | null
+          flow_and_gauge: Json | null
+          hatches_and_patterns: Json | null
+          id: string
+          pressure_and_crowding: Json | null
+          property_id: string
+          regulations_and_rules: Json | null
+          safety_and_hazards: Json | null
+          seasonal_conditions: Json | null
+          species_detail: Json | null
+          updated_at: string
+          water_characteristics: Json | null
+        }
+        Insert: {
+          access_and_logistics?: Json | null
+          amenities?: Json | null
+          completeness_score?: number
+          created_at?: string
+          equipment_recommendations?: Json | null
+          experience_profile?: Json | null
+          flow_and_gauge?: Json | null
+          hatches_and_patterns?: Json | null
+          id?: string
+          pressure_and_crowding?: Json | null
+          property_id: string
+          regulations_and_rules?: Json | null
+          safety_and_hazards?: Json | null
+          seasonal_conditions?: Json | null
+          species_detail?: Json | null
+          updated_at?: string
+          water_characteristics?: Json | null
+        }
+        Update: {
+          access_and_logistics?: Json | null
+          amenities?: Json | null
+          completeness_score?: number
+          created_at?: string
+          equipment_recommendations?: Json | null
+          experience_profile?: Json | null
+          flow_and_gauge?: Json | null
+          hatches_and_patterns?: Json | null
+          id?: string
+          pressure_and_crowding?: Json | null
+          property_id?: string
+          regulations_and_rules?: Json | null
+          safety_and_hazards?: Json | null
+          seasonal_conditions?: Json | null
+          species_detail?: Json | null
+          updated_at?: string
+          water_characteristics?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_knowledge_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -2457,74 +4309,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_lodging_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: true
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      property_knowledge: {
-        Row: {
-          id: string
-          property_id: string
-          created_at: string
-          updated_at: string
-          water_characteristics: Json | null
-          species_detail: Json | null
-          hatches_and_patterns: Json | null
-          seasonal_conditions: Json | null
-          flow_and_gauge: Json | null
-          access_and_logistics: Json | null
-          regulations_and_rules: Json | null
-          equipment_recommendations: Json | null
-          safety_and_hazards: Json | null
-          amenities: Json | null
-          experience_profile: Json | null
-          pressure_and_crowding: Json | null
-          completeness_score: number
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          created_at?: string
-          updated_at?: string
-          water_characteristics?: Json | null
-          species_detail?: Json | null
-          hatches_and_patterns?: Json | null
-          seasonal_conditions?: Json | null
-          flow_and_gauge?: Json | null
-          access_and_logistics?: Json | null
-          regulations_and_rules?: Json | null
-          equipment_recommendations?: Json | null
-          safety_and_hazards?: Json | null
-          amenities?: Json | null
-          experience_profile?: Json | null
-          pressure_and_crowding?: Json | null
-          completeness_score?: number
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          created_at?: string
-          updated_at?: string
-          water_characteristics?: Json | null
-          species_detail?: Json | null
-          hatches_and_patterns?: Json | null
-          seasonal_conditions?: Json | null
-          flow_and_gauge?: Json | null
-          access_and_logistics?: Json | null
-          regulations_and_rules?: Json | null
-          equipment_recommendations?: Json | null
-          safety_and_hazards?: Json | null
-          amenities?: Json | null
-          experience_profile?: Json | null
-          pressure_and_crowding?: Json | null
-          completeness_score?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "property_knowledge_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: true
             referencedRelation: "properties"
@@ -2893,6 +4677,53 @@ export type Database = {
           },
         ]
       }
+      segments: {
+        Row: {
+          cached_at: string | null
+          cached_count: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_dynamic: boolean
+          name: string
+          rules: Json
+          updated_at: string
+        }
+        Insert: {
+          cached_at?: string | null
+          cached_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_dynamic?: boolean
+          name: string
+          rules?: Json
+          updated_at?: string
+        }
+        Update: {
+          cached_at?: string | null
+          cached_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_dynamic?: boolean
+          name?: string
+          rules?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "segments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signed_documents: {
         Row: {
           booking_id: string
@@ -3026,6 +4857,56 @@ export type Database = {
         }
         Relationships: []
       }
+      support_tickets: {
+        Row: {
+          admin_notes: string | null
+          assigned_to: string | null
+          category: string
+          created_at: string
+          id: string
+          message: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          category: string
+          created_at?: string
+          id?: string
+          message: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_reviews: {
         Row: {
           angler_user_id: string
@@ -3145,8 +5026,28 @@ export type Database = {
       }
     }
     Functions: {
+      add_compass_credits: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
+      calculate_cancellation_score: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       cross_club_agreement_limit: {
         Args: { p_club_id: string }
+        Returns: number
+      }
+      decrement_compass_credits: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
+      evaluate_segment_query: {
+        Args: { query_params?: string; query_sql: string }
+        Returns: Json
+      }
+      increment_compass_usage: {
+        Args: { p_period: string; p_user_id: string }
         Returns: number
       }
       is_cross_club_eligible: { Args: { p_club_id: string }; Returns: boolean }
@@ -3278,9 +5179,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

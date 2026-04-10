@@ -2,7 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import { requireAuth, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/compass/conversations
@@ -12,7 +12,7 @@ export async function GET() {
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data, error } = await db
     .from("compass_conversations")
     .select("id, title, created_at, updated_at")
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
   const { title, messages } = parsed.data;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data, error } = await db
     .from("compass_conversations")
     .insert({

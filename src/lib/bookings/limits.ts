@@ -1,6 +1,5 @@
 import "server-only";
 
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   DEFAULT_CONCURRENT_CAP,
@@ -42,7 +41,7 @@ export interface PropertyLimitCheck {
 export async function getBookingStanding(
   userId: string
 ): Promise<StandingRecord> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const { data } = await db
     .from("booking_standing")
@@ -82,7 +81,7 @@ export async function getBookingStanding(
 export async function getActiveBookingCount(
   userId: string
 ): Promise<number> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Single-day bookings (no group)
   const { count: singleCount } = await db
@@ -143,7 +142,7 @@ export async function checkPropertyLimit(
   bookingDate: string
 ): Promise<PropertyLimitCheck> {
   const typedAdmin = createAdminClient();
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Fetch property limits
   const { data: property } = await db
@@ -215,7 +214,7 @@ export async function checkPropertyLimit(
 export async function getCancellationScore(
   userId: string
 ): Promise<number> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data } = await db.rpc("calculate_cancellation_score", {
     p_user_id: userId,
   });
@@ -230,7 +229,7 @@ export async function getCancellationScore(
 export async function updateStanding(
   userId: string
 ): Promise<{ changed: boolean; oldStanding: string; newStanding: string }> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   // Get current standing

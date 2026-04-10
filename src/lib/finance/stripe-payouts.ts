@@ -8,8 +8,8 @@ import "server-only";
  */
 
 import { stripe } from "@/lib/stripe/server";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/supabase";
 import {
   attemptPayoutMatch,
   createException,
@@ -25,7 +25,7 @@ import {
 export async function ingestPayout(
   payoutObj: Record<string, unknown>
 ): Promise<void> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   const payoutId = payoutObj.id as string;
   const amount = (payoutObj.amount as number) / 100; // Stripe sends cents
@@ -54,7 +54,7 @@ export async function ingestPayout(
         description: (payoutObj.description as string) ?? null,
         balance_transaction_id:
           (payoutObj.balance_transaction as string) ?? null,
-        metadata: (payoutObj.metadata as Record<string, unknown>) ?? {},
+        metadata: (payoutObj.metadata ?? {}) as Json,
         synced_at: new Date().toISOString(),
       })
       .eq("stripe_payout_id", payoutId);
@@ -72,7 +72,7 @@ export async function ingestPayout(
       description: (payoutObj.description as string) ?? null,
       balance_transaction_id:
         (payoutObj.balance_transaction as string) ?? null,
-      metadata: (payoutObj.metadata as Record<string, unknown>) ?? {},
+      metadata: (payoutObj.metadata ?? {}) as Json,
       reconciliation_status: "pending",
     });
   }
@@ -88,7 +88,7 @@ export async function ingestPayout(
 export async function markPayoutPaid(
   payoutObj: Record<string, unknown>
 ): Promise<void> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const payoutId = payoutObj.id as string;
 
   const { data: payout } = await db
@@ -132,7 +132,7 @@ export async function markPayoutPaid(
 export async function markPayoutFailed(
   payoutObj: Record<string, unknown>
 ): Promise<void> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const payoutId = payoutObj.id as string;
   const amount = (payoutObj.amount as number) / 100;
   const now = new Date().toISOString();
@@ -193,7 +193,7 @@ export async function markPayoutFailed(
 async function fetchBalanceTransactions(
   stripePayoutId: string
 ): Promise<void> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   let itemCount = 0;

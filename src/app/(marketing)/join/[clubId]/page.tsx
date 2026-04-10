@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { notFound } from "next/navigation";
 import JoinCta from "./JoinCta";
 
@@ -29,7 +28,7 @@ async function getClub(clubId: string) {
 async function getReferrer(clubId: string, referralCode: string) {
   if (!referralCode) return null;
   try {
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
     const typedAdmin = createAdminClient();
 
     const { data: rows } = await db

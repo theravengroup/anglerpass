@@ -217,10 +217,7 @@ export async function POST(request: Request) {
     }
 
     // ── Property availability check ─────────────────────────────
-    const { createUntypedAdminClient } = await import(
-      "@/lib/supabase/untyped-admin"
-    );
-    const untypedDb = createUntypedAdminClient();
+    const untypedDb = createAdminClient();
     const { data: blockedPropertyDates } = await untypedDb
       .from("property_availability")
       .select("date, status")

@@ -1,5 +1,5 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/admin/finance-ops/revenue-streams?days=30
@@ -19,42 +19,34 @@ export async function GET(request: Request) {
   const days = parseInt(searchParams.get("days") ?? "30", 10);
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-  const untypedAdmin = createUntypedAdminClient();
+  const untypedAdmin = createAdminClient();
 
-  // Fetch all succeeded bookings in range (use untyped — some fee columns added by later migrations)
+  // Fetch all succeeded bookings in range
   const { data: bookings } = await untypedAdmin
     .from("bookings")
     .select(
-      "id, platform_fee_cents, cross_club_fee_cents, guide_service_fee_cents, amount_cents, paid_at, booking_date"
+      "id, platform_fee_cents, cross_club_fee, guide_service_fee, amount_cents, paid_at, booking_date"
     )
     .eq("payment_status", "succeeded")
     .gte("paid_at", since);
 
-  const bookingList = (bookings ?? []) as Array<{
-    id: string;
-    platform_fee_cents: number | null;
-    cross_club_fee_cents: number | null;
-    guide_service_fee_cents: number | null;
-    amount_cents: number | null;
-    paid_at: string;
-    booking_date: string;
-  }>;
+  const bookingList = bookings ?? [];
 
-  // Platform fees
+  // Platform fees (stored in cents)
   const platformFees = bookingList.reduce(
     (sum, b) => sum + ((b.platform_fee_cents ?? 0) / 100),
     0
   );
 
-  // Cross-club fees
+  // Cross-club fees (stored in dollars)
   const crossClubFees = bookingList.reduce(
-    (sum, b) => sum + ((b.cross_club_fee_cents ?? 0) / 100),
+    (sum, b) => sum + (b.cross_club_fee ?? 0),
     0
   );
 
-  // Guide service fees
+  // Guide service fees (stored in dollars)
   const guideServiceFees = bookingList.reduce(
-    (sum, b) => sum + ((b.guide_service_fee_cents ?? 0) / 100),
+    (sum, b) => sum + (b.guide_service_fee ?? 0),
     0
   );
 
@@ -95,13 +87,14 @@ export async function GET(request: Request) {
   }>();
 
   for (const b of bookingList) {
+    if (!b.paid_at) continue;
     const date = b.paid_at.split("T")[0];
     const entry = dailyMap.get(date) ?? {
       platform: 0, cross_club: 0, guide: 0, membership: 0, compass: 0,
     };
     entry.platform += (b.platform_fee_cents ?? 0) / 100;
-    entry.cross_club += (b.cross_club_fee_cents ?? 0) / 100;
-    entry.guide += (b.guide_service_fee_cents ?? 0) / 100;
+    entry.cross_club += b.cross_club_fee ?? 0;
+    entry.guide += b.guide_service_fee ?? 0;
     dailyMap.set(date, entry);
   }
 

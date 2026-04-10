@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createHmac, timingSafeEqual } from "crypto";
 
 /**
@@ -53,7 +52,7 @@ function verifySignature(
 async function handleCompassCreditPurchase(
   paymentIntent: Record<string, unknown>
 ) {
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
   const metadata = paymentIntent.metadata as Record<string, string>;
   const userId = metadata.user_id;
   const packKey = metadata.pack_key;

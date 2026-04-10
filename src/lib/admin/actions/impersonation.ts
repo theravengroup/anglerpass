@@ -3,7 +3,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { auditLog, AuditAction } from "@/lib/permissions/audit";
 
 const IMPERSONATION_COOKIE = "ap_impersonation_token";
@@ -74,7 +73,7 @@ export async function startImpersonation(formData: FormData) {
   const sessionToken = crypto.randomUUID();
 
   // Insert impersonation session
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { error: insertError } = await db
     .from("impersonation_sessions")
     .insert({
@@ -132,7 +131,7 @@ export async function endImpersonation() {
     redirect("/admin/users");
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Find the active session
   const { data: session } = await db
@@ -194,7 +193,7 @@ export async function getActiveImpersonation(): Promise<{
 
   if (!token) return null;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data: session } = await db
     .from("impersonation_sessions")
     .select("*")

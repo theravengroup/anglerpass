@@ -2,7 +2,6 @@ import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { SITE_URL } from "@/lib/constants";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { referralInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { generateReferralCode, buildReferralLink } from "@/lib/referral";
@@ -23,7 +22,7 @@ export async function POST(
 
     const { user } = auth;
 
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
     const admin = createAdminClient();
 
     // Verify club exists and has referral program enabled
@@ -179,7 +178,7 @@ export async function GET(
 
     const { user } = auth;
 
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
 
     // Verify active membership
     const { data: membership, error: memErr } = await db

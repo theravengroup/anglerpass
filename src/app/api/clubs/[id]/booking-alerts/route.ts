@@ -1,6 +1,5 @@
 import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 
 /**
  * GET /api/clubs/[id]/booking-alerts
@@ -48,10 +47,10 @@ export async function GET(
     return jsonOk({ alerts: [] });
   }
 
-  const memberIds = members.map((m) => m.user_id);
+  const memberIds = members.map((m) => m.user_id).filter((id): id is string => id !== null);
 
   // Query booking_standing for flagged members
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const { data: standings } = await db
     .from("booking_standing")
     .select("user_id, standing, concurrent_cap, cancellation_score")

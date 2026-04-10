@@ -1,6 +1,5 @@
 import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { getCreditPack } from "@/lib/constants/compass-usage";
 import { z } from "zod";
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
 
   const stripe = getStripeServer();
   const typedAdmin = createAdminClient();
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
 
   // Get user email for Stripe customer
   const { data: userData } = await typedAdmin.auth.admin.getUserById(auth.user.id);

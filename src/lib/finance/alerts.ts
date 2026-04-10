@@ -11,7 +11,6 @@ import "server-only";
  * - Daily cash summary (info)
  */
 
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -32,7 +31,7 @@ export interface FinanceAlert {
  * Returns a list of alerts that should be sent to admin/finance staff.
  */
 export async function generateFinanceAlerts(): Promise<FinanceAlert[]> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const alerts: FinanceAlert[] = [];
 
   // 1. Critical: Payout failures in last 24h
@@ -177,7 +176,7 @@ export async function sendFinanceAlerts(
  * Generate and send a daily cash summary notification.
  */
 export async function sendDailyCashSummary(): Promise<void> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Get latest snapshot
   const { data: snapshot } = await db

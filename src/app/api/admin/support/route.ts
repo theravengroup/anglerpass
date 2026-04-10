@@ -8,7 +8,6 @@ import {
   parsePositiveInt,
 } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import {
   supportTicketUpdateSchema,
   SUPPORT_STATUSES,
@@ -29,7 +28,7 @@ export async function GET(request: Request) {
   const category = searchParams.get("category") ?? "";
   const search = searchParams.get("search") ?? "";
 
-  const untyped = createUntypedAdminClient();
+  const untyped = createAdminClient();
 
   let query = untyped
     .from("support_tickets")
@@ -139,7 +138,7 @@ export async function PATCH(request: Request) {
   }
 
   const { ticket_id, updates } = parsed.data;
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Build update object — only include defined fields
   const updatePayload: Record<string, unknown> = {};

@@ -61,10 +61,7 @@ export async function GET(
       process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
 
     // Fetch blocked/maintenance dates for the next 6 months
-    const { createUntypedAdminClient } = await import(
-      "@/lib/supabase/untyped-admin"
-    );
-    const untypedDb = createUntypedAdminClient();
+    const untypedDb = createAdminClient();
     const sixMonthsOut = new Date();
     sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
     const { data: blockedDates } = await untypedDb

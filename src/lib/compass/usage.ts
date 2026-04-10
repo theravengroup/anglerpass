@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   getMonthlyLimit,
   WARNING_THRESHOLD,
@@ -42,7 +42,7 @@ export async function getUsageStatus(
   }
 
   try {
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const period = getCurrentPeriod();
 
     const [usageResult, creditsResult] = await Promise.all([
@@ -98,7 +98,7 @@ export async function recordMessage(
   roles: string[]
 ): Promise<void> {
   try {
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const period = getCurrentPeriod();
     const monthlyLimit = getMonthlyLimit(roles);
 
@@ -130,7 +130,7 @@ export async function addCredits(
   userId: string,
   messages: number
 ): Promise<void> {
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
   await admin.rpc("add_compass_credits", {
     p_user_id: userId,
     p_amount: messages,

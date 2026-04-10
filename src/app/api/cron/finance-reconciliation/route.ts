@@ -1,5 +1,5 @@
 import { jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { runDailySweep, updateSyncStatus } from "@/lib/finance/reconciliation";
 import { listAccounts } from "@/lib/mercury/client";
 import { stripe } from "@/lib/stripe/server";
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return jsonError("Unauthorized", 401);
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const results: Record<string, unknown> = {};
 
   // 1. Refresh Mercury account balances
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
 // ─── Daily Snapshot ─────────────────────────────────────────────────
 
 async function generateDailySnapshot(): Promise<boolean> {
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const today = new Date().toISOString().split("T")[0];
 
   // Check if snapshot already exists for today

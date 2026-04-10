@@ -1,5 +1,5 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { referralSettingsSchema } from "@/lib/validations/clubs";
 
 // GET: Retrieve referral program settings for a club
@@ -15,7 +15,7 @@ export async function GET(
 
     const { user } = auth;
 
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
 
     // Get club with referral settings
     const { data: club, error: clubErr } = await db
@@ -84,7 +84,7 @@ export async function PATCH(
 
     const { user } = auth;
 
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
 
     // Get club
     const { data: club, error: clubErr } = await db

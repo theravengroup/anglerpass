@@ -1,6 +1,5 @@
 import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 
 /**
  * GET /api/admin/compass/stats
@@ -25,7 +24,7 @@ export async function GET() {
     return jsonError("Forbidden", 403);
   }
 
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
   const now = new Date();
   const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 

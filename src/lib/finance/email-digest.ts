@@ -6,7 +6,6 @@ import "server-only";
  */
 
 import { getResend } from "@/lib/email";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/constants";
 
@@ -23,7 +22,7 @@ export async function sendDailyDigest(): Promise<number> {
   const resend = getResend();
   if (!resend) return 0;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   // Get latest snapshot
@@ -160,7 +159,7 @@ export async function sendWeeklyDigest(): Promise<number> {
   const resend = getResend();
   if (!resend) return 0;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   // Get last 7 daily snapshots

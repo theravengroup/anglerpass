@@ -1,6 +1,5 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 
 // GET: Retrieve referral credit history
 export async function GET(
@@ -16,7 +15,7 @@ export async function GET(
     const { user } = auth;
 
     const admin = createAdminClient();
-    const db = createUntypedAdminClient();
+    const db = createAdminClient();
 
     // Check if user is club owner
     const { data: club, error: clubErr } = await admin

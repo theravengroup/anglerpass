@@ -1,6 +1,5 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { clubMemberStatusSchema } from "@/lib/validations/clubs";
 import { notifyMemberApproved } from "@/lib/notifications";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
@@ -138,7 +137,7 @@ export async function PATCH(
       );
 
       // Transition referral credit from pending → earned
-      const db = createUntypedAdminClient();
+      const db = createAdminClient();
       db.from("referral_credits")
         .update({
           status: "earned",

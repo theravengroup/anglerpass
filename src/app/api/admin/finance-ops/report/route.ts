@@ -1,5 +1,4 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -29,7 +28,7 @@ export async function GET(request: Request) {
     ? `${endYear + 1}-01-01`
     : `${endYear}-${String(endMonth + 1).padStart(2, "0")}-01`;
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   // 1. All payouts for the month

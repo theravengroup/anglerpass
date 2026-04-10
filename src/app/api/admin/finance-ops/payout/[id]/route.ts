@@ -1,5 +1,4 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest } from "next/server";
 
@@ -17,7 +16,7 @@ export async function GET(
   if (!auth) return jsonError("Unauthorized", 401);
 
   const { id: payoutId } = await params;
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const typedAdmin = createAdminClient();
 
   // Fetch payout

@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 
 /**
  * GET /api/properties/[id]/availability?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
@@ -24,7 +23,7 @@ export async function GET(
   const endDate = searchParams.get("end_date");
 
   const admin = createAdminClient();
-  const untypedDb = createUntypedAdminClient();
+  const untypedDb = createAdminClient();
 
   let query = untypedDb
     .from("property_availability")
@@ -156,7 +155,7 @@ export async function PUT(
     }
 
     // Upsert blocked/maintenance records
-    const untypedDb = createUntypedAdminClient();
+    const untypedDb = createAdminClient();
     const records = safeDates.map((date) => ({
       property_id: propertyId,
       date,
@@ -184,7 +183,7 @@ export async function PUT(
 
   // For "available" — delete blocked/maintenance entries (restore default)
   if (status === "available") {
-    const untypedDb = createUntypedAdminClient();
+    const untypedDb = createAdminClient();
     const { error } = await untypedDb
       .from("property_availability")
       .delete()

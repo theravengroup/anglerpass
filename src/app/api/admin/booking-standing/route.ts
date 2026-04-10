@@ -1,6 +1,5 @@
 import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { getPlatformStaffRole } from "@/lib/permissions/db";
 import { auditLog, AuditAction } from "@/lib/permissions/audit";
 import { STANDING_CONFIG, type BookingStanding } from "@/lib/constants/booking-limits";
@@ -24,7 +23,7 @@ export async function GET(request: Request) {
     return jsonError("Forbidden", 403);
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
   const admin = createAdminClient();
   const { searchParams } = new URL(request.url);
   const showAll = searchParams.get("all") === "true";
@@ -110,7 +109,7 @@ export async function PATCH(request: Request) {
     return jsonError(`Invalid standing. Must be one of: ${validStandings.join(", ")}`, 400);
   }
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Get current standing for audit
   const { data: current } = await db

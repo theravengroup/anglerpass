@@ -1,5 +1,5 @@
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/admin/finance-ops/cash-flow?days=30
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const days = parseInt(searchParams.get("days") ?? "30", 10);
 
-  const db = createUntypedAdminClient();
+  const db = createAdminClient();
 
   // Daily snapshots give us the trend data
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)

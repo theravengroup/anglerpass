@@ -10,7 +10,6 @@ import "server-only";
 
 import { stripe } from "@/lib/stripe/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createUntypedAdminClient } from "@/lib/supabase/untyped-admin";
 import { createException } from "./reconciliation";
 
 interface TransferVerificationResult {
@@ -29,7 +28,7 @@ export async function verifyConnectTransfers(
   endDate: Date
 ): Promise<TransferVerificationResult> {
   const typedAdmin = createAdminClient();
-  const untypedAdmin = createUntypedAdminClient();
+  const untypedAdmin = createAdminClient();
 
   const result: TransferVerificationResult = {
     transfers_checked: 0,
