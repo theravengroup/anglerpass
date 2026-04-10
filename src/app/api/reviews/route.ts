@@ -1,4 +1,5 @@
 import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { roundCurrency } from "@/lib/constants/fees";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { toDateString } from "@/lib/utils";
 import { reviewSchema } from "@/lib/validations/guides";
@@ -257,7 +258,7 @@ async function recalculateGuideStats(
       (acc: number, r: { rating: number }) => acc + r.rating,
       0
     );
-    const avg = Math.round((sum / reviews.length) * 100) / 100;
+    const avg = roundCurrency(sum / reviews.length);
 
     await admin
       .from("guide_profiles")

@@ -1,7 +1,7 @@
 "use client";
 
 import type { FeeBreakdown } from "@/lib/constants/fees";
-import { CROSS_CLUB_FEE_PER_ROD } from "@/lib/constants/fees";
+import { CROSS_CLUB_FEE_PER_ROD, roundCurrency } from "@/lib/constants/fees";
 
 interface ProposalCostBreakdownProps {
   fees: FeeBreakdown;
@@ -14,7 +14,7 @@ export default function ProposalCostBreakdown({
 }: ProposalCostBreakdownProps) {
   const rodLabel = maxAnglers > 1 ? "anglers" : "angler";
   const totalPerAngler =
-    maxAnglers > 0 ? Math.round((fees.totalAmount / maxAnglers) * 100) / 100 : 0;
+    maxAnglers > 0 ? roundCurrency(fees.totalAmount / maxAnglers) : 0;
 
   return (
     <div className="space-y-2 rounded-lg border border-stone-light/20 bg-offwhite/50 p-4">

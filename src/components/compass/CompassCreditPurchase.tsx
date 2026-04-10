@@ -6,6 +6,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { roundCurrency } from "@/lib/constants/fees";
 import { StripeProvider } from "@/components/shared/StripeProvider";
 import {
   Dialog,
@@ -132,7 +133,7 @@ export default function CompassCreditPurchase({
                 </span>
                 <span className="mt-0.5 text-xs text-text-light">
                   {formatPrice(
-                    Math.round((pack.priceCents / pack.messages) * 100) / 100
+                    roundCurrency(pack.priceCents / pack.messages)
                   )}
                   /msg
                 </span>

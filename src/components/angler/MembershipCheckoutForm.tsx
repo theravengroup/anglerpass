@@ -9,7 +9,7 @@ import {
 import { StripeProvider } from "@/components/shared/StripeProvider";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
-import { MEMBERSHIP_PROCESSING_FEE_RATE } from "@/lib/constants/fees";
+import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 
 interface MembershipCheckoutFormProps {
   club: {
@@ -40,7 +40,7 @@ export default function MembershipCheckoutForm({
   const initiationFee = club.initiation_fee ?? 0;
   const annualDues = club.annual_dues ?? 0;
   const processingFee =
-    Math.round((initiationFee + annualDues) * MEMBERSHIP_PROCESSING_FEE_RATE * 100) / 100;
+    roundCurrency((initiationFee + annualDues) * MEMBERSHIP_PROCESSING_FEE_RATE);
   const totalDueToday = initiationFee + annualDues + processingFee;
 
   async function handleProceedToPayment() {

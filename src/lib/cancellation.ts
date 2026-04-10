@@ -15,6 +15,7 @@ import {
   LATE_CANCEL_WINDOW_HOURS,
   getRefundPercentage,
 } from "@/lib/constants/booking-limits";
+import { roundCurrency } from "@/lib/constants/fees";
 
 /**
  * @deprecated Use GRADUATED_REFUND_TIERS from booking-limits.ts
@@ -75,7 +76,7 @@ export function calculateRefund(
   // Calculate refund amount
   const amount =
     percentage > 0
-      ? Math.round(totalAmount * (percentage / 100) * 100) / 100
+      ? roundCurrency(totalAmount * (percentage / 100))
       : 0;
 
   // Late cancel fee applies within 72 hours but only if booking hasn't started

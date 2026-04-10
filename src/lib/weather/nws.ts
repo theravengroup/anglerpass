@@ -19,6 +19,7 @@ import type {
   WeatherCondition,
   FishingCondition,
 } from "./types";
+import { roundCurrency } from "@/lib/constants/fees";
 
 const NWS_BASE = "https://api.weather.gov";
 const USER_AGENT = "AnglerPass/1.0 (support@anglerpass.com)";
@@ -269,7 +270,7 @@ function normalizePeriods(
     // Precip amount from gridData (mm → inches)
     const precipMm = dailyPrecip.get(dateKey);
     const precipAmountIn =
-      precipMm != null ? Math.round((precipMm / 25.4) * 100) / 100 : null;
+      precipMm != null ? roundCurrency(precipMm / 25.4) : null;
 
     // Wind gusts from gridData (km/h → mph)
     const gustKmh = dailyGusts.get(dateKey);

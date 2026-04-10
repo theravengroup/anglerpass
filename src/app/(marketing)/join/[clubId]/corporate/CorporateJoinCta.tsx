@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { MEMBERSHIP_PROCESSING_FEE_RATE } from "@/lib/constants/fees";
+import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 
 interface CorporateJoinCtaProps {
   clubId: string;
@@ -44,7 +44,7 @@ export default function CorporateJoinCta({
   const initiationFee = corporateInitiationFee ?? 0;
   const dues = annualDues ?? 0;
   const processingFee =
-    Math.round((initiationFee + dues) * MEMBERSHIP_PROCESSING_FEE_RATE * 100) / 100;
+    roundCurrency((initiationFee + dues) * MEMBERSHIP_PROCESSING_FEE_RATE);
 
   useEffect(() => {
     const supabase = createClient();
