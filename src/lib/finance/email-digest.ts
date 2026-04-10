@@ -8,6 +8,7 @@ import "server-only";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/constants";
+import { toDateString } from "@/lib/utils";
 
 function formatUsd(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -255,7 +256,7 @@ export async function sendWeeklyDigest(): Promise<number> {
   if (!staff || staff.length === 0) return 0;
 
   let sent = 0;
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
   for (const member of staff) {
     try {
       const { data: { user } } = await typedAdmin.auth.admin.getUserById(member.user_id);

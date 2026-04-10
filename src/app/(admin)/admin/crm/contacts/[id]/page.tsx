@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -68,7 +68,7 @@ export default function ContactDetailPage() {
   const [loading, setLoading] = useState(true);
   const [newTag, setNewTag] = useState("");
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/crm/contacts/${contactId}`);
@@ -81,11 +81,12 @@ export default function ContactDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [contactId, router]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contactId]);
 
   const addTag = async () => {
     if (!newTag.trim()) return;

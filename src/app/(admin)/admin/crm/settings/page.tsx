@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   Loader2,
   Plus,
@@ -75,7 +75,7 @@ function TopicManager() {
   const [editRequired, setEditRequired] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/crm/topics");
@@ -86,11 +86,12 @@ function TopicManager() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createTopic = async () => {
     if (!newSlug.trim() || !newName.trim()) return;
@@ -402,7 +403,7 @@ function FrequencyCapManager() {
   const [newWindow, setNewWindow] = useState(168);
   const [creating, setCreating] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/crm/frequency-caps");
@@ -413,11 +414,12 @@ function FrequencyCapManager() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createCap = async () => {
     if (!newName.trim()) return;

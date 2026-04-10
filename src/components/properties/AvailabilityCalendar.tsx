@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toDateString } from "@/lib/utils";
 import {
   ChevronLeft,
   ChevronRight,
@@ -96,8 +97,8 @@ export default function AvailabilityCalendar({
       const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
 
       const params = new URLSearchParams({
-        start_date: start.toISOString().split("T")[0],
-        end_date: end.toISOString().split("T")[0],
+        start_date: toDateString(start),
+        end_date: toDateString(end),
       });
 
       const res = await fetch(`/api/properties/${propertyId}/availability?${params}`);
@@ -182,7 +183,7 @@ export default function AvailabilityCalendar({
   const month = currentMonth.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
 
   const monthLabel = currentMonth.toLocaleDateString("en-US", {
     month: "long",

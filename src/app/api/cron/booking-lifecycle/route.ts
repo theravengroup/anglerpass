@@ -7,6 +7,7 @@ import {
   notifyBookingThankYou,
 } from "@/lib/notifications";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
+import { toDateString } from "@/lib/utils";
 
 /**
  * POST: Booking lifecycle emails — runs daily via Vercel Cron.
@@ -251,9 +252,7 @@ export async function POST(request: Request) {
 
 // ─── Utilities ──────────────────────────────────────────────────────
 
-function toDateString(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
+// toDateString imported from @/lib/utils
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);

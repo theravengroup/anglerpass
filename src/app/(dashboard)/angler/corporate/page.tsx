@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { CorporateOverviewCard } from "@/components/angler/CorporateOverviewCard";
@@ -54,7 +54,7 @@ export default function CorporateDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     setError(null);
     try {
@@ -74,11 +74,12 @@ export default function CorporateDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleRevokeInvitation(invitationId: string) {
     setRevokingId(invitationId);

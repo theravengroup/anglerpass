@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createHmac, timingSafeEqual } from "crypto";
+import { toDateString } from "@/lib/utils";
 
 /**
  * Main Stripe webhook handler for AnglerPass.
@@ -234,7 +235,7 @@ async function handleInvoicePaid(invoice: Record<string, unknown>) {
     .update({
       dues_status: "active",
       dues_paid_through: periodEndTs
-        ? new Date(periodEndTs * 1000).toISOString().split("T")[0]
+        ? toDateString(new Date(periodEndTs * 1000))
         : null,
       grace_period_ends: null,
       updated_at: new Date().toISOString(),
@@ -244,10 +245,10 @@ async function handleInvoicePaid(invoice: Record<string, unknown>) {
   // Record payment
   const amountPaid = (invoice.amount_paid as number) ?? 0;
   const periodEndDate = periodEndTs
-    ? new Date(periodEndTs * 1000).toISOString().split("T")[0]
+    ? toDateString(new Date(periodEndTs * 1000))
     : null;
   const periodStartDate = periodEndTs
-    ? new Date((periodEndTs - 365 * 86400) * 1000).toISOString().split("T")[0]
+    ? toDateString(new Date((periodEndTs - 365 * 86400) * 1000))
     : null;
 
   await admin.from("membership_payments").insert({
@@ -303,7 +304,7 @@ async function handleInvoicePaymentFailed(
     .from("club_memberships")
     .update({
       dues_status: "grace_period",
-      grace_period_ends: gracePeriodEnds.toISOString().split("T")[0],
+      grace_period_ends: toDateString(gracePeriodEnds),
       updated_at: new Date().toISOString(),
     })
     .eq("id", membership.id);

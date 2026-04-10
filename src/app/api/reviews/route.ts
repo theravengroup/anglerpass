@@ -1,5 +1,6 @@
 import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 import { reviewSchema } from "@/lib/validations/guides";
 
 // GET: Fetch reviews
@@ -82,7 +83,7 @@ export async function GET(request: Request) {
       .select("id, booking_date, guide_id, property_id, angler_id, guide_profiles(user_id, display_name), properties(name)")
       .or(`angler_id.eq.${user.id},guide_profiles.user_id.eq.${user.id}`)
       .eq("status", "confirmed")
-      .lt("booking_date", new Date().toISOString().split("T")[0])
+      .lt("booking_date", toDateString())
       .not("guide_id", "is", null);
 
     // Find which ones the user hasn't reviewed yet

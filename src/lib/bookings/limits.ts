@@ -12,6 +12,7 @@ import {
   notifyBookingAbuseFlagged,
 } from "@/lib/notifications";
 import { AuditAction, auditLog } from "@/lib/permissions/audit";
+import { toDateString } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -89,7 +90,7 @@ export async function getActiveBookingCount(
     .select("id", { count: "exact", head: true })
     .eq("angler_id", userId)
     .in("status", ["confirmed", "pending"])
-    .gte("booking_date", new Date().toISOString().split("T")[0])
+    .gte("booking_date", toDateString())
     .is("booking_group_id", null);
 
   // Multi-day groups: count distinct groups (use primary record)
@@ -98,7 +99,7 @@ export async function getActiveBookingCount(
     .select("booking_group_id")
     .eq("angler_id", userId)
     .in("status", ["confirmed", "pending"])
-    .gte("booking_date", new Date().toISOString().split("T")[0])
+    .gte("booking_date", toDateString())
     .not("booking_group_id", "is", null);
 
   // Deduplicate group IDs
@@ -183,7 +184,7 @@ export async function checkPropertyLimit(
       parseInt(bookingMonth.split("-")[1]),
       1
     );
-    const monthEnd = nextMonth.toISOString().split("T")[0];
+    const monthEnd = toDateString(nextMonth);
 
     // Count user's bookings at this property in the calendar month
     const { count } = await db

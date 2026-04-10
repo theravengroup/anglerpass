@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Compass } from "lucide-react";
 import SearchFilters, {
@@ -79,7 +79,7 @@ export default function DiscoverPage() {
   }, [filters.water_type, filters.species, filters.min_price, filters.max_price, filters.lodging]);
 
   // Client-side text search + state filter
-  const filteredProperties = useMemo(() => {
+  const filteredProperties = (() => {
     let results = properties;
     if (filters.state) {
       const st = filters.state.toLowerCase();
@@ -98,7 +98,7 @@ export default function DiscoverPage() {
       );
     }
     return results;
-  }, [properties, filters.q, filters.state]);
+  })();
 
   if (loading) {
     return (

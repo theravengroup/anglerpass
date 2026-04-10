@@ -1,5 +1,6 @@
 import { jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 import { runDailySweep, updateSyncStatus } from "@/lib/finance/reconciliation";
 import { listAccounts } from "@/lib/mercury/client";
 import { stripe } from "@/lib/stripe/server";
@@ -151,7 +152,7 @@ export async function POST(request: Request) {
 
 async function generateDailySnapshot(): Promise<boolean> {
   const db = createAdminClient();
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
 
   // Check if snapshot already exists for today
   const { data: existing } = await db

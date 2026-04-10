@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Loader2,
@@ -31,7 +31,7 @@ export default function CrmWorkflowsPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/crm/workflows");
@@ -42,11 +42,12 @@ export default function CrmWorkflowsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createWorkflow = async () => {
     setCreating(true);

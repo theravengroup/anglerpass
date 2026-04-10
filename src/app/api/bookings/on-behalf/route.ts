@@ -8,6 +8,7 @@ import {
 } from "@/lib/notifications";
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { authorize, P, auditBookingAction, AuditAction } from "@/lib/permissions";
+import { toDateString } from "@/lib/utils";
 import { jsonError, jsonCreated, requireAuth} from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
@@ -142,7 +143,7 @@ export async function POST(request: Request) {
     const allDates: string[] = [];
     for (let i = 0; i < numberOfDays; i++) {
       const d = new Date(startDateObj.getTime() + i * msPerDay);
-      allDates.push(d.toISOString().split("T")[0]);
+      allDates.push(toDateString(d));
     }
 
     const isMultiDay = numberOfDays > 1;

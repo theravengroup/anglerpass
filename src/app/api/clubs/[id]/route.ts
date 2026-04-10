@@ -1,5 +1,6 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 import { clubSchema } from "@/lib/validations/clubs";
 
 // GET: Fetch a single club with stats
@@ -78,7 +79,7 @@ export async function GET(
       .eq("status", "pending");
 
     // Get upcoming bookings count (confirmed, future dates, via club property access)
-    const today = new Date().toISOString().split("T")[0];
+    const today = toDateString();
     const { data: clubPropertyIds } = await admin
       .from("club_property_access")
       .select("property_id")

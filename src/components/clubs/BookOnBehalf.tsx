@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { UserCheck, Search, Loader2, CalendarDays, MapPin } from 'lucide-react';
+import { toDateString } from '@/lib/utils';
 
 interface ClubMember {
   id: string;
@@ -115,7 +116,7 @@ export default function BookOnBehalf({ clubId, members, properties }: BookOnBeha
   // Minimum date is tomorrow
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
+  const minDate = toDateString(tomorrow);
 
   return (
     <div className="space-y-6">

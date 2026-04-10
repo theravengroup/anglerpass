@@ -8,6 +8,7 @@ import { detectCrossClubRouting } from "@/lib/cross-club";
 import { auditBookingAction, AuditAction } from "@/lib/permissions";
 import { checkConcurrentLimit, checkPropertyLimit } from "@/lib/bookings/limits";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
+import { toDateString } from "@/lib/utils";
 
 /**
  * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
     const allDates: string[] = [];
     for (let i = 0; i < numberOfDays; i++) {
       const d = new Date(startDateObj.getTime() + i * msPerDay);
-      allDates.push(d.toISOString().split("T")[0]);
+      allDates.push(toDateString(d));
     }
 
     const isMultiDay = numberOfDays > 1;

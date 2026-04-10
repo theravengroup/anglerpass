@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CalendarDays, MapPin, Users } from "lucide-react";
+import { toDateString } from "@/lib/utils";
 
 interface GuideBooking {
   id: string;
@@ -43,7 +44,7 @@ export default function GuideBookingsPage() {
     load();
   }, []);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
   const upcoming = bookings.filter(
     (b) => b.status === "confirmed" && b.booking_date >= today
   );

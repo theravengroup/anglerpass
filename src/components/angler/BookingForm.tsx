@@ -8,6 +8,7 @@ import {
   calculateFeeBreakdown,
   ROD_NOMENCLATURE,
 } from "@/lib/constants/fees";
+import { toDateString } from "@/lib/utils";
 import GuidesSection from "./GuidesSection";
 import FeeBreakdown from "./FeeBreakdown";
 import BookingPaymentForm from "./BookingPaymentForm";
@@ -159,7 +160,7 @@ export default function BookingForm({ property, initialMembership }: BookingForm
   // Get tomorrow's date as minimum booking date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
+  const minDate = toDateString(tomorrow);
 
   // Payment step — shown after booking is created
   if (showPayment && pendingBookingId) {

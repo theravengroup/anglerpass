@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GUIDE_SERVICE_FEE_RATE } from "@/lib/constants/fees";
+import { GUIDE_SERVICE_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 
 export function ProposalStepFee({
   feePerAngler,
@@ -13,9 +13,9 @@ export function ProposalStepFee({
   maxAnglers: number;
   onChange: (fee: number) => void;
 }) {
-  const serviceFee = Math.round(feePerAngler * GUIDE_SERVICE_FEE_RATE * 100) / 100;
-  const netPerAngler = Math.round((feePerAngler - serviceFee) * 100) / 100;
-  const totalGuideFee = Math.round(feePerAngler * maxAnglers * 100) / 100;
+  const serviceFee = roundCurrency(feePerAngler * GUIDE_SERVICE_FEE_RATE);
+  const netPerAngler = roundCurrency(feePerAngler - serviceFee);
+  const totalGuideFee = roundCurrency(feePerAngler * maxAnglers);
 
   return (
     <div className="space-y-5">

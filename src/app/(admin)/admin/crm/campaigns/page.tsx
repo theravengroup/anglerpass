@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -127,7 +127,7 @@ function CampaignList({ onNavigate }: { onNavigate: (id: string) => void }) {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -140,11 +140,12 @@ function CampaignList({ onNavigate }: { onNavigate: (id: string) => void }) {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter]);
 
   const createCampaign = async () => {
     setCreating(true);
@@ -268,7 +269,7 @@ function SegmentList() {
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/segments");
@@ -279,11 +280,12 @@ function SegmentList() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createSegment = async () => {
     if (!newName.trim()) return;

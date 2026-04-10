@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 import {
   generateICalFeed,
   toICalDate,
@@ -46,7 +47,7 @@ export async function GET(
     }
 
     // Fetch future bookings (pending + confirmed only)
-    const today = new Date().toISOString().split("T")[0];
+    const today = toDateString();
     const { data: bookings } = await admin
       .from("bookings")
       .select(
@@ -70,7 +71,7 @@ export async function GET(
       .eq("property_id", id)
       .in("status", ["blocked", "maintenance"])
       .gte("date", today)
-      .lte("date", sixMonthsOut.toISOString().split("T")[0])
+      .lte("date", toDateString(sixMonthsOut))
       .order("date");
 
     // Build blocked date events

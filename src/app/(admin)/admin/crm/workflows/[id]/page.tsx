@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -57,7 +57,7 @@ export default function WorkflowDetailPage() {
   const nodesRef = useRef<WfNode[]>([]);
   const edgesRef = useRef<WfEdge[]>([]);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/crm/workflows/${workflowId}`);
@@ -89,11 +89,12 @@ export default function WorkflowDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [workflowId, router]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflowId]);
 
   const handleBuilderChange = useCallback(
     (newNodes: WfNode[], newEdges: WfEdge[]) => {

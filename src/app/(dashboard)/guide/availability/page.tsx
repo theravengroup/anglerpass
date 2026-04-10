@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { toDateString } from "@/lib/utils";
 
 interface AvailabilityEntry {
   id: string;
@@ -30,8 +31,8 @@ export default function GuideAvailabilityPage() {
       const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
 
       const params = new URLSearchParams({
-        start_date: start.toISOString().split("T")[0],
-        end_date: end.toISOString().split("T")[0],
+        start_date: toDateString(start),
+        end_date: toDateString(end),
       });
 
       const res = await fetch(`/api/guides/availability?${params}`);
@@ -90,7 +91,7 @@ export default function GuideAvailabilityPage() {
   const availabilityMap = new Map(
     availability.map((a) => [a.date, a])
   );
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
 
   const handleDateClick = (dateStr: string) => {
     const entry = availabilityMap.get(dateStr);

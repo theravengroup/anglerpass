@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Loader2,
@@ -35,7 +35,7 @@ export default function CrmContactsPage() {
   const [page, setPage] = useState(0);
   const limit = 25;
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -53,11 +53,12 @@ export default function CrmContactsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, page]);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, page]);
 
   useEffect(() => {
     setPage(0);

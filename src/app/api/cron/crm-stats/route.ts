@@ -3,6 +3,7 @@ import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/types/supabase";
+import { toDateString } from "@/lib/utils";
 
 // ─── POST /api/cron/crm-stats ─────────────────────────────────────
 // Runs daily via Vercel Cron. Computes CRM dashboard metrics and
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient();
-  const today = new Date().toISOString().split("T")[0];
+  const today = toDateString();
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -150,7 +151,7 @@ async function buildDailyBreakdown(
       const entry = row as unknown as Record<string, unknown>;
       const val = entry[dateField];
       if (!val) continue;
-      const date = new Date(val as string).toISOString().split("T")[0];
+      const date = toDateString(new Date(val as string));
       counts.set(date, (counts.get(date) ?? 0) + 1);
     }
   }
@@ -159,7 +160,7 @@ async function buildDailyBreakdown(
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
+    const dateStr = toDateString(d);
     days.push({ date: dateStr, count: counts.get(dateStr) ?? 0 });
   }
 

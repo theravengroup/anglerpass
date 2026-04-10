@@ -8,7 +8,7 @@ import {
   createPaymentIntent,
   stripe,
 } from "@/lib/stripe/server";
-import { MEMBERSHIP_PROCESSING_FEE_RATE } from "@/lib/constants/fees";
+import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 
 const MembershipCheckoutSchema = z.object({
   clubId: z.string().uuid(),
@@ -200,7 +200,7 @@ export async function POST(request: Request) {
     }
 
     if (initiationFee > 0) {
-      const processingFee = Math.round(initiationFee * MEMBERSHIP_PROCESSING_FEE_RATE * 100) / 100;
+      const processingFee = roundCurrency(initiationFee * MEMBERSHIP_PROCESSING_FEE_RATE);
       const totalCents = Math.round((initiationFee + processingFee) * 100);
 
       const pi = await createPaymentIntent({

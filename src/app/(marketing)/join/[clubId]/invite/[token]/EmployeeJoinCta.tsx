@@ -11,7 +11,7 @@ import { StripeProvider } from "@/components/shared/StripeProvider";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { MEMBERSHIP_PROCESSING_FEE_RATE } from "@/lib/constants/fees";
+import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 
 interface EmployeeJoinCtaProps {
   clubId: string;
@@ -39,7 +39,7 @@ export default function EmployeeJoinCta({
   const [membershipId, setMembershipId] = useState<string | null>(null);
 
   const dues = annualDues ?? 0;
-  const processingFee = Math.round(dues * MEMBERSHIP_PROCESSING_FEE_RATE * 100) / 100;
+  const processingFee = roundCurrency(dues * MEMBERSHIP_PROCESSING_FEE_RATE);
   const totalDue = dues + processingFee;
 
   useEffect(() => {

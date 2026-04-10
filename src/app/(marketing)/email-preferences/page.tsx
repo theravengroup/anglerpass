@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Mail, Check, Shield } from "lucide-react";
 
 interface TopicPref {
@@ -19,7 +19,7 @@ export default function EmailPreferencesPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     setLoading(true);
     setError(null);
     try {
@@ -35,11 +35,12 @@ export default function EmailPreferencesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }
 
   useEffect(() => {
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleTopic = (topicId: string) => {
     setPrefs((prev) =>

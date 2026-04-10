@@ -177,10 +177,13 @@ export function calculateFeeBreakdown(
   };
 }
 
-/** Round to 2 decimal places. */
-function round(n: number): number {
+/** Round to 2 decimal places (currency precision). */
+export function roundCurrency(n: number): number {
   return Math.round(n * 100) / 100;
 }
+
+/** @internal Alias used within this module. */
+const round = roundCurrency;
 
 // ─── Nomenclature ───────────────────────────────────────────────────
 /**

@@ -2,6 +2,7 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 import { requireAdmin, jsonError } from "@/lib/api/helpers";
+import { toDateString } from "@/lib/utils";
 
 // ─── GET /api/admin/crm/dashboard ─────────────────────────────────
 // Returns aggregated CRM metrics for the dashboard.
@@ -222,7 +223,7 @@ async function buildDailyBreakdown(
     const entry = row as unknown as Record<string, unknown>;
     const val = entry[dateField];
     if (!val) continue;
-    const date = new Date(val as string).toISOString().split("T")[0];
+    const date = toDateString(new Date(val as string));
     counts.set(date, (counts.get(date) ?? 0) + 1);
   }
 
@@ -231,7 +232,7 @@ async function buildDailyBreakdown(
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
+    const dateStr = toDateString(d);
     days.push({ date: dateStr, count: counts.get(dateStr) ?? 0 });
   }
 
@@ -243,7 +244,7 @@ function buildEmptyDays(count: number): DayCount[] {
   for (let i = count - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    days.push({ date: d.toISOString().split("T")[0], count: 0 });
+    days.push({ date: toDateString(d), count: 0 });
   }
   return days;
 }

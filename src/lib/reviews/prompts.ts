@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getResend } from "@/lib/email";
 import { REVIEW_WINDOW_DAYS, LANDOWNER_FAULTS } from "@/lib/validations/reviews";
 import { SITE_URL } from "@/lib/constants";
+import { toDateString } from "@/lib/utils";
 
 // ─── Constants ──────────────────────────────────────────────────────
 
@@ -106,8 +107,8 @@ async function findEligibleBookings(
     .from("bookings")
     .select("id, property_id, angler_id, booking_date, booking_end_date, properties(name)")
     .eq("status", "completed")
-    .lte("booking_date", now.toISOString().split("T")[0])
-    .gte("booking_date", windowStart.toISOString().split("T")[0]);
+    .lte("booking_date", toDateString(now))
+    .gte("booking_date", toDateString(windowStart));
 
   if (completedError) {
     console.error("[review-prompts] Error fetching completed bookings:", completedError);
@@ -118,8 +119,8 @@ async function findEligibleBookings(
     .from("bookings")
     .select("id, property_id, angler_id, booking_date, booking_end_date, cancellation_fault, properties(name)")
     .eq("status", "cancelled")
-    .lte("booking_date", now.toISOString().split("T")[0])
-    .gte("booking_date", windowStart.toISOString().split("T")[0]);
+    .lte("booking_date", toDateString(now))
+    .gte("booking_date", toDateString(windowStart));
 
   if (cancelledError) {
     console.error("[review-prompts] Error fetching cancelled bookings:", cancelledError);

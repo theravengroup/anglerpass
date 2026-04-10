@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { roundCurrency } from "@/lib/constants/fees";
+import { toDateString } from "@/lib/utils";
 import { createHash } from "crypto";
 import type { Database } from "@/types/supabase";
 
@@ -295,7 +297,7 @@ export async function GET() {
   const now = new Date();
   const duesPaidThrough = new Date(now);
   duesPaidThrough.setFullYear(duesPaidThrough.getFullYear() + 1);
-  const dpt = duesPaidThrough.toISOString().split("T")[0];
+  const dpt = toDateString(duesPaidThrough);
   const daysAgo = (d: number) => new Date(now.getTime() - d * 86400000).toISOString();
 
   // Dev user: admin of club 1, member of club 2
@@ -360,13 +362,13 @@ export async function GET() {
     rate: number;
   }) {
     const d = new Date(now.getTime() + opts.daysOffset * 86400000);
-    const pf = Math.round(opts.rate * 0.15 * 100) / 100;
+    const pf = roundCurrency(opts.rate * 0.15);
     bookings.push({
       id: sid(opts.seed),
       property_id: opts.propId,
       angler_id: opts.anglerId,
       club_membership_id: opts.memId,
-      booking_date: d.toISOString().split("T")[0],
+      booking_date: toDateString(d),
       duration: "full_day", party_size: 1, booking_days: 1,
       base_rate: opts.rate,
       platform_fee: pf,

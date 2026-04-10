@@ -1,5 +1,6 @@
 import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 import { createProposalSchema, saveDraftProposalSchema } from "@/lib/validations/proposals";
 import { notifyProposalReceived } from "@/lib/notifications";
 
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
           guide_id: guideProfile.id,
           property_id: data.property_id,
           club_id: clubId,
-          proposed_date: data.proposed_date || new Date().toISOString().split("T")[0],
+          proposed_date: data.proposed_date || toDateString(),
           start_time: data.start_time || "08:00",
           duration_hours: data.duration_hours ?? 4,
           max_anglers: data.max_anglers ?? 1,

@@ -8,7 +8,7 @@ import {
   DollarSign,
   UserPlus,
 } from "lucide-react";
-import { GUIDE_SERVICE_FEE_RATE } from "@/lib/constants/fees";
+import { GUIDE_SERVICE_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 import type { TripDetails } from "./ProposalStepDetails";
 import type { InvitedAngler } from "./ProposalStepInvite";
 
@@ -23,9 +23,8 @@ export function ProposalStepReview({
   feePerAngler: number;
   invitees: InvitedAngler[];
 }) {
-  const serviceFee =
-    Math.round(feePerAngler * GUIDE_SERVICE_FEE_RATE * 100) / 100;
-  const netPerAngler = Math.round((feePerAngler - serviceFee) * 100) / 100;
+  const serviceFee = roundCurrency(feePerAngler * GUIDE_SERVICE_FEE_RATE);
+  const netPerAngler = roundCurrency(feePerAngler - serviceFee);
 
   return (
     <div className="space-y-5">

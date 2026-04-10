@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
+import { toDateString } from "@/lib/utils";
 
 type ExportType = "payouts" | "exceptions" | "revenue" | "cash_flow";
 
@@ -94,7 +95,7 @@ async function exportPayouts() {
     ]);
   }
 
-  downloadCSV(rows, `anglerpass-payouts-${new Date().toISOString().split("T")[0]}.csv`);
+  downloadCSV(rows, `anglerpass-payouts-${toDateString()}.csv`);
 }
 
 async function exportExceptions() {
@@ -119,7 +120,7 @@ async function exportExceptions() {
     ]);
   }
 
-  downloadCSV(rows, `anglerpass-exceptions-${new Date().toISOString().split("T")[0]}.csv`);
+  downloadCSV(rows, `anglerpass-exceptions-${toDateString()}.csv`);
 }
 
 async function exportRevenue() {
@@ -152,7 +153,7 @@ async function exportRevenue() {
     String(data.streams.compass_credit_revenue),
   ]);
 
-  downloadCSV(rows, `anglerpass-revenue-${new Date().toISOString().split("T")[0]}.csv`);
+  downloadCSV(rows, `anglerpass-revenue-${toDateString()}.csv`);
 }
 
 async function exportCashFlow() {
@@ -168,5 +169,5 @@ async function exportCashFlow() {
     rows.push([day.date, String(day.created), String(day.settled)]);
   }
 
-  downloadCSV(rows, `anglerpass-cash-flow-${new Date().toISOString().split("T")[0]}.csv`);
+  downloadCSV(rows, `anglerpass-cash-flow-${toDateString()}.csv`);
 }

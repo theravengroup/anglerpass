@@ -1,5 +1,6 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { roundCurrency } from "@/lib/constants/fees";
 
 /**
  * Financial analytics API — provides detailed fee-split breakdowns
@@ -423,7 +424,7 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     cross_club_booking_count: crossClubReferralBookings,
     // New: monthly membership trend
     monthly_membership: Object.entries(monthlyMembership)
-      .map(([month, amount]) => ({ month, amount: Math.round(amount * 100) / 100 }))
+      .map(([month, amount]) => ({ month, amount: roundCurrency(amount) }))
       .sort((a, b) => a.month.localeCompare(b.month))
       .slice(-12),
     commission_by_property: Object.values(propMap).sort((a, b) => b.commission - a.commission),
@@ -596,8 +597,8 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
     // New: discount savings
     total_discount_savings: totalDiscountSavings,
     // New: cost metrics
-    cost_per_trip: Math.round(costPerTrip * 100) / 100,
-    avg_rod_fee: Math.round(avgRodFee * 100) / 100,
+    cost_per_trip: roundCurrency(costPerTrip),
+    avg_rod_fee: roundCurrency(avgRodFee),
     spending_by_property: Object.values(propMap).sort((a, b) => b.total_amount - a.total_amount),
     monthly_spending: monthly,
     recent_transactions: allBookings.slice(0, 25).map((b: Record<string, unknown>) => ({
@@ -843,7 +844,7 @@ function aggregateMonthly(
   }
 
   return Object.entries(map)
-    .map(([month, amount]) => ({ month, amount: Math.round(amount * 100) / 100 }))
+    .map(([month, amount]) => ({ month, amount: roundCurrency(amount) }))
     .sort((a, b) => a.month.localeCompare(b.month))
     .slice(-12);
 }

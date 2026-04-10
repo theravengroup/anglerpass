@@ -1,4 +1,5 @@
 import "server-only";
+import { roundCurrency } from "@/lib/constants/fees";
 
 /**
  * Mercury Banking API client.
@@ -210,5 +211,5 @@ export function isStripeDeposit(txn: MercuryTransaction): boolean {
 /** Format Mercury amount (cents in some endpoints, dollars in others). */
 export function toDecimal(amount: number): number {
   // Mercury API returns amounts in dollars (not cents)
-  return Math.round(amount * 100) / 100;
+  return roundCurrency(amount);
 }

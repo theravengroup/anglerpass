@@ -8,6 +8,7 @@ import "server-only";
  */
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { toDateString } from "@/lib/utils";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -142,8 +143,8 @@ export async function attemptDepositMatch(
     .from("finance_stripe_payouts")
     .select("id, stripe_payout_id, amount, arrival_date")
     .eq("reconciliation_status", "pending")
-    .gte("arrival_date", windowStart.toISOString().split("T")[0])
-    .lte("arrival_date", windowEnd.toISOString().split("T")[0]);
+    .gte("arrival_date", toDateString(windowStart))
+    .lte("arrival_date", toDateString(windowEnd));
 
   const matches = ((candidates ?? []) as StripePayout[]).filter(
     (p) => Math.abs(p.amount - t.amount) < 0.01
