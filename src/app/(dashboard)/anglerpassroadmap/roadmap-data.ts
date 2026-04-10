@@ -491,7 +491,7 @@ export const PHASES: RoadmapPhase[] = [
             id: "p1-ma-reengagement",
             label: "Pre-built campaigns (welcome series, re-engagement, seasonal, post-trip)",
             detail: "Ship with default campaign templates for common lifecycle touchpoints. Admins can customize or create new ones.",
-            done: false,
+            done: true,
           },
         ],
       },
