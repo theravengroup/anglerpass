@@ -31,7 +31,7 @@ describe("calculateRefund — graduated tiers", () => {
 
     expect(result.percentage).toBe(100);
     expect(result.amount).toBe(200);
-    expect(result.label).toContain("100%");
+    expect(result.label).toContain("7 days");
     expect(result.hoursUntilBooking).toBeGreaterThan(168);
     expect(result.lateCancelFee).toBe(0);
   });

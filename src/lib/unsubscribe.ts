@@ -13,7 +13,8 @@ function getSecret(): string {
   const secret =
     process.env.UNSUBSCRIBE_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!secret) {
-    if (process.env.NODE_ENV === "development") return "dev-only-secret";
+    if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test")
+      return "dev-only-secret";
     throw new Error(
       "Missing UNSUBSCRIBE_SECRET or SUPABASE_SERVICE_ROLE_KEY — cannot sign unsubscribe tokens"
     );
