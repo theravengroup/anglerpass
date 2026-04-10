@@ -6,6 +6,7 @@ import {
   jsonOk,
   jsonError,
   parsePositiveInt,
+  escapeIlike,
 } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
   }
 
   if (search) {
-    query = query.ilike("subject", `%${search.replace(/[%_\\]/g, "\\$&")}%`);
+    query = query.ilike("subject", `%${escapeIlike(search)}%`);
   }
 
   const from = (page - 1) * pageSize;

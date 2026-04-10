@@ -22,11 +22,16 @@ export function getAllPosts(): Post[] {
     .readdirSync(postsDirectory)
     .filter((name) => name.endsWith('.json'));
 
-  const posts = fileNames.map((fileName) => {
+  const posts = fileNames.reduce<Post[]>((acc, fileName) => {
     const filePath = path.join(postsDirectory, fileName);
     const fileContents = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContents) as Post;
-  });
+    try {
+      acc.push(JSON.parse(fileContents) as Post);
+    } catch {
+      console.error(`[posts] Failed to parse ${fileName}, skipping`);
+    }
+    return acc;
+  }, []);
 
   return posts.sort(
     (a, b) =>
@@ -47,7 +52,12 @@ export function getPostBySlug(slug: string): Post | undefined {
   if (!fs.existsSync(filePath)) return undefined;
 
   const fileContents = fs.readFileSync(filePath, 'utf8');
-  return JSON.parse(fileContents) as Post;
+  try {
+    return JSON.parse(fileContents) as Post;
+  } catch {
+    console.error(`[posts] Failed to parse ${slug}.json`);
+    return undefined;
+  }
 }
 
 export function getRelatedPosts(currentSlug: string, limit = 3): Post[] {

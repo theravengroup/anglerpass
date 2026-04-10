@@ -19,8 +19,7 @@ import {
   FileText,
   ChevronDown,
 } from "lucide-react";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
+import { SITE_URL } from "@/lib/constants";
 
 interface CopyTemplate {
   id: string;

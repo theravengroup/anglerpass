@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, escapeIlike } from "@/lib/api/helpers";
 
 /**
  * GET /api/admin/crm/contacts
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       // Search by display_name only (email search requires auth lookup)
-      query = query.ilike("display_name", `%${search}%`);
+      query = query.ilike("display_name", `%${escapeIlike(search)}%`);
     }
 
     const { data: profiles, count, error } = await query;

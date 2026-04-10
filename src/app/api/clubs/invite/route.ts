@@ -1,4 +1,5 @@
-import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
+import { SITE_URL } from "@/lib/constants";
 import { getResend } from "@/lib/email";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -91,8 +92,6 @@ export async function POST(request: Request) {
     const resend = getResend();
     if (resend) {
       try {
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://anglerpass.com";
-
         await resend.emails.send({
           from: "AnglerPass <hello@anglerpass.com>",
           to: admin_email,
@@ -113,13 +112,13 @@ export async function POST(request: Request) {
     To get started, create your club's account on AnglerPass:
   </p>
   <div style="margin: 32px 0;">
-    <a href="${siteUrl}/signup?role=club_admin&invitation=${invitation.token}"
+    <a href="${SITE_URL}/signup?role=club_admin&invitation=${invitation.token}"
        style="display: inline-block; padding: 14px 32px; background: #3a6b7c; color: #fff; text-decoration: none; border-radius: 6px; font-family: sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.3px;">
       Set Up Your Club →
     </a>
   </div>
   <p style="font-size: 14px; line-height: 1.7; color: #9a9a8e;">
-    If you have questions, reply to this email or visit <a href="${siteUrl}/clubs" style="color: #3a6b7c;">anglerpass.com/clubs</a>
+    If you have questions, reply to this email or visit <a href="${SITE_URL}/clubs" style="color: #3a6b7c;">anglerpass.com/clubs</a>
     to learn more about what the platform offers for clubs.
   </p>
   <p style="font-size: 14px; color: #9a9a8e; margin-top: 32px;">— The AnglerPass Team</p>
