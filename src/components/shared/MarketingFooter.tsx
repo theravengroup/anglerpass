@@ -13,7 +13,7 @@ const PLATFORM_LINKS = [
   { href: '/clubs', label: 'For Clubs' },
   { href: '/anglers', label: 'For Anglers' },
   { href: '/guides', label: 'For Guides' },
-  { href: '/clubs#corporate', label: 'Corporate Memberships' },
+  { href: '/corporates', label: 'Corporate Memberships' },
   { href: '/explore', label: 'Explore Waters' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/learn', label: 'Learn' },
