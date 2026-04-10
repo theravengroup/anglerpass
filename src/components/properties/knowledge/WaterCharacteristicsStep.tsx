@@ -31,9 +31,10 @@ import {
   STRUCTURAL_FEATURE_LABELS,
   BOTTOM_COMPOSITIONS,
   BOTTOM_COMPOSITION_LABELS,
-  SEASONS,
-  SEASON_LABELS,
 } from "@/lib/constants/property-knowledge";
+
+import CheckboxGroupCard from "./CheckboxGroupCard";
+import TemperatureProfiles from "./TemperatureProfiles";
 
 interface KnowledgeStepProps {
   register: UseFormRegister<PropertyKnowledgeFormData>;
@@ -133,130 +134,43 @@ export default function WaterCharacteristicsStep({
         </CardContent>
       </Card>
 
-      {/* Depth Zones */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Depth Zones
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-xs text-text-light">
-            Lets AI recommend appropriate gear and techniques for available
-            water depths.
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {DEPTH_ZONES.map((zone) => {
-              const selected = (
-                (watch("water_characteristics.depth_zones") ?? []) as string[]
-              ).includes(zone);
-              return (
-                <label
-                  key={zone}
-                  className="flex items-center gap-2 rounded-md border border-stone-light/30 px-3 py-2 text-sm cursor-pointer hover:bg-sand/30"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() =>
-                      toggleArrayItem(
-                        "water_characteristics.depth_zones",
-                        zone,
-                      )
-                    }
-                    className="accent-forest"
-                  />
-                  {DEPTH_ZONE_LABELS[zone]}
-                </label>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <CheckboxGroupCard
+        title="Depth Zones"
+        hint="Lets AI recommend appropriate gear and techniques for available water depths."
+        items={DEPTH_ZONES}
+        labels={DEPTH_ZONE_LABELS}
+        selectedItems={
+          (watch("water_characteristics.depth_zones") ?? []) as string[]
+        }
+        onToggle={toggleArrayItem}
+        fieldPath="water_characteristics.depth_zones"
+      />
 
-      {/* Structural Features */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Structural Features
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-xs text-text-light">
-            Structural diversity is key for species variety and technique
-            matching.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {STRUCTURAL_FEATURES.map((feat) => {
-              const selected = (
-                (watch("water_characteristics.structural_features") ??
-                  []) as string[]
-              ).includes(feat);
-              return (
-                <label
-                  key={feat}
-                  className="flex items-center gap-2 rounded-md border border-stone-light/30 px-3 py-2 text-sm cursor-pointer hover:bg-sand/30"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() =>
-                      toggleArrayItem(
-                        "water_characteristics.structural_features",
-                        feat,
-                      )
-                    }
-                    className="accent-forest"
-                  />
-                  {STRUCTURAL_FEATURE_LABELS[feat]}
-                </label>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <CheckboxGroupCard
+        title="Structural Features"
+        hint="Structural diversity is key for species variety and technique matching."
+        items={STRUCTURAL_FEATURES}
+        labels={STRUCTURAL_FEATURE_LABELS}
+        selectedItems={
+          (watch("water_characteristics.structural_features") ?? []) as string[]
+        }
+        onToggle={toggleArrayItem}
+        fieldPath="water_characteristics.structural_features"
+        columns="grid-cols-2 sm:grid-cols-3"
+      />
 
-      {/* Bottom Composition */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Bottom Composition
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-xs text-text-light">
-            Bottom type affects wading safety and insect habitat for hatch
-            predictions.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {BOTTOM_COMPOSITIONS.map((comp) => {
-              const selected = (
-                (watch("water_characteristics.bottom_composition") ??
-                  []) as string[]
-              ).includes(comp);
-              return (
-                <label
-                  key={comp}
-                  className="flex items-center gap-2 rounded-md border border-stone-light/30 px-3 py-2 text-sm cursor-pointer hover:bg-sand/30"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() =>
-                      toggleArrayItem(
-                        "water_characteristics.bottom_composition",
-                        comp,
-                      )
-                    }
-                    className="accent-forest"
-                  />
-                  {BOTTOM_COMPOSITION_LABELS[comp]}
-                </label>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <CheckboxGroupCard
+        title="Bottom Composition"
+        hint="Bottom type affects wading safety and insect habitat for hatch predictions."
+        items={BOTTOM_COMPOSITIONS}
+        labels={BOTTOM_COMPOSITION_LABELS}
+        selectedItems={
+          (watch("water_characteristics.bottom_composition") ?? []) as string[]
+        }
+        onToggle={toggleArrayItem}
+        fieldPath="water_characteristics.bottom_composition"
+        columns="grid-cols-2 sm:grid-cols-4"
+      />
 
       {/* Stream Width Range */}
       <Card className="border-stone-light/20">
@@ -296,80 +210,7 @@ export default function WaterCharacteristicsStep({
         </CardContent>
       </Card>
 
-      {/* Temperature Profiles */}
-      <Card className="border-stone-light/20">
-        <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-heading)] text-lg">
-            Temperature Profiles
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-xs text-text-light">
-            Seasonal temps let AI predict fish activity and recommend optimal
-            visit windows.
-          </p>
-          {SEASONS.map((season) => (
-            <div key={season} className="space-y-2">
-              <h4 className="text-sm font-semibold text-text-primary">
-                {SEASON_LABELS[season]}
-              </h4>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label
-                    htmlFor={`temp_${season}_min`}
-                    className="text-xs"
-                  >
-                    Min ({"\u00B0"}F)
-                  </Label>
-                  <Input
-                    id={`temp_${season}_min`}
-                    type="number"
-                    placeholder="e.g. 38"
-                    {...register(
-                      `water_characteristics.temp_${season}.min_f` as `water_characteristics.temp_spring.min_f`,
-                      { valueAsNumber: true },
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label
-                    htmlFor={`temp_${season}_max`}
-                    className="text-xs"
-                  >
-                    Max ({"\u00B0"}F)
-                  </Label>
-                  <Input
-                    id={`temp_${season}_max`}
-                    type="number"
-                    placeholder="e.g. 55"
-                    {...register(
-                      `water_characteristics.temp_${season}.max_f` as `water_characteristics.temp_spring.max_f`,
-                      { valueAsNumber: true },
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label
-                    htmlFor={`temp_${season}_optimal`}
-                    className="text-xs"
-                  >
-                    Optimal ({"\u00B0"}F)
-                  </Label>
-                  <Input
-                    id={`temp_${season}_optimal`}
-                    type="number"
-                    placeholder="e.g. 48"
-                    {...register(
-                      `water_characteristics.temp_${season}.optimal_f` as `water_characteristics.temp_spring.optimal_f`,
-                      { valueAsNumber: true },
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <TemperatureProfiles register={register} />
     </div>
   );
 }
