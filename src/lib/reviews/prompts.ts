@@ -270,7 +270,7 @@ async function buildPromptContext(
         .from("profiles")
         .select("display_name, phone")
         .eq("id", booking.angler_id)
-        .single(),
+        .maybeSingle(),
       admin.auth.admin.getUserById(booking.angler_id),
     ]);
 
@@ -468,7 +468,7 @@ async function sendSmsMessage(
     .from("profiles")
     .select("sms_consent")
     .eq("id", ctx.anglerId)
-    .single();
+    .maybeSingle();
 
   if (!consentProfile?.sms_consent) {
     await logPrompt(admin, ctx, promptType, "sms", "skipped", "No SMS consent (TCPA)");

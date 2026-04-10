@@ -38,7 +38,7 @@ export async function PATCH(
       .from("clubs")
       .select("id, owner_id, name")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club) {
       return jsonError("Club not found", 404);
@@ -65,7 +65,7 @@ export async function PATCH(
       .select("id, guide_id, club_id, status")
       .eq("id", affiliationId)
       .eq("club_id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!affiliation) {
       return jsonError("Affiliation not found", 404);
@@ -90,9 +90,9 @@ export async function PATCH(
       .select(
         "id, guide_id, status, label, updated_at, guide_profiles(id, user_id, display_name)"
       )
-      .single();
+      .maybeSingle();
 
-    if (error) {
+    if (error || !updated) {
       console.error("[clubs/guide-affiliations] Update error:", error);
       return jsonError("Failed to update affiliation", 500);
     }

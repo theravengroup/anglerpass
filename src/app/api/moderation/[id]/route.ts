@@ -34,7 +34,7 @@ export async function POST(
       .from("properties")
       .select("id, status, name, owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!property) {
       return jsonError("Property not found", 404);

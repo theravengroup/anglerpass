@@ -21,7 +21,7 @@ export async function GET(
       )
       .eq("id", id)
       .eq("status", "live")
-      .single();
+      .maybeSingle();
 
     if (error || !guide) {
       return jsonError("Guide not found", 404);

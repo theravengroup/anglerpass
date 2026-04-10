@@ -1049,7 +1049,7 @@ export async function POST(request: Request) {
     .from("profiles")
     .select("role, roles")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   const userRoles: string[] = profile?.roles ?? [profile?.role ?? "angler"];
 

@@ -12,7 +12,7 @@ async function verifyClubManager(
     .from("clubs")
     .select("owner_id, name")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
 
@@ -92,7 +92,7 @@ export async function GET(
               .from("profiles")
               .select("display_name, avatar_url")
               .eq("id", app.user_id)
-              .single(),
+              .maybeSingle(),
           ]);
           email = authUser?.user?.email ?? null;
           displayName = profile?.display_name ?? null;

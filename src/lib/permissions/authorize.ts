@@ -117,7 +117,7 @@ export async function authorize(
       .eq("club_id", clubId)
       .eq("user_id", userId)
       .eq("status", "active")
-      .single();
+      .maybeSingle();
 
     if (membership) {
       ctx.clubRole = membership.role as ClubRole;
@@ -232,7 +232,7 @@ export async function requireClubPermission(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   const clubRole = membership?.role as ClubRole | undefined;
 
@@ -264,7 +264,7 @@ export async function isClubStaff(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (!membership) return { isStaff: false, role: null };
 

@@ -1,14 +1,9 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { z } from "zod";
 import { notifyMemberApproved } from "@/lib/notifications";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-const reviewSchema = z.object({
-  action: z.enum(["approve", "decline"]),
-  declined_reason: z.string().max(500).optional(),
-});
+import { applicationReviewSchema } from "@/lib/validations/clubs";
 
 async function verifyClubManager(
   admin: SupabaseClient,
@@ -19,7 +14,7 @@ async function verifyClubManager(
     .from("clubs")
     .select("owner_id, name")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
 
@@ -74,7 +69,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const parsed = reviewSchema.safeParse(body);
+    const parsed = applicationReviewSchema.safeParse(body);
     if (!parsed.success) {
       return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
@@ -85,7 +80,7 @@ export async function PATCH(
       .select("id, club_id, user_id, status")
       .eq("id", applicationId)
       .eq("club_id", id)
-      .single();
+      .maybeSingle();
 
     if (!application) {
       return jsonError("Application not found", 404);
@@ -103,7 +98,7 @@ export async function PATCH(
         .from("clubs")
         .select("initiation_fee, annual_dues")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       const hasFees =
         (clubDetails?.initiation_fee ?? 0) > 0 ||

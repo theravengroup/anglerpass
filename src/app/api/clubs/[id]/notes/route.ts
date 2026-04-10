@@ -1,4 +1,3 @@
-import { z } from "zod";
 import {
   jsonOk,
   jsonCreated,
@@ -7,14 +6,7 @@ import {
 } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CLUB_STAFF_ROLES } from "@/lib/permissions/constants";
-
-const VALID_ENTITY_TYPES = ["member", "property", "landowner"] as const;
-
-const createNoteSchema = z.object({
-  entity_type: z.enum(VALID_ENTITY_TYPES),
-  entity_id: z.string().uuid(),
-  body: z.string().min(1).max(5000),
-});
+import { createStaffNoteSchema, VALID_NOTE_ENTITY_TYPES } from "@/lib/validations/clubs";
 
 /** Verify user is club owner or active staff */
 async function verifyClubStaff(clubId: string, userId: string) {
@@ -24,7 +16,7 @@ async function verifyClubStaff(clubId: string, userId: string) {
     .from("clubs")
     .select("owner_id")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
   if (club.owner_id === userId) return admin;
@@ -69,7 +61,7 @@ export async function GET(
       return jsonError("entity_type and entity_id are required", 400);
     }
 
-    if (!VALID_ENTITY_TYPES.includes(entityType as typeof VALID_ENTITY_TYPES[number])) {
+    if (!VALID_NOTE_ENTITY_TYPES.includes(entityType as typeof VALID_NOTE_ENTITY_TYPES[number])) {
       return jsonError("Invalid entity_type", 400);
     }
 
@@ -129,7 +121,7 @@ export async function POST(
     if (!admin) return jsonError("Forbidden", 403);
 
     const body = await _request.json();
-    const parsed = createNoteSchema.safeParse(body);
+    const parsed = createStaffNoteSchema.safeParse(body);
     if (!parsed.success) {
       return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
     }
@@ -158,7 +150,7 @@ export async function POST(
       .from("profiles")
       .select("display_name")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     return jsonCreated({
       note: {

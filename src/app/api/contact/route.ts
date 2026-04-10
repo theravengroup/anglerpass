@@ -1,4 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, isDuplicateError } from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { contactSchema, CONTACT_DEPARTMENTS } from "@/lib/validations/contact";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         source: "contact-form",
       });
 
-      if (error && error.code !== "23505") {
+      if (error && !isDuplicateError(error)) {
         console.error("[contact] Insert error:", error);
       }
     }

@@ -1,17 +1,8 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-const MAX_EMAILS = 200;
-
-const bulkInviteSchema = z.object({
-  emails: z
-    .array(z.email("Invalid email address"))
-    .min(1, "At least one email is required")
-    .max(MAX_EMAILS, `Maximum ${MAX_EMAILS} emails per request`),
-});
+import { bulkMemberInviteSchema } from "@/lib/validations/clubs";
 
 /**
  * Check if the user is a club owner or active staff member.
@@ -26,7 +17,7 @@ async function verifyClubManager(
     .from("clubs")
     .select("owner_id, name")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
 
@@ -134,7 +125,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const result = bulkInviteSchema.safeParse(body);
+    const result = bulkMemberInviteSchema.safeParse(body);
 
     if (!result.success) {
       return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);

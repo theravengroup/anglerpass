@@ -152,7 +152,7 @@ export async function POST(request: Request) {
         .from("guide_profiles")
         .select("display_name")
         .eq("id", guideId)
-        .single();
+        .maybeSingle();
 
       const nameParts = (profile?.display_name ?? "").split(" ");
       const firstName = nameParts[0] || undefined;

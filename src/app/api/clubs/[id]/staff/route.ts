@@ -101,7 +101,7 @@ export async function GET(request: Request, context: RouteContext) {
       .from("clubs")
       .select("owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     return jsonOk({
       staff,

@@ -18,7 +18,7 @@ export async function GET() {
       .from("guide_profiles")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found", 404);
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       .from("guide_profiles")
       .select("id, display_name, status")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found", 404);
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("id, owner_id, name")
       .eq("id", club_id)
-      .single();
+      .maybeSingle();
 
     if (!club) {
       return jsonError("Club not found", 404);

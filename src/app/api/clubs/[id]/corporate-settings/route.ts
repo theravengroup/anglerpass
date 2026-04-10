@@ -74,7 +74,7 @@ export async function PATCH(
       .select(
         "corporate_memberships_enabled, corporate_initiation_fee"
       )
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[corporate-settings] Update error:", updateError);

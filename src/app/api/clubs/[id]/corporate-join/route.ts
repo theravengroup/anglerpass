@@ -1,11 +1,6 @@
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAuth, jsonCreated, jsonError } from "@/lib/api/helpers";
-
-const corporateJoinSchema = z.object({
-  company_name: z.string().min(1, "Company name is required").max(300),
-  job_title: z.string().max(200).optional(),
-});
+import { corporateJoinSchema } from "@/lib/validations/clubs";
 
 export async function POST(
   request: Request,
@@ -35,7 +30,7 @@ export async function POST(
         "id, name, corporate_memberships_enabled, membership_application_required"
       )
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club) {
       return jsonError("Club not found", 404);
@@ -104,7 +99,7 @@ export async function POST(
         })
         .eq("id", existing.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         console.error("[corporate-join] Update error:", updateError);

@@ -54,7 +54,7 @@ export async function attemptPayoutMatch(
     .from("finance_stripe_payouts")
     .select("id, stripe_payout_id, amount, arrival_date, status")
     .eq("id", payoutId)
-    .single();
+    .maybeSingle();
 
   if (!payout) return null;
 
@@ -130,7 +130,7 @@ export async function attemptDepositMatch(
     .from("finance_mercury_transactions")
     .select("id, mercury_txn_id, amount, posted_at")
     .eq("id", mercuryTxnId)
-    .single();
+    .maybeSingle();
 
   if (!txn) return null;
   const t = txn as MercuryTxn;

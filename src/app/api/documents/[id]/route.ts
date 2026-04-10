@@ -21,7 +21,7 @@ export async function GET(
       .from("document_templates")
       .select("*, properties!document_templates_property_id_fkey(owner_id)")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !template) {
       return jsonError("Template not found", 404);
@@ -61,7 +61,7 @@ export async function PATCH(
       .from("document_templates")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!existing || existing.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -82,7 +82,7 @@ export async function PATCH(
       })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[documents/[id]] Update error:", error);
@@ -116,7 +116,7 @@ export async function DELETE(
       .from("document_templates")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!existing || existing.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("role, roles")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Profile not found", 404);
@@ -97,7 +97,7 @@ export async function DELETE() {
       .from("profiles")
       .select("avatar_url, role, roles")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Profile not found", 404);

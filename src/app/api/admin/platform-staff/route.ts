@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     .from("profiles")
     .select("id, display_name, role")
     .eq("id", user_id)
-    .single();
+    .maybeSingle();
 
   if (!profile) {
     return jsonError("User not found", 404);
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
   const { data: existing } = await createAdminClient().from("platform_staff")
     .select("id, role, revoked_at")
     .eq("user_id", user_id)
-    .single();
+    .maybeSingle();
 
   if (existing && !existing.revoked_at) {
     // Update role in place
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       .update({ role })
       .eq("id", existing.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[platform-staff] Update error:", error);
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       })
       .eq("id", existing.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[platform-staff] Reactivate error:", error);
@@ -240,7 +240,7 @@ export async function DELETE(request: Request) {
     .select("id, role")
     .eq("user_id", user_id)
     .is("revoked_at", null)
-    .single();
+    .maybeSingle();
 
   if (!existing) {
     return jsonError("No active platform staff record found", 404);

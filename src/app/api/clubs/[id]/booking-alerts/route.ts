@@ -23,7 +23,7 @@ export async function GET(
     .eq("club_id", clubId)
     .eq("user_id", auth.user.id)
     .in("status", ["active"])
-    .single();
+    .maybeSingle();
 
   if (!membership) {
     return jsonError("Forbidden", 403);

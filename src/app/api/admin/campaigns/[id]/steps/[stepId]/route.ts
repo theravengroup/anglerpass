@@ -20,7 +20,7 @@ export async function PATCH(
   const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 
@@ -49,7 +49,7 @@ export async function PATCH(
     .eq("id", stepId)
     .eq("campaign_id", id)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError(`Failed to update step: ${error.message}`, 500);
@@ -76,7 +76,7 @@ export async function DELETE(
   const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 

@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       "*, profiles!trip_reviews_angler_user_id_fkey(display_name), review_category_ratings(category_key, rating_value), review_responses(id, response_text, submitted_at, published_at, status, responder_role)"
     )
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error || !review) {
     return jsonError("Review not found", 404);
@@ -37,7 +37,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       .from("properties")
       .select("owner_id")
       .eq("id", review.property_id)
-      .single();
+      .maybeSingle();
 
     const isPropertyOwner = property?.owner_id === auth.user.id;
 
@@ -46,7 +46,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       .from("profiles")
       .select("role")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     const isAdmin = profile?.role === "admin";
 
@@ -60,13 +60,13 @@ export async function GET(request: Request, { params }: RouteParams) {
     .from("properties")
     .select("owner_id")
     .eq("id", review.property_id)
-    .single();
+    .maybeSingle();
 
   const { data: userProfile } = await admin
     .from("profiles")
     .select("role")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   const canSeePrivateFeedback =
     property?.owner_id === auth.user.id || userProfile?.role === "admin";
@@ -103,7 +103,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       "id, angler_user_id, status, trip_completed, review_window_expires_at, extension_requested, extension_expires_at"
     )
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error || !review) {
     return jsonError("Review not found", 404);

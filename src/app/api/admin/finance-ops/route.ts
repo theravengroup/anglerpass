@@ -94,7 +94,7 @@ export async function PATCH(request: Request) {
     })
     .eq("id", exception_id)
     .select("id, status")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError("Failed to update exception", 500);

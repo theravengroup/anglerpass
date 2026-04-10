@@ -120,7 +120,7 @@ async function handleTransactionCreated(
       .from("finance_mercury_transactions")
       .select("id")
       .eq("mercury_txn_id", txnId)
-      .single();
+      .maybeSingle();
 
     if (inserted) {
       await attemptDepositMatch((inserted as { id: string }).id);

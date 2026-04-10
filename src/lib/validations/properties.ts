@@ -158,3 +158,32 @@ export const propertyStatusTransition = z.object({
 });
 
 export type PropertyStatusTransition = z.infer<typeof propertyStatusTransition>;
+
+// ─── Property Claim ───────────────────────────────────────────────
+
+export const propertyClaimSchema = z.object({
+  token: z.string().uuid("Invalid claim token"),
+});
+
+export type PropertyClaimInput = z.infer<typeof propertyClaimSchema>;
+
+// ─── Bulk Availability ────────────────────────────────────────────
+
+export const bulkAvailabilitySchema = z.object({
+  dates: z
+    .array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/))
+    .min(1, "At least one date required")
+    .max(365, "Cannot update more than 365 dates at once"),
+  status: z.enum(["blocked", "available", "maintenance"]),
+  reason: z.string().max(200).optional(),
+});
+
+export type BulkAvailabilityInput = z.infer<typeof bulkAvailabilitySchema>;
+
+// ─── Invite Landowner ─────────────────────────────────────────────
+
+export const inviteLandownerSchema = z.object({
+  landowner_email: z.string().email("Valid email is required"),
+});
+
+export type InviteLandownerInput = z.infer<typeof inviteLandownerSchema>;

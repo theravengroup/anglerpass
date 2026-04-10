@@ -1,12 +1,8 @@
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { capturePaymentIntent } from "@/lib/stripe/server";
-
-const CaptureSchema = z.object({
-  bookingId: z.string().uuid(),
-});
+import { capturePaymentSchema } from "@/lib/validations/stripe";
 
 /**
  * POST /api/stripe/capture
@@ -23,7 +19,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = CaptureSchema.safeParse(body);
+    const parsed = capturePaymentSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid request body", 400);
@@ -37,7 +33,7 @@ export async function POST(request: Request) {
       .from("bookings")
       .select("id, stripe_payment_intent_id, payment_status, property_id")
       .eq("id", bookingId)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);
@@ -56,13 +52,13 @@ export async function POST(request: Request) {
       .from("properties")
       .select("owner_id")
       .eq("id", booking.property_id)
-      .single();
+      .maybeSingle();
 
     const { data: profile } = await admin
       .from("profiles")
       .select("role")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     const isOwner = property?.owner_id === auth.user.id;
     const isAdmin = profile?.role === "admin";

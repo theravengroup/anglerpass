@@ -116,7 +116,7 @@ export async function POST(request: Request) {
       .select("id, status")
       .eq("angler_id", user.id)
       .eq("delegate_email", email)
-      .single();
+      .maybeSingle();
 
     if (existingByEmail && existingByEmail.status !== "revoked") {
       return jsonError("This person is already a delegate or has a pending invitation", 409);
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
         .select("id, status")
         .eq("angler_id", user.id)
         .eq("delegate_id", targetUser.id)
-        .single();
+        .maybeSingle();
 
       if (existingById && existingById.status !== "revoked") {
         return jsonError("This person is already a delegate", 409);
@@ -157,9 +157,9 @@ export async function POST(request: Request) {
         .update(delegateData)
         .eq("id", existingByEmail.id)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) {
+      if (error || !delegate) {
         console.error("[delegates] Update error:", error);
         return jsonError("Failed to update delegate", 500);
       }

@@ -1,8 +1,8 @@
 import "server-only";
 
-import { z } from "zod";
 import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { updateConversationSchema } from "@/lib/validations/compass";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -37,11 +37,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
   return jsonOk({ conversation: data });
 }
 
-const updateSchema = z.object({
-  title: z.string().max(200).optional(),
-  messages: z.array(z.record(z.string(), z.unknown())).optional(),
-});
-
 /**
  * PATCH /api/compass/conversations/:id
  * Update a conversation's title or messages.
@@ -53,7 +48,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
 
   const body = await request.json();
-  const parsed = updateSchema.safeParse(body);
+  const parsed = updateConversationSchema.safeParse(body);
 
   if (!parsed.success) {
     return jsonError("Invalid request body", 400);
@@ -90,7 +85,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     .update(updates)
     .eq("id", id)
     .select("id, title, updated_at")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError("Failed to update conversation", 500);

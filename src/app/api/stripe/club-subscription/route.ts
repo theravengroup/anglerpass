@@ -1,17 +1,9 @@
 import Stripe from "stripe";
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer, stripe } from "@/lib/stripe/server";
-
-const ClubSubscriptionSchema = z.object({
-  clubId: z.string().uuid(),
-  /** Stripe Price ID for the selected tier */
-  priceId: z.string(),
-  /** Platform tier name for tracking */
-  tier: z.enum(["starter", "standard", "pro"]),
-});
+import { clubSubscriptionSchema } from "@/lib/validations/stripe";
 
 /**
  * POST /api/stripe/club-subscription
@@ -28,7 +20,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = ClubSubscriptionSchema.safeParse(body);
+    const parsed = clubSubscriptionSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid request body", 400);
@@ -42,7 +34,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("id, owner_id, stripe_subscription_id, name")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== auth.user.id) {
       return jsonError("Forbidden", 403);
@@ -90,7 +82,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name, stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     let customerId = profile?.stripe_customer_id;
 

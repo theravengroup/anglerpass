@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isDuplicateError } from "@/lib/api/helpers";
 import { RESPONSE_EDIT_LOCK_HOURS } from "@/lib/validations/reviews";
 
 // ─── Rule 10: Landowner Response ─────────────────────────────────────
@@ -27,7 +28,7 @@ export async function validateResponseRights(
     .from("trip_reviews")
     .select("id, property_id, status")
     .eq("id", reviewId)
-    .single();
+    .maybeSingle();
 
   if (reviewError || !review) {
     return { authorized: false, error: "Review not found" };
@@ -59,7 +60,7 @@ export async function validateResponseRights(
     .from("properties")
     .select("id, owner_id")
     .eq("id", review.property_id)
-    .single();
+    .maybeSingle();
 
   if (property?.owner_id === userId) {
     return { authorized: true, role: "landowner" };
@@ -131,7 +132,7 @@ export async function createReviewResponse(
 
   if (insertError) {
     // Could be unique constraint violation
-    if (insertError.code === "23505") {
+    if (isDuplicateError(insertError)) {
       return {
         success: false,
         error: "A response already exists for this review",
@@ -170,7 +171,7 @@ export async function updateReviewResponse(
     .from("review_responses")
     .select("id, review_id, responder_user_id, submitted_at, status")
     .eq("id", responseId)
-    .single();
+    .maybeSingle();
 
   if (error || !response) {
     return { success: false, error: "Response not found" };

@@ -136,7 +136,7 @@ export async function POST(
       .from("clubs")
       .select("id, subscription_tier")
       .eq("id", partner_club_id)
-      .single();
+      .maybeSingle();
 
     if (!partnerClub) {
       return jsonError("Partner club not found", 404);

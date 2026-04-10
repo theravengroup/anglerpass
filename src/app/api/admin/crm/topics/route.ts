@@ -1,7 +1,7 @@
 import "server-only";
 
-import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
-import { z } from "zod";
+import { requireAdmin, jsonOk, jsonError, jsonCreated, isDuplicateError } from "@/lib/api/helpers";
+import { createTopicSchema } from "@/lib/validations/crm";
 
 // ─── GET /api/admin/crm/topics ────────────────────────────────────
 // List all subscription topics
@@ -20,15 +20,6 @@ export async function GET() {
 // ─── POST /api/admin/crm/topics ───────────────────────────────────
 // Create a new subscription topic
 
-const createTopicSchema = z.object({
-  slug: z.string().min(1).max(50).regex(/^[a-z0-9_]+$/),
-  name: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
-  is_default: z.boolean().optional(),
-  is_required: z.boolean().optional(),
-  display_order: z.number().int().min(0).optional(),
-});
-
 export async function POST(req: Request) {
   const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
@@ -45,7 +36,7 @@ export async function POST(req: Request) {
     .single();
 
   if (error) {
-    if (error.code === "23505") {
+    if (isDuplicateError(error)) {
       return jsonError("A topic with that slug already exists", 409);
     }
     return jsonError("Failed to create topic", 500);

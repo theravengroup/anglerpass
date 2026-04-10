@@ -24,7 +24,7 @@ export async function GET(
     .from("finance_stripe_payouts")
     .select("*")
     .eq("id", payoutId)
-    .single();
+    .maybeSingle();
 
   if (payoutError || !payout) {
     return jsonError("Payout not found", 404);
@@ -63,7 +63,7 @@ export async function GET(
       .from("finance_mercury_transactions")
       .select("*")
       .eq("id", p.matched_mercury_txn_id)
-      .single();
+      .maybeSingle();
     mercuryTxn = data;
   }
 

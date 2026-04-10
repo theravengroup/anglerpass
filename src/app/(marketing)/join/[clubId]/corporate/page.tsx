@@ -12,7 +12,7 @@ async function getClub(clubId: string) {
         "id, name, description, location, initiation_fee, annual_dues, corporate_memberships_enabled, corporate_initiation_fee, membership_application_required, stripe_dues_price_id"
       )
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
     return data;

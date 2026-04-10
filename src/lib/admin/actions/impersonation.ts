@@ -41,7 +41,7 @@ export async function startImpersonation(formData: FormData) {
     .from("profiles")
     .select("id, role, display_name")
     .eq("id", currentUser.id)
-    .single();
+    .maybeSingle();
 
   if (!adminProfile || adminProfile.role !== "admin") {
     throw new Error("Unauthorized: Admin access required");
@@ -52,7 +52,7 @@ export async function startImpersonation(formData: FormData) {
     .from("profiles")
     .select("id, role, display_name")
     .eq("id", targetUserId)
-    .single();
+    .maybeSingle();
 
   if (!targetProfile) {
     throw new Error("Target user not found");
@@ -139,7 +139,7 @@ export async function endImpersonation() {
     .select("*")
     .eq("session_token", token)
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
 
   if (session) {
     // End the session
@@ -199,7 +199,7 @@ export async function getActiveImpersonation(): Promise<{
     .select("*")
     .eq("session_token", token)
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
 
   if (!session) {
     // Token exists but session is invalid — clean up cookie

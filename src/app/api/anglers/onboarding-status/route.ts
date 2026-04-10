@@ -61,7 +61,7 @@ export async function GET() {
         .from("clubs")
         .select("id, name, location, logo_url, initiation_fee, annual_dues")
         .eq("id", pendingMembership.club_id)
-        .single();
+        .maybeSingle();
 
       if (application?.status === "payment_pending") {
         return jsonOk({

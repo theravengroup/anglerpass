@@ -68,7 +68,7 @@ async function handleReportCompleted(
     .from("guide_profiles")
     .select("id, user_id, status")
     .eq("checkr_candidate_id", candidateId)
-    .single();
+    .maybeSingle();
 
   if (!guide) {
     console.error("[checkr] No guide found for candidate:", candidateId);
@@ -151,7 +151,7 @@ async function handleReportSuspended(
     .from("guide_profiles")
     .select("id, user_id, status")
     .eq("checkr_candidate_id", candidateId)
-    .single();
+    .maybeSingle();
 
   if (!guide) return;
 

@@ -20,7 +20,7 @@ export async function GET(
   const { data: segment, error } = await auth.admin.from("segments")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error || !segment) {
     return jsonError("Segment not found", 404);
@@ -59,7 +59,7 @@ export async function PATCH(
   const { data: existing } = await auth.admin.from("segments")
     .select("id")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!existing) {
     return jsonError("Segment not found", 404);
@@ -74,7 +74,7 @@ export async function PATCH(
     .update(updates)
     .eq("id", id)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError(`Failed to update segment: ${error.message}`, 500);

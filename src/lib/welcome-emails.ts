@@ -166,7 +166,7 @@ export async function sendWelcomeEmail(
     .from("profiles")
     .select("display_name")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   const displayName = profile?.display_name ?? "there";
 

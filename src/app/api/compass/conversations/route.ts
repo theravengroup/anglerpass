@@ -1,8 +1,8 @@
 import "server-only";
 
-import { z } from "zod";
 import { requireAuth, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createConversationSchema } from "@/lib/validations/compass";
 
 /**
  * GET /api/compass/conversations
@@ -27,11 +27,6 @@ export async function GET() {
   return jsonOk({ conversations: data ?? [] });
 }
 
-const createSchema = z.object({
-  title: z.string().max(200).optional(),
-  messages: z.array(z.record(z.string(), z.unknown())).default([]),
-});
-
 /**
  * POST /api/compass/conversations
  * Create a new Compass conversation.
@@ -41,7 +36,7 @@ export async function POST(request: Request) {
   if (!auth) return jsonError("Unauthorized", 401);
 
   const body = await request.json();
-  const parsed = createSchema.safeParse(body);
+  const parsed = createConversationSchema.safeParse(body);
 
   if (!parsed.success) {
     return jsonError("Invalid request body", 400);

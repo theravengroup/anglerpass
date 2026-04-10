@@ -160,7 +160,7 @@ export async function notify(
     .from("profiles")
     .select("display_name")
     .eq("id", payload.userId)
-    .single();
+    .maybeSingle();
 
   const displayName = profile?.display_name ?? "there";
 

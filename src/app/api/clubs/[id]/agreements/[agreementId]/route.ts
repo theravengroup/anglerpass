@@ -40,7 +40,7 @@ export async function PATCH(
       .from("cross_club_agreements")
       .select("*")
       .eq("id", agreementId)
-      .single();
+      .maybeSingle();
 
     if (!agreement) {
       return jsonError("Agreement not found", 404);
@@ -75,7 +75,7 @@ export async function PATCH(
         })
         .eq("id", agreementId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("[agreements] Accept error:", error);
@@ -101,7 +101,7 @@ export async function PATCH(
         })
         .eq("id", agreementId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("[agreements] Revoke error:", error);

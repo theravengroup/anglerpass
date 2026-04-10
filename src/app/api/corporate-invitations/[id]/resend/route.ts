@@ -26,7 +26,7 @@ export async function POST(
       .from("corporate_invitations")
       .select("id, email, token, status, club_id, corporate_member_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (fetchErr || !invitation) {
       return jsonError("Invitation not found", 404);
@@ -71,14 +71,14 @@ export async function POST(
       .from("clubs")
       .select("name, annual_dues")
       .eq("id", invitation.club_id)
-      .single();
+      .maybeSingle();
 
     // Get sponsor display name
     const { data: profile } = await admin
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const clubName = club?.name ?? "the club";
     const sponsorName = profile?.display_name ?? user.email ?? "Your sponsor";

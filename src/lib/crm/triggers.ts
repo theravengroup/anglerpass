@@ -107,7 +107,7 @@ export async function fireCrmTrigger(
         .select("id, delay_minutes")
         .eq("campaign_id", campaign.id)
         .eq("step_order", 1)
-        .single()
+        .maybeSingle()
         .then((r: { data: Pick<CampaignStep, "id" | "delay_minutes"> | null; error: unknown }) => r);
 
       if (!firstStep) continue;

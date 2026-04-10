@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { getResend } from "@/lib/email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -9,10 +8,7 @@ import {
 } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { SITE_URL } from "@/lib/constants";
-
-const inviteSchema = z.object({
-  landowner_email: z.string().email("Valid email is required"),
-});
+import { inviteLandownerSchema } from "@/lib/validations/properties";
 
 /**
  * POST /api/properties/[id]/invite-landowner
@@ -38,7 +34,7 @@ export async function POST(
     .from("properties")
     .select("id, name, created_by_club_id, owner_id")
     .eq("id", propertyId)
-    .single();
+    .maybeSingle();
 
   if (!property) return jsonError("Property not found", 404);
   if (!property.created_by_club_id) {
@@ -57,7 +53,7 @@ export async function POST(
   if (!role?.allowed) return jsonError("Forbidden", 403);
 
   const body = await request.json();
-  const result = inviteSchema.safeParse(body);
+  const result = inviteLandownerSchema.safeParse(body);
   if (!result.success) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
@@ -70,7 +66,7 @@ export async function POST(
     .select("id, status")
     .eq("property_id", propertyId)
     .eq("status", "pending")
-    .single();
+    .maybeSingle();
 
   if (existing) {
     return jsonError(
@@ -84,7 +80,7 @@ export async function POST(
     .from("clubs")
     .select("name")
     .eq("id", property.created_by_club_id)
-    .single();
+    .maybeSingle();
 
   const clubName = club?.name ?? "Your club";
 

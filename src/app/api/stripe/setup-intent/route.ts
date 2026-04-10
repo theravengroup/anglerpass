@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name, stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     // Get or create a Stripe Customer
     let customerId = profile?.stripe_customer_id;

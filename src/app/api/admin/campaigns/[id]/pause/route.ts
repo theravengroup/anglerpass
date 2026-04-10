@@ -22,7 +22,7 @@ export async function POST(
   const { data: campaign } = await campaigns
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 

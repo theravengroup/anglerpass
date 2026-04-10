@@ -18,7 +18,7 @@ export async function GET() {
     .from("profiles")
     .select("role")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   if (profile?.role !== "admin") {
     return jsonError("Forbidden", 403);

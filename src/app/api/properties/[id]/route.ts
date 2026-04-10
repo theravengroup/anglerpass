@@ -21,7 +21,7 @@ export async function GET(
       .from("properties")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       return jsonError("Property not found", 404);
@@ -43,7 +43,7 @@ export async function GET(
           .from("profiles")
           .select("role")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
         if (profile?.role === "admin") hasAccess = true;
       }
 
@@ -78,7 +78,7 @@ export async function PATCH(
       .from("properties")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!existing) {
       return jsonError("Property not found", 404);
@@ -147,7 +147,7 @@ export async function PATCH(
         .update({ status: statusResult.data.status })
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("[properties] Status update error:", error);
@@ -177,7 +177,7 @@ export async function PATCH(
       })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[properties] Update error:", error);
@@ -210,7 +210,7 @@ export async function DELETE(
       .from("properties")
       .select("owner_id, photos")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

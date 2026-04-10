@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       .select("id")
       .eq("user_id", user.id)
       .eq("status", "approved")
-      .single();
+      .maybeSingle();
 
     if (!guideProfile) {
       return jsonError("Only approved guides can search for anglers", 403);

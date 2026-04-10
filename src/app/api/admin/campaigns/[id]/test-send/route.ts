@@ -44,7 +44,7 @@ export async function POST(
   const { data: campaign } = await auth.admin.from("campaigns")
     .select("from_name, from_email, reply_to")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 
@@ -61,7 +61,7 @@ export async function POST(
     stepQuery = stepQuery.order("step_order", { ascending: true }).limit(1);
   }
 
-  const { data: step } = await stepQuery.single();
+  const { data: step } = await stepQuery.maybeSingle();
 
   if (!step) {
     return jsonError("No steps found for this campaign", 404);

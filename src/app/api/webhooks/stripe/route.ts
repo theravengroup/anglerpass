@@ -72,7 +72,7 @@ async function handleCompassCreditPurchase(
     .from("compass_credit_purchases")
     .select("id, status")
     .eq("stripe_payment_intent_id", paymentIntent.id as string)
-    .single();
+    .maybeSingle();
 
   if (purchase?.status === "succeeded") {
     return;
@@ -182,7 +182,7 @@ async function handlePaymentIntentFailed(
     .from("bookings")
     .select("angler_id")
     .eq("id", bookingId)
-    .single();
+    .maybeSingle();
 
   if (booking?.angler_id) {
     const { notify } = await import("@/lib/notifications");
@@ -220,7 +220,7 @@ async function handleInvoicePaid(invoice: Record<string, unknown>) {
     .from("club_memberships")
     .select("id, club_id, user_id")
     .eq("stripe_subscription_id", subscriptionId)
-    .single();
+    .maybeSingle();
 
   if (!membership) {
     return;
@@ -292,7 +292,7 @@ async function handleInvoicePaymentFailed(
     .from("club_memberships")
     .select("id, user_id")
     .eq("stripe_subscription_id", subscriptionId)
-    .single();
+    .maybeSingle();
 
   if (!membership) return;
 
@@ -372,7 +372,7 @@ async function handleSubscriptionUpdated(
     .from("club_memberships")
     .select("id")
     .eq("stripe_subscription_id", subscriptionId)
-    .single();
+    .maybeSingle();
 
   if (!membership) return;
 
@@ -425,7 +425,7 @@ async function handleSubscriptionDeleted(
     .from("club_memberships")
     .select("id, user_id")
     .eq("stripe_subscription_id", subscriptionId)
-    .single();
+    .maybeSingle();
 
   if (!membership) return;
 
@@ -534,7 +534,7 @@ export async function POST(request: NextRequest) {
     .from("stripe_webhook_events")
     .select("id")
     .eq("id", event.id)
-    .single();
+    .maybeSingle();
 
   if (existing) {
     console.info(`[stripe-webhook] Duplicate event ${event.id}, skipping`);

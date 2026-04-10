@@ -21,7 +21,7 @@ export async function GET(
       .from("properties")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -32,7 +32,7 @@ export async function GET(
       .from("calendar_tokens")
       .select("token")
       .eq("property_id", id)
-      .single();
+      .maybeSingle();
 
     if (!tokenRecord) {
       const { data: newToken, error } = await admin
@@ -80,7 +80,7 @@ export async function DELETE(
       .from("properties")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

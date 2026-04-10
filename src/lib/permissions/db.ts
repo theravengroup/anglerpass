@@ -34,7 +34,7 @@ export async function getPlatformStaffRole(userId: string): Promise<PlatformStaf
     .eq("user_id", userId)
     .is("revoked_at", null)
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error || !data) return null;
   return data;
@@ -62,7 +62,7 @@ export async function getActiveDelegate(
     .eq("delegate_id", delegateId)
     .eq("status", "active")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error || !data) return null;
   return data;

@@ -1,13 +1,8 @@
-import { z } from "zod";
 import { getResend } from "@/lib/email";
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import type { Json } from "@/types/supabase";
-
-const inviteSchema = z.object({
-  email: z.email("A valid email is required"),
-  name: z.string().max(200).optional(),
-});
+import { adminInviteSchema } from "@/lib/validations/admin";
 
 // ─── POST: Invite a new admin team member ──────────────────────────
 export async function POST(request: Request) {
@@ -19,7 +14,7 @@ export async function POST(request: Request) {
     if (!auth) return jsonError("Forbidden", 403);
 
     const body = await request.json();
-    const result = inviteSchema.safeParse(body);
+    const result = adminInviteSchema.safeParse(body);
 
     if (!result.success) {
       return jsonError(
@@ -36,7 +31,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const inviterName =
       inviterProfile?.display_name ?? user.email ?? "An admin";
@@ -60,7 +55,7 @@ export async function POST(request: Request) {
         .from("profiles")
         .select("role, roles")
         .eq("id", existingUser.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.role === "admin") {
         return jsonError("This person is already an admin", 409);

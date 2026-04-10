@@ -40,7 +40,7 @@ export async function GET() {
         "id, status, verification_fee_paid, checkr_status, checkr_candidate_id, license_url, insurance_url, first_aid_cert_url, guide_license_url, license_expiry, insurance_expiry, first_aid_expiry, guide_license_expiry, verified_at, live_at, rejection_reason, suspended_reason, suspension_type"
       )
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found", 404);
@@ -90,7 +90,7 @@ export async function POST() {
         "id, status, verification_fee_paid, license_url, insurance_url, display_name"
       )
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found. Create your profile first.", 404);

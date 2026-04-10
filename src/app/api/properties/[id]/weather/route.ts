@@ -28,7 +28,7 @@ export async function GET(
       .select("id, latitude, longitude, status")
       .eq("id", id)
       .eq("status", "published")
-      .single();
+      .maybeSingle();
 
     if (error || !property) {
       return jsonError("Property not found", 404);

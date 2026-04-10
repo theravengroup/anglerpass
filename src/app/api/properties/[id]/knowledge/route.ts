@@ -17,7 +17,7 @@ async function canEditKnowledge(
     .from("properties")
     .select("owner_id, created_by_club_id")
     .eq("id", propertyId)
-    .single();
+    .maybeSingle();
 
   if (!property) return false;
 
@@ -41,7 +41,7 @@ async function canEditKnowledge(
     .from("profiles")
     .select("role")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   return profile?.role === "admin";
 }
@@ -143,7 +143,7 @@ export async function PUT(
         .update(payload)
         .eq("property_id", propertyId)
         .select()
-        .single();
+        .maybeSingle();
       data = res.data;
       error = res.error;
     } else {

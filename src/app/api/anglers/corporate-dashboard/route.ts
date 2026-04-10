@@ -50,7 +50,7 @@ export async function GET(_request: NextRequest) {
     .from("clubs")
     .select("name, location")
     .eq("id", membership.club_id)
-    .single() as {
+    .maybeSingle() as {
     data: { name: string; location: string | null } | null;
     error: { message: string } | null;
   };

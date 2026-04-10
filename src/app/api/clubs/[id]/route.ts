@@ -22,7 +22,7 @@ export async function GET(
       .from("clubs")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !club) {
       return jsonError("Club not found", 404);
@@ -43,7 +43,7 @@ export async function GET(
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (!membership && profile?.role !== "admin") {
         return jsonError("Forbidden", 403);
@@ -134,7 +134,7 @@ export async function PATCH(
       .from("clubs")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -164,7 +164,7 @@ export async function PATCH(
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[clubs/[id]] Update error:", updateError);

@@ -84,7 +84,7 @@ function LoginForm() {
         .from("profiles")
         .select("role, roles")
         .returns<{ role: string; roles: string[] | null }[]>()
-        .single();
+        .maybeSingle();
 
       const primaryRole = profile?.roles?.[0] ?? profile?.role ?? "angler";
 

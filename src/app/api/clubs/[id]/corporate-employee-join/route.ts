@@ -1,11 +1,7 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notify } from "@/lib/notifications";
-
-const bodySchema = z.object({
-  token: z.string().min(1, "Token is required"),
-});
+import { corporateEmployeeJoinSchema } from "@/lib/validations/clubs";
 
 export async function POST(
   request: Request,
@@ -20,7 +16,7 @@ export async function POST(
     const { user } = auth;
 
     const body = await request.json();
-    const result = bodySchema.safeParse(body);
+    const result = corporateEmployeeJoinSchema.safeParse(body);
 
     if (!result.success) {
       return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
@@ -34,7 +30,7 @@ export async function POST(
       .from("corporate_invitations")
       .select("id, email, status, club_id, corporate_member_id, invited_at")
       .eq("token", token)
-      .single();
+      .maybeSingle();
 
     if (invErr || !invitation) {
       return jsonError("Invalid invitation token", 404);
@@ -86,7 +82,7 @@ export async function POST(
       .from("club_memberships")
       .select("id, company_name, user_id")
       .eq("id", invitation.corporate_member_id)
-      .single();
+      .maybeSingle();
 
     if (!corporateMembership) {
       return jsonError("Corporate membership not found", 404);
@@ -138,13 +134,13 @@ export async function POST(
         .from("clubs")
         .select("name")
         .eq("id", clubId)
-        .single();
+        .maybeSingle();
 
       const { data: employeeProfile } = await admin
         .from("profiles")
         .select("display_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const employeeName =
         employeeProfile?.display_name ?? user.email ?? "An employee";

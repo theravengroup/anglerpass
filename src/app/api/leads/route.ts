@@ -1,4 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, isDuplicateError } from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { leadSchema } from "@/lib/validations/leads";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -198,7 +198,7 @@ export async function POST(request: Request) {
         role_response: roleResponse ?? null,
       });
 
-      if (error && error.code !== "23505") {
+      if (error && !isDuplicateError(error)) {
         console.error("[leads] Insert error:", error);
         return jsonError("Failed to save lead", 500);
       }

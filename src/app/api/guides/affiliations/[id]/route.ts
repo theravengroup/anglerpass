@@ -24,7 +24,7 @@ export async function DELETE(
       .from("guide_profiles")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found", 404);
@@ -35,7 +35,7 @@ export async function DELETE(
       .from("guide_club_affiliations")
       .select("id, guide_id, status")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!affiliation) {
       return jsonError("Affiliation not found", 404);

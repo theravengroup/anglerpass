@@ -150,7 +150,7 @@ export async function checkPropertyLimit(
     .from("properties")
     .select("max_bookings_per_member_per_month, advance_booking_days, name")
     .eq("id", propertyId)
-    .single();
+    .maybeSingle();
 
   if (!property) return { allowed: true };
 
@@ -279,7 +279,7 @@ export async function updateStanding(
         .from("profiles")
         .select("display_name")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
       // Notify platform admins
       const { data: admins } = await typedAdmin

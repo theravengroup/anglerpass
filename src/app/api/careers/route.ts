@@ -1,4 +1,4 @@
-import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { jsonError, jsonOk, isDuplicateError } from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
 import { careersInquirySchema } from "@/lib/validations/careers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         source: "team-page",
       });
 
-      if (error && error.code !== "23505") {
+      if (error && !isDuplicateError(error)) {
         console.error("[careers] Insert error:", error);
       }
     }

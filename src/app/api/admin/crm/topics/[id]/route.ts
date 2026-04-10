@@ -1,17 +1,9 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { z } from "zod";
+import { updateTopicSchema } from "@/lib/validations/crm";
 
 // ─── PATCH /api/admin/crm/topics/[id] ─────────────────────────────
-
-const updateTopicSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  description: z.string().max(500).nullable().optional(),
-  is_default: z.boolean().optional(),
-  is_required: z.boolean().optional(),
-  display_order: z.number().int().min(0).optional(),
-});
 
 export async function PATCH(
   req: Request,
@@ -36,7 +28,7 @@ export async function PATCH(
     .update(updates)
     .eq("id", id)
     .select()
-    .single();
+    .maybeSingle();
 
   if (error || !topic) {
     return jsonError("Topic not found", 404);

@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       .from("club_invitations")
       .select("club_name, status, properties(name)")
       .eq("token", token)
-      .single();
+      .maybeSingle();
 
     if (error || !invitation) {
       return jsonError("Invitation not found", 404);

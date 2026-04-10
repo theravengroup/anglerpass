@@ -21,7 +21,7 @@ export async function GET(
       .from("clubs")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

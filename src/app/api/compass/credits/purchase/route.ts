@@ -2,11 +2,7 @@ import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { getCreditPack } from "@/lib/constants/compass-usage";
-import { z } from "zod";
-
-const purchaseSchema = z.object({
-  packKey: z.string().min(1),
-});
+import { compassCreditPurchaseSchema } from "@/lib/validations/compass-usage";
 
 /**
  * POST /api/compass/credits/purchase
@@ -20,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = purchaseSchema.safeParse(body);
+  const parsed = compassCreditPurchaseSchema.safeParse(body);
   if (!parsed.success) {
     return jsonError("Invalid request: packKey is required", 400);
   }

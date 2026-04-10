@@ -184,7 +184,7 @@ export async function sendDailyCashSummary(): Promise<void> {
     .select("*")
     .order("snapshot_date", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!snapshot) return;
 

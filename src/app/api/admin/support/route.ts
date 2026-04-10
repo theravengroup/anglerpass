@@ -157,7 +157,7 @@ export async function PATCH(request: Request) {
     .update(updatePayload)
     .eq("id", ticket_id)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError(`Failed to update ticket: ${error.message}`, 500);

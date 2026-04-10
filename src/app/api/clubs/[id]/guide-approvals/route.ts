@@ -26,7 +26,7 @@ export async function GET(
       .from("clubs")
       .select("id, owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -81,7 +81,7 @@ export async function PATCH(
       .from("clubs")
       .select("id, name, owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -108,7 +108,7 @@ export async function PATCH(
       )
       .eq("id", approval_id)
       .eq("club_id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!approval) {
       return jsonError("Approval not found", 404);
@@ -132,7 +132,7 @@ export async function PATCH(
       })
       .eq("id", approval_id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[clubs/guide-approvals] Update error:", updateError);

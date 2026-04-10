@@ -51,7 +51,7 @@ export async function GET(request: Request) {
               .select("role")
               .eq("id", user.id)
               .returns<{ role: string }[]>()
-              .single();
+              .maybeSingle();
             destination = profile?.role
               ? getRoleHomePath(profile.role)
               : "/dashboard";
@@ -135,7 +135,7 @@ async function sendWelcomeEmailIfNew(userId: string) {
       .select("role, welcome_email_step")
       .eq("id", userId)
       .returns<Array<{ role: string; welcome_email_step: number }>>()
-      .single();
+      .maybeSingle();
 
     if (!profile) return;
 

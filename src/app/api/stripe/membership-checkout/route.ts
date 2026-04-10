@@ -1,5 +1,4 @@
 import Stripe from "stripe";
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -9,15 +8,7 @@ import {
   stripe,
 } from "@/lib/stripe/server";
 import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
-
-const MembershipCheckoutSchema = z.object({
-  clubId: z.string().uuid(),
-  /** Stripe Price ID for the recurring dues (created by club admin) */
-  duesPriceId: z.string().optional(),
-  membershipType: z.enum(["individual", "corporate", "corporate_employee"]).default("individual"),
-  invitationToken: z.string().optional(),
-  companyName: z.string().optional(),
-});
+import { membershipCheckoutSchema } from "@/lib/validations/stripe";
 
 /**
  * POST /api/stripe/membership-checkout
@@ -37,7 +28,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = MembershipCheckoutSchema.safeParse(body);
+    const parsed = membershipCheckoutSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid request body", 400);
@@ -59,7 +50,7 @@ export async function POST(request: Request) {
         .from("corporate_invitations")
         .select("id, status, club_id, corporate_member_id")
         .eq("token", invitationToken)
-        .single();
+        .maybeSingle();
 
       if (!invitation) {
         return jsonError("Invalid invitation token", 404);
@@ -76,7 +67,7 @@ export async function POST(request: Request) {
         .from("club_memberships")
         .select("id, company_name")
         .eq("id", invitation.corporate_member_id)
-        .single();
+        .maybeSingle();
 
       if (!sponsorMembership) {
         return jsonError("Corporate sponsor membership not found", 404);
@@ -91,7 +82,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("id, name, initiation_fee, annual_dues, corporate_initiation_fee, corporate_memberships_enabled")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club) {
       return jsonError("Club not found", 404);
@@ -119,7 +110,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name, stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     let customerId = profile?.stripe_customer_id;
 
@@ -269,7 +260,7 @@ export async function POST(request: Request) {
         .from("corporate_invitations")
         .select("id")
         .eq("token", invitationToken)
-        .single();
+        .maybeSingle();
 
       if (invitation) {
         await admin

@@ -1,8 +1,8 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { z } from "zod";
 import type { Json } from "@/types/supabase";
+import { updateWorkflowSchema } from "@/lib/validations/crm";
 
 // ─── GET /api/admin/crm/workflows/[id] ────────────────────────────
 
@@ -18,7 +18,7 @@ export async function GET(
   const { data: workflow } = await auth.admin.from("crm_workflows")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!workflow) return jsonError("Workflow not found", 404);
 
@@ -44,28 +44,6 @@ export async function GET(
 
 // ─── PATCH /api/admin/crm/workflows/[id] ──────────────────────────
 
-const updateWorkflowSchema = z.object({
-  name: z.string().min(1).max(200).optional(),
-  description: z.string().max(2000).nullable().optional(),
-  trigger_event: z.string().nullable().optional(),
-  segment_id: z.string().uuid().nullable().optional(),
-  // Save entire graph in one call
-  nodes: z.array(z.object({
-    id: z.string().uuid().optional(),
-    type: z.enum(["trigger", "send_email", "delay", "condition", "split", "end"]),
-    label: z.string().max(200),
-    config: z.record(z.string(), z.unknown()),
-    position_x: z.number(),
-    position_y: z.number(),
-  })).optional(),
-  edges: z.array(z.object({
-    id: z.string().uuid().optional(),
-    source_node_id: z.string(),
-    target_node_id: z.string(),
-    source_handle: z.string().default("default"),
-  })).optional(),
-});
-
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -84,7 +62,7 @@ export async function PATCH(
   const { data: existing } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!existing) return jsonError("Workflow not found", 404);
 
@@ -162,7 +140,7 @@ export async function PATCH(
 
   // Return full workflow
   const [wfResult, nodesResult, edgesResult] = await Promise.all([
-    auth.admin.from("crm_workflows").select("*").eq("id", id).single(),
+    auth.admin.from("crm_workflows").select("*").eq("id", id).maybeSingle(),
     auth.admin.from("crm_workflow_nodes").select("*").eq("workflow_id", id),
     auth.admin.from("crm_workflow_edges").select("*").eq("workflow_id", id),
   ]);
@@ -190,7 +168,7 @@ export async function DELETE(
   const { data: existing } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!existing) return jsonError("Workflow not found", 404);
 

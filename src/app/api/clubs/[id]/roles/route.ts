@@ -47,7 +47,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .select("id, user_id, role, status")
       .eq("id", member_id)
       .eq("club_id", clubId)
-      .single();
+      .maybeSingle();
 
     if (memError || !membership) {
       return jsonError("Member not found in this club", 404);
@@ -58,7 +58,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .from("clubs")
       .select("owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (club && membership.user_id === club.owner_id) {
       return jsonError("Cannot change the club owner's role", 400);
@@ -75,7 +75,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       })
       .eq("id", member_id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[club-roles] Update error:", updateError);

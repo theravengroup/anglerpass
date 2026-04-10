@@ -1,17 +1,7 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { z } from "zod";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const SWITCHABLE_ROLES = ["landowner", "club_admin", "angler", "guide"] as const;
-
-const switchRoleSchema = z.object({
-  role: z.enum(SWITCHABLE_ROLES),
-});
-
-const addRoleSchema = z.object({
-  role: z.enum(SWITCHABLE_ROLES),
-});
+import { switchRoleSchema, addRoleSchema } from "@/lib/validations/profile";
 
 // PATCH: Switch active role (must already have this role)
 export async function PATCH(request: Request) {
@@ -39,7 +29,7 @@ export async function PATCH(request: Request) {
       .from("profiles")
       .select("roles")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Profile not found", 404);
@@ -95,7 +85,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("roles")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Profile not found", 404);

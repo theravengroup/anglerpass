@@ -2,30 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth} from "@/lib/api/helpers";
 import { trackConversion } from "@/lib/crm/conversions";
-import { z } from "zod";
-
-const trackSchema = z.object({
-  event_name: z.string().min(1).max(100),
-  category: z
-    .enum([
-      "signup",
-      "booking",
-      "purchase",
-      "upgrade",
-      "referral",
-      "engagement",
-      "retention",
-      "reactivation",
-      "other",
-    ])
-    .optional(),
-  value_cents: z.number().int().min(0).optional(),
-  currency: z.string().length(3).optional(),
-  properties: z.record(z.string(), z.unknown()).optional(),
-  // Allow server-side calls to specify user
-  user_id: z.string().uuid().optional(),
-  email: z.string().email().optional(),
-});
+import { trackConversionSchema } from "@/lib/validations/crm";
 
 /**
  * POST /api/crm/conversions
@@ -58,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const parsed = trackSchema.safeParse(body);
+  const parsed = trackConversionSchema.safeParse(body);
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
   }

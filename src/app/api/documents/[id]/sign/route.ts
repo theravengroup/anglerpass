@@ -33,7 +33,7 @@ export async function POST(
       .select("*, properties(name)")
       .eq("id", templateId)
       .eq("active", true)
-      .single();
+      .maybeSingle();
 
     if (!template) {
       return jsonError("Template not found or inactive", 404);
@@ -44,7 +44,7 @@ export async function POST(
       .from("bookings")
       .select("id, angler_id, booking_date, party_size, property_id")
       .eq("id", result.data.booking_id)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);
@@ -77,7 +77,7 @@ export async function POST(
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const propertyName =
       (template.properties as { name: string } | null)?.name ?? "the property";

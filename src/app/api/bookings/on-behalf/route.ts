@@ -9,7 +9,7 @@ import {
 import { detectCrossClubRouting } from "@/lib/cross-club";
 import { authorize, P, auditBookingAction, AuditAction } from "@/lib/permissions";
 import { toDateString } from "@/lib/utils";
-import { jsonError, jsonCreated, requireAuth} from "@/lib/api/helpers";
+import { jsonError, jsonCreated, requireAuth, isDuplicateError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 /**
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       .select("id, club_id, user_id, status")
       .eq("id", club_membership_id)
       .eq("user_id", angler_id)
-      .single();
+      .maybeSingle();
 
     if (memError || !membership) {
       return jsonError("Invalid club membership for this angler", 400);
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id"
       )
       .eq("id", property_id)
-      .single();
+      .maybeSingle();
 
     if (propError || !property) {
       return jsonError("Property not found", 404);
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
         .from("guide_profiles")
         .select("id, user_id, display_name, status, rate_full_day, rate_half_day, max_anglers")
         .eq("id", guide_id)
-        .single();
+        .maybeSingle();
 
       if (!guideProfile || guideProfile.status !== "approved") {
         return jsonError("Selected guide is not available", 400);
@@ -215,7 +215,7 @@ export async function POST(request: Request) {
         .eq("guide_id", guide_id)
         .eq("property_id", property_id)
         .eq("status", "approved")
-        .single();
+        .maybeSingle();
 
       if (!waterApproval) {
         return jsonError("Selected guide is not approved for this property", 400);
@@ -302,7 +302,7 @@ export async function POST(request: Request) {
       .order("booking_date", { ascending: true });
 
     if (insertError) {
-      if (insertError.code === "23505") {
+      if (isDuplicateError(insertError)) {
         return jsonError("A booking already exists for this property on one of the selected dates", 409);
       }
       console.error("[bookings/on-behalf] Insert error:", insertError);
@@ -324,8 +324,8 @@ export async function POST(request: Request) {
 
     // Get names for notifications
     const [anglerProfile, staffProfile] = await Promise.all([
-      admin.from("profiles").select("display_name").eq("id", angler_id).single(),
-      admin.from("profiles").select("display_name").eq("id", user.id).single(),
+      admin.from("profiles").select("display_name").eq("id", angler_id).maybeSingle(),
+      admin.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
     ]);
 
     const anglerName = anglerProfile.data?.display_name ?? "An angler";

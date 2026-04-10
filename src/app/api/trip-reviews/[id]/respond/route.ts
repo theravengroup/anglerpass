@@ -80,7 +80,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     .select("id")
     .eq("review_id", reviewId)
     .eq("responder_user_id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   if (error || !response) {
     return jsonError("Response not found or you are not the responder", 404);

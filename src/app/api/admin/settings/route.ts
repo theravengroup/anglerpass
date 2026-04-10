@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { z } from "zod";
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import type { Json } from "@/types/supabase";
+import { adminSettingsPatchSchema } from "@/lib/validations/admin";
 
 // ─── GET: Fetch all platform settings ──────────────────────────────
 
@@ -42,18 +42,13 @@ export async function GET() {
 
 // ─── PATCH: Update a single platform setting ───────────────────────
 
-const patchSchema = z.object({
-  key: z.string().min(1, "Key is required"),
-  value: z.unknown().refine((v) => v !== undefined, "Value is required"),
-});
-
 export async function PATCH(request: NextRequest) {
   try {
     const auth = await requireAdmin();
     if (!auth) return jsonError("Forbidden", 403);
 
     const body = await request.json();
-    const parsed = patchSchema.safeParse(body);
+    const parsed = adminSettingsPatchSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
@@ -66,7 +61,7 @@ export async function PATCH(request: NextRequest) {
       .from("platform_settings")
       .select("value")
       .eq("key", key)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existing) {
       console.error("[admin/settings] Setting not found:", key);
@@ -85,7 +80,7 @@ export async function PATCH(request: NextRequest) {
       })
       .eq("key", key)
       .select("key, value, description, updated_at")
-      .single();
+      .maybeSingle();
 
     if (updateError || !updated) {
       console.error("[admin/settings] Failed to update setting:", updateError);

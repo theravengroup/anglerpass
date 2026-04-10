@@ -323,12 +323,12 @@ export async function processSendBatch(
     const { data: step } = await stepsTable
       .select("subject, html_body, cta_label, cta_url")
       .eq("id", send.step_id)
-      .single();
+      .maybeSingle();
 
     const { data: campaign } = await campaignsTable
       .select("from_name, from_email, reply_to")
       .eq("id", send.campaign_id)
-      .single();
+      .maybeSingle();
 
     if (!step || !campaign) {
       await sendsTable

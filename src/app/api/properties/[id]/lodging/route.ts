@@ -53,7 +53,7 @@ export async function PUT(
       .from("properties")
       .select("owner_id")
       .eq("id", propertyId)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -105,7 +105,7 @@ export async function PUT(
         .update(payload)
         .eq("property_id", propertyId)
         .select()
-        .single();
+        .maybeSingle();
       data = result.data;
       error = result.error;
     } else {

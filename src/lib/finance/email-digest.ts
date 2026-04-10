@@ -32,7 +32,7 @@ export async function sendDailyDigest(): Promise<number> {
     .select("*")
     .order("snapshot_date", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!snapshot) return 0;
 

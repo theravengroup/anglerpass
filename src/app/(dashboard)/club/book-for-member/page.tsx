@@ -29,7 +29,7 @@ export default async function BookForMemberPage() {
     .eq('status', 'active')
     .in('role', ['admin', 'staff', 'owner', 'club_admin', 'booking_staff'])
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!membership) {
     return (

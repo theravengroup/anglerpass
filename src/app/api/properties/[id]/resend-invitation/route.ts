@@ -29,7 +29,7 @@ export async function POST(
     .select("id, token, landowner_email, club_id, reminder_count")
     .eq("property_id", propertyId)
     .eq("status", "pending")
-    .single();
+    .maybeSingle();
 
   if (!invitation) {
     return jsonError("No pending invitation found for this property", 404);
@@ -41,8 +41,8 @@ export async function POST(
 
   // Get property and club info
   const [{ data: property }, { data: club }] = await Promise.all([
-    admin.from("properties").select("name").eq("id", propertyId).single(),
-    admin.from("clubs").select("name").eq("id", invitation.club_id).single(),
+    admin.from("properties").select("name").eq("id", propertyId).maybeSingle(),
+    admin.from("clubs").select("name").eq("id", invitation.club_id).maybeSingle(),
   ]);
 
   const propertyName = property?.name ?? "Your property";

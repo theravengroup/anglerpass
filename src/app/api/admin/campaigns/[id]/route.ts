@@ -20,7 +20,7 @@ export async function GET(
   const { data: campaign, error } = await auth.admin.from("campaigns")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error || !campaign) {
     return jsonError("Campaign not found", 404);
@@ -38,7 +38,7 @@ export async function GET(
     const { data: seg } = await auth.admin.from("segments")
       .select("*")
       .eq("id", campaign.segment_id)
-      .single();
+      .maybeSingle();
     segment = seg;
   }
 
@@ -81,7 +81,7 @@ export async function PATCH(
   const { data: existing } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!existing) {
     return jsonError("Campaign not found", 404);
@@ -105,7 +105,7 @@ export async function PATCH(
     })
     .eq("id", id)
     .select("*")
-    .single();
+    .maybeSingle();
 
   if (error) {
     return jsonError(`Failed to update campaign: ${error.message}`, 500);
@@ -132,7 +132,7 @@ export async function DELETE(
   const { data: existing } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!existing) {
     return jsonError("Campaign not found", 404);

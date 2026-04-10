@@ -21,7 +21,7 @@ export async function GET() {
     .from("profiles")
     .select("role, roles")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   const userRoles: string[] = profile?.roles ?? [profile?.role ?? "angler"];
   const usage = await getUsageStatus(auth.user.id, userRoles);

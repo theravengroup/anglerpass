@@ -1,10 +1,6 @@
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
-
-const claimSchema = z.object({
-  token: z.string().uuid("Invalid claim token"),
-});
+import { propertyClaimSchema } from "@/lib/validations/properties";
 
 /**
  * POST /api/properties/claim
@@ -16,7 +12,7 @@ export async function POST(request: Request) {
   if (!auth) return jsonError("Unauthorized", 401);
 
   const body = await request.json();
-  const result = claimSchema.safeParse(body);
+  const result = propertyClaimSchema.safeParse(body);
   if (!result.success) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
@@ -28,7 +24,7 @@ export async function POST(request: Request) {
     .from("property_claim_invitations")
     .select("id, property_id, club_id, status")
     .eq("token", result.data.token)
-    .single();
+    .maybeSingle();
 
   if (!invitation) {
     return jsonError("Invalid or expired invitation", 404);
@@ -43,7 +39,7 @@ export async function POST(request: Request) {
     .from("properties")
     .select("id, name, owner_id")
     .eq("id", invitation.property_id)
-    .single();
+    .maybeSingle();
 
   if (!property) {
     return jsonError("Property not found", 404);
@@ -79,7 +75,7 @@ export async function POST(request: Request) {
     .from("profiles")
     .select("id, role, roles")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   if (profile) {
     const roles = (profile.roles as string[]) ?? [];
@@ -118,7 +114,7 @@ export async function GET(request: Request) {
     .from("property_claim_invitations")
     .select("id, property_id, club_id, status, landowner_email")
     .eq("token", token)
-    .single();
+    .maybeSingle();
 
   if (!invitation) {
     return jsonError("Invalid or expired invitation", 404);
@@ -130,12 +126,12 @@ export async function GET(request: Request) {
       .from("properties")
       .select("id, name, location_description, photos, water_type")
       .eq("id", invitation.property_id)
-      .single(),
+      .maybeSingle(),
     admin
       .from("clubs")
       .select("id, name")
       .eq("id", invitation.club_id)
-      .single(),
+      .maybeSingle(),
   ]);
 
   return jsonOk({

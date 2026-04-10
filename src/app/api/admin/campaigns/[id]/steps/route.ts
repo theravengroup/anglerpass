@@ -46,7 +46,7 @@ export async function POST(
   const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 

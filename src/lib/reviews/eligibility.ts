@@ -57,7 +57,7 @@ export async function checkReviewEligibility(
       "id, property_id, angler_id, status, booking_date, booking_end_date, cancellation_fault"
     )
     .eq("id", bookingId)
-    .single();
+    .maybeSingle();
 
   if (bookingError || !booking) {
     return {
@@ -165,7 +165,7 @@ export async function requestExtension(
       "id, angler_user_id, extension_requested, review_window_expires_at, status"
     )
     .eq("id", reviewId)
-    .single();
+    .maybeSingle();
 
   if (error || !review) {
     return { success: false, error: "Review not found" };

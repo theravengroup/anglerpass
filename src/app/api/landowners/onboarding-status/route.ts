@@ -44,7 +44,7 @@ export async function GET() {
         .from("profiles")
         .select("stripe_connect_account_id, stripe_connect_onboarded")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const hasPayoutSetup = !!(
         profile?.stripe_connect_account_id &&
@@ -106,7 +106,7 @@ export async function GET() {
       .from("properties")
       .select("rate_adult_full_day, max_rods, max_guests")
       .eq("id", draftProperty.id)
-      .single();
+      .maybeSingle();
 
     const hasPricing = !!(propertyDetail?.rate_adult_full_day && propertyDetail.rate_adult_full_day > 0);
     const hasCapacity = !!(propertyDetail?.max_rods && propertyDetail.max_rods > 0);

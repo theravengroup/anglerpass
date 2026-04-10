@@ -103,3 +103,69 @@ export const referralInviteSchema = z.object({
 });
 
 export type ReferralInviteData = z.infer<typeof referralInviteSchema>;
+
+// ─── Club Join Request ────────────────────────────────────────────
+export const clubJoinSchema = z.object({
+  club_id: z.uuid(),
+  referral_code: z.string().max(20).optional(),
+  application_note: z.string().max(2000).optional(),
+});
+
+export type ClubJoinInput = z.infer<typeof clubJoinSchema>;
+
+// ─── Club Invite (Landowner → Club) ──────────────────────────────
+export const clubInviteSchema = z.object({
+  property_id: z.uuid(),
+  club_name: z.string().min(1, "Club name is required").max(200),
+  admin_email: z.email("Valid email is required"),
+});
+
+export type ClubInviteInput = z.infer<typeof clubInviteSchema>;
+
+// ─── Corporate Join ───────────────────────────────────────────────
+export const corporateJoinSchema = z.object({
+  company_name: z.string().min(1, "Company name is required").max(300),
+  job_title: z.string().max(200).optional(),
+});
+
+export type CorporateJoinInput = z.infer<typeof corporateJoinSchema>;
+
+// ─── Corporate Employee Join ──────────────────────────────────────
+export const corporateEmployeeJoinSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+});
+
+export type CorporateEmployeeJoinInput = z.infer<typeof corporateEmployeeJoinSchema>;
+
+// ─── Staff Notes ──────────────────────────────────────────────────
+
+export const VALID_NOTE_ENTITY_TYPES = ["member", "property", "landowner"] as const;
+
+export const createStaffNoteSchema = z.object({
+  entity_type: z.enum(VALID_NOTE_ENTITY_TYPES),
+  entity_id: z.string().uuid(),
+  body: z.string().min(1).max(5000),
+});
+
+export type CreateStaffNoteInput = z.infer<typeof createStaffNoteSchema>;
+
+// ─── Bulk Member Invite ───────────────────────────────────────────
+
+export const MAX_BULK_INVITE_EMAILS = 200;
+
+export const bulkMemberInviteSchema = z.object({
+  emails: z
+    .array(z.email("Invalid email address"))
+    .min(1, "At least one email is required")
+    .max(MAX_BULK_INVITE_EMAILS, `Maximum ${MAX_BULK_INVITE_EMAILS} emails per request`),
+});
+
+export type BulkMemberInviteInput = z.infer<typeof bulkMemberInviteSchema>;
+
+// ─── Application Review ──────────────────────────────────────────
+export const applicationReviewSchema = z.object({
+  action: z.enum(["approve", "decline"]),
+  declined_reason: z.string().max(500).optional(),
+});
+
+export type ApplicationReviewInput = z.infer<typeof applicationReviewSchema>;

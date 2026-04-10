@@ -3,7 +3,7 @@ import "server-only";
 import { NextRequest } from "next/server";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { z } from "zod";
+import { updatePreferencesSchema } from "@/lib/validations/crm";
 
 // ─── GET /api/crm/preferences ─────────────────────────────────────
 // Returns the current user's topic subscription preferences.
@@ -55,21 +55,12 @@ export async function GET() {
 // Update topic subscription preferences.
 // Body: { subscriptions: [{ topic_id, subscribed }] }
 
-const updatePrefsSchema = z.object({
-  subscriptions: z.array(
-    z.object({
-      topic_id: z.string().uuid(),
-      subscribed: z.boolean(),
-    })
-  ),
-});
-
 export async function PATCH(req: NextRequest) {
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const body = await req.json();
-  const result = updatePrefsSchema.safeParse(body);
+  const result = updatePreferencesSchema.safeParse(body);
   if (!result.success) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }

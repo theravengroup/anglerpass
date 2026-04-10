@@ -1,28 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAdmin } from "@/lib/api/helpers";
 import {
-  adminGuideReviewSchema,
-  GUIDE_STATUSES,
-} from "@/lib/validations/guides";
-import {
   notifyGuideProfileApproved,
   notifyGuideProfileRejected,
 } from "@/lib/notifications";
-import { z } from "zod";
-
-// ─── Query Params Validation ───────────────────────────────────────
-
-const guideListQuerySchema = z.object({
-  status: z.enum(GUIDE_STATUSES).optional(),
-});
-
-// ─── PATCH Body Validation ─────────────────────────────────────────
-
-const adminGuidePatchSchema = z.object({
-  guide_id: z.uuid("guide_id must be a valid UUID"),
-  action: adminGuideReviewSchema.shape.action,
-  reason: adminGuideReviewSchema.shape.reason,
-});
+import { guideListQuerySchema, adminGuidePatchSchema } from "@/lib/validations/admin";
+import { GUIDE_STATUSES } from "@/lib/validations/guides";
 
 // ─── Guide Profile Update Shape ────────────────────────────────────
 
@@ -133,7 +116,7 @@ export async function PATCH(request: Request) {
       .from("guide_profiles")
       .select("id, user_id, status")
       .eq("id", guide_id)
-      .single();
+      .maybeSingle();
 
     if (!guideProfile) {
       return jsonError("Guide profile not found", 404);
@@ -173,7 +156,7 @@ export async function PATCH(request: Request) {
       .update(updates)
       .eq("id", guide_id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[admin/guides] Update error:", updateError);

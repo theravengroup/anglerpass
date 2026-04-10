@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       .from("bookings")
       .select("id, angler_id, guide_id, booking_date, guide_profiles(user_id)")
       .eq("id", result.data.booking_id)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);

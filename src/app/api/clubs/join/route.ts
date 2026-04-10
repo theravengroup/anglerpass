@@ -1,14 +1,8 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/types/supabase";
-import { z } from "zod";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const joinSchema = z.object({
-  club_id: z.uuid(),
-  referral_code: z.string().max(20).optional(),
-  application_note: z.string().max(2000).optional(),
-});
+import { clubJoinSchema } from "@/lib/validations/clubs";
 
 // POST: Request to join a club
 export async function POST(request: Request) {
@@ -23,7 +17,7 @@ export async function POST(request: Request) {
     const { user } = auth;
 
     const body = await request.json();
-    const parsed = joinSchema.safeParse(body);
+    const parsed = clubJoinSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid club ID", 400);
@@ -37,7 +31,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("id, name, membership_application_required")
       .eq("id", club_id)
-      .single();
+      .maybeSingle();
 
     if (!club) {
       return jsonError("Club not found", 404);
@@ -198,7 +192,7 @@ export async function POST(request: Request) {
           .from("clubs")
           .select("referral_program_enabled, referral_reward")
           .eq("id", club_id)
-          .single();
+          .maybeSingle();
 
         const settings = clubSettings as {
           referral_program_enabled: boolean;

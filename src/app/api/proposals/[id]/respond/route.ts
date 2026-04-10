@@ -44,7 +44,7 @@ export async function POST(
       .select("*")
       .eq("proposal_id", proposalId)
       .eq("angler_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (inviteeError || !invitee) {
       return jsonError("You are not invited to this proposal", 404);
@@ -67,7 +67,7 @@ export async function POST(
       `
       )
       .eq("id", proposalId)
-      .single();
+      .maybeSingle();
 
     if (proposalError || !proposal) {
       return jsonError("Proposal not found", 404);
@@ -236,7 +236,7 @@ export async function POST(
         .from("profiles")
         .select("display_name, stripe_customer_id")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const anglerName = anglerProfile?.display_name ?? "An angler";
 
@@ -334,7 +334,7 @@ export async function POST(
         .from("profiles")
         .select("display_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const anglerName = anglerProfile?.display_name ?? "An angler";
 

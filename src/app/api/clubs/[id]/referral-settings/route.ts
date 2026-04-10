@@ -22,7 +22,7 @@ export async function GET(
       .from("clubs")
       .select("id, owner_id, referral_program_enabled, referral_reward, initiation_fee")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (clubErr || !club) {
       return jsonError("Club not found", 404);
@@ -91,7 +91,7 @@ export async function PATCH(
       .from("clubs")
       .select("id, owner_id, initiation_fee")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (clubErr || !club) {
       return jsonError("Club not found", 404);

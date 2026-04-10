@@ -13,7 +13,7 @@ async function getClub(clubId: string) {
         "id, name, description, location, initiation_fee, annual_dues, membership_application_required, corporate_memberships_enabled"
       )
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
     return data;
@@ -46,7 +46,7 @@ async function getReferrer(clubId: string, referralCode: string) {
       .from("profiles")
       .select("display_name")
       .eq("id", membership.user_id)
-      .single();
+      .maybeSingle();
 
     return {
       name: profile?.display_name ?? "A member",

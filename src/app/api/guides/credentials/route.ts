@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       .from("guide_profiles")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!guideProfile) {
       return jsonError("Guide profile not found. Create a profile first.", 404);

@@ -1,15 +1,6 @@
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
-import { z } from "zod";
 import type { Json } from "@/types/supabase";
-
-const updateClubSchema = z.object({
-  name: z.string().min(1).max(200).optional(),
-  description: z.string().max(2000).nullable().optional(),
-  location: z.string().max(500).nullable().optional(),
-  rules: z.string().max(5000).nullable().optional(),
-  website: z.string().url().max(500).nullable().optional(),
-  subscription_tier: z.enum(["starter", "standard", "pro"]).optional(),
-});
+import { adminClubUpdateSchema } from "@/lib/validations/admin";
 
 // ─── GET: Single club with members and properties ────────────────────
 
@@ -29,7 +20,7 @@ export async function GET(
       .from("clubs")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (clubError || !club) {
       return jsonError("Club not found", 404);
@@ -43,7 +34,7 @@ export async function GET(
       .from("profiles")
       .select("display_name")
       .eq("id", club.owner_id)
-      .single();
+      .maybeSingle();
 
     ownerName = ownerProfile?.display_name ?? null;
 
@@ -187,7 +178,7 @@ export async function PATCH(
 
     // Parse and validate body
     const body = await request.json();
-    const parsed = updateClubSchema.safeParse(body);
+    const parsed = adminClubUpdateSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError(parsed.error.issues[0]?.message ?? "Invalid input", 400);
@@ -204,7 +195,7 @@ export async function PATCH(
       .from("clubs")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existing) {
       return jsonError("Club not found", 404);
@@ -222,7 +213,7 @@ export async function PATCH(
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[admin/clubs] Update error:", updateError);

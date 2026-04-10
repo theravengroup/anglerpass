@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       .from("properties")
       .select("id, owner_id, photos")
       .eq("id", propertyId)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

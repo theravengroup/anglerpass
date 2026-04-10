@@ -15,7 +15,7 @@ async function getInvitation(token: string) {
         "id, email, status, token, club_id, corporate_member_id, invited_at, accepted_at"
       )
       .eq("token", token)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
     return data;
@@ -31,7 +31,7 @@ async function getClub(clubId: string) {
       .from("clubs")
       .select("id, name, description, location, annual_dues, stripe_dues_price_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
     return data;
@@ -49,7 +49,7 @@ async function getCorporateMember(
       .from("club_memberships")
       .select("company_name, user_id")
       .eq("id", membershipId)
-      .single();
+      .maybeSingle();
 
     if (error || !membership) return null;
 
@@ -59,7 +59,7 @@ async function getCorporateMember(
         .from("profiles")
         .select("display_name")
         .eq("id", membership.user_id)
-        .single();
+        .maybeSingle();
 
       sponsorName = profile?.display_name ?? null;
 

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         .from("guide_profiles")
         .select("id")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (!guideProfile) {
         return jsonError("Guide profile not found", 404);
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       .from("guide_profiles")
       .select("id, display_name, status")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!guideProfile || guideProfile.status !== "approved") {
       return jsonError("You must be an approved guide to create proposals", 403);
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
           .eq("guide_id", guideProfile.id)
           .eq("property_id", data.property_id)
           .eq("status", "approved")
-          .single();
+          .maybeSingle();
 
         if (!waterApproval) {
           return jsonError("You are not approved to guide on this property", 403);
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
       .eq("guide_id", guideProfile.id)
       .eq("property_id", data.property_id)
       .eq("status", "approved")
-      .single();
+      .maybeSingle();
 
     if (!waterApproval) {
       return jsonError("You are not approved to guide on this property", 403);
@@ -256,7 +256,7 @@ export async function POST(request: Request) {
       .from("properties")
       .select("name")
       .eq("id", data.property_id)
-      .single();
+      .maybeSingle();
 
     const propertyName = property?.name ?? "a property";
 

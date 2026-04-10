@@ -23,7 +23,7 @@ export async function GET() {
       .from("profiles")
       .select("stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.stripe_customer_id) {
       return jsonOk({ cards: [], bankAccounts: [] });
@@ -107,7 +107,7 @@ export async function PUT(request: NextRequest) {
       .from("profiles")
       .select("stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.stripe_customer_id) {
       return jsonError("No Stripe customer found", 404);

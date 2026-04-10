@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         .from("guide_profiles")
         .select("id")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (!profile) {
         return jsonError("Guide profile not found", 404);
@@ -83,7 +83,7 @@ export async function PUT(request: Request) {
       .from("guide_profiles")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return jsonError("Guide profile not found", 404);

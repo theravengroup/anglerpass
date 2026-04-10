@@ -32,7 +32,7 @@ export async function getProfile(): Promise<UserProfile | null> {
         roles: string[] | null;
       }[]
     >()
-    .single();
+    .maybeSingle();
 
   if (profile) {
     return {

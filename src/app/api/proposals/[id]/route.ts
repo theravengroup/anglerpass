@@ -38,7 +38,7 @@ export async function GET(
       `
       )
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !proposal) {
       return jsonError("Proposal not found", 404);
@@ -140,7 +140,7 @@ export async function PATCH(
       .from("guide_profiles")
       .select("id, display_name")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!guideProfile) {
       return jsonError("Guide profile not found", 404);
@@ -151,7 +151,7 @@ export async function PATCH(
       .select("*")
       .eq("id", id)
       .eq("guide_id", guideProfile.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !proposal) {
       return jsonError("Proposal not found or you do not own it", 404);
@@ -245,7 +245,7 @@ export async function PATCH(
         })
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         console.error("[proposals] Send update error:", updateError);
@@ -257,7 +257,7 @@ export async function PATCH(
         .from("properties")
         .select("name")
         .eq("id", proposal.property_id)
-        .single();
+        .maybeSingle();
 
       const propertyName = property?.name ?? "a property";
 
@@ -291,7 +291,7 @@ export async function PATCH(
         })
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         console.error("[proposals] Cancel update error:", updateError);

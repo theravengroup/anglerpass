@@ -25,7 +25,7 @@ export default async function ClubStaffPage() {
     .eq('user_id', user.id)
     .eq('status', 'active')
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!membership) redirect('/club');
 
@@ -34,7 +34,7 @@ export default async function ClubStaffPage() {
     .from('clubs')
     .select('owner_id')
     .eq('id', membership.club_id)
-    .single();
+    .maybeSingle();
 
   const isOwner = club?.owner_id === user.id;
 

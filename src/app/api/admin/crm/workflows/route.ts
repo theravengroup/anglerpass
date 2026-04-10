@@ -1,8 +1,8 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
-import { z } from "zod";
 import type { Json } from "@/types/supabase";
+import { createWorkflowSchema } from "@/lib/validations/crm";
 
 // ─── GET /api/admin/crm/workflows ─────────────────────────────────
 
@@ -37,13 +37,6 @@ export async function GET() {
 }
 
 // ─── POST /api/admin/crm/workflows ────────────────────────────────
-
-const createWorkflowSchema = z.object({
-  name: z.string().min(1).max(200),
-  description: z.string().max(2000).optional(),
-  trigger_event: z.string().optional(),
-  segment_id: z.string().uuid().optional(),
-});
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();

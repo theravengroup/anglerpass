@@ -144,7 +144,7 @@ export async function refreshSegmentCache(
   const { data: segment } = await segments
     .select("id, rules")
     .eq("id", segmentId)
-    .single();
+    .maybeSingle();
 
   if (!segment) {
     throw new Error(`Segment not found: ${segmentId}`);
@@ -178,7 +178,7 @@ export async function userMatchesSegment(
     const { data: segment } = await admin.from("segments")
       .select("rules")
       .eq("id", segmentOrId)
-      .single();
+      .maybeSingle();
 
     if (!segment) return false;
     rules = (segment as Record<string, unknown>).rules as SegmentRuleGroup[];

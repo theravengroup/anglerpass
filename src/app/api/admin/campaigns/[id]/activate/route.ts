@@ -30,7 +30,7 @@ export async function POST(
   const { data: campaign } = await campaigns
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!campaign) return jsonError("Campaign not found", 404);
 
@@ -98,7 +98,7 @@ async function enrollBroadcastRecipients(
   const { data: segment } = await admin.from("segments")
     .select("rules")
     .eq("id", segmentId)
-    .single();
+    .maybeSingle();
 
   if (!segment) return 0;
 
@@ -113,7 +113,7 @@ async function enrollBroadcastRecipients(
     .eq("campaign_id", campaignId)
     .order("step_order", { ascending: true })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!firstStep) return 0;
 

@@ -30,7 +30,7 @@ export async function POST(
       .from("clubs")
       .select("id, name, referral_program_enabled, referral_reward")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (clubErr || !club) {
       return jsonError("Club not found", 404);
@@ -54,7 +54,7 @@ export async function POST(
       .eq("club_id", clubId)
       .eq("user_id", user.id)
       .eq("status", "active")
-      .single();
+      .maybeSingle();
 
     if (memErr || !membership) {
       return jsonError("You must be an active member of this club to send referrals", 403);
@@ -103,7 +103,7 @@ export async function POST(
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const referrerName = profile?.display_name ?? "A member";
 
@@ -187,7 +187,7 @@ export async function GET(
       .eq("club_id", clubId)
       .eq("user_id", user.id)
       .eq("status", "active")
-      .single();
+      .maybeSingle();
 
     if (memErr || !membership) {
       return jsonError("Not an active member", 403);

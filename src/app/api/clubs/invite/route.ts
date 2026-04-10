@@ -1,15 +1,9 @@
 import { jsonCreated, jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { SITE_URL } from "@/lib/constants";
 import { getResend } from "@/lib/email";
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const inviteSchema = z.object({
-  property_id: z.uuid(),
-  club_name: z.string().min(1, "Club name is required").max(200),
-  admin_email: z.email("Valid email is required"),
-});
+import { clubInviteSchema } from "@/lib/validations/clubs";
 
 export async function POST(request: Request) {
   const limited = rateLimit("clubs-invite", getClientIp(request), 10, 60_000);
@@ -23,7 +17,7 @@ export async function POST(request: Request) {
     const { user } = auth;
 
     const body = await request.json();
-    const result = inviteSchema.safeParse(body);
+    const result = clubInviteSchema.safeParse(body);
 
     if (!result.success) {
       return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
@@ -37,7 +31,7 @@ export async function POST(request: Request) {
       .from("properties")
       .select("id, name, owner_id")
       .eq("id", property_id)
-      .single();
+      .maybeSingle();
 
     if (propError || !property) {
       return jsonError("Property not found", 404);
@@ -67,7 +61,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const inviterName = profile?.display_name ?? user.email ?? "A landowner";
 
@@ -179,7 +173,7 @@ export async function GET(request: Request) {
       .from("properties")
       .select("owner_id")
       .eq("id", propertyId)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

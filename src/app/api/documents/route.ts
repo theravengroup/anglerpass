@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       .from("properties")
       .select("owner_id")
       .eq("id", propertyId)
-      .single();
+      .maybeSingle();
 
     const isOwner = property?.owner_id === user.id;
 
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       .from("properties")
       .select("owner_id")
       .eq("id", property_id)
-      .single();
+      .maybeSingle();
 
     if (!property || property.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

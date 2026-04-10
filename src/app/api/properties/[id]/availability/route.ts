@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { bulkAvailabilitySchema } from "@/lib/validations/properties";
 
 /**
  * GET /api/properties/[id]/availability?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
@@ -65,15 +65,6 @@ export async function GET(
  * Bulk set dates as blocked, maintenance, or available.
  * Only property owners and club admins/managers can manage availability.
  */
-const bulkAvailabilitySchema = z.object({
-  dates: z
-    .array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/))
-    .min(1, "At least one date required")
-    .max(365, "Cannot update more than 365 dates at once"),
-  status: z.enum(["blocked", "available", "maintenance"]),
-  reason: z.string().max(200).optional(),
-});
-
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -97,7 +88,7 @@ export async function PUT(
     .from("properties")
     .select("id, owner_id")
     .eq("id", propertyId)
-    .single();
+    .maybeSingle();
 
   if (!property) return jsonError("Property not found", 404);
 

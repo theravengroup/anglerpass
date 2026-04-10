@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendCrmEmail } from "@/lib/crm/email-sender";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
-import { z } from "zod";
+import { crmSendSchema } from "@/lib/validations/crm";
 
 // ─── POST /api/crm/send ───────────────────────────────────────────
 // API-triggered email send. Used by server code to send one-off or
@@ -12,39 +12,6 @@ import { z } from "zod";
 // template rendering, subscription checks, and frequency caps.
 //
 // Auth: Requires CRON_SECRET or internal service key.
-
-const sendSchema = z.object({
-  // Recipient — one of these required
-  to: z.string().email().optional(),
-  user_id: z.string().uuid().optional(),
-
-  // Content
-  subject: z.string().min(1).max(500),
-  html_body: z.string().min(1).max(200_000),
-  from_name: z.string().max(100).default("AnglerPass"),
-  from_email: z.string().email().default("hello@anglerpass.com"),
-  reply_to: z.string().email().optional(),
-
-  // Optional: link to a campaign for tracking
-  campaign_id: z.string().uuid().optional(),
-  step_id: z.string().uuid().optional(),
-
-  // Template data for Liquid rendering
-  data: z.record(z.string(), z.unknown()).optional(),
-
-  // Topic slug for subscription checking
-  topic_slug: z.string().optional(),
-
-  // CTA
-  cta_label: z.string().max(100).optional(),
-  cta_url: z.string().max(2000).optional(),
-
-  // Skip pre-send checks (for transactional emails)
-  skip_checks: z.boolean().default(false),
-}).refine(
-  (d) => d.to || d.user_id,
-  { message: "Either 'to' (email) or 'user_id' is required" }
-);
 
 export async function POST(req: NextRequest) {
   // Auth: service-to-service via CRON_SECRET or admin session
@@ -67,7 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const result = sendSchema.safeParse(body);
+  const result = crmSendSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
       { error: result.error.issues[0]?.message ?? "Invalid input" },

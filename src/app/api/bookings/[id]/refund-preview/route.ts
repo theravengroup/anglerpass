@@ -24,7 +24,7 @@ export async function GET(
       .from("bookings")
       .select("id, status, angler_id, booking_date, total_amount")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);

@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("id, owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -91,7 +91,7 @@ export async function DELETE(request: Request) {
       .from("clubs")
       .select("id, owner_id, logo_url")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);

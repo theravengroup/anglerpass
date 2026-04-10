@@ -22,7 +22,7 @@ export async function PATCH(
       .from("clubs")
       .select("owner_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!club || club.owner_id !== user.id) {
       return jsonError("Forbidden", 403);
@@ -34,7 +34,7 @@ export async function PATCH(
       .select("id, status")
       .eq("id", accessId)
       .eq("club_id", id)
-      .single();
+      .maybeSingle();
 
     if (!access) {
       return jsonError("Property association not found", 404);
@@ -61,7 +61,7 @@ export async function PATCH(
       .update(updates)
       .eq("id", accessId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[clubs/properties] Update error:", updateError);

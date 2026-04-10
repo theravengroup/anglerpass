@@ -119,7 +119,7 @@ export async function DELETE(request: Request) {
       .from("profiles")
       .select("id, role, display_name")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (!target) return jsonError("User not found", 404);
 
@@ -184,7 +184,7 @@ export async function PATCH(request: Request) {
       .from("profiles")
       .select("id, role, display_name, suspended_at")
       .eq("id", user_id)
-      .single();
+      .maybeSingle();
 
     if (!target) return jsonError("User not found", 404);
 

@@ -1,12 +1,8 @@
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createTransfer } from "@/lib/stripe/server";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
-
-const PayoutSchema = z.object({
-  bookingId: z.string().uuid(),
-});
+import { payoutSchema } from "@/lib/validations/stripe";
 
 /**
  * POST /api/stripe/payout
@@ -26,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = PayoutSchema.safeParse(body);
+    const parsed = payoutSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid request body", 400);
@@ -53,7 +49,7 @@ export async function POST(request: Request) {
         club_membership_id
       `)
       .eq("id", bookingId)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);
@@ -68,7 +64,7 @@ export async function POST(request: Request) {
       .from("properties")
       .select("id, owner_id, rate_adult_full_day, rate_adult_half_day")
       .eq("id", booking.property_id)
-      .single();
+      .maybeSingle();
 
     if (!property) {
       return jsonError("Property not found", 404);
@@ -78,7 +74,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("role")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     const isOwner = property.owner_id === auth.user.id;
     const isAdmin = profile?.role === "admin";
@@ -93,7 +89,7 @@ export async function POST(request: Request) {
       .select("club_id")
       .eq("property_id", booking.property_id)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const propertyClubId = clubProperty?.club_id ?? null;
 
@@ -109,7 +105,7 @@ export async function POST(request: Request) {
         .from("club_memberships")
         .select("club_id")
         .eq("id", booking.club_membership_id)
-        .single();
+        .maybeSingle();
 
       if (membership && membership.club_id !== propertyClubId) {
         isCrossClub = true;
@@ -123,7 +119,7 @@ export async function POST(request: Request) {
         .from("guide_profiles")
         .select("rate_full_day, rate_half_day")
         .eq("user_id", booking.guide_id)
-        .single();
+        .maybeSingle();
 
       if (guideProfile) {
         guideRate = booking.duration === "half_day"
@@ -157,7 +153,7 @@ export async function POST(request: Request) {
         .from("profiles")
         .select("stripe_connect_account_id")
         .eq("id", property.owner_id)
-        .single();
+        .maybeSingle();
 
       if (ownerProfile?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.landownerPayout * 100);
@@ -184,7 +180,7 @@ export async function POST(request: Request) {
         .from("clubs")
         .select("stripe_connect_account_id")
         .eq("id", propertyClubId)
-        .single();
+        .maybeSingle();
 
       if (club?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.clubCommission * 100);
@@ -211,14 +207,14 @@ export async function POST(request: Request) {
         .from("club_memberships")
         .select("club_id")
         .eq("id", booking.club_membership_id)
-        .single();
+        .maybeSingle();
 
       if (membership?.club_id) {
         const { data: homeClub } = await admin
           .from("clubs")
           .select("stripe_connect_account_id")
           .eq("id", membership.club_id)
-          .single();
+          .maybeSingle();
 
         if (homeClub?.stripe_connect_account_id) {
           const amountCents = Math.round(fees.homeClubReferral * 100);
@@ -246,7 +242,7 @@ export async function POST(request: Request) {
         .from("guide_profiles")
         .select("stripe_connect_account_id")
         .eq("user_id", booking.guide_id)
-        .single();
+        .maybeSingle();
 
       if (guideProfile?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.guidePayout * 100);

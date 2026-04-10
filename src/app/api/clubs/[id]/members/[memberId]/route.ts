@@ -18,7 +18,7 @@ async function verifyClubManager(
     .from("clubs")
     .select("owner_id, name")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
 
@@ -65,7 +65,7 @@ export async function PATCH(
       .select("id, user_id, status, role")
       .eq("id", memberId)
       .eq("club_id", id)
-      .single();
+      .maybeSingle();
 
     if (!membership) {
       return jsonError("Membership not found", 404);
@@ -108,7 +108,7 @@ export async function PATCH(
       .update(updates)
       .eq("id", memberId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[clubs/members] Update error:", updateError);
@@ -185,7 +185,7 @@ export async function DELETE(
       .select("role")
       .eq("id", memberId)
       .eq("club_id", id)
-      .single();
+      .maybeSingle();
 
     if (!membership) {
       return jsonError("Membership not found", 404);

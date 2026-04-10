@@ -118,7 +118,7 @@ export async function markPayoutPaid(
     .from("finance_stripe_payouts")
     .select("id")
     .eq("stripe_payout_id", payoutId)
-    .single();
+    .maybeSingle();
 
   if (updated) {
     await attemptPayoutMatch((updated as { id: string }).id);

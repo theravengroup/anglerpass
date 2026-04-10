@@ -1,9 +1,5 @@
-import { z } from "zod";
 import { jsonOk, jsonError } from "@/lib/api/helpers";
-
-const verifyTurnstileSchema = z.object({
-  token: z.string().min(1, "Turnstile token is required"),
-});
+import { verifyTurnstileSchema } from "@/lib/validations/auth";
 
 interface TurnstileVerifyResponse {
   success: boolean;

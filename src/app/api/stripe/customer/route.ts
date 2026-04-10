@@ -18,7 +18,7 @@ export async function POST() {
       .from("profiles")
       .select("display_name, stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     if (profile?.stripe_customer_id) {
       return jsonOk({ customerId: profile.stripe_customer_id });

@@ -1,14 +1,8 @@
 import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { getResend } from "@/lib/email";
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
-
-const inviteSchema = z.object({
-  club_name: z.string().min(1, "Club name is required").max(200),
-  admin_email: z.email("Valid email is required"),
-  admin_name: z.string().max(200).optional(),
-});
+import { anglerClubInviteSchema } from "@/lib/validations/angler";
 
 export async function POST(request: Request) {
   const limited = rateLimit("angler-invite-club", getClientIp(request), 5, 60_000);
@@ -22,7 +16,7 @@ export async function POST(request: Request) {
     const { user } = auth;
 
     const body = await request.json();
-    const result = inviteSchema.safeParse(body);
+    const result = anglerClubInviteSchema.safeParse(body);
 
     if (!result.success) {
       return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
@@ -51,7 +45,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const anglerName = profile?.display_name ?? "One of your members";
 

@@ -55,7 +55,7 @@ export async function requireAdmin() {
     .from("profiles")
     .select("role")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   if (error || !profile || profile.role !== "admin") return null;
 
@@ -125,6 +125,16 @@ export function escapeIlike(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
 }
 
+// ─── Error Classification ──────────────────────────────────────────
+
+/**
+ * Check if a Supabase/Postgres error is a unique constraint violation (code 23505).
+ * Useful for gracefully handling duplicate insert attempts.
+ */
+export function isDuplicateError(error: { code?: string } | null): boolean {
+  return error?.code === "23505";
+}
+
 // ─── Permission-Based Helpers ───────────────────────────────────────
 
 /**
@@ -166,8 +176,7 @@ export async function requireClubRole(
   // Check authorization
   const authResult = await authorize({ permission, userId, clubId });
 
-  // Get membership info — .single() returns error when no row matches,
-  // so membership may be null even without a thrown exception.
+  // Get membership info — .maybeSingle() returns null when no row matches.
   const { data: membership } = await admin
     .from("club_memberships")
     .select("id, role, status")

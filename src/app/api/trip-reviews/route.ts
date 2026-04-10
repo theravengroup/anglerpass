@@ -4,6 +4,7 @@ import {
   jsonCreated,
   jsonError,
   requireAuth,
+  isDuplicateError,
 } from "@/lib/api/helpers";
 import { tripReviewCreateSchema } from "@/lib/validations/reviews";
 import {
@@ -219,7 +220,7 @@ export async function POST(request: Request) {
 
   if (insertError) {
     // Unique constraint violation on booking_id
-    if (insertError.code === "23505") {
+    if (isDuplicateError(insertError)) {
       return jsonError("A review already exists for this booking", 409);
     }
     console.error("[trip-reviews] Insert error:", insertError);

@@ -1,4 +1,4 @@
-import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonCreated, jsonError, jsonOk, requireAuth, isDuplicateError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { bookingSchema } from "@/lib/validations/bookings";
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id"
       )
       .eq("id", property_id)
-      .single();
+      .maybeSingle();
 
     if (propError || !property) {
       return jsonError("Property not found", 404);
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       .select("id, club_id, status")
       .eq("id", club_membership_id)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (memError || !membership) {
       return jsonError("Invalid club membership", 400);
@@ -247,7 +247,7 @@ export async function POST(request: Request) {
         .from("guide_profiles")
         .select("id, user_id, display_name, status, rate_full_day, rate_half_day, max_anglers")
         .eq("id", guide_id)
-        .single();
+        .maybeSingle();
 
       if (!guideProfile || guideProfile.status !== "approved") {
         return jsonError("Selected guide is not available", 400);
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
         .eq("guide_id", guide_id)
         .eq("property_id", property_id)
         .eq("status", "approved")
-        .single();
+        .maybeSingle();
 
       if (!waterApproval) {
         return jsonError("Selected guide is not approved for this property", 400);
@@ -353,7 +353,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       // Check for unique constraint violation (double booking)
-      if (insertError.code === "23505") {
+      if (isDuplicateError(insertError)) {
         return jsonError("A booking already exists for this property on one of the selected dates", 409);
       }
       console.error("[bookings] Insert error:", insertError);
@@ -379,7 +379,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const anglerName = anglerProfile?.display_name ?? "An angler";
 

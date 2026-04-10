@@ -27,7 +27,7 @@ export async function validateFlaggingRights(
     .from("trip_reviews")
     .select("id, property_id, status")
     .eq("id", reviewId)
-    .single();
+    .maybeSingle();
 
   if (reviewError || !review) {
     return { authorized: false, error: "Review not found" };
@@ -38,7 +38,7 @@ export async function validateFlaggingRights(
     .from("properties")
     .select("id, owner_id")
     .eq("id", review.property_id)
-    .single();
+    .maybeSingle();
 
   if (property?.owner_id === userId) {
     return { authorized: true, role: "landowner" };

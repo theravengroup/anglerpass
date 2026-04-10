@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("roles")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const currentRoles: string[] = userProfile?.roles ?? [];
     if (!currentRoles.includes("guide")) {
@@ -146,7 +146,7 @@ export async function PATCH(request: Request) {
       .from("guide_profiles")
       .select("id, status")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!existing) {
       return jsonError("Guide profile not found", 404);
@@ -188,7 +188,7 @@ export async function PATCH(request: Request) {
       .update(updates)
       .eq("id", existing.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[guides/profile] Update error:", error);

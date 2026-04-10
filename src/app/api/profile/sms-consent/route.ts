@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     })
     .eq("id", auth.user.id)
     .select("id, phone, sms_consent, sms_consent_at")
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("[sms-consent] Update error:", error);
@@ -76,7 +76,7 @@ export async function DELETE() {
     })
     .eq("id", auth.user.id)
     .select("id, phone, sms_consent, sms_consent_revoked_at")
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("[sms-consent] Revoke error:", error);
@@ -99,7 +99,7 @@ export async function GET() {
     .from("profiles")
     .select("id, phone, sms_consent, sms_consent_at, sms_consent_revoked_at")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("[sms-consent] Fetch error:", error);

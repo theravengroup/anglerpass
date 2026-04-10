@@ -14,7 +14,7 @@ export async function POST(
   const { data: workflow } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (!workflow) return jsonError("Workflow not found", 404);
 

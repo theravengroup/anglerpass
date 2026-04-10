@@ -44,7 +44,7 @@ export async function GET() {
           .from("profiles")
           .select("display_name")
           .eq("id", otherId)
-          .single();
+          .maybeSingle();
 
         // Get last message preview
         const { data: lastMessage } = await admin
@@ -53,7 +53,7 @@ export async function GET() {
           .eq("thread_id", thread.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         // Get unread count
         const { count: unreadCount } = await admin

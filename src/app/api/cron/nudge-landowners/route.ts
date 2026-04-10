@@ -54,8 +54,8 @@ export async function POST(request: Request) {
 
     // Get property and club names for the email
     const [{ data: property }, { data: club }] = await Promise.all([
-      admin.from("properties").select("name").eq("id", inv.property_id).single(),
-      admin.from("clubs").select("name").eq("id", inv.club_id).single(),
+      admin.from("properties").select("name").eq("id", inv.property_id).maybeSingle(),
+      admin.from("clubs").select("name").eq("id", inv.club_id).maybeSingle(),
     ]);
 
     const propertyName = property?.name ?? "Your property";

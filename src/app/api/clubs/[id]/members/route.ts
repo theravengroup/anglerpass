@@ -17,7 +17,7 @@ async function verifyClubManager(
     .from("clubs")
     .select("owner_id, name")
     .eq("id", clubId)
-    .single();
+    .maybeSingle();
 
   if (!club) return null;
 

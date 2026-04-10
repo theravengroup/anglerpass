@@ -33,7 +33,7 @@ export async function evaluateVerification(
       "id, user_id, status, verification_fee_paid, checkr_status, license_url, insurance_url, first_aid_cert_url, license_expiry, insurance_expiry, first_aid_expiry"
     )
     .eq("id", guideId)
-    .single();
+    .maybeSingle();
 
   if (error || !guide) {
     return { ready: false, status: "not_found", missing: ["Guide profile not found"] };
@@ -121,7 +121,7 @@ export async function checkCredentialExpiry(
       "license_expiry, insurance_expiry, first_aid_expiry, uscg_license_expiry, guide_license_expiry"
     )
     .eq("id", guideId)
-    .single();
+    .maybeSingle();
 
   if (!guide) return { expired: [], expiringSoon: [] };
 

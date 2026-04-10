@@ -22,7 +22,7 @@ export async function GET(
       .from("message_threads")
       .select("id, participant_a, participant_b, booking_id")
       .eq("id", threadId)
-      .single();
+      .maybeSingle();
 
     if (!thread) {
       return jsonError("Thread not found", 404);
@@ -89,7 +89,7 @@ export async function POST(
       .from("message_threads")
       .select("id, participant_a, participant_b, booking_id")
       .eq("id", threadId)
-      .single();
+      .maybeSingle();
 
     if (!thread) {
       return jsonError("Thread not found", 404);

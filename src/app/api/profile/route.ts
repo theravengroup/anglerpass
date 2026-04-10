@@ -21,7 +21,7 @@ export async function GET() {
         "id, display_name, role, bio, location, avatar_url, fishing_experience, favorite_species, created_at"
       )
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (error || !profile) {
       return jsonError("Profile not found", 404);
@@ -77,7 +77,7 @@ export async function PATCH(request: Request) {
       .select(
         "id, display_name, role, bio, location, avatar_url, fishing_experience, favorite_species"
       )
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[profile] PATCH error:", error);

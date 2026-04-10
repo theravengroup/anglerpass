@@ -77,7 +77,7 @@ async function advanceDripEnrollments(
       const { data: campaign } = await campaigns
         .select("id, status, type")
         .eq("id", e.campaign_id)
-        .single();
+        .maybeSingle();
 
       if (!campaign || (campaign as Record<string, unknown>).status !== "active") {
         continue;

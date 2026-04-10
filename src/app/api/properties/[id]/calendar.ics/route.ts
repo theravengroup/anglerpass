@@ -29,7 +29,7 @@ export async function GET(
       .select("property_id")
       .eq("property_id", id)
       .eq("token", token)
-      .single();
+      .maybeSingle();
 
     if (!calendarToken) {
       return new Response("Invalid token", { status: 403 });
@@ -40,7 +40,7 @@ export async function GET(
       .from("properties")
       .select("name, location_description")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!property) {
       return new Response("Property not found", { status: 404 });

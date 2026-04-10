@@ -29,7 +29,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const { data: existing, error: fetchError } = await createAdminClient().from("angler_delegates")
       .select("id, angler_id, access_level, status")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existing) {
       return jsonError("Delegate not found", 404);
@@ -50,7 +50,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       .update({ access_level })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("[delegates] Update error:", error);
@@ -91,7 +91,7 @@ export async function DELETE(request: Request, context: RouteContext) {
     const { data: existing, error: fetchError } = await createAdminClient().from("angler_delegates")
       .select("id, angler_id, delegate_id, access_level, status")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !existing) {
       return jsonError("Delegate not found", 404);

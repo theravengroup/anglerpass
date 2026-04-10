@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -6,12 +5,7 @@ import {
   getOrCreateCustomer,
   createPaymentIntent,
 } from "@/lib/stripe/server";
-
-const CreatePaymentIntentSchema = z.object({
-  bookingId: z.string().uuid(),
-  amountCents: z.number().int().positive(),
-  platformFeeCents: z.number().int().nonnegative(),
-});
+import { createPaymentIntentSchema } from "@/lib/validations/stripe";
 
 /**
  * POST /api/stripe/payment-intent
@@ -28,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = CreatePaymentIntentSchema.safeParse(body);
+    const parsed = createPaymentIntentSchema.safeParse(body);
 
     if (!parsed.success) {
       return jsonError("Invalid request body", 400);
@@ -43,7 +37,7 @@ export async function POST(request: Request) {
       .select("id, angler_id, payment_status")
       .eq("id", bookingId)
       .eq("angler_id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);
@@ -58,7 +52,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name, stripe_customer_id")
       .eq("id", auth.user.id)
-      .single();
+      .maybeSingle();
 
     let customerId = profile?.stripe_customer_id;
 

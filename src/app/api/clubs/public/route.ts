@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         "id, name, description, location, initiation_fee, annual_dues, membership_application_required"
       )
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !club) {
       return jsonError("Club not found", 404);

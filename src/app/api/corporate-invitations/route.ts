@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       .from("clubs")
       .select("name, annual_dues")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     const clubName = club?.name ?? "the club";
     const annualDues = club?.annual_dues ?? null;
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       .from("profiles")
       .select("display_name")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     const sponsorName = profile?.display_name ?? user.email ?? "Your sponsor";
     const companyName = membership.company_name ?? "your company";

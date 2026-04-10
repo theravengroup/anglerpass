@@ -22,7 +22,7 @@ export async function GET(
       .from("clubs")
       .select("id, owner_id")
       .eq("id", clubId)
-      .single();
+      .maybeSingle();
 
     if (clubErr || !club) {
       return jsonError("Club not found", 404);

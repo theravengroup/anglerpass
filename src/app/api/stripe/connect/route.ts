@@ -38,7 +38,7 @@ async function resolveEntity(
       .from("guide_profiles")
       .select("id, stripe_connect_account_id, stripe_connect_onboarded")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (!data) return null;
     return {
@@ -55,7 +55,7 @@ async function resolveEntity(
       .from("profiles")
       .select("id, stripe_connect_account_id, stripe_connect_onboarded")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (!data) return null;
     return {
@@ -73,7 +73,7 @@ async function resolveEntity(
       .select("id, stripe_connect_account_id, stripe_connect_onboarded")
       .eq("owner_id", userId)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (!data) return null;
     return {

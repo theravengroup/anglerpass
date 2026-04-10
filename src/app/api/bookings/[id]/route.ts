@@ -27,7 +27,7 @@ export async function GET(
         "*, properties(id, name, location_description, photos, water_type, regulations, access_notes, gate_code_required, gate_code, owner_id), profiles!bookings_angler_id_fkey(display_name)"
       )
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error || !booking) {
       return jsonError("Booking not found", 404);
@@ -43,7 +43,7 @@ export async function GET(
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.role !== "admin") {
         return jsonError("Forbidden", 403);
@@ -91,7 +91,7 @@ export async function PATCH(
         "id, status, angler_id, property_id, booking_date, total_amount, properties(owner_id, name), profiles!bookings_angler_id_fkey(display_name)"
       )
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (!booking) {
       return jsonError("Booking not found", 404);
@@ -143,7 +143,7 @@ export async function PATCH(
       })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("[bookings/[id]] Cancel error:", updateError);
