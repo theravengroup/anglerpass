@@ -17,7 +17,6 @@ export async function GET(
 
   const { id: payoutId } = await params;
   const db = createAdminClient();
-  const typedAdmin = createAdminClient();
 
   // Fetch payout
   const { data: payout, error: payoutError } = await db
@@ -47,7 +46,7 @@ export async function GET(
   let bookings: Array<Record<string, unknown>> = [];
   if (bookingIds.length > 0) {
     const uniqueIds = [...new Set(bookingIds)];
-    const { data } = await typedAdmin
+    const { data } = await db
       .from("bookings")
       .select(
         "id, booking_date, party_size, amount_cents, payment_status, angler_id, property_id"

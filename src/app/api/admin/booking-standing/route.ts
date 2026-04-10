@@ -24,7 +24,6 @@ export async function GET(request: Request) {
   }
 
   const db = createAdminClient();
-  const admin = createAdminClient();
   const { searchParams } = new URL(request.url);
   const showAll = searchParams.get("all") === "true";
 
@@ -51,7 +50,7 @@ export async function GET(request: Request) {
 
   const profiles: Record<string, { display_name: string | null }> = {};
   if (userIds.length > 0) {
-    const { data: profileRows } = await admin
+    const { data: profileRows } = await db
       .from("profiles")
       .select("id, display_name")
       .in("id", userIds);
