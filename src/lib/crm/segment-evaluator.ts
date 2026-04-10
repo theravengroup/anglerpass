@@ -20,6 +20,10 @@ import type {
   Segment,
 } from "@/lib/crm/types";
 import { buildSegmentQuery } from "@/lib/crm/segment-engine";
+import {
+  buildLeadSegmentQuery,
+  hasLeadConditions,
+} from "@/lib/crm/lead-segment-engine";
 
 // ─── Core Evaluator ─────────────────────────────────────────────────
 
@@ -98,11 +102,19 @@ export async function previewSegment(
 /**
  * Get all matching recipients for a segment — used when sending campaigns.
  * Returns full CrmRecipient objects suitable for enrollment/sending.
+ *
+ * When `includeLeads` is true and the segment rules contain lead-applicable
+ * conditions, also queries the leads table and returns mixed user+lead results.
+ * Leads that have already converted to users are excluded to prevent duplicates.
  */
 export async function getSegmentRecipients(
   admin: SupabaseClient,
-  rules: SegmentRuleGroup[]
+  rules: SegmentRuleGroup[],
+  options: { includeLeads?: boolean } = {}
 ): Promise<CrmRecipient[]> {
+  const recipients: CrmRecipient[] = [];
+
+  // 1. Always query profiles (users)
   const query = buildSegmentQuery(rules, {
     select: "p.id, p.email, p.display_name, p.role",
   });
@@ -117,17 +129,66 @@ export async function getSegmentRecipients(
     throw new Error(`Segment query failed: ${error.message}`);
   }
 
-  return ((data ?? []) as Array<{
+  const userEmails = new Set<string>();
+
+  for (const r of (data ?? []) as Array<{
     id: string;
     email: string;
     display_name: string | null;
-  }>).map((r) => ({
-    user_id: r.id,
-    email: r.email,
-    display_name: r.display_name,
-    recipient_type: "user" as const,
-    lead_id: null,
-  }));
+  }>) {
+    recipients.push({
+      user_id: r.id,
+      email: r.email,
+      display_name: r.display_name,
+      recipient_type: "user",
+      lead_id: null,
+    });
+    userEmails.add(r.email.toLowerCase());
+  }
+
+  // 2. Query leads if requested and segment has lead-applicable conditions
+  if (options.includeLeads && hasLeadConditions(rules)) {
+    const leadQuery = buildLeadSegmentQuery(rules);
+
+    if (leadQuery) {
+      const { data: leadData, error: leadError } = await admin.rpc(
+        "evaluate_segment_query",
+        {
+          query_sql: leadQuery.sql,
+          query_params: JSON.stringify(leadQuery.params),
+        }
+      );
+
+      if (leadError) {
+        console.error("[crm/segment-evaluator] Lead recipients error:", leadError);
+        // Don't throw — gracefully degrade to users-only
+      } else {
+        for (const r of (leadData ?? []) as Array<{
+          id: string;
+          email: string;
+          first_name: string;
+          last_name: string | null;
+        }>) {
+          // Skip leads whose email is already in the user list
+          if (userEmails.has(r.email.toLowerCase())) continue;
+
+          const displayName = r.last_name
+            ? `${r.first_name} ${r.last_name}`
+            : r.first_name;
+
+          recipients.push({
+            user_id: null,
+            email: r.email,
+            display_name: displayName,
+            recipient_type: "lead",
+            lead_id: r.id,
+          });
+        }
+      }
+    }
+  }
+
+  return recipients;
 }
 
 // ─── Segment CRUD Helpers ───────────────────────────────────────────

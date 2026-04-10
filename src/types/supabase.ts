@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       angler_club_invitations: {
@@ -1575,6 +1600,45 @@ export type Database = {
           window_hours?: number
         }
         Relationships: []
+      }
+      crm_lead_topic_subscriptions: {
+        Row: {
+          id: string
+          lead_id: string
+          subscribed: boolean
+          topic_id: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          lead_id: string
+          subscribed?: boolean
+          topic_id: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          lead_id?: string
+          subscribed?: boolean
+          topic_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_lead_topic_subscriptions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_lead_topic_subscriptions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "crm_subscription_topics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       crm_notifications: {
         Row: {
@@ -3245,6 +3309,8 @@ export type Database = {
       }
       leads: {
         Row: {
+          converted_at: string | null
+          converted_to_user_id: string | null
           created_at: string | null
           email: string
           first_name: string
@@ -3258,6 +3324,8 @@ export type Database = {
           type: string
         }
         Insert: {
+          converted_at?: string | null
+          converted_to_user_id?: string | null
           created_at?: string | null
           email: string
           first_name: string
@@ -3271,6 +3339,8 @@ export type Database = {
           type?: string
         }
         Update: {
+          converted_at?: string | null
+          converted_to_user_id?: string | null
           created_at?: string | null
           email?: string
           first_name?: string
@@ -4685,6 +4755,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
+          include_leads: boolean
           is_dynamic: boolean
           name: string
           rules: Json
@@ -4697,6 +4768,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          include_leads?: boolean
           is_dynamic?: boolean
           name: string
           rules?: Json
@@ -4709,6 +4781,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          include_leads?: boolean
           is_dynamic?: boolean
           name?: string
           rules?: Json
@@ -5179,6 +5252,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

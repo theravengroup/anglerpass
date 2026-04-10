@@ -12,10 +12,11 @@ const PROTECTED_PREFIXES = [
   "/angler",
   "/admin",
   "/guide",
+  "/corporate",
 ];
 
 /** Public marketing pages whose paths happen to start with protected prefixes */
-const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers", "/guides"]);
+const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers", "/guides", "/corporates"]);
 
 const AUTH_ROUTES = new Set([
   "/login",

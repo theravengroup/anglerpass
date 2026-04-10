@@ -308,6 +308,7 @@ export async function processSendBatch(
       recipientEmail: send.recipient_email,
       recipientId: send.recipient_id ?? undefined,
       recipientType: send.recipient_type,
+      leadId: send.lead_id ?? undefined,
       campaignId: send.campaign_id,
     });
 
@@ -338,7 +339,7 @@ export async function processSendBatch(
       continue;
     }
 
-    // Get recipient name if user
+    // Get recipient name
     let recipientName: string | undefined;
     if (send.recipient_id) {
       const { data: profile } = await admin
@@ -347,6 +348,18 @@ export async function processSendBatch(
         .eq("id", send.recipient_id)
         .maybeSingle();
       recipientName = profile?.display_name ?? undefined;
+    } else if (send.lead_id) {
+      const { data: lead } = await admin
+        .from("leads")
+        .select("first_name, last_name")
+        .eq("id", send.lead_id)
+        .maybeSingle();
+      if (lead) {
+        const leadRow = lead as { first_name: string; last_name: string | null };
+        recipientName = leadRow.last_name
+          ? `${leadRow.first_name} ${leadRow.last_name}`
+          : leadRow.first_name;
+      }
     }
 
     // Parse template_data if present

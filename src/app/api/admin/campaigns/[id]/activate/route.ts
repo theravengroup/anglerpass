@@ -94,16 +94,19 @@ async function enrollBroadcastRecipients(
   campaignId: string,
   segmentId: string
 ): Promise<number> {
-  // Load segment rules
+  // Load segment rules + include_leads flag
   const { data: segment } = await admin.from("segments")
-    .select("rules")
+    .select("rules, include_leads")
     .eq("id", segmentId)
     .maybeSingle();
 
   if (!segment) return 0;
 
-  const rules = segment.rules as SegmentRuleGroup[];
-  const recipients = await getSegmentRecipients(admin, rules);
+  const segmentRow = segment as { rules: unknown; include_leads: boolean };
+  const rules = segmentRow.rules as SegmentRuleGroup[];
+  const recipients = await getSegmentRecipients(admin, rules, {
+    includeLeads: segmentRow.include_leads,
+  });
 
   if (recipients.length === 0) return 0;
 

@@ -48,6 +48,7 @@ export const createSegmentSchema = z.object({
   name: z.string().min(1, "Name is required").max(200),
   description: z.string().max(1000).optional(),
   is_dynamic: z.boolean().default(true),
+  include_leads: z.boolean().default(false),
   rules: z.array(segmentRuleGroupSchema).min(1, "At least one rule group is required"),
 });
 

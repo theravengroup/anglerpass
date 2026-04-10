@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getRoleHomePath } from "@/types/roles";
 import { sendWelcomeEmail } from "@/lib/welcome-emails";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
+import { convertLeadToUser } from "@/lib/crm/lead-conversion";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -34,6 +35,13 @@ export async function GET(request: Request) {
           }).catch((err) =>
             console.error("[auth/callback] CRM trigger error:", err)
           );
+
+          // Convert matching waitlist lead → user (non-blocking)
+          if (user.email) {
+            convertLeadToUser(user.email, user.id).catch((err) =>
+              console.error("[auth/callback] Lead conversion error:", err)
+            );
+          }
         }
 
         // Determine redirect destination

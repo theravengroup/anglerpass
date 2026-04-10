@@ -22,6 +22,7 @@ import {
   SendHorizontal,
   Inbox,
   Sparkles,
+  Building2,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -153,6 +154,28 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <Shield />,
     },
   ],
+  corporate: [
+    {
+      label: "Staff",
+      href: "/corporate/staff",
+      icon: <Users />,
+    },
+    {
+      label: "Billing",
+      href: "/corporate/billing",
+      icon: <DollarSign />,
+    },
+    {
+      label: "Company Profile",
+      href: "/corporate/profile",
+      icon: <Building2 />,
+    },
+    {
+      label: "Club Details",
+      href: "/corporate/club",
+      icon: <MapPin />,
+    },
+  ],
   guide: [
     {
       label: "My Profile",
@@ -219,6 +242,11 @@ const PAGE_TITLES: Record<string, string> = {
   "/angler/guides": "Find Guides",
   "/angler/delegates": "Trusted Delegates",
   "/angler/proposals": "Trip Proposals",
+  "/corporate": "Corporate Dashboard",
+  "/corporate/staff": "Staff Management",
+  "/corporate/billing": "Billing & Invoices",
+  "/corporate/profile": "Company Profile",
+  "/corporate/club": "Club Details",
   "/guide": "Guide Dashboard",
   "/guide/profile": "Guide Profile",
   "/guide/availability": "Availability",

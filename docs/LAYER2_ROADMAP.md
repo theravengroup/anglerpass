@@ -117,6 +117,76 @@ The following features shipped since the initial roadmap was written. They span 
 - ✅ Legacy pattern removal and styling violations fixed
 - ✅ Supabase CLI migration sync (all 42 migrations tracked)
 
+### Pre-Launch Hardening & Cleanup (April 2026)
+
+Full codebase audit and refactor pass — production-safety improvements, security fixes, dead code removal, and test suite stabilization.
+
+#### Security Hardening
+- ✅ **Admin auth gap fixed** — 10 admin API routes upgraded from `requireAuth()` to `requireAdmin()`, closing a privilege escalation where any authenticated user could access admin finance, CRM, compass, and weather data via the RLS-bypassing admin client
+  - `finance-ops/` (and all sub-routes: cash-flow, exceptions, payout/[id], report, revenue-streams)
+  - `compass/stats/`, `crm/contacts/`, `crm/contacts/[id]/`, `weather-prefetch/`
+- ✅ **Cron route protection fixed** — 2 routes (`guide-credential-expiry`, `nudge-landowners`) changed from weak `if (cronSecret && ...)` to strict `if (!cronSecret || ...)`, preventing unauthenticated access when `CRON_SECRET` env var is missing
+- ✅ **ilike injection fixed** — `admin/crm/contacts` and `admin/support` routes now use shared `escapeIlike()` helper instead of raw/manual regex escaping
+- ✅ **JSON.parse safety** — `src/lib/posts.ts` wrapped in try-catch to prevent crashes on malformed blog post frontmatter
+
+#### Supabase Type System Overhaul
+- ✅ **Type regeneration** — Regenerated `src/types/supabase.ts` from live schema (all 42 migrations)
+- ✅ **Typed admin client migration** — Replaced all `createUntypedAdminClient()` calls with fully-typed `createAdminClient()` across the entire codebase
+- ✅ **`crmTable()` wrapper removal** — Deleted the untyped CRM query wrapper; all CRM tables now queried via typed `admin.from("table")` with full column autocompletion
+- ✅ **Deleted `src/lib/supabase/untyped-admin.ts`** — no more untyped Supabase access anywhere in the codebase
+
+#### `.single()` → `.maybeSingle()` Migration
+- ✅ Migrated ~340 SELECT queries from `.single()` to `.maybeSingle()` to prevent runtime exceptions when rows don't exist
+- ✅ Kept `.single()` only after INSERT/upsert operations where a row is guaranteed
+
+#### Utility Helper Consolidation
+- ✅ **`toDateString()`** in `src/lib/utils.ts` — replaced 43 instances of `.toISOString().split("T")[0]`
+- ✅ **`roundCurrency()`** in `src/lib/constants/fees.ts` — replaced 20 instances of `Math.round(n*100)/100`
+- ✅ **`isDuplicateError()`** in `src/lib/api/helpers.ts` — replaced raw `"23505"` Postgres error code checks
+- ✅ **`SITE_URL` deduplication** — `src/lib/seo.ts` and `src/components/clubs/ClubEmbedWidget.tsx` now import from `@/lib/constants` instead of hardcoding
+
+#### Schema Centralization
+- ✅ Extracted 29 inline Zod schemas from API routes into 9 domain-organized validation files:
+  - `validations/admin.ts` (5 schemas), `validations/angler.ts` (1), `validations/auth.ts` (1)
+  - `validations/compass.ts` (2), `validations/crm.ts` (8), `validations/stripe.ts` (6)
+  - Extended: `validations/clubs.ts` (+7), `validations/properties.ts` (+3), `validations/profile.ts` (+2)
+
+#### Component Splitting (~300-line limit enforcement)
+- ✅ Split 20+ oversized components into ~60 focused sub-components:
+  - `PolicyContent` (635→13 lines) → MembershipPolicies, PaymentPolicies, ServicePolicies, policy-styles
+  - `MarketingFooter` (456→184) → ContactModal, ContactForm
+  - `DashboardPreviewSection` (411→83) → 4 role-specific previews + DashboardPreviewHelpers
+  - `EmailQualityPanel` (404→138) → EmailPreviewTab, EmailSpamTab, EmailChecklistTab
+  - `AccessAndLogisticsStep` (468→50) → LocationFields, ParkingAndVehicleFields, AccessMethodFields
+  - `SpeciesDetailStep` (405→124) → SpeciesPopulationFields, SpeciesBehaviorFields
+  - `NodeProperties` (402→90) → 7 node-type panels in node-props/ directory
+  - `SeasonalConditionsStep` (387→122) → MonthChecklistCard, SeasonProfileCard
+  - `BlockProperties` (385→39) → BlockPropertyFields, BlockTypeProps
+  - `GuideOnboardingCard` (382→62) → GuideOnboardingSteps
+  - `MigrationForm` (378→126) → MigrationFormFields, MigrationLoomInstructions
+  - `ClubAssociation` (375→119) → AssociatedClubsList, PendingInvitationsList, ClubInviteForm
+  - `WaterCharacteristicsStep` (375→216) → CheckboxGroupCard, TemperatureProfiles
+  - `LodgingSection` (371→102) → LodgingBasicInfo, LodgingAmenities, LodgingPricing, LodgingExternalListing
+
+#### Dead Code Removal (12 files deleted)
+- ✅ `SegmentRuleBuilder.tsx`, `InviteClubCard.tsx`, `StaffRoleManager.tsx`
+- ✅ `CinematicDivider.tsx`, `ConciergeSection.tsx`, `DashboardPreviewModal.tsx`, `FooterModal.tsx`
+- ✅ `AnglerPassLogo.tsx`, `PayoutSummary.tsx`, `avatar.tsx`, `tabs.tsx`
+- ✅ `src/lib/crm/admin-queries.ts` (empty stub after crmTable removal)
+
+#### React 19 / Next.js 16 Modernization
+- ✅ Removed unnecessary `useCallback`/`useMemo` from 9 components (React Compiler auto-memoizes)
+
+#### Test Suite
+- ✅ Fixed 3 failing tests: `unsubscribe.test.ts`, `welcome-emails.test.ts` (`NODE_ENV=test` fallback secret), `cancellation.test.ts` (graduated tier label assertion)
+- ✅ All 18 test files / 309 tests passing
+
+#### Browser QA Verification
+- ✅ Dev server verified across all roles (landowner, club, angler, admin)
+- ✅ Auth boundaries tested — unauthenticated users correctly redirected
+- ✅ Admin dashboard, finance-ops, CRM, and compass routes confirmed working with proper auth
+- ✅ Component renders verified after all splits (no regressions)
+
 ---
 
 ## Phase 2: Landowner Property Management

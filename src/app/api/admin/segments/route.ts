@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { name, description, is_dynamic, rules } = result.data;
+  const { name, description, is_dynamic, include_leads, rules } = result.data;
 
   // Calculate initial count
   let cachedCount = 0;
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
       name,
       description: description ?? null,
       is_dynamic,
+      include_leads,
       rules,
       cached_count: cachedCount,
       cached_at: new Date().toISOString(),

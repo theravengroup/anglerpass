@@ -64,6 +64,50 @@ export async function isSubscribedToTopic(
   return topicRow.is_default === true;
 }
 
+// ─── Lead Topic Subscription Check ────────────────────────────────
+
+/**
+ * Check if a lead is subscribed to a campaign's topic.
+ * Same logic as isSubscribedToTopic but queries crm_lead_topic_subscriptions.
+ */
+export async function isLeadSubscribedToTopic(
+  admin: SupabaseClient,
+  leadId: string,
+  campaignId: string
+): Promise<boolean> {
+  const { data: campaign } = await admin.from("campaigns")
+    .select("topic_id")
+    .eq("id", campaignId)
+    .maybeSingle();
+
+  if (!campaign) return true;
+  const topicId = (campaign as Record<string, unknown>).topic_id as string | null;
+  if (!topicId) return true;
+
+  const { data: topic } = await admin.from("crm_subscription_topics")
+    .select("is_required, is_default")
+    .eq("id", topicId)
+    .maybeSingle();
+
+  if (!topic) return true;
+  const topicRow = topic as Record<string, unknown>;
+
+  if (topicRow.is_required === true) return true;
+
+  const { data: sub } = await admin.from("crm_lead_topic_subscriptions")
+    .select("subscribed")
+    .eq("lead_id", leadId)
+    .eq("topic_id", topicId)
+    .maybeSingle();
+
+  if (sub) {
+    return (sub as Record<string, unknown>).subscribed === true;
+  }
+
+  // No explicit preference — use topic default
+  return topicRow.is_default === true;
+}
+
 // ─── Frequency Cap Check ───────────────────────────────────────────
 
 /**
@@ -123,6 +167,7 @@ export async function runPreSendChecks(
     recipientEmail: string;
     recipientId?: string;
     recipientType: "user" | "lead";
+    leadId?: string;
     campaignId: string;
   }
 ): Promise<PreSendCheckResult> {
@@ -145,6 +190,18 @@ export async function runPreSendChecks(
     const subscribed = await isSubscribedToTopic(
       admin,
       opts.recipientId,
+      opts.campaignId
+    );
+    if (!subscribed) {
+      return { allowed: false, reason: "topic_unsubscribed" };
+    }
+  }
+
+  // 3b. Check lead topic subscription (leads only)
+  if (opts.recipientType === "lead" && opts.leadId) {
+    const subscribed = await isLeadSubscribedToTopic(
+      admin,
+      opts.leadId,
       opts.campaignId
     );
     if (!subscribed) {

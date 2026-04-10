@@ -1,4 +1,4 @@
-export type UserRole = "landowner" | "club_admin" | "angler" | "admin" | "guide";
+export type UserRole = "landowner" | "club_admin" | "angler" | "admin" | "guide" | "corporate";
 
 export const ROLE_HOME_PATHS: Record<UserRole, string> = {
   landowner: "/landowner",
@@ -6,6 +6,7 @@ export const ROLE_HOME_PATHS: Record<UserRole, string> = {
   angler: "/angler",
   admin: "/admin",
   guide: "/guide",
+  corporate: "/corporate",
 };
 
 export function getRoleHomePath(role: string): string {

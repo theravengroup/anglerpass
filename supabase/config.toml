@@ -1,5 +1,4 @@
-[project]
-id = "anglerpass"
+project_id = "anglerpass"
 
 [api]
 enabled = true

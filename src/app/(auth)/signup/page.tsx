@@ -24,7 +24,7 @@ const signupSchema = z.object({
   lastName: z.string().optional(),
   email: z.email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["landowner", "club_admin", "angler", "guide"], {
+  role: z.enum(["landowner", "club_admin", "angler", "guide", "corporate"], {
     error: "Please select your role",
   }),
 });
@@ -36,6 +36,7 @@ const ROLE_LABELS: Record<string, string> = {
   club_admin: "Club / Outfitter",
   angler: "Angler",
   guide: "Fishing Guide",
+  corporate: "Corporate Membership",
 };
 
 export default function SignupPage() {
@@ -71,7 +72,7 @@ function SignupForm() {
 
   // Pre-fill role from invitation URL
   useEffect(() => {
-    if (invitationRole && ["landowner", "club_admin", "angler", "guide"].includes(invitationRole)) {
+    if (invitationRole && ["landowner", "club_admin", "angler", "guide", "corporate"].includes(invitationRole)) {
       setValue("role", invitationRole as SignupFormData["role"]);
     }
   }, [invitationRole, setValue]);
