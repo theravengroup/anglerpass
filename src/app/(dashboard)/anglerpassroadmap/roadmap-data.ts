@@ -175,7 +175,7 @@ export const PHASES: RoadmapPhase[] = [
         title: "Marketing Site",
         items: [
           { id: "c-mkt-home", label: "Homepage with 12 bespoke sections", done: true },
-          { id: "c-mkt-audiences", label: "4 audience pages (anglers, clubs, landowners, guides)", done: true },
+          { id: "c-mkt-audiences", label: "5 audience pages (anglers, clubs, landowners, guides, corporates)", done: true },
           { id: "c-mkt-pricing", label: "Comprehensive pricing page with fee breakdowns", done: true },
           { id: "c-mkt-policies", label: "Platform policies page", done: true },
           { id: "c-mkt-privacy", label: "Standalone privacy policy", done: true },
@@ -196,6 +196,27 @@ export const PHASES: RoadmapPhase[] = [
         items: [
           { id: "c-learn-system", label: "Learn center with 20 educational posts (MDX, categories, SEO)", done: true },
           { id: "c-learn-sitemap", label: "Dynamic sitemap generation for learn posts", done: true },
+        ],
+      },
+      {
+        id: "complete-testing",
+        title: "Testing & Quality",
+        items: [
+          { id: "c-playwright", label: "Playwright E2E test suite (48 tests: marketing, auth, API, dashboards)", done: true },
+          { id: "c-test-auth-helper", label: "Dev login test helper (cookie-based auth for all 6 roles)", done: true },
+          { id: "c-test-projects", label: "Two-project Playwright config (smoke → dashboards dependency chain)", done: true },
+        ],
+      },
+      {
+        id: "complete-crm",
+        title: "CRM & Marketing Automation",
+        items: [
+          { id: "c-crm-campaigns", label: "Campaign engine (broadcast, drip, triggered) with multi-step sequences", done: true },
+          { id: "c-crm-segments", label: "Audience segmentation (dynamic rule-based, segment preview, count caching)", done: true },
+          { id: "c-crm-workflows", label: "Automation workflows (visual node-based builder, trigger events, branching)", done: true },
+          { id: "c-crm-admin", label: "Admin CRM dashboard (campaigns, segments, workflows, test-send)", done: true },
+          { id: "c-crm-engagement", label: "Engagement tracking (delivers, opens, clicks per campaign)", done: true },
+          { id: "c-crm-templates", label: "Email template engine for campaign sends", done: true },
         ],
       },
       {
@@ -440,31 +461,31 @@ export const PHASES: RoadmapPhase[] = [
             id: "p1-ma-campaigns",
             label: "Campaign engine with audience segments and trigger conditions",
             detail: "Define campaigns targeting specific segments (role, activity, geography, club status). Trigger on signup, inactivity, post-trip, pre-renewal, abandoned onboarding.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-ma-drip",
             label: "Cron-driven drip sequence runner",
             detail: "Daily cron evaluates all active campaigns, sends eligible emails via Resend. Multi-step sequences with delay logic and exit conditions.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-ma-engagement",
             label: "Engagement tracking (opens, clicks, bounces)",
             detail: "Resend webhooks for delivery events stored in our database. Per-campaign and per-user engagement metrics.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-ma-segments",
             label: "Audience segmentation (role, activity, geography, membership status)",
             detail: "Reusable segment definitions querying existing Supabase data. No external sync needed — all data already in our database.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-ma-admin",
             label: "Admin campaign dashboard (create, pause, view performance)",
             detail: "Campaign list with status, send counts, open/click rates. Create new campaigns with segment picker and email template builder.",
-            done: false,
+            done: true,
           },
           {
             id: "p1-ma-reengagement",
@@ -612,7 +633,7 @@ export const PHASES: RoadmapPhase[] = [
         title: "2F: Testing & Infrastructure",
         description: "Operational maturity for a platform handling financial transactions.",
         items: [
-          { id: "p2-tests", label: "Test framework (Vitest unit + Playwright E2E)", done: false },
+          { id: "p2-tests", label: "Test framework (Vitest unit + Playwright E2E)", done: true },
           { id: "p2-cicd", label: "CI/CD pipeline (GitHub Actions: lint, type-check, test, build)", done: false },
           { id: "p2-monitoring", label: "Monitoring (Sentry deep integration, API latency alerts)", done: false },
           { id: "p2-backups", label: "Database backup verification (automated recovery testing)", done: false },
@@ -622,8 +643,8 @@ export const PHASES: RoadmapPhase[] = [
         id: "p2-corporate",
         title: "2G: Corporate & Enterprise",
         items: [
-          { id: "p2-corp-dashboard", label: "Corporate admin dashboard (utilization, spending, engagement)", done: false },
-          { id: "p2-corp-billing", label: "Corporate billing (invoices, PO numbers, net-30 terms)", done: false },
+          { id: "p2-corp-dashboard", label: "Corporate admin dashboard (utilization, spending, engagement)", done: true },
+          { id: "p2-corp-billing", label: "Corporate billing (invoices, PO numbers, net-30 terms)", done: true },
           { id: "p2-corp-events", label: "Enterprise event booking (multi-property, catering, itinerary)", done: false },
           { id: "p2-corp-gifts", label: "Gift certificate programs (branded gift experiences)", done: false },
         ],
