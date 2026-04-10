@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { updateStepSchema } from "@/lib/validations/campaigns";
 
 /**
@@ -18,7 +17,7 @@ export async function PATCH(
   const { id, stepId } = await params;
 
   // Verify campaign is editable
-  const { data: campaign } = await crmTable(auth.admin, "campaigns")
+  const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -42,7 +41,7 @@ export async function PATCH(
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: step, error } = await crmTable(auth.admin, "campaign_steps")
+  const { data: step, error } = await auth.admin.from("campaign_steps")
     .update({
       ...result.data,
       updated_at: new Date().toISOString(),
@@ -74,7 +73,7 @@ export async function DELETE(
   const { id, stepId } = await params;
 
   // Verify campaign is draft
-  const { data: campaign } = await crmTable(auth.admin, "campaigns")
+  const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -85,7 +84,7 @@ export async function DELETE(
     return jsonError("Steps can only be deleted from draft campaigns", 409);
   }
 
-  const { error } = await crmTable(auth.admin, "campaign_steps")
+  const { error } = await auth.admin.from("campaign_steps")
     .delete()
     .eq("id", stepId)
     .eq("campaign_id", id);

@@ -1,7 +1,6 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { z } from "zod";
 
 // ─── GET /api/admin/crm/frequency-caps ────────────────────────────
@@ -10,7 +9,7 @@ export async function GET() {
   const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
-  const { data: caps } = await crmTable(auth.admin, "crm_frequency_caps")
+  const { data: caps } = await auth.admin.from("crm_frequency_caps")
     .select("*")
     .order("window_hours", { ascending: true });
 
@@ -37,8 +36,8 @@ export async function POST(req: Request) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: cap, error } = await crmTable(auth.admin, "crm_frequency_caps")
-    .insert(result.data as Record<string, unknown>)
+  const { data: cap, error } = await auth.admin.from("crm_frequency_caps")
+    .insert(result.data)
     .select()
     .single();
 
@@ -72,8 +71,8 @@ export async function PATCH(req: Request) {
 
   const { id, ...updates } = result.data;
 
-  const { data: cap, error } = await crmTable(auth.admin, "crm_frequency_caps")
-    .update({ ...updates, updated_at: new Date().toISOString() } as Record<string, unknown>)
+  const { data: cap, error } = await auth.admin.from("crm_frequency_caps")
+    .update({ ...updates, updated_at: new Date().toISOString() })
     .eq("id", id)
     .select()
     .single();

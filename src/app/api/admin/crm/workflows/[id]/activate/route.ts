@@ -1,7 +1,6 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 export async function POST(
   _req: Request,
@@ -12,7 +11,7 @@ export async function POST(
 
   const { id } = await params;
 
-  const { data: workflow } = await crmTable(auth.admin, "crm_workflows")
+  const { data: workflow } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -25,7 +24,7 @@ export async function POST(
   }
 
   // Verify the workflow has at least a trigger and one action node
-  const { data: nodes } = await crmTable(auth.admin, "crm_workflow_nodes")
+  const { data: nodes } = await auth.admin.from("crm_workflow_nodes")
     .select("type")
     .eq("workflow_id", id);
 
@@ -37,7 +36,7 @@ export async function POST(
     return jsonError("Workflow must have at least one action node besides the trigger", 400);
   }
 
-  await crmTable(auth.admin, "crm_workflows")
+  await auth.admin.from("crm_workflows")
     .update({
       status: "active",
       activated_at: new Date().toISOString(),

@@ -6,7 +6,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
 import type { RecipientContext } from "@/lib/crm/template-engine";
 import type { NotificationCategory } from "@/lib/crm/types";
@@ -45,7 +44,7 @@ export async function createNotification(
 
   const id = crypto.randomUUID();
 
-  await crmTable(admin, "crm_notifications").insert({
+  await admin.from("crm_notifications").insert({
     id,
     user_id: opts.userId,
     title,
@@ -81,7 +80,7 @@ export async function getUserNotifications(
   const limit = opts.limit ?? 20;
   const offset = opts.offset ?? 0;
 
-  let query = crmTable(admin, "crm_notifications")
+  let query = admin.from("crm_notifications")
     .select("id, title, body, action_url, category, is_read, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
@@ -101,7 +100,7 @@ export async function getUserNotifications(
       is_read: boolean;
       created_at: string;
     }>>(),
-    crmTable(admin, "crm_notifications")
+    admin.from("crm_notifications")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .eq("is_read", false),
@@ -121,7 +120,7 @@ export async function markNotificationsRead(
   userId: string,
   notificationIds: string[]
 ): Promise<void> {
-  await crmTable(admin, "crm_notifications")
+  await admin.from("crm_notifications")
     .update({
       is_read: true,
       read_at: new Date().toISOString(),
@@ -137,7 +136,7 @@ export async function markAllNotificationsRead(
   admin: SupabaseClient,
   userId: string
 ): Promise<void> {
-  await crmTable(admin, "crm_notifications")
+  await admin.from("crm_notifications")
     .update({
       is_read: true,
       read_at: new Date().toISOString(),

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { createCampaignSchema } from "@/lib/validations/campaigns";
+import type { Json } from "@/types/supabase";
 
 /**
  * GET /api/admin/campaigns
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const status = url.searchParams.get("status");
   const type = url.searchParams.get("type");
 
-  let query = crmTable(auth.admin, "campaigns")
+  let query = auth.admin.from("campaigns")
     .select("*")
     .order("created_at", { ascending: false });
 
@@ -37,13 +37,13 @@ export async function GET(request: NextRequest) {
 
   // Enrich with send stats for each campaign
   const enriched = await Promise.all(
-    (campaigns ?? []).map(async (campaign: Record<string, unknown>) => {
-      const stats = await getCampaignStats(auth.admin, campaign.id as string);
+    (campaigns ?? []).map(async (campaign) => {
+      const stats = await getCampaignStats(auth.admin, campaign.id);
       return { ...campaign, ...stats };
     })
   );
 
-  const { count: total } = await crmTable(auth.admin, "campaigns")
+  const { count: total } = await auth.admin.from("campaigns")
     .select("*", { count: "exact", head: true });
 
   return jsonOk({
@@ -73,9 +73,11 @@ export async function POST(request: NextRequest) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: campaign, error } = await crmTable(auth.admin, "campaigns")
+  const { trigger_config, ...rest } = result.data;
+  const { data: campaign, error } = await auth.admin.from("campaigns")
     .insert({
-      ...result.data,
+      ...rest,
+      trigger_config: trigger_config as Json,
       status: "draft",
       created_by: auth.user.id,
     })
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 async function getCampaignStats(admin: SupabaseClient, campaignId: string) {
-  const sends = crmTable(admin, "campaign_sends");
+  const sends = admin.from("campaign_sends");
 
   // Get total sends
   const { count: totalSends } = await sends
@@ -131,7 +133,7 @@ async function getCampaignStats(admin: SupabaseClient, campaignId: string) {
   const clicked = clickedCount ?? 0;
 
   // Get step count
-  const { count: stepCount } = await crmTable(admin, "campaign_steps")
+  const { count: stepCount } = await admin.from("campaign_steps")
     .select("*", { count: "exact", head: true })
     .eq("campaign_id", campaignId);
 

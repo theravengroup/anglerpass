@@ -11,7 +11,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 export type SendTimeStrategy =
   | "immediate"
@@ -86,7 +85,7 @@ async function getEngagementOptimalTime(
   const dayOfWeek = getDayOfWeekInTz(now, tz);
 
   // Get engagement scores for today's day of week
-  const { data: windows } = await crmTable(admin, "crm_engagement_windows")
+  const { data: windows } = await admin.from("crm_engagement_windows")
     .select("hour_utc, score")
     .eq("email", email)
     .eq("day_of_week", dayOfWeek)
@@ -130,7 +129,7 @@ export async function recordEngagement(
   const clickInc = eventType === "click" ? 1 : 0;
 
   // Upsert the engagement window
-  const { data: existing } = await crmTable(admin, "crm_engagement_windows")
+  const { data: existing } = await admin.from("crm_engagement_windows")
     .select("id, open_count, click_count")
     .eq("email", email)
     .eq("day_of_week", dayOfWeek)
@@ -143,7 +142,7 @@ export async function recordEngagement(
     const newClicks = (existing.click_count ?? 0) + clickInc;
     const score = newOpens * 1 + newClicks * 3;
 
-    await crmTable(admin, "crm_engagement_windows")
+    await admin.from("crm_engagement_windows")
       .update({
         open_count: newOpens,
         click_count: newClicks,
@@ -154,7 +153,7 @@ export async function recordEngagement(
   } else {
     const score = openInc * 1 + clickInc * 3;
 
-    await crmTable(admin, "crm_engagement_windows").insert({
+    await admin.from("crm_engagement_windows").insert({
       email,
       day_of_week: dayOfWeek,
       hour_utc: hourUtc,
@@ -173,7 +172,7 @@ export async function getEngagementHeatmap(
   admin: SupabaseClient,
   email: string
 ): Promise<Array<{ day: number; hour: number; score: number }>> {
-  const { data } = await crmTable(admin, "crm_engagement_windows")
+  const { data } = await admin.from("crm_engagement_windows")
     .select("day_of_week, hour_utc, score")
     .eq("email", email)
     .returns<Array<{ day_of_week: number; hour_utc: number; score: number }>>();

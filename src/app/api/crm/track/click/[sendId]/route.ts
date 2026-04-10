@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { recordEngagement } from "@/lib/crm/send-time-optimizer";
 import { SITE_URL } from "@/lib/constants";
 
@@ -50,8 +49,8 @@ async function recordClick(
   request: NextRequest
 ) {
   const admin = createAdminClient();
-  const sends = crmTable(admin, "campaign_sends");
-  const events = crmTable(admin, "engagement_events");
+  const sends = admin.from("campaign_sends");
+  const events = admin.from("engagement_events");
 
   // Validate send exists
   const { data: send } = await sends

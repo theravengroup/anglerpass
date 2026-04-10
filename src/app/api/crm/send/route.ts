@@ -2,7 +2,6 @@ import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { sendCrmEmail } from "@/lib/crm/email-sender";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 import { z } from "zod";
@@ -130,15 +129,15 @@ export async function POST(req: NextRequest) {
 
   if (input.topic_slug && !input.skip_checks) {
     // Find or create a virtual campaign linkage for topic checking
-    const { data: topic } = await crmTable(admin, "crm_subscription_topics")
+    const { data: topic } = await admin.from("crm_subscription_topics")
       .select("id")
       .eq("slug", input.topic_slug)
       .maybeSingle();
 
     if (topic && campaignId) {
       // Ensure campaign has this topic
-      await crmTable(admin, "campaigns")
-        .update({ topic_id: (topic as Record<string, unknown>).id })
+      await admin.from("campaigns")
+        .update({ topic_id: topic.id })
         .eq("id", campaignId);
     }
   }
@@ -164,27 +163,37 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Create a send record for tracking
-  const sendRecord = {
-    campaign_id: campaignId ?? null,
-    step_id: input.step_id ?? null,
-    recipient_id: userId ?? null,
-    recipient_email: email,
-    recipient_type: userId ? "user" : "lead",
-    lead_id: null,
-    status: "queued",
-    created_at: new Date().toISOString(),
-  } as Record<string, unknown>;
+  // Create a send record for tracking (requires campaign_id + step_id)
+  let sendId: string;
+  let tracked = false;
 
-  const { data: send, error: sendError } = await crmTable(admin, "campaign_sends")
-    .insert(sendRecord)
-    .select("id")
-    .single();
+  if (campaignId && input.step_id) {
+    const { data: send, error: sendError } = await admin.from("campaign_sends")
+      .insert({
+        campaign_id: campaignId,
+        step_id: input.step_id,
+        recipient_id: userId ?? null,
+        recipient_email: email,
+        recipient_type: userId ? "user" : "lead",
+        lead_id: null,
+        status: "queued",
+        created_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
 
-  if (sendError || !send) {
-    // If we can't create a tracking record (e.g., no campaign_id for FK),
-    // still send but without tracking
-    const sendId = crypto.randomUUID();
+    if (!sendError && send) {
+      sendId = send.id;
+      tracked = true;
+    } else {
+      sendId = crypto.randomUUID();
+    }
+  } else {
+    sendId = crypto.randomUUID();
+  }
+
+  if (!tracked) {
+    // Send without tracking record
     const sendResult = await sendCrmEmail(admin, {
       sendId,
       to: email,
@@ -207,8 +216,6 @@ export async function POST(req: NextRequest) {
       error: sendResult.error,
     });
   }
-
-  const sendId = (send as Record<string, unknown>).id as string;
 
   // Send the email
   const sendResult = await sendCrmEmail(admin, {

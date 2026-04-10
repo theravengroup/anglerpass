@@ -9,7 +9,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
 import type { RecipientContext } from "@/lib/crm/template-engine";
 
@@ -53,7 +52,7 @@ export async function sendSms(
 
   // Create tracking record
   const sendId = crypto.randomUUID();
-  await crmTable(admin, "crm_sms_sends").insert({
+  await admin.from("crm_sms_sends").insert({
     id: sendId,
     user_id: opts.userId ?? null,
     phone_number: opts.phoneNumber,
@@ -72,7 +71,7 @@ export async function sendSms(
     const error = "Twilio not configured — TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER missing";
     console.warn(`[sms-sender] ${error}`);
 
-    await crmTable(admin, "crm_sms_sends")
+    await admin.from("crm_sms_sends")
       .update({ status: "failed", error_message: error })
       .eq("id", sendId);
 
@@ -101,7 +100,7 @@ export async function sendSms(
       const json = await res.json();
       const providerId = json.sid as string;
 
-      await crmTable(admin, "crm_sms_sends")
+      await admin.from("crm_sms_sends")
         .update({
           status: "sent",
           provider_id: providerId,
@@ -114,7 +113,7 @@ export async function sendSms(
       const errorBody = await res.text();
       const error = `Twilio error ${res.status}: ${errorBody.substring(0, 200)}`;
 
-      await crmTable(admin, "crm_sms_sends")
+      await admin.from("crm_sms_sends")
         .update({ status: "failed", error_message: error })
         .eq("id", sendId);
 
@@ -123,7 +122,7 @@ export async function sendSms(
   } catch (err) {
     const error = err instanceof Error ? err.message : "Unknown error";
 
-    await crmTable(admin, "crm_sms_sends")
+    await admin.from("crm_sms_sends")
       .update({ status: "failed", error_message: error })
       .eq("id", sendId);
 

@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { createSegmentSchema } from "@/lib/validations/campaigns";
 import { countSegment } from "@/lib/crm/segment-evaluator";
 import type { SegmentRuleGroup } from "@/lib/crm/types";
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(Number(url.searchParams.get("limit") ?? "50"), 100);
   const offset = (page - 1) * limit;
 
-  const segments = crmTable(auth.admin, "segments");
+  const segments = auth.admin.from("segments");
 
   const { data, error } = await segments
     .select("*")
@@ -75,7 +74,7 @@ export async function POST(request: NextRequest) {
     // Don't block creation — count will be 0 until next refresh
   }
 
-  const { data: segment, error } = await crmTable(auth.admin, "segments")
+  const { data: segment, error } = await auth.admin.from("segments")
     .insert({
       name,
       description: description ?? null,

@@ -20,7 +20,6 @@ import type {
   Segment,
 } from "@/lib/crm/types";
 import { buildSegmentQuery } from "@/lib/crm/segment-engine";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 // ─── Core Evaluator ─────────────────────────────────────────────────
 
@@ -140,7 +139,7 @@ export async function refreshSegmentCache(
   admin: SupabaseClient,
   segmentId: string
 ): Promise<number> {
-  const segments = crmTable(admin, "segments");
+  const segments = admin.from("segments");
 
   const { data: segment } = await segments
     .select("id, rules")
@@ -176,7 +175,7 @@ export async function userMatchesSegment(
   let rules: SegmentRuleGroup[];
 
   if (typeof segmentOrId === "string") {
-    const { data: segment } = await crmTable(admin, "segments")
+    const { data: segment } = await admin.from("segments")
       .select("rules")
       .eq("id", segmentOrId)
       .single();

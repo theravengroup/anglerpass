@@ -1,7 +1,6 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { z } from "zod";
 
 // ─── PATCH /api/admin/crm/topics/[id] ─────────────────────────────
@@ -33,7 +32,7 @@ export async function PATCH(
     updated_at: new Date().toISOString(),
   } as Record<string, unknown>;
 
-  const { data: topic, error } = await crmTable(auth.admin, "crm_subscription_topics")
+  const { data: topic, error } = await auth.admin.from("crm_subscription_topics")
     .update(updates)
     .eq("id", id)
     .select()
@@ -58,7 +57,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Check if any campaigns use this topic
-  const { count } = await crmTable(auth.admin, "campaigns")
+  const { count } = await auth.admin.from("campaigns")
     .select("id", { count: "exact", head: true })
     .eq("topic_id", id);
 
@@ -70,11 +69,11 @@ export async function DELETE(
   }
 
   // Delete user subscriptions first, then the topic
-  await crmTable(auth.admin, "crm_user_topic_subscriptions")
+  await auth.admin.from("crm_user_topic_subscriptions")
     .delete()
     .eq("topic_id", id);
 
-  const { error } = await crmTable(auth.admin, "crm_subscription_topics")
+  const { error } = await auth.admin.from("crm_subscription_topics")
     .delete()
     .eq("id", id);
 

@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 /**
  * GET /api/cron/crm-drip
@@ -47,10 +46,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 async function advanceDripEnrollments(
   admin: SupabaseClient
 ): Promise<{ advanced: number; completed: number; errors: number }> {
-  const enrollments = crmTable(admin, "campaign_enrollments");
-  const steps = crmTable(admin, "campaign_steps");
-  const sends = crmTable(admin, "campaign_sends");
-  const campaigns = crmTable(admin, "campaigns");
+  const enrollments = admin.from("campaign_enrollments");
+  const steps = admin.from("campaign_steps");
+  const sends = admin.from("campaign_sends");
+  const campaigns = admin.from("campaigns");
 
   // Find active enrollments that are due for their next step
   const { data: dueEnrollments } = await enrollments

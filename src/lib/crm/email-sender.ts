@@ -8,7 +8,6 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getResend } from "@/lib/email";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
 import type { TemplateData } from "@/lib/crm/template-engine";
@@ -47,7 +46,7 @@ export async function isSuppressed(
   admin: SupabaseClient,
   email: string
 ): Promise<boolean> {
-  const { data } = await crmTable(admin, "email_suppression_list")
+  const { data } = await admin.from("email_suppression_list")
     .select("id")
     .eq("email", email.toLowerCase())
     .maybeSingle();
@@ -206,7 +205,7 @@ export async function sendCrmEmail(
   }
 
   // Mark as sending
-  await crmTable(admin, "campaign_sends")
+  await admin.from("campaign_sends")
     .update({ status: "sending" })
     .eq("id", payload.sendId);
 
@@ -247,7 +246,7 @@ export async function sendCrmEmail(
       result.data && "id" in result.data ? result.data.id : undefined;
 
     // Update send record
-    await crmTable(admin, "campaign_sends")
+    await admin.from("campaign_sends")
       .update({
         status: "sent",
         sent_at: new Date().toISOString(),
@@ -261,7 +260,7 @@ export async function sendCrmEmail(
       err instanceof Error ? err.message : "Unknown send error";
     console.error(`[crm/email-sender] Send failed for ${payload.sendId}:`, err);
 
-    await crmTable(admin, "campaign_sends")
+    await admin.from("campaign_sends")
       .update({
         status: "failed",
         bounce_reason: errorMsg,
@@ -282,7 +281,7 @@ export async function processSendBatch(
   batchSize = 50
 ): Promise<{ sent: number; skipped: number; failed: number }> {
   // Fetch queued sends that are due
-  const { data: queued } = await crmTable(admin, "campaign_sends")
+  const { data: queued } = await admin.from("campaign_sends")
     .select(
       "id, campaign_id, step_id, recipient_id, recipient_email, recipient_type, lead_id, drip_scheduled_for, template_data"
     )
@@ -299,9 +298,9 @@ export async function processSendBatch(
   let skipped = 0;
   let failed = 0;
 
-  const sendsTable = crmTable(admin, "campaign_sends");
-  const stepsTable = crmTable(admin, "campaign_steps");
-  const campaignsTable = crmTable(admin, "campaigns");
+  const sendsTable = admin.from("campaign_sends");
+  const stepsTable = admin.from("campaign_steps");
+  const campaignsTable = admin.from("campaigns");
 
   for (const send of queued) {
     // Run all pre-send checks (suppression, opt-out, topic subs, frequency caps)

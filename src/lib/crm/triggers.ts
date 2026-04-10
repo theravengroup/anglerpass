@@ -11,7 +11,6 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuppressed, hasMarketingOptOut } from "@/lib/crm/email-sender";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { userMatchesSegment } from "@/lib/crm/segment-evaluator";
 import { enrollInWorkflows } from "@/lib/crm/workflow-engine";
 import type { CrmTriggerEvent, Campaign, CampaignStep } from "@/lib/crm/types";
@@ -66,7 +65,7 @@ export async function fireCrmTrigger(
     }
 
     // Find active triggered campaigns for this event
-    const { data: campaigns } = await crmTable(admin, "campaigns")
+    const { data: campaigns } = await admin.from("campaigns")
       .select("id, type, segment_id")
       .eq("type", "triggered")
       .eq("status", "active")
@@ -95,7 +94,7 @@ export async function fireCrmTrigger(
       }
 
       // Check if already enrolled
-      const { data: existing } = await crmTable(admin, "campaign_enrollments")
+      const { data: existing } = await admin.from("campaign_enrollments")
         .select("id")
         .eq("campaign_id", campaign.id)
         .eq("recipient_email", email)
@@ -104,7 +103,7 @@ export async function fireCrmTrigger(
       if (existing) continue;
 
       // Get the first step
-      const { data: firstStep } = await crmTable(admin, "campaign_steps")
+      const { data: firstStep } = await admin.from("campaign_steps")
         .select("id, delay_minutes")
         .eq("campaign_id", campaign.id)
         .eq("step_order", 1)
@@ -119,7 +118,7 @@ export async function fireCrmTrigger(
       );
 
       // Create enrollment
-      await crmTable(admin, "campaign_enrollments").insert({
+      await admin.from("campaign_enrollments").insert({
         campaign_id: campaign.id,
         recipient_id: context.userId ?? null,
         recipient_email: email,

@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { getContactTimeline } from "@/lib/crm/conversions";
 
 /**
@@ -47,7 +46,7 @@ export async function GET(
       timeline,
     ] = await Promise.all([
       // Email stats
-      crmTable(admin, "campaign_sends")
+      admin.from("campaign_sends")
         .select("status, opened_at, clicked_at, bounced_at, unsubscribed_at")
         .eq("recipient_email", email)
         .returns<Array<{
@@ -58,13 +57,13 @@ export async function GET(
           unsubscribed_at: string | null;
         }>>(),
       // Tags
-      crmTable(admin, "crm_contact_tags")
+      admin.from("crm_contact_tags")
         .select("id, tag, created_at")
         .eq("user_id", id)
         .order("created_at", { ascending: false })
         .returns<Array<{ id: string; tag: string; created_at: string }>>(),
       // Conversions
-      crmTable(admin, "crm_conversions")
+      admin.from("crm_conversions")
         .select("id, event_name, event_category, value_cents, created_at")
         .eq("email", email)
         .order("created_at", { ascending: false })
@@ -77,7 +76,7 @@ export async function GET(
           created_at: string;
         }>>(),
       // Campaign enrollments
-      crmTable(admin, "campaign_enrollments")
+      admin.from("campaign_enrollments")
         .select("id, campaign_id, status, enrolled_at")
         .eq("recipient_email", email)
         .order("enrolled_at", { ascending: false })
@@ -89,7 +88,7 @@ export async function GET(
           enrolled_at: string;
         }>>(),
       // Workflow enrollments
-      crmTable(admin, "crm_workflow_enrollments")
+      admin.from("crm_workflow_enrollments")
         .select("id, workflow_id, status, enrolled_at, completed_at")
         .eq("email", email)
         .order("enrolled_at", { ascending: false })
@@ -171,7 +170,7 @@ export async function PATCH(
         const normalizedTag = String(tag).toLowerCase().trim();
         if (!normalizedTag) continue;
 
-        await crmTable(admin, "crm_contact_tags")
+        await admin.from("crm_contact_tags")
           .upsert(
             {
               user_id: id,
@@ -186,7 +185,7 @@ export async function PATCH(
     // Remove tags
     if (Array.isArray(body.remove_tags)) {
       for (const tag of body.remove_tags) {
-        await crmTable(admin, "crm_contact_tags")
+        await admin.from("crm_contact_tags")
           .delete()
           .eq("user_id", id)
           .eq("tag", String(tag).toLowerCase().trim());

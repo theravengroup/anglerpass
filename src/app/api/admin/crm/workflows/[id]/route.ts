@@ -1,8 +1,8 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { z } from "zod";
+import type { Json } from "@/types/supabase";
 
 // ─── GET /api/admin/crm/workflows/[id] ────────────────────────────
 
@@ -15,7 +15,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: workflow } = await crmTable(auth.admin, "crm_workflows")
+  const { data: workflow } = await auth.admin.from("crm_workflows")
     .select("*")
     .eq("id", id)
     .single();
@@ -24,11 +24,11 @@ export async function GET(
 
   // Load nodes and edges
   const [nodesResult, edgesResult] = await Promise.all([
-    crmTable(auth.admin, "crm_workflow_nodes")
+    auth.admin.from("crm_workflow_nodes")
       .select("*")
       .eq("workflow_id", id)
       .order("created_at", { ascending: true }),
-    crmTable(auth.admin, "crm_workflow_edges")
+    auth.admin.from("crm_workflow_edges")
       .select("*")
       .eq("workflow_id", id),
   ]);
@@ -81,15 +81,14 @@ export async function PATCH(
   }
 
   // Verify workflow exists and is editable
-  const { data: existing } = await crmTable(auth.admin, "crm_workflows")
+  const { data: existing } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
     .single();
 
   if (!existing) return jsonError("Workflow not found", 404);
 
-  const status = (existing as Record<string, unknown>).status;
-  if (status !== "draft" && status !== "paused") {
+  if (existing.status !== "draft" && existing.status !== "paused") {
     return jsonError("Only draft or paused workflows can be edited", 409);
   }
 
@@ -97,23 +96,23 @@ export async function PATCH(
 
   // Update workflow metadata
   if (Object.keys(workflowUpdates).length > 0) {
-    await crmTable(auth.admin, "crm_workflows")
+    await auth.admin.from("crm_workflows")
       .update({
         ...workflowUpdates,
         updated_at: new Date().toISOString(),
-      } as Record<string, unknown>)
+      })
       .eq("id", id);
   }
 
   // Replace nodes if provided
   if (nodes) {
     // Delete existing edges first (FK constraint)
-    await crmTable(auth.admin, "crm_workflow_edges")
+    await auth.admin.from("crm_workflow_edges")
       .delete()
       .eq("workflow_id", id);
 
     // Delete existing nodes
-    await crmTable(auth.admin, "crm_workflow_nodes")
+    await auth.admin.from("crm_workflow_nodes")
       .delete()
       .eq("workflow_id", id);
 
@@ -122,20 +121,20 @@ export async function PATCH(
 
     for (const node of nodes) {
       const clientId = node.id ?? crypto.randomUUID();
-      const { data: inserted } = await crmTable(auth.admin, "crm_workflow_nodes")
+      const { data: inserted } = await auth.admin.from("crm_workflow_nodes")
         .insert({
           workflow_id: id,
           type: node.type,
           label: node.label,
-          config: node.config,
+          config: node.config as Json,
           position_x: node.position_x,
           position_y: node.position_y,
-        } as Record<string, unknown>)
+        })
         .select("id")
         .single();
 
       if (inserted) {
-        nodeIdMap.set(clientId, (inserted as Record<string, unknown>).id as string);
+        nodeIdMap.set(clientId, inserted.id);
       }
     }
 
@@ -145,27 +144,27 @@ export async function PATCH(
         const sourceId = nodeIdMap.get(edge.source_node_id) ?? edge.source_node_id;
         const targetId = nodeIdMap.get(edge.target_node_id) ?? edge.target_node_id;
 
-        await crmTable(auth.admin, "crm_workflow_edges")
+        await auth.admin.from("crm_workflow_edges")
           .insert({
             workflow_id: id,
             source_node_id: sourceId,
             target_node_id: targetId,
             source_handle: edge.source_handle,
-          } as Record<string, unknown>);
+          });
       }
     }
   }
 
   // Update timestamp
-  await crmTable(auth.admin, "crm_workflows")
+  await auth.admin.from("crm_workflows")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", id);
 
   // Return full workflow
   const [wfResult, nodesResult, edgesResult] = await Promise.all([
-    crmTable(auth.admin, "crm_workflows").select("*").eq("id", id).single(),
-    crmTable(auth.admin, "crm_workflow_nodes").select("*").eq("workflow_id", id),
-    crmTable(auth.admin, "crm_workflow_edges").select("*").eq("workflow_id", id),
+    auth.admin.from("crm_workflows").select("*").eq("id", id).single(),
+    auth.admin.from("crm_workflow_nodes").select("*").eq("workflow_id", id),
+    auth.admin.from("crm_workflow_edges").select("*").eq("workflow_id", id),
   ]);
 
   return jsonOk({
@@ -188,19 +187,19 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const { data: existing } = await crmTable(auth.admin, "crm_workflows")
+  const { data: existing } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
     .single();
 
   if (!existing) return jsonError("Workflow not found", 404);
 
-  if ((existing as Record<string, unknown>).status === "active") {
+  if (existing.status === "active") {
     return jsonError("Cannot delete an active workflow. Pause it first.", 409);
   }
 
   // Cascade handles nodes, edges, enrollments, logs
-  await crmTable(auth.admin, "crm_workflows").delete().eq("id", id);
+  await auth.admin.from("crm_workflows").delete().eq("id", id);
 
   return jsonOk({ deleted: true });
 }

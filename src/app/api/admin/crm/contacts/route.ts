@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 /**
  * GET /api/admin/crm/contacts
@@ -69,21 +68,21 @@ export async function GET(request: NextRequest) {
     // Enrich with engagement stats in bulk
     const [sendStatsRes, openStatsRes, tagDataRes, convDataRes] =
       await Promise.all([
-        crmTable(admin, "campaign_sends")
+        admin.from("campaign_sends")
           .select("recipient_id")
           .in("recipient_id", filteredIds)
           .eq("status", "sent")
           .returns<{ recipient_id: string }[]>(),
-        crmTable(admin, "campaign_sends")
+        admin.from("campaign_sends")
           .select("recipient_id")
           .in("recipient_id", filteredIds)
           .not("opened_at", "is", null)
           .returns<{ recipient_id: string }[]>(),
-        crmTable(admin, "crm_contact_tags")
+        admin.from("crm_contact_tags")
           .select("user_id, tag")
           .in("user_id", filteredIds)
           .returns<{ user_id: string; tag: string }[]>(),
-        crmTable(admin, "crm_conversions")
+        admin.from("crm_conversions")
           .select("user_id")
           .in("user_id", filteredIds)
           .returns<{ user_id: string }[]>(),

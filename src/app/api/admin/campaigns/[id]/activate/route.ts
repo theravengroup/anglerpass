@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { getSegmentRecipients } from "@/lib/crm/segment-evaluator";
 import type { SegmentRuleGroup } from "@/lib/crm/types";
 
@@ -24,8 +23,8 @@ export async function POST(
 
   const { id } = await params;
 
-  const campaigns = crmTable(auth.admin, "campaigns");
-  const steps = crmTable(auth.admin, "campaign_steps");
+  const campaigns = auth.admin.from("campaigns");
+  const steps = auth.admin.from("campaign_steps");
 
   // Load campaign
   const { data: campaign } = await campaigns
@@ -35,11 +34,9 @@ export async function POST(
 
   if (!campaign) return jsonError("Campaign not found", 404);
 
-  const c = campaign as Record<string, unknown>;
-
-  if (c.status !== "draft" && c.status !== "paused") {
+  if (campaign.status !== "draft" && campaign.status !== "paused") {
     return jsonError(
-      `Campaign is ${c.status} — only draft or paused campaigns can be activated`,
+      `Campaign is ${campaign.status} — only draft or paused campaigns can be activated`,
       409
     );
   }
@@ -58,17 +55,17 @@ export async function POST(
   await campaigns
     .update({
       status: "active",
-      started_at: c.started_at ?? now,
+      started_at: campaign.started_at ?? now,
       updated_at: now,
     })
     .eq("id", id);
 
   // For broadcast campaigns: enroll all segment recipients immediately
-  if (c.type === "broadcast" && c.segment_id) {
+  if (campaign.type === "broadcast" && campaign.segment_id) {
     const enrolled = await enrollBroadcastRecipients(
       auth.admin,
       id,
-      c.segment_id as string
+      campaign.segment_id
     );
     return jsonOk({
       activated: true,
@@ -80,9 +77,9 @@ export async function POST(
 
   return jsonOk({
     activated: true,
-    type: c.type,
+    type: campaign.type,
     message:
-      c.type === "triggered"
+      campaign.type === "triggered"
         ? "Triggered campaign activated. New trigger events will enroll recipients."
         : "Drip campaign activated. The cron runner will process scheduled steps.",
   });
@@ -98,20 +95,20 @@ async function enrollBroadcastRecipients(
   segmentId: string
 ): Promise<number> {
   // Load segment rules
-  const { data: segment } = await crmTable(admin, "segments")
+  const { data: segment } = await admin.from("segments")
     .select("rules")
     .eq("id", segmentId)
     .single();
 
   if (!segment) return 0;
 
-  const rules = (segment as Record<string, unknown>).rules as SegmentRuleGroup[];
+  const rules = segment.rules as SegmentRuleGroup[];
   const recipients = await getSegmentRecipients(admin, rules);
 
   if (recipients.length === 0) return 0;
 
   // Get the first step
-  const { data: firstStep } = await crmTable(admin, "campaign_steps")
+  const { data: firstStep } = await admin.from("campaign_steps")
     .select("id, delay_minutes")
     .eq("campaign_id", campaignId)
     .order("step_order", { ascending: true })
@@ -120,12 +117,11 @@ async function enrollBroadcastRecipients(
 
   if (!firstStep) return 0;
 
-  const step = firstStep as Record<string, unknown>;
   const now = new Date();
 
   // Create enrollments + queue sends in batches
-  const enrollments = crmTable(admin, "campaign_enrollments");
-  const sends = crmTable(admin, "campaign_sends");
+  const enrollments = admin.from("campaign_enrollments");
+  const sends = admin.from("campaign_sends");
 
   let enrolled = 0;
 
@@ -152,12 +148,12 @@ async function enrollBroadcastRecipients(
 
     // Queue the first send
     const scheduledFor = new Date(
-      now.getTime() + (step.delay_minutes as number) * 60_000
+      now.getTime() + firstStep.delay_minutes * 60_000
     );
 
     await sends.insert({
       campaign_id: campaignId,
-      step_id: step.id,
+      step_id: firstStep.id,
       recipient_id: recipient.user_id,
       recipient_email: recipient.email,
       recipient_type: recipient.recipient_type,

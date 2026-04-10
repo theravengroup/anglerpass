@@ -9,7 +9,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 // ─── Topic Subscription Check ──────────────────────────────────────
 
@@ -29,7 +28,7 @@ export async function isSubscribedToTopic(
   campaignId: string
 ): Promise<boolean> {
   // Get campaign's topic
-  const { data: campaign } = await crmTable(admin, "campaigns")
+  const { data: campaign } = await admin.from("campaigns")
     .select("topic_id")
     .eq("id", campaignId)
     .maybeSingle();
@@ -39,7 +38,7 @@ export async function isSubscribedToTopic(
   if (!topicId) return true; // No topic assigned — allow
 
   // Get the topic
-  const { data: topic } = await crmTable(admin, "crm_subscription_topics")
+  const { data: topic } = await admin.from("crm_subscription_topics")
     .select("is_required, is_default")
     .eq("id", topicId)
     .maybeSingle();
@@ -51,7 +50,7 @@ export async function isSubscribedToTopic(
   if (topicRow.is_required === true) return true;
 
   // Check user's explicit preference
-  const { data: sub } = await crmTable(admin, "crm_user_topic_subscriptions")
+  const { data: sub } = await admin.from("crm_user_topic_subscriptions")
     .select("subscribed")
     .eq("user_id", userId)
     .eq("topic_id", topicId)
@@ -76,7 +75,7 @@ export async function isWithinFrequencyCaps(
   recipientEmail: string
 ): Promise<boolean> {
   // Load active frequency caps
-  const { data: caps } = await crmTable(admin, "crm_frequency_caps")
+  const { data: caps } = await admin.from("crm_frequency_caps")
     .select("max_sends, window_hours")
     .eq("is_active", true)
     .eq("applies_to", "marketing");
@@ -93,7 +92,7 @@ export async function isWithinFrequencyCaps(
     ).toISOString();
 
     // Count recent sends to this recipient
-    const { count } = await crmTable(admin, "campaign_sends")
+    const { count } = await admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .eq("recipient_email", recipientEmail.toLowerCase())
       .in("status", ["sent", "delivered"])

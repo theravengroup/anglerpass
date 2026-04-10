@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonCreated, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { createStepSchema } from "@/lib/validations/campaigns";
 
 /**
@@ -17,7 +16,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: steps, error } = await crmTable(auth.admin, "campaign_steps")
+  const { data: steps, error } = await auth.admin.from("campaign_steps")
     .select("*")
     .eq("campaign_id", id)
     .order("step_order", { ascending: true });
@@ -44,7 +43,7 @@ export async function POST(
   const { id } = await params;
 
   // Verify campaign exists and is editable
-  const { data: campaign } = await crmTable(auth.admin, "campaigns")
+  const { data: campaign } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -68,7 +67,7 @@ export async function POST(
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: step, error } = await crmTable(auth.admin, "campaign_steps")
+  const { data: step, error } = await auth.admin.from("campaign_steps")
     .insert({
       ...result.data,
       campaign_id: id,

@@ -1,7 +1,6 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { z } from "zod";
 
 // ─── GET /api/admin/crm/topics ────────────────────────────────────
@@ -11,7 +10,7 @@ export async function GET() {
   const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
-  const { data: topics } = await crmTable(auth.admin, "crm_subscription_topics")
+  const { data: topics } = await auth.admin.from("crm_subscription_topics")
     .select("*")
     .order("display_order", { ascending: true });
 
@@ -40,8 +39,8 @@ export async function POST(req: Request) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: topic, error } = await crmTable(auth.admin, "crm_subscription_topics")
-    .insert(result.data as Record<string, unknown>)
+  const { data: topic, error } = await auth.admin.from("crm_subscription_topics")
+    .insert(result.data)
     .select()
     .single();
 

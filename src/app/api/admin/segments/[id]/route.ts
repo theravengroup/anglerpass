@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { updateSegmentSchema } from "@/lib/validations/campaigns";
 import { refreshSegmentCache } from "@/lib/crm/segment-evaluator";
 
@@ -18,7 +17,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: segment, error } = await crmTable(auth.admin, "segments")
+  const { data: segment, error } = await auth.admin.from("segments")
     .select("*")
     .eq("id", id)
     .single();
@@ -57,7 +56,7 @@ export async function PATCH(
   }
 
   // Verify segment exists
-  const { data: existing } = await crmTable(auth.admin, "segments")
+  const { data: existing } = await auth.admin.from("segments")
     .select("id")
     .eq("id", id)
     .single();
@@ -71,7 +70,7 @@ export async function PATCH(
     updated_at: new Date().toISOString(),
   };
 
-  const { data: segment, error } = await crmTable(auth.admin, "segments")
+  const { data: segment, error } = await auth.admin.from("segments")
     .update(updates)
     .eq("id", id)
     .select("*")
@@ -108,7 +107,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Check if any active campaigns reference this segment
-  const { data: campaigns } = await crmTable(auth.admin, "campaigns")
+  const { data: campaigns } = await auth.admin.from("campaigns")
     .select("id, name")
     .eq("segment_id", id)
     .in("status", ["active", "draft"]);
@@ -123,7 +122,7 @@ export async function DELETE(
     );
   }
 
-  const { error } = await crmTable(auth.admin, "segments")
+  const { error } = await auth.admin.from("segments")
     .delete()
     .eq("id", id);
 

@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 /**
  * POST /api/admin/campaigns/[id]/pause
@@ -18,7 +17,7 @@ export async function POST(
 
   const { id } = await params;
 
-  const campaigns = crmTable(auth.admin, "campaigns");
+  const campaigns = auth.admin.from("campaigns");
 
   const { data: campaign } = await campaigns
     .select("id, status")
@@ -43,7 +42,7 @@ export async function POST(
     .eq("id", id);
 
   // Pause active enrollments
-  await crmTable(auth.admin, "campaign_enrollments")
+  await auth.admin.from("campaign_enrollments")
     .update({ status: "paused" })
     .eq("campaign_id", id)
     .eq("status", "active");

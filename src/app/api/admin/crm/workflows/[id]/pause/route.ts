@@ -1,7 +1,6 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 export async function POST(
   _req: Request,
@@ -12,7 +11,7 @@ export async function POST(
 
   const { id } = await params;
 
-  const { data: workflow } = await crmTable(auth.admin, "crm_workflows")
+  const { data: workflow } = await auth.admin.from("crm_workflows")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -25,14 +24,14 @@ export async function POST(
 
   // Pause workflow and all active enrollments
   await Promise.all([
-    crmTable(auth.admin, "crm_workflows")
+    auth.admin.from("crm_workflows")
       .update({
         status: "paused",
         paused_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq("id", id),
-    crmTable(auth.admin, "crm_workflow_enrollments")
+    auth.admin.from("crm_workflow_enrollments")
       .update({ status: "paused" })
       .eq("workflow_id", id)
       .eq("status", "active"),

@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { jsonOk, jsonError } from "@/lib/api/helpers";
 
 /**
@@ -33,10 +32,10 @@ export async function POST(request: NextRequest) {
   }
 
   const admin = createAdminClient();
-  const sends = crmTable(admin, "campaign_sends");
-  const events = crmTable(admin, "engagement_events");
-  const suppressions = crmTable(admin, "email_suppression_list");
-  const enrollments = crmTable(admin, "campaign_enrollments");
+  const sends = admin.from("campaign_sends");
+  const events = admin.from("engagement_events");
+  const suppressions = admin.from("email_suppression_list");
+  const enrollments = admin.from("campaign_enrollments");
 
   // Find the campaign_send by Resend message ID
   const messageId = data.email_id;
@@ -53,8 +52,6 @@ export async function POST(request: NextRequest) {
     return jsonOk({ received: true, matched: false });
   }
 
-  const sendRow = send as Record<string, unknown>;
-
   switch (type) {
     case "email.delivered": {
       await sends
@@ -62,7 +59,7 @@ export async function POST(request: NextRequest) {
           status: "delivered",
           delivered_at: new Date().toISOString(),
         })
-        .eq("id", sendRow.id);
+        .eq("id", send.id);
       break;
     }
 
@@ -76,10 +73,10 @@ export async function POST(request: NextRequest) {
           bounced_at: new Date().toISOString(),
           bounce_reason: bounceReason,
         })
-        .eq("id", sendRow.id);
+        .eq("id", send.id);
 
       await events.insert({
-        send_id: sendRow.id,
+        send_id: send.id,
         event_type: "bounce",
       });
 
@@ -87,7 +84,7 @@ export async function POST(request: NextRequest) {
       if (data.bounce?.type === "hard") {
         await suppressions.upsert(
           {
-            email: (sendRow.recipient_email as string).toLowerCase(),
+            email: send.recipient_email.toLowerCase(),
             reason: "hard_bounce",
             source: "resend_webhook",
           },
@@ -96,7 +93,7 @@ export async function POST(request: NextRequest) {
 
         await enrollments
           .update({ status: "cancelled" })
-          .eq("recipient_email", sendRow.recipient_email)
+          .eq("recipient_email", send.recipient_email)
           .eq("status", "active");
       }
       break;
@@ -105,7 +102,7 @@ export async function POST(request: NextRequest) {
     case "email.complained": {
       await suppressions.upsert(
         {
-          email: (sendRow.recipient_email as string).toLowerCase(),
+          email: send.recipient_email.toLowerCase(),
           reason: "complaint",
           source: "resend_webhook",
         },
@@ -113,13 +110,13 @@ export async function POST(request: NextRequest) {
       );
 
       await events.insert({
-        send_id: sendRow.id,
+        send_id: send.id,
         event_type: "complaint",
       });
 
       await enrollments
         .update({ status: "cancelled" })
-        .eq("recipient_email", sendRow.recipient_email)
+        .eq("recipient_email", send.recipient_email)
         .eq("status", "active");
       break;
     }

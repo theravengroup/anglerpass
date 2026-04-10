@@ -13,7 +13,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { sendCrmEmail } from "@/lib/crm/email-sender";
 import { runPreSendChecks } from "@/lib/crm/subscription-checks";
 import { renderTemplate, buildTemplateData } from "@/lib/crm/template-engine";
@@ -74,7 +73,7 @@ export async function processWorkflowEnrollments(
   // - status = active
   // - current_node_id is not null (enrolled at a node)
   // - wait_until is null or has passed
-  const { data: enrollments } = await crmTable(admin, "crm_workflow_enrollments")
+  const { data: enrollments } = await admin.from("crm_workflow_enrollments")
     .select("id, workflow_id, user_id, email, current_node_id, status, wait_until, context_data")
     .eq("status", "active")
     .not("current_node_id", "is", null)
@@ -95,11 +94,11 @@ export async function processWorkflowEnrollments(
 
   for (const wfId of workflowIds) {
     const [nodesRes, edgesRes] = await Promise.all([
-      crmTable(admin, "crm_workflow_nodes")
+      admin.from("crm_workflow_nodes")
         .select("id, workflow_id, type, label, config")
         .eq("workflow_id", wfId)
         .returns<NodeRow[]>(),
-      crmTable(admin, "crm_workflow_edges")
+      admin.from("crm_workflow_edges")
         .select("id, source_node_id, target_node_id, source_handle")
         .eq("workflow_id", wfId)
         .returns<EdgeRow[]>(),
@@ -148,7 +147,7 @@ export async function processWorkflowEnrollments(
 
       if (result.action === "wait") {
         // Node set a wait_until — update enrollment
-        await crmTable(admin, "crm_workflow_enrollments")
+        await admin.from("crm_workflow_enrollments")
           .update({
             wait_until: result.waitUntil,
             last_processed_at: new Date().toISOString(),
@@ -179,7 +178,7 @@ export async function processWorkflowEnrollments(
             completed++;
           } else {
             // Move to next node
-            await crmTable(admin, "crm_workflow_enrollments")
+            await admin.from("crm_workflow_enrollments")
               .update({
                 current_node_id: nextNodeId,
                 wait_until: null,
@@ -311,7 +310,7 @@ async function executeSendEmail(
 
   // Create a tracking record
   const sendId = crypto.randomUUID();
-  await crmTable(admin, "campaign_sends").insert({
+  await admin.from("campaign_sends").insert({
     id: sendId,
     campaign_id: null,
     step_id: null,
@@ -625,7 +624,7 @@ async function evaluateCondition(
       case "opened_last_email":
       case "clicked_last_email": {
         // Check the most recent send to this email
-        const { data } = await crmTable(admin, "campaign_sends")
+        const { data } = await admin.from("campaign_sends")
           .select("opened_at, clicked_at")
           .eq("recipient_email", enrollment.email)
           .order("created_at", { ascending: false })
@@ -744,7 +743,7 @@ async function completeEnrollment(
   admin: SupabaseClient,
   enrollmentId: string
 ): Promise<void> {
-  await crmTable(admin, "crm_workflow_enrollments")
+  await admin.from("crm_workflow_enrollments")
     .update({
       status: "completed",
       completed_at: new Date().toISOString(),
@@ -758,7 +757,7 @@ async function exitEnrollment(
   enrollmentId: string,
   reason: string
 ): Promise<void> {
-  await crmTable(admin, "crm_workflow_enrollments")
+  await admin.from("crm_workflow_enrollments")
     .update({
       status: "exited",
       completed_at: new Date().toISOString(),
@@ -781,7 +780,7 @@ async function logWorkflowStep(
   details?: Record<string, unknown>
 ): Promise<void> {
   try {
-    await crmTable(admin, "crm_workflow_logs").insert({
+    await admin.from("crm_workflow_logs").insert({
       workflow_id: enrollment.workflow_id,
       enrollment_id: enrollment.id,
       node_id: node?.id ?? null,
@@ -809,7 +808,7 @@ export async function enrollInWorkflows(
   }
 ): Promise<number> {
   // Find active workflows triggered by this event
-  const { data: workflows } = await crmTable(admin, "crm_workflows")
+  const { data: workflows } = await admin.from("crm_workflows")
     .select("id")
     .eq("status", "active")
     .eq("trigger_event", event)
@@ -821,7 +820,7 @@ export async function enrollInWorkflows(
 
   for (const wf of workflows) {
     // Check for existing active enrollment
-    const { data: existing } = await crmTable(admin, "crm_workflow_enrollments")
+    const { data: existing } = await admin.from("crm_workflow_enrollments")
       .select("id")
       .eq("workflow_id", wf.id)
       .eq("email", context.email)
@@ -831,7 +830,7 @@ export async function enrollInWorkflows(
     if (existing) continue;
 
     // Find the trigger node
-    const { data: triggerNode } = await crmTable(admin, "crm_workflow_nodes")
+    const { data: triggerNode } = await admin.from("crm_workflow_nodes")
       .select("id")
       .eq("workflow_id", wf.id)
       .eq("type", "trigger")
@@ -841,7 +840,7 @@ export async function enrollInWorkflows(
     if (!triggerNode || triggerNode.length === 0) continue;
 
     // Create enrollment at the trigger node
-    await crmTable(admin, "crm_workflow_enrollments").insert({
+    await admin.from("crm_workflow_enrollments").insert({
       workflow_id: wf.id,
       user_id: context.userId ?? null,
       email: context.email,

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { updateCampaignSchema } from "@/lib/validations/campaigns";
+import type { Json } from "@/types/supabase";
 
 /**
  * GET /api/admin/campaigns/[id]
@@ -17,7 +17,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: campaign, error } = await crmTable(auth.admin, "campaigns")
+  const { data: campaign, error } = await auth.admin.from("campaigns")
     .select("*")
     .eq("id", id)
     .single();
@@ -27,18 +27,17 @@ export async function GET(
   }
 
   // Load steps
-  const { data: steps } = await crmTable(auth.admin, "campaign_steps")
+  const { data: steps } = await auth.admin.from("campaign_steps")
     .select("*")
     .eq("campaign_id", id)
     .order("step_order", { ascending: true });
 
   // Load segment if referenced
   let segment = null;
-  const segmentId = (campaign as Record<string, unknown>).segment_id;
-  if (segmentId) {
-    const { data: seg } = await crmTable(auth.admin, "segments")
+  if (campaign.segment_id) {
+    const { data: seg } = await auth.admin.from("segments")
       .select("*")
-      .eq("id", segmentId)
+      .eq("id", campaign.segment_id)
       .single();
     segment = seg;
   }
@@ -79,7 +78,7 @@ export async function PATCH(
   }
 
   // Verify campaign exists and is editable
-  const { data: existing } = await crmTable(auth.admin, "campaigns")
+  const { data: existing } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -88,17 +87,20 @@ export async function PATCH(
     return jsonError("Campaign not found", 404);
   }
 
-  const status = (existing as Record<string, unknown>).status;
-  if (status !== "draft" && status !== "paused") {
+  if (existing.status !== "draft" && existing.status !== "paused") {
     return jsonError(
       "Only draft or paused campaigns can be edited",
       409
     );
   }
 
-  const { data: campaign, error } = await crmTable(auth.admin, "campaigns")
+  const { trigger_config, ...rest } = result.data;
+  const { data: campaign, error } = await auth.admin.from("campaigns")
     .update({
-      ...result.data,
+      ...rest,
+      ...(trigger_config !== undefined && {
+        trigger_config: trigger_config as Json,
+      }),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
@@ -127,7 +129,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Only draft campaigns can be deleted
-  const { data: existing } = await crmTable(auth.admin, "campaigns")
+  const { data: existing } = await auth.admin.from("campaigns")
     .select("id, status")
     .eq("id", id)
     .single();
@@ -136,7 +138,7 @@ export async function DELETE(
     return jsonError("Campaign not found", 404);
   }
 
-  if ((existing as Record<string, unknown>).status !== "draft") {
+  if (existing.status !== "draft") {
     return jsonError(
       "Only draft campaigns can be deleted. Archive active campaigns instead.",
       409
@@ -144,12 +146,12 @@ export async function DELETE(
   }
 
   // Delete steps first (FK constraint)
-  await crmTable(auth.admin, "campaign_steps")
+  await auth.admin.from("campaign_steps")
     .delete()
     .eq("campaign_id", id);
 
   // Delete the campaign
-  const { error } = await crmTable(auth.admin, "campaigns")
+  const { error } = await auth.admin.from("campaigns")
     .delete()
     .eq("id", id);
 

@@ -2,7 +2,6 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 import { requireAdmin, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 // ─── GET /api/admin/crm/dashboard ─────────────────────────────────
 // Returns aggregated CRM metrics for the dashboard.
@@ -16,7 +15,7 @@ export async function GET() {
   const { admin } = auth;
 
   // Try cached snapshot first (from the daily cron)
-  const { data: snapshot } = await crmTable(admin, "crm_dashboard_snapshots")
+  const { data: snapshot } = await admin.from("crm_dashboard_snapshots")
     .select("*")
     .order("snapshot_date", { ascending: false })
     .limit(1)
@@ -67,7 +66,7 @@ interface TopCampaignRow {
 type AdminClient = any;
 
 async function getRecentSends(admin: AdminClient) {
-  const { data } = await crmTable(admin, "campaign_sends")
+  const { data } = await admin.from("campaign_sends")
     .select("id, recipient_email, status, sent_at, campaign_id")
     .order("created_at", { ascending: false })
     .limit(5);
@@ -76,7 +75,7 @@ async function getRecentSends(admin: AdminClient) {
 
   // Get campaign names
   const campaignIds = [...new Set(data.map((s: Record<string, unknown>) => s.campaign_id))];
-  const { data: campaigns } = await crmTable(admin, "campaigns")
+  const { data: campaigns } = await admin.from("campaigns")
     .select("id, name")
     .in("id", campaignIds);
 
@@ -94,7 +93,7 @@ async function getRecentSends(admin: AdminClient) {
 }
 
 async function getSegmentsCount(admin: AdminClient) {
-  const { count } = await crmTable(admin, "segments")
+  const { count } = await admin.from("segments")
     .select("id", { count: "exact", head: true });
   return count ?? 0;
 }
@@ -122,39 +121,39 @@ async function computeLiveSnapshot(admin: AdminClient) {
     // Total leads
     admin.from("leads").select("id", { count: "exact", head: true }),
     // Active campaigns
-    crmTable(admin, "campaigns")
+    admin.from("campaigns")
       .select("id", { count: "exact", head: true })
       .eq("status", "active"),
     // Sends 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .gte("created_at", sevenDaysAgo),
     // Sends 30d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .gte("created_at", thirtyDaysAgo),
     // Delivered 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .eq("status", "delivered")
       .gte("created_at", sevenDaysAgo),
     // Opens 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .not("opened_at", "is", null)
       .gte("created_at", sevenDaysAgo),
     // Clicks 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .not("clicked_at", "is", null)
       .gte("created_at", sevenDaysAgo),
     // Bounces 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .eq("status", "bounced")
       .gte("created_at", sevenDaysAgo),
     // Unsubscribes 7d
-    crmTable(admin, "campaign_sends")
+    admin.from("campaign_sends")
       .select("id", { count: "exact", head: true })
       .eq("status", "unsubscribed")
       .gte("created_at", sevenDaysAgo),
@@ -209,7 +208,7 @@ async function buildDailyBreakdown(
   since: string
 ): Promise<DayCount[]> {
   // Get all sends in range and group client-side (Supabase REST doesn't support GROUP BY)
-  const { data } = await crmTable(admin, "campaign_sends")
+  const { data } = await admin.from("campaign_sends")
     .select(dateField)
     .not(dateField, "is", null)
     .gte(dateField, since)
@@ -251,7 +250,7 @@ function buildEmptyDays(count: number): DayCount[] {
 
 async function getTopCampaigns(admin: AdminClient): Promise<TopCampaignRow[]> {
   // Get campaigns with most sends
-  const { data: campaigns } = await crmTable(admin, "campaigns")
+  const { data: campaigns } = await admin.from("campaigns")
     .select("id, name, type, status")
     .in("status", ["active", "completed", "paused"])
     .order("created_at", { ascending: false })
@@ -267,18 +266,18 @@ async function getTopCampaigns(admin: AdminClient): Promise<TopCampaignRow[]> {
     const campaignId = campaign.id as string;
 
     const [totalResult, deliveredResult, openedResult, clickedResult] = await Promise.all([
-      crmTable(admin, "campaign_sends")
+      admin.from("campaign_sends")
         .select("id", { count: "exact", head: true })
         .eq("campaign_id", campaignId),
-      crmTable(admin, "campaign_sends")
+      admin.from("campaign_sends")
         .select("id", { count: "exact", head: true })
         .eq("campaign_id", campaignId)
         .eq("status", "delivered"),
-      crmTable(admin, "campaign_sends")
+      admin.from("campaign_sends")
         .select("id", { count: "exact", head: true })
         .eq("campaign_id", campaignId)
         .not("opened_at", "is", null),
-      crmTable(admin, "campaign_sends")
+      admin.from("campaign_sends")
         .select("id", { count: "exact", head: true })
         .eq("campaign_id", campaignId)
         .not("clicked_at", "is", null),

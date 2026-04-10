@@ -10,7 +10,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { crmTable } from "@/lib/crm/admin-queries";
 
 export type ConversionCategory =
   | "signup"
@@ -60,7 +59,7 @@ export async function trackConversion(
 
   const id = crypto.randomUUID();
 
-  await crmTable(admin, "crm_conversions").insert({
+  await admin.from("crm_conversions").insert({
     id,
     user_id: opts.userId ?? null,
     email: opts.email,
@@ -111,7 +110,7 @@ async function findAttribution(
   const cutoff = new Date(Date.now() - windowHours * 3_600_000).toISOString();
 
   // Look for clicks first (strongest signal)
-  const { data: clicked } = await crmTable(admin, "campaign_sends")
+  const { data: clicked } = await admin.from("campaign_sends")
     .select("id, campaign_id")
     .eq("recipient_email", email)
     .not("clicked_at", "is", null)
@@ -130,7 +129,7 @@ async function findAttribution(
   }
 
   // Then opens
-  const { data: opened } = await crmTable(admin, "campaign_sends")
+  const { data: opened } = await admin.from("campaign_sends")
     .select("id, campaign_id")
     .eq("recipient_email", email)
     .not("opened_at", "is", null)
@@ -149,7 +148,7 @@ async function findAttribution(
   }
 
   // Then any send
-  const { data: sent } = await crmTable(admin, "campaign_sends")
+  const { data: sent } = await admin.from("campaign_sends")
     .select("id, campaign_id")
     .eq("recipient_email", email)
     .eq("status", "sent")
@@ -168,7 +167,7 @@ async function findAttribution(
   }
 
   // Check workflow enrollments
-  const { data: enrollment } = await crmTable(admin, "crm_workflow_enrollments")
+  const { data: enrollment } = await admin.from("crm_workflow_enrollments")
     .select("id, workflow_id")
     .eq("email", email)
     .gte("enrolled_at", cutoff)
@@ -209,7 +208,7 @@ export async function logActivity(
   opts: LogActivityOptions
 ): Promise<void> {
   try {
-    await crmTable(admin, "crm_contact_activity").insert({
+    await admin.from("crm_contact_activity").insert({
       user_id: opts.userId ?? null,
       email: opts.email,
       activity_type: opts.activityType,
@@ -239,7 +238,7 @@ export async function getContactTimeline(
   metadata: Record<string, unknown>;
   created_at: string;
 }>> {
-  let query = crmTable(admin, "crm_contact_activity")
+  let query = admin.from("crm_contact_activity")
     .select("id, activity_type, title, description, source_type, metadata, created_at")
     .order("created_at", { ascending: false })
     .range(opts.offset ?? 0, (opts.offset ?? 0) + (opts.limit ?? 50) - 1);
@@ -276,7 +275,7 @@ export async function getCampaignConversions(
   total_value_cents: number;
   conversions_by_event: Record<string, number>;
 }> {
-  const { data } = await crmTable(admin, "crm_conversions")
+  const { data } = await admin.from("crm_conversions")
     .select("event_name, value_cents")
     .eq("attributed_campaign_id", campaignId)
     .returns<{ event_name: string; value_cents: number }[]>();

@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { buildCrmEmailHtml } from "@/lib/crm/email-sender";
 import { testSendSchema } from "@/lib/validations/campaigns";
 import { getResend } from "@/lib/email";
@@ -42,7 +41,7 @@ export async function POST(
   const { email, step_id } = result.data;
 
   // Load campaign
-  const { data: campaign } = await crmTable(auth.admin, "campaigns")
+  const { data: campaign } = await auth.admin.from("campaigns")
     .select("from_name, from_email, reply_to")
     .eq("id", id)
     .single();
@@ -52,7 +51,7 @@ export async function POST(
   const c = campaign as Record<string, unknown>;
 
   // Load the step — if step_id provided, use that; otherwise use step 1
-  let stepQuery = crmTable(auth.admin, "campaign_steps")
+  let stepQuery = auth.admin.from("campaign_steps")
     .select("subject, html_body, cta_label, cta_url")
     .eq("campaign_id", id);
 

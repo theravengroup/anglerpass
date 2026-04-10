@@ -1,8 +1,8 @@
 import "server-only";
 
 import { requireAdmin, jsonOk, jsonError, jsonCreated } from "@/lib/api/helpers";
-import { crmTable } from "@/lib/crm/admin-queries";
 import { z } from "zod";
+import type { Json } from "@/types/supabase";
 
 // ─── GET /api/admin/crm/workflows ─────────────────────────────────
 
@@ -10,25 +10,24 @@ export async function GET() {
   const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
-  const { data: workflows } = await crmTable(auth.admin, "crm_workflows")
+  const { data: workflows } = await auth.admin.from("crm_workflows")
     .select("*")
     .order("updated_at", { ascending: false });
 
   // Get node counts per workflow
   const results = [];
   for (const wf of workflows ?? []) {
-    const w = wf as Record<string, unknown>;
-    const { count } = await crmTable(auth.admin, "crm_workflow_nodes")
+    const { count } = await auth.admin.from("crm_workflow_nodes")
       .select("id", { count: "exact", head: true })
-      .eq("workflow_id", w.id);
+      .eq("workflow_id", wf.id);
 
-    const { count: enrollmentCount } = await crmTable(auth.admin, "crm_workflow_enrollments")
+    const { count: enrollmentCount } = await auth.admin.from("crm_workflow_enrollments")
       .select("id", { count: "exact", head: true })
-      .eq("workflow_id", w.id)
+      .eq("workflow_id", wf.id)
       .eq("status", "active");
 
     results.push({
-      ...w,
+      ...wf,
       node_count: count ?? 0,
       active_enrollments: enrollmentCount ?? 0,
     });
@@ -56,12 +55,12 @@ export async function POST(req: Request) {
     return jsonError(result.error.issues[0]?.message ?? "Invalid input", 400);
   }
 
-  const { data: workflow, error } = await crmTable(auth.admin, "crm_workflows")
+  const { data: workflow, error } = await auth.admin.from("crm_workflows")
     .insert({
       ...result.data,
       status: "draft",
       created_by: auth.user.id,
-    } as Record<string, unknown>)
+    })
     .select()
     .single();
 
@@ -70,15 +69,14 @@ export async function POST(req: Request) {
   }
 
   // Create default trigger node
-  const wfId = (workflow as Record<string, unknown>).id;
-  await crmTable(auth.admin, "crm_workflow_nodes").insert({
-    workflow_id: wfId,
+  await auth.admin.from("crm_workflow_nodes").insert({
+    workflow_id: workflow.id,
     type: "trigger",
     label: "Trigger",
-    config: { event: result.data.trigger_event ?? null },
+    config: { event: result.data.trigger_event ?? null } as Json,
     position_x: 250,
     position_y: 50,
-  } as Record<string, unknown>);
+  });
 
   return jsonCreated({ workflow });
 }

@@ -2,7 +2,7 @@ import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { crmTable } from "@/lib/crm/admin-queries";
+import type { Json } from "@/types/supabase";
 
 // ─── POST /api/cron/crm-stats ─────────────────────────────────────
 // Runs daily via Vercel Cron. Computes CRM dashboard metrics and
@@ -43,19 +43,19 @@ export async function POST(req: NextRequest) {
     ] = await Promise.all([
       admin.from("profiles").select("id", { count: "exact", head: true }),
       admin.from("leads").select("id", { count: "exact", head: true }),
-      crmTable(admin, "campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "delivered").gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "delivered").gte("created_at", thirtyDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).not("opened_at", "is", null).gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).not("opened_at", "is", null).gte("created_at", thirtyDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).not("clicked_at", "is", null).gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).not("clicked_at", "is", null).gte("created_at", thirtyDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "bounced").gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "bounced").gte("created_at", thirtyDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "unsubscribed").gte("created_at", sevenDaysAgo),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("status", "unsubscribed").gte("created_at", thirtyDaysAgo),
+      admin.from("campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "delivered").gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "delivered").gte("created_at", thirtyDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).not("opened_at", "is", null).gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).not("opened_at", "is", null).gte("created_at", thirtyDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).not("clicked_at", "is", null).gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).not("clicked_at", "is", null).gte("created_at", thirtyDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "bounced").gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "bounced").gte("created_at", thirtyDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "unsubscribed").gte("created_at", sevenDaysAgo),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("status", "unsubscribed").gte("created_at", thirtyDaysAgo),
     ]);
 
     const delivered7d = delivered7dResult.count ?? 0;
@@ -102,8 +102,14 @@ export async function POST(req: NextRequest) {
       top_campaigns: topCampaigns,
     };
 
-    await crmTable(admin, "crm_dashboard_snapshots")
-      .upsert(snapshotData as Record<string, unknown>, { onConflict: "snapshot_date" });
+    await admin.from("crm_dashboard_snapshots")
+      .upsert({
+        ...snapshotData,
+        sends_by_day: sendsByDay as unknown as Json,
+        opens_by_day: opensByDay as unknown as Json,
+        clicks_by_day: clicksByDay as unknown as Json,
+        top_campaigns: topCampaigns as unknown as Json,
+      }, { onConflict: "snapshot_date" });
 
     return NextResponse.json({
       ok: true,
@@ -132,7 +138,7 @@ async function buildDailyBreakdown(
   dateField: string,
   since: string
 ): Promise<DayCount[]> {
-  const { data } = await crmTable(admin, "campaign_sends")
+  const { data } = await admin.from("campaign_sends")
     .select(dateField)
     .not(dateField, "is", null)
     .gte(dateField, since)
@@ -161,7 +167,7 @@ async function buildDailyBreakdown(
 }
 
 async function getTopCampaigns(admin: AdminClient) {
-  const { data: campaigns } = await crmTable(admin, "campaigns")
+  const { data: campaigns } = await admin.from("campaigns")
     .select("id, name, type, status")
     .in("status", ["active", "completed", "paused"])
     .order("created_at", { ascending: false })
@@ -176,10 +182,10 @@ async function getTopCampaigns(admin: AdminClient) {
     const campaignId = campaign.id as string;
 
     const [totalRes, deliveredRes, openedRes, clickedRes] = await Promise.all([
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).eq("status", "delivered"),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).not("opened_at", "is", null),
-      crmTable(admin, "campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).not("clicked_at", "is", null),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).eq("status", "delivered"),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).not("opened_at", "is", null),
+      admin.from("campaign_sends").select("id", { count: "exact", head: true }).eq("campaign_id", campaignId).not("clicked_at", "is", null),
     ]);
 
     const total = totalRes.count ?? 0;
