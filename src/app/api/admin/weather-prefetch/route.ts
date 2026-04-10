@@ -1,4 +1,4 @@
-import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAdmin } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPropertyForecast } from "@/lib/weather";
 
@@ -13,24 +13,11 @@ import { getPropertyForecast } from "@/lib/weather";
  */
 export async function POST(request: Request) {
   try {
-    const auth = await requireAuth();
+    const auth = await requireAdmin();
 
     if (!auth) return jsonError("Unauthorized", 401);
 
-    const { user } = auth;
-
     const admin = createAdminClient();
-
-    // Verify admin role
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profile?.role !== "admin") {
-      return jsonError("Forbidden", 403);
-    }
 
     // Fetch all published properties with coordinates
     const { data: properties } = await admin

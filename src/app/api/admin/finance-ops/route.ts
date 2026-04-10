@@ -1,4 +1,4 @@
-import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -12,7 +12,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * - Latest daily snapshot
  */
 export async function GET() {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const db = createAdminClient();
@@ -67,7 +67,7 @@ export async function GET() {
  * Resolve or dismiss a reconciliation exception.
  */
 export async function PATCH(request: Request) {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const body = await request.json();

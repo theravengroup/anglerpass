@@ -1,4 +1,4 @@
-import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * Supports filtering by status and sorting by age or severity.
  */
 export async function GET(request: Request) {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const { searchParams } = new URL(request.url);

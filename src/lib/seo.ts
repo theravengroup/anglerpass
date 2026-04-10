@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/constants';
 
-export const SITE_URL = 'https://anglerpass.com';
+export { SITE_URL };
 export const SITE_NAME = 'AnglerPass';
 export const DEFAULT_TITLE = 'AnglerPass — Private Water Fly Fishing Access';
 export const DEFAULT_DESCRIPTION =

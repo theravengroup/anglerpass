@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAdmin } from "@/lib/api/helpers";
 import { getContactTimeline } from "@/lib/crm/conversions";
 
 /**
@@ -12,7 +12,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await requireAuth();
+  const authResult = await requireAdmin();
   if (!authResult) return jsonError("Unauthorized", 401);
 
   const { id } = await params;
@@ -154,14 +154,14 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await requireAuth();
+  const authResult = await requireAdmin();
   if (!authResult) return jsonError("Unauthorized", 401);
 
   const { id } = await params;
   const body = await request.json();
   const admin = createAdminClient();
 
-  // Use authenticated user from requireAuth above
+  // Use authenticated user from requireAdmin above
 
   try {
     // Add tags

@@ -1,4 +1,4 @@
-import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest } from "next/server";
 
@@ -12,7 +12,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const { id: payoutId } = await params;

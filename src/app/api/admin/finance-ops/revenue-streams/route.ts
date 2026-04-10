@@ -1,4 +1,4 @@
-import { requireAuth, jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireAdmin, jsonOk, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -12,7 +12,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * - Compass AI credit packs
  */
 export async function GET(request: Request) {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) return jsonError("Unauthorized", 401);
 
   const { searchParams } = new URL(request.url);

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { jsonOk, jsonError, requireAuth, escapeIlike } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAdmin, escapeIlike } from "@/lib/api/helpers";
 
 /**
  * GET /api/admin/crm/contacts
@@ -9,7 +9,7 @@ import { jsonOk, jsonError, requireAuth, escapeIlike } from "@/lib/api/helpers";
  * Query params: search, limit, offset, tag
  */
 export async function GET(request: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAdmin();
   if (!authResult) return jsonError("Unauthorized", 401);
 
   const admin = createAdminClient();

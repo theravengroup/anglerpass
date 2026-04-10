@@ -1,4 +1,4 @@
-import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
+import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -6,22 +6,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * Returns Compass AI usage stats for the admin dashboard.
  */
 export async function GET() {
-  const auth = await requireAuth();
+  const auth = await requireAdmin();
   if (!auth) {
     return jsonError("Unauthorized", 401);
-  }
-
-  const typedAdmin = createAdminClient();
-
-  // Verify admin role
-  const { data: profile } = await typedAdmin
-    .from("profiles")
-    .select("role")
-    .eq("id", auth.user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") {
-    return jsonError("Forbidden", 403);
   }
 
   const admin = createAdminClient();
@@ -84,7 +71,7 @@ export async function GET() {
 
   if (topUsersRaw.length > 0) {
     const userIds = topUsersRaw.map((u) => u.user_id);
-    const { data: profiles } = await typedAdmin
+    const { data: profiles } = await admin
       .from("profiles")
       .select("id, display_name")
       .in("id", userIds);
