@@ -188,6 +188,7 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-mkt-conservation", label: "Conservation page (habitat preservation, catch-and-release values)", done: true },
           { id: "c-mkt-ai", label: "AnglerPass Compass AI section (trip matching, planning, on-water guidance)", done: true },
           { id: "c-mkt-explore", label: "Public Explore Waters page (search properties without login)", done: true },
+          { id: "c-mkt-team", label: "Team page with bios and leadership profiles", done: true },
         ],
       },
       {
@@ -196,6 +197,19 @@ export const PHASES: RoadmapPhase[] = [
         items: [
           { id: "c-learn-system", label: "Learn center with 20 educational posts (MDX, categories, SEO)", done: true },
           { id: "c-learn-sitemap", label: "Dynamic sitemap generation for learn posts", done: true },
+        ],
+      },
+      {
+        id: "complete-auth-ux",
+        title: "Auth & UX Polish",
+        items: [
+          { id: "c-nav-avatar", label: "Nav avatar dropdown (profile photo, initials fallback, Dashboard/Settings/Log Out)", done: true },
+          { id: "c-role-protection", label: "Role-based route protection (middleware enforces role-to-path mapping)", done: true },
+          { id: "c-cache-control", label: "Cache-Control headers on protected routes (prevent stale back-button pages)", done: true },
+          { id: "c-auth-aware-ctas", label: "Auth-aware CTAs across marketing site (waitlist, footer, 404, error, final CTA)", done: true },
+          { id: "c-login-messaging", label: "Login page query param messaging (error/success banners)", done: true },
+          { id: "c-signup-dupe", label: "Signup duplicate email detection with sign-in link", done: true },
+          { id: "c-auth-callback", label: "Auth callback error handling (redirect to login with message)", done: true },
         ],
       },
       {
