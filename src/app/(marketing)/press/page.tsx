@@ -77,7 +77,7 @@ export default function PressPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="marketing-grid-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {KEY_FACTS.map((fact) => (
               <div
                 key={fact.label}

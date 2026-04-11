@@ -156,7 +156,7 @@ export default function ClubsPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
@@ -194,7 +194,7 @@ export default function ClubsPage() {
               of your stated fees.
             </p>
           </div>
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {[
               {
                 name: 'Starter',
@@ -295,7 +295,7 @@ export default function ClubsPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {[
               {
                 icon: Building2,
@@ -402,7 +402,7 @@ export default function ClubsPage() {
           </div>
 
           {/* What clubs control */}
-          <div className="reveal grid grid-cols-3 gap-6 mb-16">
+          <div className="reveal marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 mb-16">
             {[
               {
                 title: 'Full Partner Control',

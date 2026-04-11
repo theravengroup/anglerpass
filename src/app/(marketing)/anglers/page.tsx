@@ -155,7 +155,7 @@ export default function AnglersPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
@@ -190,7 +190,7 @@ export default function AnglersPage() {
             water through a fly fishing club that vouches for its members. Clubs are the
             trust layer that makes landowners comfortable opening their gates.
           </p>
-          <div className="marketing-features-grid grid grid-cols-3 gap-6 text-left">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 text-left">
             {[
               { step: '01', title: 'Join a Club', text: 'Find a fly fishing club on AnglerPass and apply for membership. Clubs set their own standards and vet every applicant.' },
               { step: '02', title: 'Get Vetted', text: 'Your club reviews your application and vouches for you as a responsible angler. This vetting is what earns landowner trust.' },

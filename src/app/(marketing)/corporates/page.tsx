@@ -177,7 +177,7 @@ export default function CorporateMembershipsPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
@@ -211,7 +211,7 @@ export default function CorporateMembershipsPage() {
             Getting started is straightforward. Find a club that offers corporate
             memberships, pay one initiation fee, and start inviting your&nbsp;team.
           </p>
-          <div className="marketing-features-grid grid grid-cols-3 gap-6 text-left">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 text-left">
             {[
               {
                 step: '01',

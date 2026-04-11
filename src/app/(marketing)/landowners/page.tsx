@@ -156,7 +156,7 @@ export default function LandownersPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
@@ -212,7 +212,7 @@ export default function LandownersPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[860px] mx-auto">
+          <div className="marketing-grid-3 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[860px] mx-auto">
             <div className="reveal d1 bg-white border border-parchment rounded-[14px] px-7 py-8 text-center">
               <div className="w-[44px] h-[44px] rounded-[10px] bg-forest/8 flex items-center justify-center mb-5 mx-auto text-forest">
                 <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -281,7 +281,7 @@ export default function LandownersPage() {
             at least one fly fishing club. The club acts as the trust layer
             &mdash; vetting the anglers who can see and book your water.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-[640px] mx-auto text-left">
+          <div className="marketing-grid-3 grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-[640px] mx-auto text-left">
             <div className="bg-white border border-parchment rounded-xl px-5 py-5">
               <span className="inline-flex items-center justify-center size-8 rounded-lg bg-forest/8 text-forest font-heading text-[15px] font-bold mb-3">1</span>
               <h3 className="text-[14px] font-semibold text-forest mb-1.5">Register your property</h3>

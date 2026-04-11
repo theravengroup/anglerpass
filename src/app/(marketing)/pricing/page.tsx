@@ -42,7 +42,7 @@ export default function PricingPage() {
           </div>
 
           {/* Subscription tiers */}
-          <div className="marketing-features-grid grid grid-cols-3 gap-6 mb-10">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 mb-10">
             {[
               { name: 'Starter', price: '$79', members: '100', properties: '10' },
               { name: 'Standard', price: '$199', members: '500', properties: '50', highlight: true },

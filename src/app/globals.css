@@ -131,7 +131,7 @@ p, li, figcaption, blockquote, dd, dt, label, caption {
   .marketing-features-grid { grid-template-columns: 1fr !important; }
 }
 @media (min-width: 769px) and (max-width: 1024px) {
-  .marketing-features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .marketing-grid-3 { grid-template-columns: 1fr !important; }
 }
 
 /* ═══ FOOTER MODALS (shared across all pages) ═══ */

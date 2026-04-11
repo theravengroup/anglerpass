@@ -191,7 +191,7 @@ export default async function LearnPostPage({ params }: PageProps) {
             <h2 className="font-heading text-[24px] font-semibold text-forest mb-6">
               Related Articles
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="marketing-grid-3 grid grid-cols-1 lg:grid-cols-3 gap-4">
               {related.map((r) => (
                 <Link
                   key={r.slug}

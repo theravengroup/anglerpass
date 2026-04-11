@@ -207,7 +207,7 @@ export default function GuidesPage() {
             </p>
           </div>
 
-          <div className="marketing-features-grid grid grid-cols-3 gap-6">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <div
                 key={feature.title}
