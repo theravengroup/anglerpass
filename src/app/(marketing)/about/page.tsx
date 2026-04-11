@@ -63,7 +63,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-[16.5px] leading-[1.7] text-text-secondary">
               Private fly fishing water in the United States is fragmented,
-              inaccessible, and poorly managed. Landowners have water but no way
+              inaccessible, and largely unconnected. Landowners have water but no way
               to monetize it safely. Clubs have members but no modern tools.
               Anglers want access but have no way to find it.
             </p>
