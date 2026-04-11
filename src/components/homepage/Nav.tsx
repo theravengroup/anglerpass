@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 const navLinks = [
   { anchor: '#problem', label: 'The Problem' },
@@ -14,10 +15,20 @@ const navLinks = [
   { anchor: '#faq', label: 'FAQ' },
 ];
 
+interface UserInfo {
+  firstName: string;
+  lastName: string;
+  initials: string;
+}
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const isHomepage = pathname === '/';
 
   useEffect(() => {
@@ -29,6 +40,53 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Check auth state
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function getUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const meta = session.user.user_metadata ?? {};
+        const firstName = (meta.first_name || meta.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || '').trim();
+        const lastName = (meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '').trim();
+        const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || firstName.charAt(0).toUpperCase() || '?';
+        setUser({ firstName, lastName, initials });
+      } else {
+        setUser(null);
+      }
+    }
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata ?? {};
+        const firstName = (meta.first_name || meta.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || '').trim();
+        const lastName = (meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '').trim();
+        const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || firstName.charAt(0).toUpperCase() || '?';
+        setUser({ firstName, lastName, initials });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Close avatar dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+        setAvatarOpen(false);
+      }
+    }
+    if (avatarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [avatarOpen]);
+
   function handleAnchorClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
     if (href.startsWith('#')) {
       e.preventDefault();
@@ -39,6 +97,14 @@ export default function Nav() {
       }
       setMobileOpen(false);
     }
+  }
+
+  async function handleSignOut() {
+    setAvatarOpen(false);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
   }
 
   return (
@@ -122,7 +188,22 @@ export default function Nav() {
         </ul>
         <div className="nav-cta">
           <Link href="/explore" className="btn btn-login">Explore Waters</Link>
-          <a href="/login" className="btn btn-login">Log In</a>
+          {user ? (
+            <div className="nav-avatar-wrap" ref={avatarRef} onClick={() => setAvatarOpen((prev) => !prev)}>
+              <span className="nav-avatar-name">{user.firstName}</span>
+              <div className="nav-avatar" aria-label="Account menu">
+                {user.initials}
+              </div>
+              <div className={`nav-avatar-dropdown${avatarOpen ? ' open' : ''}`}>
+                <Link href="/dashboard" onClick={() => setAvatarOpen(false)}>Dashboard</Link>
+                <Link href="/dashboard/settings" onClick={() => setAvatarOpen(false)}>Account Settings</Link>
+                <div className="nav-avatar-divider" />
+                <button type="button" onClick={handleSignOut}>Log Out</button>
+              </div>
+            </div>
+          ) : (
+            <a href="/login" className="btn btn-login">Log In</a>
+          )}
         </div>
         <button
           className="mobile-toggle"
@@ -145,8 +226,18 @@ export default function Nav() {
             gap: '4px',
           }}
         >
-          {[...navLinks, { anchor: '#investors', label: 'Investors' }, { anchor: '/explore', label: 'Explore Waters' }, { anchor: '/login', label: 'Log In' }].map((item) =>
-            isHomepage ? (
+          {[
+            ...navLinks,
+            { anchor: '#investors', label: 'Investors' },
+            { anchor: '/explore', label: 'Explore Waters' },
+            ...(user
+              ? [
+                  { anchor: '/dashboard', label: 'Dashboard' },
+                  { anchor: '/dashboard/settings', label: 'Account Settings' },
+                ]
+              : [{ anchor: '/login', label: 'Log In' }]),
+          ].map((item) =>
+            isHomepage && item.anchor.startsWith('#') ? (
               <a
                 key={item.anchor}
                 href={item.anchor}
@@ -184,6 +275,31 @@ export default function Nav() {
                 {item.label}
               </Link>
             )
+          )}
+          {user && (
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                handleSignOut();
+              }}
+              style={{
+                display: 'block',
+                padding: '12px 0',
+                fontSize: '15px',
+                fontWeight: 500,
+                color: scrolled ? 'var(--text-primary)' : 'rgba(255,255,255,.85)',
+                textDecoration: 'none',
+                border: 'none',
+                borderBottom: `1px solid ${scrolled ? 'var(--border)' : 'rgba(255,255,255,.08)'}`,
+                background: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Log Out
+            </button>
           )}
         </div>
       )}
