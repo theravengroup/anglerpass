@@ -95,12 +95,7 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     href: "/admin/crm",
     icon: <Mail />,
   },
-  {
-    label: "Campaigns (Legacy)",
-    href: "/admin/campaigns",
-    icon: <Mail />,
-  },
-  {
+{
     label: "Compass AI",
     href: "/admin/compass",
     icon: <Sparkles />,
@@ -127,7 +122,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/support": "Support Tickets",
   "/admin/bookings": "Booking Management",
   "/admin/crm": "Marketing Automation",
-  "/admin/campaigns": "Campaigns (Legacy)",
   "/admin/compass": "Compass AI Usage",
 };
 
