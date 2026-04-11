@@ -347,17 +347,11 @@ export default function CorporateMembershipsPage() {
             <h3 className="font-heading text-[clamp(24px,3vw,34px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Already an Employee of a Corporate&nbsp;Member?
             </h3>
-            <p className="text-[15px] leading-[1.65] text-text-secondary mb-6 max-w-[480px] mx-auto">
+            <p className="text-[15px] leading-[1.65] text-text-secondary max-w-[480px] mx-auto">
               If your employer already has a corporate membership on AnglerPass,
               ask them for an invitation. You&rsquo;ll join the club as an angler
               with no initiation fee &mdash; just annual&nbsp;dues.
             </p>
-            <Link
-              href="/signup?role=angler"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-forest text-white transition-all duration-[400ms]"
-            >
-              Create Your Account
-            </Link>
           </div>
         </div>
       </section>
