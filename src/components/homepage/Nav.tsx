@@ -16,9 +16,11 @@ const navLinks = [
 ];
 
 interface UserInfo {
+  id: string;
   firstName: string;
   lastName: string;
   initials: string;
+  avatarUrl: string | null;
 }
 
 export default function Nav() {
@@ -44,14 +46,30 @@ export default function Nav() {
   useEffect(() => {
     const supabase = createClient();
 
+    function extractUserInfo(authUser: { id: string; email?: string; user_metadata?: Record<string, string> }): UserInfo {
+      const meta = authUser.user_metadata ?? {};
+      const firstName = (meta.first_name || meta.full_name?.split(' ')[0] || authUser.email?.split('@')[0] || '').trim();
+      const lastName = (meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '').trim();
+      const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || firstName.charAt(0).toUpperCase() || '?';
+      return { id: authUser.id, firstName, lastName, initials, avatarUrl: null };
+    }
+
+    async function fetchAvatarUrl(userId: string): Promise<string | null> {
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .maybeSingle();
+      return data?.avatar_url ?? null;
+    }
+
     async function getUser() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        const meta = session.user.user_metadata ?? {};
-        const firstName = (meta.first_name || meta.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || '').trim();
-        const lastName = (meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '').trim();
-        const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || firstName.charAt(0).toUpperCase() || '?';
-        setUser({ firstName, lastName, initials });
+        const info = extractUserInfo(session.user);
+        setUser(info);
+        const avatarUrl = await fetchAvatarUrl(session.user.id);
+        if (avatarUrl) setUser((prev) => prev ? { ...prev, avatarUrl } : prev);
       } else {
         setUser(null);
       }
@@ -59,13 +77,12 @@ export default function Nav() {
 
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const meta = session.user.user_metadata ?? {};
-        const firstName = (meta.first_name || meta.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || '').trim();
-        const lastName = (meta.last_name || meta.full_name?.split(' ').slice(1).join(' ') || '').trim();
-        const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || firstName.charAt(0).toUpperCase() || '?';
-        setUser({ firstName, lastName, initials });
+        const info = extractUserInfo(session.user);
+        setUser(info);
+        const avatarUrl = await fetchAvatarUrl(session.user.id);
+        if (avatarUrl) setUser((prev) => prev ? { ...prev, avatarUrl } : prev);
       } else {
         setUser(null);
       }
@@ -192,7 +209,11 @@ export default function Nav() {
             <div className="nav-avatar-wrap" ref={avatarRef} onClick={() => setAvatarOpen((prev) => !prev)}>
               <span className="nav-avatar-name">{user.firstName}</span>
               <div className="nav-avatar" aria-label="Account menu">
-                {user.initials}
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.firstName} />
+                ) : (
+                  user.initials
+                )}
               </div>
               <div className={`nav-avatar-dropdown${avatarOpen ? ' open' : ''}`}>
                 <Link href="/dashboard" onClick={() => setAvatarOpen(false)}>Dashboard</Link>
