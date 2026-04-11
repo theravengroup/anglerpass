@@ -36,7 +36,7 @@ const ROLE_LABELS: Record<string, string> = {
   club_admin: "Club / Outfitter",
   angler: "Angler",
   guide: "Fishing Guide",
-  corporate: "Corporate Membership",
+  corporate: "Corporate Sponsor",
 };
 
 export default function SignupPage() {
