@@ -54,6 +54,7 @@ function SignupForm() {
   const invitationToken = searchParams.get("invitation");
 
   const [error, setError] = useState<string | null>(null);
+  const [duplicateEmail, setDuplicateEmail] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -109,7 +110,16 @@ function SignupForm() {
       });
 
       if (authError) {
-        setError(authError.message);
+        // Provide a user-friendly message for duplicate email signups
+        const msg = authError.message.toLowerCase();
+        if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("user already")) {
+          setError(
+            "An account with this email already exists. Try signing in instead."
+          );
+          setDuplicateEmail(true);
+        } else {
+          setError(authError.message);
+        }
         return;
       }
 
@@ -184,6 +194,14 @@ function SignupForm() {
       {error && (
         <div role="alert" aria-live="polite" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
+          {duplicateEmail && (
+            <>
+              {" "}
+              <Link href="/login" className="font-medium text-red-800 underline">
+                Sign in here
+              </Link>
+            </>
+          )}
         </div>
       )}
 

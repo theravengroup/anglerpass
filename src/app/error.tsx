@@ -1,7 +1,8 @@
 'use client';
 
 import * as Sentry from "@sentry/nextjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from '@/lib/supabase/client';
 
 export default function Error({
   error,
@@ -10,9 +11,19 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+    });
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-forest-deep px-8 py-10">
       <div className="max-w-[480px] text-center">
@@ -50,10 +61,10 @@ export default function Error({
             Try Again
           </button>
           <a
-            href="/"
+            href={isLoggedIn ? "/dashboard" : "/"}
             className="inline-flex items-center gap-2 rounded-md border border-parchment/20 bg-transparent px-7 py-3.5 text-[14px] font-medium tracking-[0.3px] text-parchment no-underline transition-all duration-[400ms]"
           >
-            Back to Home
+            {isLoggedIn ? "Go to Dashboard" : "Back to Home"}
           </a>
         </div>
       </div>

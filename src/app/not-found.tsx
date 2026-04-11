@@ -1,6 +1,19 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 export default function NotFound() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+    });
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-forest-deep px-8 py-10">
       <div className="max-w-[480px] text-center">
@@ -38,10 +51,10 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link
-            href="/#waitlist"
+            href={isLoggedIn ? "/dashboard" : "/#waitlist"}
             className="inline-flex items-center gap-2 rounded-md border border-parchment/20 bg-transparent px-7 py-3.5 text-[14px] font-medium tracking-[0.3px] text-parchment no-underline transition-all duration-[400ms]"
           >
-            Join the Waitlist
+            {isLoggedIn ? "Go to Dashboard" : "Join the Waitlist"}
           </Link>
         </div>
       </div>

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import TurnstileWidget from '@/components/shared/TurnstileWidget';
+import { createClient } from '@/lib/supabase/client';
 
 const US_STATES = [
   'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
@@ -59,6 +60,19 @@ type FormData = z.infer<typeof schema>;
 export default function WaitlistForm() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setIsLoggedIn(true);
+        const meta = session.user.user_metadata ?? {};
+        setUserName(meta.first_name || meta.display_name || '');
+      }
+    });
+  }, []);
 
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -91,6 +105,27 @@ export default function WaitlistForm() {
       }, 3000);
     }, 1500);
   };
+
+  if (isLoggedIn) {
+    return (
+      <div className="waitlist-form-wrapper reveal-right d1">
+        <h3 className="waitlist-form-title">
+          {userName ? `Welcome back, ${userName}` : 'Welcome back'}
+        </h3>
+        <p className="waitlist-form-sub">
+          You already have an AnglerPass account. Head to your dashboard to get started.
+        </p>
+        <div className="form-submit">
+          <a href="/dashboard" className="btn btn-primary">
+            Go to Dashboard{' '}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="waitlist-form-wrapper reveal-right d1">

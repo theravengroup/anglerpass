@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import ContactModal from '@/components/shared/ContactModal';
 import ContactForm from '@/components/shared/ContactForm';
 
@@ -85,7 +86,16 @@ function FooterButtonLink({
 
 export default function MarketingFooter() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+
+  // Check auth state for account link
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+    });
+  }, []);
 
   // Listen for custom event from FinalCtaSection (or anywhere else)
   useEffect(() => {
@@ -142,11 +152,24 @@ export default function MarketingFooter() {
               <FooterLink href="/press" label="Press" />
             </FooterLinkColumn>
 
-            {/* Legal */}
+            {/* Legal & Account */}
             <FooterLinkColumn heading="Legal">
               {LEGAL_LINKS.map((link) => (
                 <FooterLink key={link.href} href={link.href} label={link.label} />
               ))}
+              <li className="mt-4 mb-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-bronze-light">
+                  Account
+                </span>
+              </li>
+              {isLoggedIn ? (
+                <>
+                  <FooterLink href="/dashboard" label="Dashboard" />
+                  <FooterLink href="/dashboard/settings" label="Settings" />
+                </>
+              ) : (
+                <FooterLink href="/login" label="Log In" />
+              )}
             </FooterLinkColumn>
           </div>
 

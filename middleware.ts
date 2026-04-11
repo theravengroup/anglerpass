@@ -15,6 +15,17 @@ const PROTECTED_PREFIXES = [
   "/corporate",
 ];
 
+/** Maps route prefixes to the role(s) allowed to access them */
+const ROLE_PREFIX_MAP: Record<string, string[]> = {
+  "/landowner": ["landowner"],
+  "/club": ["club_admin"],
+  "/angler": ["angler"],
+  "/guide": ["guide"],
+  "/corporate": ["corporate"],
+  "/admin": ["admin"],
+  // /dashboard is accessible to all authenticated users
+};
+
 /** Public marketing pages whose paths happen to start with protected prefixes */
 const PUBLIC_OVERRIDES = new Set(["/landowners", "/clubs", "/anglers", "/guides", "/corporates"]);
 
@@ -120,19 +131,29 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Admin route → verify admin role
-    if (pathname.startsWith("/admin") && profile?.role !== "admin") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
-    }
+    // Role-based route protection: verify user's role matches the route prefix
+    if (profile?.role) {
+      for (const [prefix, allowedRoles] of Object.entries(ROLE_PREFIX_MAP)) {
+        if (pathname.startsWith(prefix) && !allowedRoles.includes(profile.role)) {
+          const url = request.nextUrl.clone();
+          url.pathname = getRoleHomePath(profile.role);
+          return NextResponse.redirect(url);
+        }
+      }
 
-    // Admin user on non-admin routes → redirect to admin panel
-    if (profile?.role === "admin" && !pathname.startsWith("/admin")) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin";
-      return NextResponse.redirect(url);
+      // Admin user on non-admin routes → redirect to admin panel
+      if (profile.role === "admin" && !pathname.startsWith("/admin") && !pathname.startsWith("/dashboard")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin";
+        return NextResponse.redirect(url);
+      }
     }
+  }
+
+  // Add cache-control headers to prevent back-button showing stale pages after logout
+  if (isProtectedRoute(pathname)) {
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    response.headers.set("Pragma", "no-cache");
   }
 
   return response;

@@ -109,6 +109,20 @@ function LoginForm() {
     }
   }
 
+  // Display messages from query params (e.g. after password reset or expired link)
+  const queryError = searchParams.get("error");
+  const queryMessage = searchParams.get("message");
+
+  const QUERY_ERROR_MESSAGES: Record<string, string> = {
+    auth_callback_failed:
+      "Your confirmation link has expired or is invalid. Please try again.",
+  };
+
+  const QUERY_SUCCESS_MESSAGES: Record<string, string> = {
+    password_updated:
+      "Your password has been updated. Sign in with your new password.",
+  };
+
   return (
     <div>
       <h1 className="mb-1 text-center font-heading text-2xl font-semibold text-forest">
@@ -117,6 +131,26 @@ function LoginForm() {
       <p className="mb-8 text-center text-sm text-text-secondary">
         Sign in to your AnglerPass account
       </p>
+
+      {queryMessage && QUERY_SUCCESS_MESSAGES[queryMessage] && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+        >
+          {QUERY_SUCCESS_MESSAGES[queryMessage]}
+        </div>
+      )}
+
+      {queryError && QUERY_ERROR_MESSAGES[queryError] && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700"
+        >
+          {QUERY_ERROR_MESSAGES[queryError]}
+        </div>
+      )}
 
       {error && (
         <div
