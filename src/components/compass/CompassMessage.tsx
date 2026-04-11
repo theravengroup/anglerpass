@@ -5,6 +5,9 @@ import { User, Compass } from "lucide-react";
 import CompassPropertyCard from "./CompassPropertyCard";
 import CompassWeatherCard from "./CompassWeatherCard";
 import CompassStreamCard from "./CompassStreamCard";
+import CompassProductCard from "./CompassProductCard";
+import type { ProductRecommendation } from "./CompassProductCard";
+import AffiliateDisclosure from "@/components/shared/AffiliateDisclosure";
 
 interface CompassMessageProps {
   message: UIMessage;
@@ -206,6 +209,26 @@ function renderToolResults(message: UIMessage) {
               result as unknown as Parameters<typeof CompassStreamCard>[0]["stream"]
             }
           />
+        );
+      }
+
+      if (
+        toolName === "getProductRecommendations" &&
+        Array.isArray(result?.products) &&
+        result.products.length > 0
+      ) {
+        for (const product of result.products) {
+          cards.push(
+            <CompassProductCard
+              key={product.id}
+              product={product as ProductRecommendation}
+              source="compass"
+            />
+          );
+        }
+        // FTC-compliant affiliate disclosure
+        cards.push(
+          <AffiliateDisclosure key="affiliate-disclosure" variant="inline" />
         );
       }
     }

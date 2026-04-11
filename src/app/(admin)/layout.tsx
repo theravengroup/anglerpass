@@ -16,6 +16,7 @@ import {
   Sparkles,
   CalendarDays,
   Mail,
+  Link2,
 } from "lucide-react";
 import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
 import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
@@ -101,6 +102,11 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Sparkles />,
   },
   {
+    label: "Affiliates",
+    href: "/admin/affiliates",
+    icon: <Link2 />,
+  },
+  {
     label: "Audit Log",
     href: "/admin/audit-log",
     icon: <ScrollText />,
@@ -123,6 +129,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/bookings": "Booking Management",
   "/admin/crm": "Marketing Automation",
   "/admin/compass": "Compass AI Usage",
+  "/admin/affiliates": "Affiliate Program",
 };
 
 export default async function AdminLayout({

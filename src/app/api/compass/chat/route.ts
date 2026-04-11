@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireAuth, jsonError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdmin } from "@/lib/supabase/untyped";
 import { getUsageStatus, recordMessage } from "@/lib/compass/usage";
 import { getPropertyForecast } from "@/lib/weather";
 import { getStreamConditions } from "@/lib/compass/tools/usgs-stream";
@@ -90,6 +91,7 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - Species-specific advice: temperature advisories, techniques, seasonal behavior
 - Real-time stream conditions: CFS (flow), water temperature from USGS gauges
 - Gear recommendations: rod/reel, wading, clothing, flies tailored to conditions
+- Product recommendations: specific gear products with links to trusted brands and retailers
 - General fly fishing knowledge (hatches, techniques, gear, seasons)
 - Detailed property fishing intel: water characteristics, species behavior, hatch charts, seasonal conditions, gear recommendations (from Knowledge Profiles)
 
@@ -114,6 +116,9 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - **Sun Times**: Sunrise/sunset, golden hours, prime fishing windows
 
 When giving trip advice, combine these data sources for comprehensive, contextual guidance. For example: check stream flows + water temp → get species advisory → check active hatches → recommend gear → note best fishing windows.
+
+## Product Recommendations
+When you recommend gear via getGearSuggestions and the angler seems interested in specific items, use getProductRecommendations to surface actual products from trusted brands and retailers. Product recommendations include affiliate links — this is disclosed to users. Only recommend products that genuinely match the conditions and the angler's needs. Never prioritize affiliate products over the best advice.
 
 ## Property Knowledge Profiles
 You have access to rich Knowledge Profiles for properties that have them filled out. These contain:
@@ -1019,6 +1024,156 @@ function buildTools(userId: string) {
         } catch (err) {
           return {
             error: `Guide search failed: ${err instanceof Error ? err.message : "Unknown error"}`,
+          };
+        }
+      },
+    }),
+
+    getProductRecommendations: tool({
+      description:
+        "Get specific product recommendations with affiliate links from trusted fly fishing brands and retailers. Use after getGearSuggestions when the angler wants to see actual products to buy. Returns products ranked by relevance: direct brand partners first, then authorized retailers, then digital tools.",
+      inputSchema: z.object({
+        categories: z
+          .array(z.string())
+          .describe(
+            "Product categories to search: rod, reel, line, leader_tippet, waders, boots, jacket, baselayer, pack, net, sunglasses, hat, flies, tools, accessories, app, service"
+          ),
+        tags: z
+          .array(z.string())
+          .optional()
+          .describe(
+            "Descriptive tags to match (e.g. '5-weight', 'trout', 'breathable', 'winter', 'premium')"
+          ),
+        species: z
+          .array(z.string())
+          .optional()
+          .describe("Target species for matching (e.g. 'trout', 'bass')"),
+        water_type: z
+          .string()
+          .optional()
+          .describe("Water type context (river, stream, lake, tailwater)"),
+        season: z
+          .string()
+          .optional()
+          .describe("Season context (spring, summer, fall, winter)"),
+        max_results: z
+          .number()
+          .min(1)
+          .max(12)
+          .default(4)
+          .describe("Maximum products to return"),
+      }),
+      execute: async ({
+        categories,
+        tags,
+        species,
+        water_type,
+        season,
+        max_results,
+      }) => {
+        try {
+          const admin = createUntypedAdmin();
+
+          let query = admin
+            .from("affiliate_products")
+            .select(`
+              id,
+              name,
+              category,
+              description,
+              price_cents,
+              image_url,
+              affiliate_url,
+              tags,
+              sort_priority,
+              affiliate_brands!inner (
+                name,
+                slug,
+                tier
+              )
+            `)
+            .eq("is_active", true)
+            .in("category", categories)
+            .order("sort_priority", { ascending: false })
+            .limit(max_results * 3);
+
+          if (tags && tags.length > 0) {
+            query = query.overlaps("tags", tags);
+          }
+          if (species && species.length > 0) {
+            query = query.overlaps("species_tags", species);
+          }
+          if (water_type) {
+            query = query.overlaps("water_type_tags", [water_type.toLowerCase()]);
+          }
+          if (season) {
+            query = query.overlaps("season_tags", [season.toLowerCase()]);
+          }
+
+          const { data, error } = await query;
+
+          if (error) {
+            return { error: "Product search failed", products: [] };
+          }
+
+          if (!data || data.length === 0) {
+            return {
+              products: [],
+              message:
+                "No matching products found. I can still recommend specific brands and models based on my knowledge.",
+            };
+          }
+
+          const tierOrder: Record<string, number> = {
+            direct: 0,
+            retailer: 1,
+            digital: 2,
+          };
+
+          const ranked = data
+            .map((row) => {
+              const brand = row.affiliate_brands as unknown as {
+                name: string;
+                slug: string;
+                tier: string;
+              };
+              return {
+                id: row.id,
+                name: row.name,
+                brand_name: brand.name,
+                brand_slug: brand.slug,
+                category: row.category,
+                description: row.description,
+                price_cents: row.price_cents,
+                image_url: row.image_url,
+                affiliate_url: row.affiliate_url,
+                tier: brand.tier,
+                tags: row.tags ?? [],
+              };
+            })
+            .sort((a, b) => {
+              const tierDiff =
+                (tierOrder[a.tier] ?? 2) - (tierOrder[b.tier] ?? 2);
+              if (tierDiff !== 0) return tierDiff;
+              const aMatches = tags
+                ? a.tags.filter((t: string) => tags.includes(t)).length
+                : 0;
+              const bMatches = tags
+                ? b.tags.filter((t: string) => tags.includes(t)).length
+                : 0;
+              return bMatches - aMatches;
+            })
+            .slice(0, max_results);
+
+          return {
+            products: ranked,
+            affiliate_disclosure:
+              "AnglerPass may earn a commission on purchases made through these links at no extra cost to you.",
+          };
+        } catch (err) {
+          return {
+            error: `Product search failed: ${err instanceof Error ? err.message : "Unknown error"}`,
+            products: [],
           };
         }
       },

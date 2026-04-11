@@ -173,8 +173,13 @@ export default function MarketingFooter() {
             </FooterLinkColumn>
           </div>
 
+          {/* Affiliate disclosure */}
+          <div className="mt-11 pt-5 border-t border-white/[.06] text-[11px] leading-relaxed text-white/20 max-w-[640px]">
+            Some product recommendations on AnglerPass contain affiliate links. We may earn a small commission on purchases at no&nbsp;extra&nbsp;cost&nbsp;to&nbsp;you.
+          </div>
+
           {/* Bottom bar */}
-          <div className="marketing-footer-bottom mt-11 pt-7 border-t border-white/[.06] flex justify-between items-center text-xs text-white/25">
+          <div className="marketing-footer-bottom mt-5 pt-5 border-t border-white/[.06] flex justify-between items-center text-xs text-white/25">
             <span>&copy; {new Date().getFullYear()} AnglerPass. All rights reserved.</span>
             <a
               href={pathname === '/' ? '#hero' : '/'}
