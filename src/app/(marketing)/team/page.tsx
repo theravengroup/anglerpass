@@ -31,7 +31,7 @@ const TEAM_MEMBERS = [
     title: 'Director of Technology',
     slug: 'marcus-johnstone',
     photo: null,
-    bio: null,
+    bio: 'Marcus Johnstone brings 29 years of experience in full-stack development and technology leadership, specializing in architecting scalable cloud-based systems across public and private sectors. He leads technical vision and product development for high-growth platforms, with deep expertise in modern web technologies and enterprise application\u00a0architecture.',
   },
   {
     name: 'Casey Prather',
