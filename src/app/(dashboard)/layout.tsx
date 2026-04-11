@@ -23,6 +23,10 @@ import {
   Inbox,
   Sparkles,
   Building2,
+  Link2,
+  MousePointerClick,
+  ShoppingBag,
+  BarChart3,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -213,6 +217,33 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       icon: <DollarSign />,
     },
   ],
+  affiliate: [
+    {
+      label: "Overview",
+      href: "/affiliate",
+      icon: <BarChart3 />,
+    },
+    {
+      label: "Brands",
+      href: "/affiliate/brands",
+      icon: <Link2 />,
+    },
+    {
+      label: "Products",
+      href: "/affiliate/products",
+      icon: <ShoppingBag />,
+    },
+    {
+      label: "Click Tracking",
+      href: "/affiliate/clicks",
+      icon: <MousePointerClick />,
+    },
+    {
+      label: "Revenue",
+      href: "/affiliate/revenue",
+      icon: <DollarSign />,
+    },
+  ],
 };
 
 const PAGE_TITLES: Record<string, string> = {
@@ -256,6 +287,11 @@ const PAGE_TITLES: Record<string, string> = {
   "/guide/reviews": "Reviews",
   "/guide/messages": "Messages",
   "/guide/earnings": "Earnings",
+  "/affiliate": "Affiliate Dashboard",
+  "/affiliate/brands": "Brand Partners",
+  "/affiliate/products": "Product Catalog",
+  "/affiliate/clicks": "Click Tracking",
+  "/affiliate/revenue": "Revenue & Conversions",
   "/dashboard/notifications": "Notifications",
   "/dashboard/settings": "Settings",
   "/compass": "AnglerPass Compass",

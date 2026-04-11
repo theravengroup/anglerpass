@@ -22,6 +22,7 @@ const ROLE_LABELS: Record<string, string> = {
   angler: "Angler",
   admin: "Admin",
   guide: "Guide",
+  affiliate: "Affiliate Manager",
 };
 
 export interface SidebarItem {

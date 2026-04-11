@@ -63,7 +63,7 @@ async function devLogin(role: string, staffRole: string | null) {
   // Ensure profile exists with the requested role
   // Admin gets all roles so they can switch; others get just their role
   const allRoles = role === "admin"
-    ? ["admin", "landowner", "club_admin", "angler", "guide"]
+    ? ["admin", "landowner", "club_admin", "angler", "guide", "affiliate"]
     : [role];
 
   const { error: updateErr } = await admin

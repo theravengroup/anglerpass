@@ -13,6 +13,7 @@ const PROTECTED_PREFIXES = [
   "/admin",
   "/guide",
   "/corporate",
+  "/affiliate",
 ];
 
 /** Maps route prefixes to the role(s) allowed to access them */
@@ -22,6 +23,7 @@ const ROLE_PREFIX_MAP: Record<string, string[]> = {
   "/angler": ["angler"],
   "/guide": ["guide"],
   "/corporate": ["corporate"],
+  "/affiliate": ["affiliate"],
   "/admin": ["admin"],
   // /dashboard is accessible to all authenticated users
 };
