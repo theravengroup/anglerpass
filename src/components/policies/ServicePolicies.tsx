@@ -94,8 +94,8 @@ export default function ServicePolicies() {
         <p className={textClass}>
           Club subscriptions are separate from member dues. The subscription covers
           platform access (scheduling, roster management, communication tools). Member
-          dues and initiation fees are set and received by the club, with only the 3.5%
-          processing fee deducted to cover payment processing.
+          dues and initiation fees are set and received by the club, with a 5% AnglerPass
+          platform fee applied at checkout, paid by the member.
         </p>
         <p className={textClass}>
           Clubs can upgrade or downgrade their plan at any time. Downgrades take effect

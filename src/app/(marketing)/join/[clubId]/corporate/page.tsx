@@ -188,8 +188,8 @@ export default async function CorporateJoinPage({
               </div>
             </div>
             <p className="mt-4 text-xs leading-relaxed text-text-light">
-              A 3.5% processing fee will be added at checkout to cover payment
-              processing. Employees you invite will only pay the annual dues.
+              A 5% AnglerPass platform fee will be added at checkout. Employees
+              you invite will only pay the annual dues.
             </p>
           </div>
 

@@ -38,7 +38,7 @@ export function MembershipRevenueCard({
             </p>
           </div>
           <div className="rounded-lg border border-stone-light/20 p-4">
-            <p className="text-xs text-text-light">Processing Fees Collected</p>
+            <p className="text-xs text-text-light">Platform Fees Collected</p>
             <p className="mt-1 text-2xl font-semibold text-text-primary">
               ${membershipProcessingFees.toLocaleString()}
             </p>

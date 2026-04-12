@@ -55,7 +55,7 @@ export default function MembershipPolicies() {
         <p className={textClass}>
           You will receive an email reminder before your annual renewal date. On the
           renewal date, we will charge the payment method on file for the current
-          year&rsquo;s dues amount (plus the 3.5% processing fee).
+          year&rsquo;s dues amount (plus the 5% AnglerPass platform fee).
         </p>
 
         <h3 className={subHeadingClass}>Grace period</h3>
@@ -164,7 +164,7 @@ export default function MembershipPolicies() {
         <p className={textClass}>
           The rejoin fee is <strong>50% of the club&rsquo;s current initiation fee</strong>. This
           is a one-time payment made at the time of rejoining, in addition to the current
-          annual dues. The 3.5% processing fee applies to both the rejoin fee and the dues.
+          annual dues. The 5% AnglerPass platform fee applies to both the rejoin fee and the&nbsp;dues.
         </p>
 
         <h3 className={subHeadingClass}>Example</h3>

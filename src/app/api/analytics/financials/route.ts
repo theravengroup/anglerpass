@@ -540,7 +540,7 @@ async function getAnglerFinancials(admin: any, userId: string, since: string) {
     propMap[pname].bookings += 1;
   }
 
-  // Membership payments — with initiation vs dues split and processing fee
+  // Membership payments — with initiation vs dues split and platform fee
   const { data: membershipPayments } = await admin
     .from("membership_payments")
     .select("id, amount, total_charged, processing_fee, type, status, created_at, clubs(name)")

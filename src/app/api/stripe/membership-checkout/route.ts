@@ -17,7 +17,7 @@ import { membershipCheckoutSchema } from "@/lib/validations/stripe";
  * 1. One-time initiation fee via PaymentIntent
  * 2. Recurring annual dues via Subscription (if duesPriceId provided)
  *
- * Processing fee (3.5%) is added to both.
+ * Platform fee (5%) is added to both.
  */
 export async function POST(request: Request) {
   const limited = rateLimit("stripe-membership", getClientIp(request), 5, 60_000);

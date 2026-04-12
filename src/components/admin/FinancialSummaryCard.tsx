@@ -14,7 +14,7 @@ export function FinancialSummaryCard() {
               </li>
               <li>10% guide service fee (paid by angler)</li>
               <li>
-                3.5% payment processing markup on membership payments
+                5% platform fee on membership payments
               </li>
             </ul>
           </div>

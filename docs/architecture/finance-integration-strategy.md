@@ -2,7 +2,7 @@
 
 ## A. Executive Summary
 
-AnglerPass operates a multi-sided marketplace with five revenue streams: booking platform fees (15%), cross-club network fees ($25/rod/day), guide service fees (10%), membership processing fees (3.5%), and Compass AI credit packs. Payments flow through Stripe (direct charges + Connect transfers to landowners, clubs, and guides), banking lives in Mercury, and bookkeeping is handled by Puzzle.io.
+AnglerPass operates a multi-sided marketplace with five revenue streams: booking platform fees (15%), cross-club network fees ($25/rod/day), guide service fees (10%), membership platform fees (5%), and Compass AI credit packs. Payments flow through Stripe (direct charges + Connect transfers to landowners, clubs, and guides), banking lives in Mercury, and bookkeeping is handled by Puzzle.io.
 
 **Current state:** The codebase has a well-built Stripe integration with webhook handlers, Connect onboarding, fee calculation, manual capture/release, payout distribution, and per-role financial dashboards. What's missing is the operational finance layer — there is no automated reconciliation between Stripe payouts and Mercury deposits, no exception detection, no daily cash snapshots, and no payout-to-bank matching. Puzzle connects natively to both Stripe and Mercury, but its API is partner-restricted, so we cannot programmatically push data into it.
 
@@ -180,7 +180,7 @@ AnglerPass operates a multi-sided marketplace with five revenue streams: booking
 - Platform fees (15%)
 - Cross-club fees
 - Guide service fees
-- Membership processing fees
+- Membership platform fees
 - Compass credit revenue
 - Stripe processing fees
 - Net revenue (what stays in our Stripe account)

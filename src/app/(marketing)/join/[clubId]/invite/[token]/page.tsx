@@ -301,7 +301,7 @@ export default async function EmployeeInvitePage({
             <p className="mt-4 text-xs leading-relaxed text-text-light">
               Your initiation fee has been covered by {companyName}&rsquo;s
               corporate membership. You are only responsible for the annual dues.
-              A 3.5% processing fee will be added at checkout.
+              A 5% AnglerPass platform fee will be added at checkout.
             </p>
           </div>
 

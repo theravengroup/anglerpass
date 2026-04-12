@@ -25,8 +25,8 @@ describe("Fee constants", () => {
     expect(GUIDE_SERVICE_FEE_RATE).toBe(0.10);
   });
 
-  it("has membership processing fee rate of 3.5%", () => {
-    expect(MEMBERSHIP_PROCESSING_FEE_RATE).toBe(0.035);
+  it("has membership platform fee rate of 5%", () => {
+    expect(MEMBERSHIP_PROCESSING_FEE_RATE).toBe(0.05);
   });
 
   it("has cross-club fee of $25/rod", () => {

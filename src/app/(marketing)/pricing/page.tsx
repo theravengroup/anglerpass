@@ -32,7 +32,7 @@ export default function PricingPage() {
               For Clubs
             </span>
             <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
-              Platform subscription + pass-through processing
+              Platform subscription + membership&nbsp;platform&nbsp;fee
             </h2>
             <p className="text-[16px] text-text-secondary leading-[1.65] max-w-[680px]">
               Your monthly subscription covers the AnglerPass platform. You set your own
@@ -42,36 +42,45 @@ export default function PricingPage() {
           </div>
 
           {/* Subscription tiers */}
-          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 mb-10">
+          <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6 mb-4">
             {[
-              { name: 'Starter', price: '$79', members: '100', properties: '10' },
-              { name: 'Standard', price: '$199', members: '500', properties: '50', highlight: true },
-              { name: 'Pro', price: '$499', members: 'Unlimited', properties: 'Unlimited' },
+              { name: 'Starter', price: '$79', futurePrice: '$129', members: '100', properties: '10' },
+              { name: 'Standard', price: '$199', futurePrice: '$299', members: '500', properties: '50', highlight: true },
+              { name: 'Pro', price: '$499', futurePrice: '$699', members: 'Unlimited', properties: 'Unlimited' },
             ].map((tier) => (
               <div
                 key={tier.name}
                 className={`reveal bg-white rounded-[14px] px-6 py-7 text-center ${tier.highlight ? 'border-2 border-river' : 'border border-parchment'}`}
               >
+                <span className="inline-block mb-2 font-mono text-[10px] uppercase tracking-[0.15em] text-river font-semibold">
+                  Early Access
+                </span>
                 <h3 className="font-heading text-[20px] font-semibold text-forest mb-1">
                   {tier.name}
                 </h3>
-                <div className="mb-2">
+                <div className="mb-1">
                   <span className="font-heading text-[32px] font-semibold text-forest">
                     {tier.price}
                   </span>
                   <span className="text-[14px] text-text-light">/month</span>
                 </div>
+                <p className="text-[12px] text-text-light mb-2">
+                  <span className="line-through">{tier.futurePrice}/mo</span>{' '}after Oct&nbsp;1,&nbsp;2026
+                </p>
                 <p className="text-[13px] text-text-secondary m-0">
                   Up to {tier.members} members &middot; {tier.properties} properties
                 </p>
               </div>
             ))}
           </div>
+          <p className="text-[13px] text-text-light text-center mb-10 italic">
+            Early Access pricing is locked through September&nbsp;30,&nbsp;2026 for founding clubs.
+          </p>
 
-          {/* Processing fee callout */}
+          {/* Platform fee callout */}
           <div className="reveal bg-white border border-parchment rounded-[14px] py-8 px-7">
             <h3 className="font-heading text-[22px] font-semibold text-forest mb-4 tracking-[-0.2px]">
-              Membership payment processing
+              Membership platform fee
             </h3>
             <div className="marketing-features-grid grid grid-cols-2 gap-6">
               <div>
@@ -103,7 +112,7 @@ export default function PricingPage() {
                 <ul className="list-none m-0 p-0">
                   {[
                     'Club\'s stated fee (goes 100% to the club)',
-                    '+ 3.5% processing fee (covers payment processing)',
+                    '+ 5% AnglerPass platform fee',
                     'Total shown clearly before payment',
                   ].map((item) => (
                     <li
@@ -131,9 +140,9 @@ export default function PricingPage() {
                     New member pays at joining:
                   </p>
                   <p className="text-[13px] text-text-secondary m-0 pl-4">
-                    $350.00 initiation + $12.25 processing<br />
-                    $175.00 first year dues + $6.13 processing<br />
-                    <strong className="text-forest">Total: $543.38</strong>
+                    $350.00 initiation + $17.50 platform fee<br />
+                    $175.00 first year dues + $8.75 platform fee<br />
+                    <strong className="text-forest">Total: $551.25</strong>
                   </p>
                 </div>
                 <div>
@@ -237,7 +246,7 @@ export default function PricingPage() {
                 {[
                   { label: 'Initiation fee', detail: 'One-time, set by your club' },
                   { label: 'Annual dues', detail: 'Yearly, auto-renews' },
-                  { label: 'Processing fee', detail: '3.5% added at checkout' },
+                  { label: 'Platform fee', detail: '5% added at checkout' },
                 ].map((item) => (
                   <li key={item.label} className="py-2 border-b border-parchment">
                     <span className="text-[14px] font-medium text-forest">{item.label}</span>

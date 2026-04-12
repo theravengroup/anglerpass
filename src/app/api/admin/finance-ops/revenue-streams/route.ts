@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * - Platform fees (15%)
  * - Cross-club fees ($25/rod/day)
  * - Guide service fees (10%)
- * - Membership processing fees (3.5%)
+ * - Membership platform fees (5%)
  * - Compass AI credit packs
  */
 export async function GET(request: Request) {
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     0
   );
 
-  // Membership processing fees
+  // Membership platform fees
   const { data: membershipPayments } = await untypedAdmin
     .from("membership_payments")
     .select("processing_fee")

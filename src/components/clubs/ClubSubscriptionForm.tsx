@@ -32,7 +32,7 @@ export default function ClubSubscriptionForm({
       tier,
       { ...config, priceId: STRIPE_PRICE_IDS[tier as ClubTier] },
     ])
-  ) as Record<ClubTier, { name: string; price: number; priceId: string; features: string[] }>;
+  ) as Record<ClubTier, { name: string; price: number; futurePrice: number; priceId: string; features: string[] }>;
   const [selectedTier, setSelectedTier] = useState<ClubTier | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

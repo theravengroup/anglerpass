@@ -332,7 +332,7 @@ export const PHASES: RoadmapPhase[] = [
           {
             id: "p1-membership-checkout",
             label: "Membership checkout (Stripe Elements)",
-            detail: "Stripe Elements on /join/[clubId]. Initiation + first dues. 3.5% processing fee. Receipt.",
+            detail: "Stripe Elements on /join/[clubId]. Initiation + first dues. 5% platform fee. Receipt.",
             done: true,
           },
           {

@@ -16,7 +16,7 @@ const faqs = [
   {
     value: "pricing",
     q: "How does club pricing work?",
-    a: "Your monthly subscription covers the platform. You set your own initiation fees and annual dues \u2014 we add a 3.5% processing fee at checkout, paid by the member, to cover payment processing. Your club receives 100% of your stated fees.",
+    a: "Your monthly subscription covers the platform. You set your own initiation fees and annual dues \u2014 we add a 5% AnglerPass platform fee at checkout, paid by the member. Your club receives 100% of your stated fees.",
   },
   {
     value: "vetting",
@@ -51,7 +51,7 @@ const faqs = [
   {
     value: "payouts",
     q: "When does our club get paid?",
-    a: "Club commissions ($5 per rod per booking) are paid out monthly on the 1st via Stripe Connect, after a 7-day post-trip hold period. This aligns with how most clubs already handle their accounting. Membership dues and initiation fees are transferred to your club\u2019s Stripe account as they are collected, minus the 3.5% processing fee.",
+    a: "Club commissions ($5 per rod per booking) are paid out monthly on the 1st via Stripe Connect, after a 7-day post-trip hold period. This aligns with how most clubs already handle their accounting. Membership dues and initiation fees are transferred to your club\u2019s Stripe account as they are collected \u2014 your club receives 100% of stated fees.",
   },
   {
     value: "guides",

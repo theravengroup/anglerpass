@@ -1,7 +1,7 @@
 -- Migration 00022: Membership fees, applications, and payment tracking
 --
 -- Clubs set their own initiation fees and annual dues.
--- AnglerPass adds a 3.5% processing fee on top, paid by the member.
+-- AnglerPass adds a 5% platform fee on top, paid by the member.
 -- Clubs receive 100% of their stated fees.
 --
 -- Flow: Application → Club Approval → Payment (initiation + first year dues) → Active
@@ -131,7 +131,7 @@ create table if not exists public.membership_payments (
 
   -- Amounts
   club_amount numeric(10,2) not null,          -- what the club set (e.g. $350)
-  processing_fee numeric(10,2) not null,       -- 3.5% of club_amount (e.g. $12.25)
+  processing_fee numeric(10,2) not null,       -- 5% platform fee of club_amount (e.g. $17.50)
   total_charged numeric(10,2) not null,        -- club_amount + processing_fee (member pays this)
   club_payout numeric(10,2) not null,          -- same as club_amount (club gets 100%)
 
@@ -159,7 +159,7 @@ create index idx_membership_payments_status on public.membership_payments(status
 create index idx_membership_payments_stripe_sub on public.membership_payments(stripe_subscription_id);
 
 comment on table public.membership_payments is
-  'Tracks all membership-related payments. Processing fee (3.5%) is added on top and paid by the member. Club receives 100% of their stated fee.';
+  'Tracks all membership-related payments. Platform fee (5%) is added on top and paid by the member. Club receives 100% of their stated fee.';
 
 -- RLS
 alter table public.membership_payments enable row level security;
@@ -224,6 +224,6 @@ comment on column public.club_memberships.grace_period_ends is
 -- ============================================================
 
 insert into public.platform_settings (key, value, description) values
-  ('membership_processing_fee_pct', '3.5', 'Processing fee percentage added to membership payments (paid by member)'),
+  ('membership_processing_fee_pct', '5', 'Platform fee percentage added to membership payments (paid by member)'),
   ('membership_renewal_grace_days', '7', 'Number of days grace period after failed annual dues renewal')
 on conflict (key) do nothing;

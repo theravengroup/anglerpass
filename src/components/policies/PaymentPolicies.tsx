@@ -27,12 +27,11 @@ export default function PaymentPolicies() {
           does not store credit card numbers or bank account details directly.
         </p>
 
-        <h3 className={subHeadingClass}>Processing fee</h3>
+        <h3 className={subHeadingClass}>Membership platform fee</h3>
         <p className={textClass}>
-          A <strong>3.5% processing fee</strong> is added to all membership payments (initiation
-          fees and annual dues). This fee covers credit card and payment processing costs
-          and is paid by the member at checkout. The club receives 100% of its stated
-          initiation fee and annual dues.
+          A <strong>5% AnglerPass platform fee</strong> is added to all membership payments (initiation
+          fees and annual dues). This fee is paid by the member at checkout. The club
+          receives 100% of its stated initiation fee and annual dues.
         </p>
 
         <h3 className={subHeadingClass}>Booking fees</h3>

@@ -126,7 +126,7 @@ export default function AnglerFinancialsPage() {
       ["Membership Breakdown", "Amount"],
       ["Initiation Fees", data.total_initiation_fees.toFixed(2)],
       ["Annual Dues", data.total_annual_dues.toFixed(2)],
-      ["Processing Fees (3.5%)", data.total_processing_fees.toFixed(2)],
+      ["Platform Fees (5%)", data.total_processing_fees.toFixed(2)],
       ["Total Membership", data.total_membership_dues.toFixed(2)],
       [],
       ["Refunds & Fees", "Amount"],
@@ -289,7 +289,7 @@ export default function AnglerFinancialsPage() {
         cross-club access fee applies ($20 to AnglerPass, $5 to your home
         club). Guide fees include the guide&apos;s rate plus a 10% service fee.
         Club membership dues include initiation fees (one-time) and annual
-        dues, plus a 3.5% processing fee. Cancellation refunds follow a
+        dues, plus a 5% platform fee. Cancellation refunds follow a
         graduated policy: 100% if 7+ days out, 75% if 3&ndash;7 days, 50% if
         1&ndash;3 days, 0% under 24 hours. A $15 late cancellation fee applies
         within 72&nbsp;hours.

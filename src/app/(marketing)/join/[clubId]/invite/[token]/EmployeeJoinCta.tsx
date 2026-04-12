@@ -219,7 +219,7 @@ export default function EmployeeJoinCta({
           <span className="font-medium text-text-primary">
             ${totalDue.toFixed(2)}/year
           </span>{" "}
-          for annual dues (includes a 3.5% processing fee). Your initiation fee
+          for annual dues (includes a 5% platform fee). Your initiation fee
           has been covered by your corporate sponsor.
         </p>
       )}

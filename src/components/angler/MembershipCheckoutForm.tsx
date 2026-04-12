@@ -156,7 +156,7 @@ export default function MembershipCheckoutForm({
         {processingFee > 0 && (
           <div className="flex justify-between text-sm">
             <span className="text-text-light">
-              Processing Fee ({(MEMBERSHIP_PROCESSING_FEE_RATE * 100).toFixed(1)}%)
+              Platform Fee ({(MEMBERSHIP_PROCESSING_FEE_RATE * 100)}%)
             </span>
             <span className="text-text-light">${processingFee.toFixed(2)}</span>
           </div>

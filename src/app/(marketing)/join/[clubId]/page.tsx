@@ -209,8 +209,7 @@ export default async function JoinClubPage({
               </div>
             </div>
             <p className="mt-4 text-xs leading-relaxed text-text-light">
-              A 3.5% processing fee will be added at checkout to cover payment
-              processing.
+              A 5% AnglerPass platform fee will be added at checkout.
             </p>
           </div>
 

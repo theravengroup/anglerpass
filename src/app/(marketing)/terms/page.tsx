@@ -170,16 +170,17 @@ export default function TermsPage() {
 
             <p className={textClass}>
               <strong>Club membership payments.</strong>{' '}Clubs set their own
-              initiation fees and annual dues. A 3.5% processing fee is added
-              at checkout and paid by the member. Clubs receive 100% of their
-              stated fees.
+              initiation fees and annual dues. A 5% AnglerPass platform fee
+              is added at checkout and paid by the member. Clubs receive 100%
+              of their stated fees.
             </p>
 
             <p className={textClass}>
               <strong>Club subscriptions.</strong>{' '}Clubs pay a monthly
-              subscription based on their tier (Starter $79/mo, Standard
-              $199/mo, Pro $499/mo). Subscription tiers determine member
-              limits, property limits, and access to features such as
+              subscription based on their tier. Early Access pricing
+              (Starter $79/mo, Standard $199/mo, Pro $499/mo) is available
+              through September&nbsp;30,&nbsp;2026. Subscription tiers determine
+              member limits, property limits, and access to features such as
               cross-club agreements and corporate memberships.
             </p>
 

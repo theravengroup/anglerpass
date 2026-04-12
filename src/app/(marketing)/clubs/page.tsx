@@ -189,9 +189,8 @@ export default function ClubsPage() {
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
               Your subscription covers the platform. You set your own initiation fees
-              and annual dues &mdash; we just add a 3.5% processing fee at checkout,
-              paid by the member, to cover payment processing. Your club receives 100%
-              of your stated fees.
+              and annual dues &mdash; we add a 5% AnglerPass platform fee at checkout,
+              paid by the member. Your club receives 100% of your stated fees.
             </p>
           </div>
           <div className="marketing-features-grid marketing-grid-3 grid grid-cols-3 gap-6">
@@ -199,6 +198,7 @@ export default function ClubsPage() {
               {
                 name: 'Starter',
                 price: '$79',
+                futurePrice: '$129',
                 description: 'For new or small clubs getting started.',
                 features: ['Up to 100 members', 'Up to 10 properties', 'Member vetting & roster', 'Booking management', 'Cross-club network (2 partners)', 'Email support'],
                 highlight: false,
@@ -206,6 +206,7 @@ export default function ClubsPage() {
               {
                 name: 'Standard',
                 price: '$199',
+                futurePrice: '$299',
                 description: 'For established clubs managing active rosters.',
                 features: ['Up to 500 members', 'Up to 50 properties', 'Cross-club network (10 partners)', 'Advanced scheduling & rotation', 'Financial reporting', 'Priority support'],
                 highlight: true,
@@ -213,6 +214,7 @@ export default function ClubsPage() {
               {
                 name: 'Pro',
                 price: '$499',
+                futurePrice: '$699',
                 description: 'For large clubs with complex operations.',
                 features: ['Unlimited members', 'Unlimited properties', 'Cross-club network (unlimited)', 'Multi-rod group bookings', 'Analytics & reporting', 'Dedicated account manager'],
                 highlight: false,
@@ -227,15 +229,21 @@ export default function ClubsPage() {
                     Most Popular
                   </span>
                 )}
+                <span className="inline-block mb-2 font-mono text-[10px] uppercase tracking-[0.15em] text-river font-semibold">
+                  Early Access
+                </span>
                 <h3 className="font-heading text-[22px] font-semibold text-forest mb-1 tracking-[-0.2px]">
                   {tier.name}
                 </h3>
-                <div className="mb-3">
+                <div className="mb-1">
                   <span className="font-heading text-[36px] font-semibold text-forest">
                     {tier.price}
                   </span>
                   <span className="text-sm text-text-light">/month</span>
                 </div>
+                <p className="text-[12px] text-text-light mb-3">
+                  <span className="line-through">{tier.futurePrice}/mo</span>{' '}after Oct&nbsp;1,&nbsp;2026
+                </p>
                 <p className="text-sm leading-[1.6] text-text-secondary mb-5">
                   {tier.description}
                 </p>
@@ -256,6 +264,9 @@ export default function ClubsPage() {
             ))}
           </div>
           <div className="text-center max-w-[600px] mx-auto mt-8">
+            <p className="text-[13px] text-text-light italic mb-1">
+              Early Access pricing is locked through September&nbsp;30,&nbsp;2026 for founding clubs.
+            </p>
             <p className="text-[13px] text-text-light italic mb-3">
               All plans include a 30-day free trial. No credit card required to start.
               <br />
@@ -264,9 +275,9 @@ export default function ClubsPage() {
             <div className="bg-river/6 border border-river/12 rounded-[10px] px-6 py-5 mt-5">
               <p className="text-[13.5px] text-text-secondary leading-[1.7] m-0">
                 <strong className="text-forest">Membership payments:</strong>{' '}You set your
-                initiation fees and annual dues. When members pay, we add a 3.5% processing fee at
-                checkout to cover credit card processing &mdash; paid by the member, not by your club.
-                Your club receives 100% of your stated fees. See our{' '}
+                initiation fees and annual dues. When members pay, we add a 5% AnglerPass platform
+                fee at checkout &mdash; paid by the member, not by your club. Your club receives 100%
+                of your stated fees. See our{' '}
                 <Link href="/pricing" className="text-river underline">
                   pricing page
                 </Link>{' '}
