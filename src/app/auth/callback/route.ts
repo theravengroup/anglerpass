@@ -21,30 +21,7 @@ export async function GET(request: Request) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        if (user) {
-          // Auto-link pending club memberships by email
-          await linkPendingMemberships(user.id, user.email);
-
-          // Send welcome email 1 for new signups (step = 0 means never sent)
-          await sendWelcomeEmailIfNew(user.id);
-
-          // Fire CRM trigger for new signups
-          fireCrmTrigger("user_signup", {
-            userId: user.id,
-            email: user.email ?? undefined,
-          }).catch((err) =>
-            console.error("[auth/callback] CRM trigger error:", err)
-          );
-
-          // Convert matching waitlist lead → user (non-blocking)
-          if (user.email) {
-            convertLeadToUser(user.email, user.id).catch((err) =>
-              console.error("[auth/callback] Lead conversion error:", err)
-            );
-          }
-        }
-
-        // Determine redirect destination
+        // ── Determine redirect destination FIRST (fast path) ──
         // Validate `next` to prevent open redirect attacks
         const isSafeRedirect =
           next != null &&
@@ -52,19 +29,45 @@ export async function GET(request: Request) {
           !next.startsWith("//") &&
           !next.includes("://");
         let destination = isSafeRedirect ? next : null;
-        if (!destination) {
-          if (user) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("role")
-              .eq("id", user.id)
-              .returns<{ role: string }[]>()
-              .maybeSingle();
-            destination = profile?.role
-              ? getRoleHomePath(profile.role)
-              : "/dashboard";
-          } else {
-            destination = "/dashboard";
+
+        // Only query the profile if we don't already have a redirect target
+        if (!destination && user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .returns<{ role: string }[]>()
+            .maybeSingle();
+          destination = profile?.role
+            ? getRoleHomePath(profile.role)
+            : "/dashboard";
+        }
+        destination ??= "/dashboard";
+
+        // ── Fire all non-critical work in the background ──
+        // These run after we've determined the redirect so they don't
+        // block the user from seeing their dashboard.
+        if (user) {
+          // All non-critical: membership linking, welcome email, CRM, lead conversion
+          linkPendingMemberships(user.id, user.email).catch((err) =>
+            console.error("[auth/callback] Membership linking error:", err)
+          );
+
+          sendWelcomeEmailIfNew(user.id).catch((err) =>
+            console.error("[auth/callback] Welcome email error:", err)
+          );
+
+          fireCrmTrigger("user_signup", {
+            userId: user.id,
+            email: user.email ?? undefined,
+          }).catch((err) =>
+            console.error("[auth/callback] CRM trigger error:", err)
+          );
+
+          if (user.email) {
+            convertLeadToUser(user.email, user.id).catch((err) =>
+              console.error("[auth/callback] Lead conversion error:", err)
+            );
           }
         }
 

@@ -18,6 +18,8 @@
     "@hookform/resolvers": "^5.2.2",
     "@marsidev/react-turnstile": "^1.5.0",
     "@sentry/nextjs": "^10.47.0",
+    "@stripe/connect-js": "^3.3.35",
+    "@stripe/react-connect-js": "^3.3.34",
     "@stripe/react-stripe-js": "^6.1.0",
     "@stripe/stripe-js": "^9.0.1",
     "@supabase/ssr": "^0.10.0",

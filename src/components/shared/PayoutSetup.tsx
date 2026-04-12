@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -14,10 +13,15 @@ import {
   Check,
   Loader2,
   CreditCard,
-  ExternalLink,
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { loadConnectAndInitialize } from "@stripe/connect-js";
+import {
+  ConnectComponentsProvider,
+  ConnectAccountOnboarding,
+} from "@stripe/react-connect-js";
+import { anglerPassConnectTheme } from "@/lib/stripe/elements-theme";
 
 interface PayoutSetupProps {
   type: "guide" | "landowner" | "club";
@@ -83,32 +87,14 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
   const [loading, setLoading] = useState(true);
   const [onboarded, setOnboarded] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [creatingAccount, setCreatingAccount] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [justCompleted, setJustCompleted] = useState(false);
-  const [refreshNeeded, setRefreshNeeded] = useState(false);
 
-  const searchParams = useSearchParams();
   const config = TYPE_CONFIG[type];
   const colors = COLOR_CLASSES[type];
 
-  // Detect return from Stripe onboarding
-  useEffect(() => {
-    const stripeParam = searchParams.get("stripe_onboarding");
-    if (stripeParam === "complete") {
-      setJustCompleted(true);
-    } else if (stripeParam === "refresh") {
-      setRefreshNeeded(true);
-    }
-
-    // Clean up URL params without navigation
-    if (stripeParam) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("stripe_onboarding");
-      window.history.replaceState({}, "", url.pathname + url.search);
-    }
-  }, [searchParams]);
-
+  // Check onboarding status on mount
   useEffect(() => {
     async function checkStatus() {
       try {
@@ -129,10 +115,40 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
     checkStatus();
   }, [type]);
 
-  const startOnboarding = async () => {
-    setRedirecting(true);
+  // Initialize Connect instance for embedded onboarding
+  const connectInstance = useMemo(() => {
+    if (!showOnboarding) return null;
+
+    const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!publishableKey) return null;
+
+    return loadConnectAndInitialize({
+      publishableKey,
+      fetchClientSecret: async () => {
+        const res = await fetch("/api/stripe/account-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error ?? "Failed to create account session");
+        }
+
+        const { clientSecret } = await res.json();
+        return clientSecret;
+      },
+      appearance: anglerPassConnectTheme,
+    });
+  }, [showOnboarding, type]);
+
+  async function startOnboarding() {
+    setCreatingAccount(true);
     setError(null);
+
     try {
+      // Ensure a Connect account exists
       const res = await fetch("/api/stripe/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,19 +158,33 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
       if (!res.ok) {
         const data = await res.json();
         setError(data.error ?? "Failed to start payout setup.");
-        setRedirecting(false);
+        setCreatingAccount(false);
         return;
       }
 
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      setHasAccount(true);
+      setShowOnboarding(true);
     } catch {
       setError("Failed to start payout setup.");
-      setRedirecting(false);
+    } finally {
+      setCreatingAccount(false);
     }
-  };
+  }
+
+  function handleOnboardingExit() {
+    // Re-check status after user completes or exits onboarding
+    setShowOnboarding(false);
+    setLoading(true);
+    fetch(`/api/stripe/connect?type=${type}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setOnboarded(data.onboarded);
+          setHasAccount(data.hasAccount);
+        }
+      })
+      .finally(() => setLoading(false));
+  }
 
   if (loading) {
     return (
@@ -177,15 +207,61 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
             Payouts Connected
           </CardTitle>
           <CardDescription>
-            {justCompleted
-              ? "Stripe setup complete! Your account is now connected and ready to receive payouts."
-              : `Your ${config.label.toLowerCase()} payout account is set up and ready to receive payments via Stripe.`}
+            Your {config.label.toLowerCase()} payout account is set up and ready
+            to receive payments via&nbsp;Stripe.
           </CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
+  // Embedded onboarding flow
+  if (showOnboarding && connectInstance) {
+    return (
+      <Card className={cn("border-stone-light/20", className)}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div
+              className={cn(
+                "flex size-8 items-center justify-center rounded-full",
+                colors.iconBg
+              )}
+            >
+              <CreditCard className={cn("size-5", colors.icon)} />
+            </div>
+            Complete Payout Setup
+          </CardTitle>
+          <CardDescription>
+            Fill in the details below to connect your bank account. All
+            information is processed securely by&nbsp;Stripe.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ConnectComponentsProvider connectInstance={connectInstance}>
+            <ConnectAccountOnboarding
+              onExit={handleOnboardingExit}
+              onStepChange={(stepChange) => {
+                // Track progress for analytics (future use)
+                console.log("[PayoutSetup] Onboarding step:", stepChange.step);
+              }}
+              onLoadError={({ error: loadError }) => {
+                console.error(
+                  "[PayoutSetup] Onboarding load error:",
+                  loadError
+                );
+                setError(
+                  "Failed to load the onboarding form. Please try again."
+                );
+                setShowOnboarding(false);
+              }}
+            />
+          </ConnectComponentsProvider>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Initial state — prompt to start onboarding
   return (
     <Card
       className={cn(
@@ -213,24 +289,6 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
         <CardDescription>{config.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {refreshNeeded && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-50 p-3">
-            <p className="text-sm text-amber-800">
-              Your Stripe session expired or was interrupted. Click below to
-              continue where you left off.
-            </p>
-          </div>
-        )}
-
-        {justCompleted && !onboarded && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-50 p-3">
-            <p className="text-sm text-amber-800">
-              It looks like Stripe onboarding isn&apos;t fully complete yet.
-              Please click below to finish any remaining steps.
-            </p>
-          </div>
-        )}
-
         <div className={cn("rounded-lg border p-4", colors.border, colors.bg)}>
           <p className="text-sm text-text-secondary">
             {hasAccount
@@ -247,18 +305,16 @@ export default function PayoutSetup({ type, className }: PayoutSetupProps) {
 
         <Button
           onClick={startOnboarding}
-          disabled={redirecting}
+          disabled={creatingAccount}
           className={cn("w-full", colors.button)}
         >
-          {redirecting ? (
+          {creatingAccount && (
             <Loader2 className="mr-1.5 size-4 animate-spin" />
-          ) : (
-            <ExternalLink className="mr-1.5 size-4" />
           )}
-          {redirecting
-            ? "Redirecting to Stripe..."
+          {creatingAccount
+            ? "Setting up..."
             : hasAccount
-              ? "Continue Stripe Setup"
+              ? "Continue Payout Setup"
               : "Set Up Payouts"}
         </Button>
       </CardContent>

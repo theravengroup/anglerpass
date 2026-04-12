@@ -10,11 +10,10 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  ExternalLink,
   XCircle,
 } from "lucide-react";
 import VerificationProgress from "@/components/guide/VerificationProgress";
-import { GUIDE_VERIFICATION_FEE_DISPLAY } from "@/lib/constants/fees";
+import GuideVerificationPayment from "@/components/guide/GuideVerificationPayment";
 
 interface VerificationStatus {
   status: string;
@@ -38,7 +37,6 @@ export default function GuideVerificationPage() {
   const searchParams = useSearchParams();
   const [data, setData] = useState<VerificationStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initiating, setInitiating] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -77,27 +75,13 @@ export default function GuideVerificationPage() {
     }
   }, [paymentStatus]);
 
-  const handleInitiateVerification = async () => {
-    setInitiating(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/guides/verification", { method: "POST" });
-      const result = await res.json();
-
-      if (res.ok && result.url) {
-        window.location.href = result.url;
-      } else {
-        setMessage({
-          type: "error",
-          text: result.error ?? "Failed to start verification",
-        });
-      }
-    } catch {
-      setMessage({ type: "error", text: "An error occurred. Please try again." });
-    } finally {
-      setInitiating(false);
-    }
-  };
+  function handlePaymentSuccess() {
+    setMessage({
+      type: "success",
+      text: "Payment received! Your background check will begin shortly.",
+    });
+    load();
+  }
 
   if (loading) {
     return (
@@ -259,28 +243,7 @@ export default function GuideVerificationPage() {
                 </Link>
               </>
             ) : (
-              <>
-                <p className="text-sm text-text-secondary">
-                  Your profile and documents are ready. Pay the one-time{" "}
-                  {GUIDE_VERIFICATION_FEE_DISPLAY} verification fee to start
-                  your background check.
-                </p>
-                <Button
-                  onClick={handleInitiateVerification}
-                  disabled={initiating}
-                  className="bg-charcoal text-white hover:bg-charcoal/90"
-                >
-                  {initiating ? (
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                  ) : (
-                    <ExternalLink className="mr-2 size-4" />
-                  )}
-                  Pay {GUIDE_VERIFICATION_FEE_DISPLAY} &amp; Start Verification
-                </Button>
-                <p className="text-xs text-text-light">
-                  You&apos;ll be redirected to Stripe for secure payment.
-                </p>
-              </>
+              <GuideVerificationPayment onSuccess={handlePaymentSuccess} />
             )}
           </CardContent>
         </Card>

@@ -61,18 +61,26 @@ function isAuthRoute(pathname: string): boolean {
 // The cookie-based client can fail to resolve auth.uid() in middleware,
 // causing profile queries to return null. Use the service-role client
 // which bypasses RLS entirely — same approach as getProfile().
+//
+// The client is a module-level singleton — it holds no per-request state
+// so it's safe (and faster) to reuse across invocations.
 
 interface ProfileSlice {
   role: string;
   suspended_at: string | null;
 }
 
+let _adminClient: ReturnType<typeof createClient> | null = null;
+
 function getMiddlewareAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  if (!_adminClient) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    _adminClient = createClient(url, key, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return _adminClient;
 }
 
 async function fetchProfileSlice(
@@ -109,9 +117,13 @@ export async function middleware(request: NextRequest) {
 
   if (!user) return response;
 
+  const needsProfile = isAuthRoute(pathname) || isProtectedRoute(pathname);
+
+  // Fetch profile once per request (not twice for auth + protected checks)
+  const profile = needsProfile ? await fetchProfileSlice(user.id) : null;
+
   // ── Authenticated user on auth pages → redirect to role home ──
   if (isAuthRoute(pathname)) {
-    const profile = await fetchProfileSlice(user.id);
     // Only redirect if we have a confirmed profile; otherwise let them
     // stay on the auth page so the dashboard layout can handle setup.
     if (profile?.role) {
@@ -124,8 +136,6 @@ export async function middleware(request: NextRequest) {
 
   // ── Protected route checks (suspension, admin role) ──
   if (isProtectedRoute(pathname)) {
-    const profile = await fetchProfileSlice(user.id);
-
     // Suspended users → redirect (avoid loop on /suspended itself)
     if (profile?.suspended_at && pathname !== "/suspended") {
       const url = request.nextUrl.clone();
@@ -150,10 +160,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
       }
     }
-  }
 
-  // Add cache-control headers to prevent back-button showing stale pages after logout
-  if (isProtectedRoute(pathname)) {
+    // Prevent back-button showing stale pages after logout
     response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
     response.headers.set("Pragma", "no-cache");
   }

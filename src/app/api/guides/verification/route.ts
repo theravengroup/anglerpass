@@ -1,26 +1,7 @@
-import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
-import { SITE_URL } from "@/lib/constants";
-
-const STRIPE_API = "https://api.stripe.com/v1";
-const STRIPE_SECRET = () => process.env.STRIPE_SECRET_KEY!;
-
-async function stripePost(path: string, body: Record<string, string>) {
-  const res = await fetch(`${STRIPE_API}${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${STRIPE_SECRET()}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(body).toString(),
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message ?? "Stripe API error");
-  }
-  return res.json();
-}
 
 // ─── GET: Verification status for the authenticated guide ──────────
 
@@ -72,7 +53,7 @@ export async function GET() {
   }
 }
 
-// ─── POST: Initiate verification — creates Stripe Checkout Session ─
+// ─── POST: Initiate verification — creates PaymentIntent for inline payment ─
 
 export async function POST() {
   try {
@@ -93,7 +74,10 @@ export async function POST() {
       .maybeSingle();
 
     if (!profile) {
-      return jsonError("Guide profile not found. Create your profile first.", 404);
+      return jsonError(
+        "Guide profile not found. Create your profile first.",
+        404
+      );
     }
 
     // Already paid
@@ -103,37 +87,55 @@ export async function POST() {
 
     // Must be in draft or rejected status to initiate
     if (!["draft", "rejected"].includes(profile.status)) {
-      return jsonError(`Cannot initiate verification from ${profile.status} status`, 400);
+      return jsonError(
+        `Cannot initiate verification from ${profile.status} status`,
+        400
+      );
     }
 
     // Validate required credentials are uploaded
     if (!profile.license_url || !profile.insurance_url) {
-      return jsonError("Please upload your guide license and insurance documents before starting verification", 400);
+      return jsonError(
+        "Please upload your guide license and insurance documents before starting verification",
+        400
+      );
     }
 
-    // Create Stripe Checkout Session for one-time verification fee
-    const session = await stripePost("/checkout/sessions", {
-      mode: "payment",
-      "line_items[0][price_data][currency]": "usd",
-      "line_items[0][price_data][product_data][name]":
-        "AnglerPass Guide Verification",
-      "line_items[0][price_data][product_data][description]":
-        "One-time background check and verification fee",
-      "line_items[0][price_data][unit_amount]": String(
-        GUIDE_VERIFICATION_FEE_CENTS
-      ),
-      "line_items[0][quantity]": "1",
-      customer_email: user.email ?? "",
-      success_url: `${SITE_URL}/guide/verification?payment=success`,
-      cancel_url: `${SITE_URL}/guide/verification?payment=cancelled`,
-      "metadata[guide_id]": profile.id,
-      "metadata[user_id]": user.id,
-      "metadata[type]": "guide_verification",
+    const stripe = getStripeServer();
+
+    // Get user email
+    const { data: userData } = await admin.auth.admin.getUserById(user.id);
+    const email = userData?.user?.email ?? "";
+
+    // Get or create Stripe customer
+    const customerId = await getOrCreateCustomer(
+      user.id,
+      email,
+      profile.display_name ?? undefined
+    );
+
+    // Create PaymentIntent for inline payment via Elements
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: GUIDE_VERIFICATION_FEE_CENTS,
+      currency: "usd",
+      customer: customerId,
+      capture_method: "automatic",
+      metadata: {
+        type: "guide_verification",
+        guide_id: profile.id,
+        user_id: user.id,
+      },
     });
 
-    return jsonOk({ url: session.url });
+    // Store the session reference on the profile for webhook reconciliation
+    await admin
+      .from("guide_profiles")
+      .update({ verification_fee_session_id: paymentIntent.id })
+      .eq("id", profile.id);
+
+    return jsonOk({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error("[guides/verification] POST error:", err);
-    return jsonError("Failed to create checkout session", 500);
+    return jsonError("Failed to create payment", 500);
   }
 }

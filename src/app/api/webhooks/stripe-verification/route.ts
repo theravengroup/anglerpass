@@ -54,7 +54,7 @@ async function verifyStripeSignature(
 /**
  * POST: Stripe webhook for guide verification payments.
  *
- * Handles `checkout.session.completed` events:
+ * Handles `payment_intent.succeeded` events (migrated from checkout.session.completed):
  * 1. Marks verification fee as paid
  * 2. Transitions guide to "pending" status
  * 3. Creates a Checkr candidate and invitation
@@ -79,13 +79,13 @@ export async function POST(request: Request) {
 
     const event = JSON.parse(payload);
 
-    if (event.type !== "checkout.session.completed") {
+    if (event.type !== "payment_intent.succeeded") {
       // Acknowledge but ignore other event types
       return NextResponse.json({ received: true });
     }
 
-    const session = event.data.object;
-    const metadata = session.metadata ?? {};
+    const paymentIntent = event.data.object;
+    const metadata = paymentIntent.metadata ?? {};
 
     // Only process guide verification payments
     if (metadata.type !== "guide_verification") {
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       .from("guide_profiles")
       .update({
         verification_fee_paid: true,
-        verification_fee_session_id: session.id,
+        verification_fee_session_id: paymentIntent.id,
         verification_fee_paid_at: new Date().toISOString(),
         status: "pending",
         updated_at: new Date().toISOString(),
@@ -129,8 +129,8 @@ export async function POST(request: Request) {
       old_status: "draft",
       new_status: "pending",
       metadata: {
-        session_id: session.id,
-        amount: session.amount_total,
+        payment_intent_id: paymentIntent.id,
+        amount: paymentIntent.amount,
       },
       actor_id: userId,
     });

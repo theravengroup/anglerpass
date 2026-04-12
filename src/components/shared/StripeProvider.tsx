@@ -10,8 +10,10 @@ interface StripeProviderProps {
 }
 
 /**
- * Wraps children in Stripe Elements context with AnglerPass theming.
+ * Wraps children in Stripe Elements context with full AnglerPass theming.
  * Pass a PaymentIntent or SetupIntent client_secret.
+ *
+ * Loads the DM Sans font into Stripe's iframe so input text matches our site.
  */
 export function StripeProvider({ clientSecret, children }: StripeProviderProps) {
   return (
@@ -20,6 +22,13 @@ export function StripeProvider({ clientSecret, children }: StripeProviderProps) 
       options={{
         clientSecret,
         appearance: anglerPassElementsTheme,
+        fonts: [
+          {
+            cssSrc:
+              "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap",
+          },
+        ],
+        loader: "auto",
       }}
     >
       {children}

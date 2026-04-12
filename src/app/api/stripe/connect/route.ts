@@ -1,20 +1,10 @@
 import { NextRequest } from "next/server";
-import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createConnectAccount,
-  createAccountLink,
   getConnectAccount,
 } from "@/lib/stripe/server";
-import { SITE_URL } from "@/lib/constants";
-
-// Return paths after Stripe onboarding, keyed by entity type
-// Return to main dashboard after onboarding so the PayoutSetup card updates
-const RETURN_PATHS: Record<string, string> = {
-  guide: "/guide",
-  landowner: "/landowner",
-  club: "/club",
-};
 
 // ─── Resolve the entity's Stripe fields from the correct table ──────
 
@@ -88,7 +78,7 @@ async function resolveEntity(
   return null;
 }
 
-// ─── POST: Create Stripe Connect account + onboarding link ──────────
+// ─── POST: Create Stripe Connect account (for first-time setup) ─────
 
 export async function POST(request: NextRequest) {
   try {
@@ -126,18 +116,12 @@ export async function POST(request: NextRequest) {
         .eq(entity.idColumn, entity.idValue);
     }
 
-    // Create an Account Link for onboarding
-    const returnPath = RETURN_PATHS[type] ?? "/dashboard";
-    const accountLink = await createAccountLink(
-      accountId,
-      `${SITE_URL}${returnPath}?stripe_onboarding=complete`,
-      `${SITE_URL}${returnPath}?stripe_onboarding=refresh`
-    );
-
-    return jsonOk({ url: accountLink.url });
+    // Return the account ID — the embedded ConnectAccountOnboarding
+    // component handles the onboarding flow inline via Account Sessions
+    return jsonOk({ accountId });
   } catch (err) {
     console.error("[stripe/connect] POST error:", err);
-    return jsonError("Failed to create Stripe onboarding link", 500);
+    return jsonError("Failed to create Stripe Connect account", 500);
   }
 }
 
