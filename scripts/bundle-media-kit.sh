@@ -37,12 +37,6 @@ else
   echo "OK: Found founder headshot"
 fi
 
-if [ ! -f "public/downloads/anglerpass-backgrounder.pdf" ]; then
-  echo "MISSING: public/downloads/anglerpass-backgrounder.pdf — add press backgrounder before running"
-else
-  echo "OK: Found backgrounder PDF"
-fi
-
 echo ""
 
 # ------------------------------------------------------------------
@@ -69,11 +63,6 @@ if [ -f "public/images/press/team/dan-jahn-founder-headshot-webres.webp" ]; then
   echo "Copied founder headshot"
 fi
 
-# Backgrounder PDF
-if [ -f "public/downloads/anglerpass-backgrounder.pdf" ]; then
-  cp public/downloads/anglerpass-backgrounder.pdf "$TEMP_DIR/"
-  echo "Copied backgrounder PDF"
-fi
 
 # ------------------------------------------------------------------
 # Create README.txt
@@ -94,8 +83,6 @@ CONTENTS:
 - /logos — AnglerPass logo in multiple formats
 - /screenshots — Product screenshots
 - /founder — Founder headshot (Dan Jahn)
-- backgrounder.pdf — Full press backgrounder and fact sheet
-
 USAGE:
 All assets may be used for editorial coverage of AnglerPass.
 Please credit "AnglerPass" or "anglerpass.com" when using logos or screenshots.

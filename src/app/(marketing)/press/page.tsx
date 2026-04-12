@@ -300,8 +300,7 @@ export default function PressPage() {
               Media Kit
             </h2>
             <p className="mx-auto mb-8 max-w-[500px] text-[16.5px] leading-[1.7] text-text-secondary">
-              Download logos, product screenshots, founder headshot, and the
-              backgrounder fact sheet.
+              Download logos, product screenshots, and founder headshot.
             </p>
 
             <a
@@ -313,8 +312,8 @@ export default function PressPage() {
             </a>
 
             <p className="mx-auto mt-5 max-w-[440px] text-[13px] leading-[1.6] text-text-light">
-              Includes: Logo files (PNG, SVG), product screenshots, founder
-              headshot, and press backgrounder (PDF).
+              Includes: Logo files (PNG, SVG), product screenshots, and
+              founder headshot.
             </p>
           </div>
         </div>
