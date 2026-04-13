@@ -51,6 +51,10 @@
     {
       "path": "/api/cron/crm-workflow-runner",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/clubos-campaigns",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
