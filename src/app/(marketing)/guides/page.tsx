@@ -161,7 +161,12 @@ export default function GuidesPage() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-charcoal pt-[160px] pb-[100px]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(58,107,124,0.15),_transparent_60%)]" />
+        <img
+          src="/images/guides-hero.webp"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-charcoal/70" />
         <div className="relative max-w-[800px] mx-auto px-8 text-center">
           <span className="inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Guides

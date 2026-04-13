@@ -109,7 +109,12 @@ export default function AnglersPage() {
       />
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(154,115,64,0.1),transparent_60%)]" />
+        <img
+          src="/images/anglers-hero.webp"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-forest-deep/70" />
         <div className="relative max-w-[800px] mx-auto px-8 text-center">
           <span className="audience-hero-badge inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Anglers
@@ -252,6 +257,15 @@ export default function AnglersPage() {
           </p>
         </div>
       </section>
+
+      {/* Interstitial image */}
+      <div className="relative w-full h-[400px] overflow-hidden">
+        <img
+          src="/images/anglers-interstitial.webp"
+          alt="Angler fly fishing on private water"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Cross-club access section */}
       <section className="py-[100px] bg-parchment-light">

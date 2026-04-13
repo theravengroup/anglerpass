@@ -35,7 +35,12 @@ export default function AboutPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(58,107,124,0.12),transparent_60%)]" />
+        <img
+          src="/images/about-hero.webp"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-forest-deep/70" />
         <div className="relative max-w-[800px] mx-auto px-8 text-center">
           <span className="inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             About AnglerPass

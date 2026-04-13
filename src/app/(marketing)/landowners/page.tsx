@@ -110,7 +110,12 @@ export default function LandownersPage() {
       />
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-deep pt-[160px] pb-[100px]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(58,107,124,0.15),transparent_60%)]" />
+        <img
+          src="/images/landowners-hero.webp"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-forest-deep/70" />
         <div className="relative max-w-[800px] mx-auto px-8 text-center">
           <span className="audience-hero-badge inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
             For Landowners
@@ -266,6 +271,15 @@ export default function LandownersPage() {
           </p>
         </div>
       </section>
+
+      {/* Interstitial image */}
+      <div className="relative w-full h-[400px] overflow-hidden">
+        <img
+          src="/images/landowners-interstitial.webp"
+          alt="Private water on a landowner property"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Club affiliation */}
       <section className="py-20 bg-parchment-light">
