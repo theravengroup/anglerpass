@@ -27,6 +27,11 @@ import {
   MousePointerClick,
   ShoppingBag,
   BarChart3,
+  Megaphone,
+  Wrench,
+  HeartPulse,
+  Activity,
+  Blocks,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
 import { getProfile } from "@/lib/auth/get-profile";
@@ -124,6 +129,31 @@ const ROLE_ITEMS: Record<string, SidebarItem[]> = {
       label: "Settings",
       href: "/club/settings",
       icon: <Settings />,
+    },
+    {
+      label: "ClubOS",
+      href: "/club/clubos",
+      icon: <Blocks />,
+    },
+    {
+      label: "Communications",
+      href: "/club/clubos/communications",
+      icon: <Megaphone />,
+    },
+    {
+      label: "Operations",
+      href: "/club/clubos/operations",
+      icon: <Wrench />,
+    },
+    {
+      label: "Membership Health",
+      href: "/club/clubos/membership",
+      icon: <HeartPulse />,
+    },
+    {
+      label: "Property Activity",
+      href: "/club/clubos/property",
+      icon: <Activity />,
     },
   ],
   angler: [
@@ -266,6 +296,11 @@ const PAGE_TITLES: Record<string, string> = {
   "/club/staff": "Staff Management",
   "/club/referrals": "Member Referrals",
   "/club/book-for-member": "Book for Member",
+  "/club/clubos": "ClubOS",
+  "/club/clubos/communications": "Communications",
+  "/club/clubos/operations": "Operations",
+  "/club/clubos/membership": "Membership Health",
+  "/club/clubos/property": "Property Activity",
   "/angler": "Your Fishing Dashboard",
   "/angler/bookings": "Bookings",
   "/angler/financials": "Spending & Fees",
