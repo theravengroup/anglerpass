@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getResend } from "@/lib/email";
 import { getUnsubscribeUrl } from "@/lib/unsubscribe";
 import { SITE_URL } from "@/lib/constants";
+import { generateBookingIcs } from "@/lib/ical";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -52,6 +53,12 @@ export type NotificationType =
   | "booking_abuse_flagged"
   | "booking_late_cancel_fee";
 
+interface EmailAttachment {
+  filename: string;
+  content: string | Buffer;
+  contentType?: string;
+}
+
 interface NotificationPayload {
   userId: string;
   type: NotificationType;
@@ -59,6 +66,8 @@ interface NotificationPayload {
   body: string;
   link?: string;
   metadata?: Record<string, unknown>;
+  /** Optional email attachments (e.g. .ics calendar file) */
+  attachments?: EmailAttachment[];
 }
 
 /** Maps notification type → preference column in notification_preferences */
@@ -173,6 +182,7 @@ export async function notify(
     link: payload.link,
     type: payload.type,
     userId: payload.userId,
+    attachments: payload.attachments,
   });
 }
 
@@ -186,6 +196,7 @@ interface EmailParams {
   link?: string;
   type: NotificationType;
   userId?: string;
+  attachments?: EmailAttachment[];
 }
 
 const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
@@ -269,7 +280,7 @@ async function sendNotificationEmail(params: EmailParams) {
   const resend = getResend();
   if (!resend) return;
 
-  const { to, displayName, title, body, link, type, userId } = params;
+  const { to, displayName, title, body, link, type, userId, attachments } = params;
   const subject = SUBJECT_MAP[type] ?? title;
   const ctaLabel = CTA_LABEL_MAP[type] ?? "View on AnglerPass →";
   const ctaColor = CTA_COLOR_MAP[type] ?? "#2a5a3a";
@@ -301,6 +312,11 @@ async function sendNotificationEmail(params: EmailParams) {
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
           }
         : undefined,
+      attachments: attachments?.map((a) => ({
+        filename: a.filename,
+        content: typeof a.content === "string" ? Buffer.from(a.content) : a.content,
+        content_type: a.contentType,
+      })),
     });
   } catch (err) {
     console.error("[notify] Email send error:", err);
@@ -398,6 +414,7 @@ export async function notifyBookingConfirmed(
     totalAmount?: number;
     landownerNotes?: string;
     guideName?: string;
+    propertyLocation?: string;
   }
 ) {
   const dateRange = opts.bookingEndDate
@@ -420,6 +437,18 @@ export async function notifyBookingConfirmed(
     body += ` Note from the landowner: \u201C${opts.landownerNotes}\u201D`;
   }
 
+  // Generate .ics calendar attachment
+  const icsContent = generateBookingIcs({
+    bookingId: opts.bookingId,
+    propertyName: opts.propertyName,
+    location: opts.propertyLocation,
+    startDate: opts.bookingDate,
+    endDate: opts.bookingEndDate,
+    duration: opts.duration,
+    partySize: opts.partySize,
+    guideName: opts.guideName,
+  });
+
   await notify(admin, {
     userId: opts.anglerId,
     type: "booking_confirmed",
@@ -430,6 +459,13 @@ export async function notifyBookingConfirmed(
       booking_id: opts.bookingId,
       property_name: opts.propertyName,
     },
+    attachments: [
+      {
+        filename: "booking.ics",
+        content: icsContent,
+        contentType: "text/calendar",
+      },
+    ],
   });
 }
 

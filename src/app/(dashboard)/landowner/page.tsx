@@ -25,6 +25,7 @@ import {
 import PayoutSetup from "@/components/shared/PayoutSetup";
 import LandownerOnboardingCard from "@/components/properties/LandownerOnboardingCard";
 import SmsConsentCard from "@/components/shared/SmsConsentCard";
+import CalendarFeedCard from "@/components/shared/CalendarFeedCard";
 import { PERIOD_OPTIONS, STATUS_BADGE_COLORS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 
@@ -399,6 +400,14 @@ function ActiveLandownerDashboard({
 
       {/* SMS Consent — optional, dismissable */}
       <SmsConsentCard />
+
+      {/* Aggregate calendar feed — all properties in one subscription */}
+      <CalendarFeedCard
+        tokenEndpoint="/api/landowner/calendar-token"
+        title="All Properties Calendar"
+        description="Subscribe to bookings across all your properties in one calendar feed. Automatically updates when you add or remove properties."
+        color="forest"
+      />
 
       {/* Add another property */}
       <Link href="/landowner/properties/new">

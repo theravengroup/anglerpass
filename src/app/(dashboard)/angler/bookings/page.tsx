@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
+  CalendarPlus,
   Loader2,
   MapPin,
   Compass,
@@ -469,16 +470,28 @@ function BookingCard({
         {/* Action buttons */}
         <div className="flex shrink-0 flex-col gap-1.5">
           {booking.status === "confirmed" && (
-            <Link href={`/angler/sign/${booking.id}`}>
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full border-forest/20 text-xs text-forest hover:bg-forest/5"
-              >
-                <FileText className="mr-1 size-3" />
-                Documents
-              </Button>
-            </Link>
+            <>
+              <Link href={`/angler/sign/${booking.id}`}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full border-forest/20 text-xs text-forest hover:bg-forest/5"
+                >
+                  <FileText className="mr-1 size-3" />
+                  Documents
+                </Button>
+              </Link>
+              <a href={`/api/bookings/${booking.id}/calendar.ics`} download>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full border-bronze/20 text-xs text-bronze hover:bg-bronze/5"
+                >
+                  <CalendarPlus className="mr-1 size-3" />
+                  Add to Calendar
+                </Button>
+              </a>
+            </>
           )}
           {canCancel && onCancel && (
             <Button

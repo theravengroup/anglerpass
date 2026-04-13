@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     const { data: property, error: propError } = await admin
       .from("properties")
       .select(
-        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id"
+        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id, location_description"
       )
       .eq("id", property_id)
       .maybeSingle();
@@ -357,6 +357,7 @@ export async function POST(request: Request) {
       partySize: party_size,
       totalAmount: fees.totalAmount,
       guideName: guideName ?? undefined,
+      propertyLocation: property.location_description ?? undefined,
     }).catch((err) => console.error("[bookings/on-behalf] Angler notification error:", err));
 
     // Notify guide if selected

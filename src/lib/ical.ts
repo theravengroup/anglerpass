@@ -100,3 +100,53 @@ export function toICalStatus(
       return "TENTATIVE";
   }
 }
+
+/**
+ * Generate a single-event .ics file for a booking (for email attachment / download).
+ */
+export function generateBookingIcs(opts: {
+  bookingId: string;
+  propertyName: string;
+  location?: string;
+  startDate: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD (last day of booking)
+  duration: string; // "full_day" | "half_day"
+  partySize: number;
+  guideName?: string;
+  status?: string;
+}): string {
+  const dtstart = toICalDate(opts.startDate);
+  // For multi-day bookings, DTEND is the day AFTER the last day
+  const dtend = toICalDateEnd(opts.endDate ?? opts.startDate);
+  const durationLabel = opts.duration === "half_day" ? "Half Day" : "Full Day";
+
+  let description = `${durationLabel} booking for ${opts.partySize} angler${opts.partySize > 1 ? "s" : ""} at ${opts.propertyName}.`;
+  if (opts.guideName) {
+    description += `\\nGuide: ${opts.guideName}`;
+  }
+  description += "\\nBooked via AnglerPass";
+
+  const lines: string[] = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//AnglerPass//Booking//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:booking-${opts.bookingId}@anglerpass.com`,
+    `DTSTART;VALUE=DATE:${dtstart}`,
+    `DTEND;VALUE=DATE:${dtend}`,
+    `SUMMARY:${escapeICalText(`${opts.propertyName} — ${durationLabel}`)}`,
+    `DESCRIPTION:${escapeICalText(description)}`,
+    `STATUS:${toICalStatus(opts.status ?? "confirmed")}`,
+    `DTSTAMP:${formatDateUTC(new Date().toISOString())}`,
+  ];
+
+  if (opts.location) {
+    lines.push(`LOCATION:${escapeICalText(opts.location)}`);
+  }
+
+  lines.push("END:VEVENT", "END:VCALENDAR");
+
+  return lines.join("\r\n");
+}

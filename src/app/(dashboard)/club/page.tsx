@@ -28,6 +28,7 @@ import PayoutSetup from "@/components/shared/PayoutSetup";
 import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist";
 import BookingAlertsCard from "@/components/clubs/BookingAlertsCard";
 import ClubEmbedWidget from "@/components/clubs/ClubEmbedWidget";
+import CalendarFeedCard from "@/components/shared/CalendarFeedCard";
 import Link from "next/link";
 import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
@@ -448,6 +449,14 @@ function ActiveClubDashboard({
           </Link>
         ))}
       </div>
+
+      {/* Calendar feed — all club bookings in one subscription */}
+      <CalendarFeedCard
+        tokenEndpoint="/api/clubs/calendar-token"
+        title="Club Bookings Calendar"
+        description="Subscribe to all bookings across your club's properties. See who is fishing where, at a glance."
+        color="river"
+      />
     </div>
   );
 }
