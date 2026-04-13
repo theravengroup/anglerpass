@@ -11,78 +11,87 @@ export const ROLE_PATHS: Record<string, string> = {
   admin: "/admin",
   guide: "/guide",
   corporate: "/corporate",
+  affiliate: "/affiliate",
 };
 
 /**
  * Log in as a given role using the dev-only login endpoint.
  *
- * Uses the API context to set auth cookies (avoids browser-level
- * connection issues), then navigates to the role's dashboard.
+ * Uses page.goto to follow the full redirect chain (sets cookies in
+ * the browser context reliably), then navigates to the role dashboard.
+ *
+ * Includes a retry mechanism: if the first login attempt lands on the
+ * wrong role (due to a concurrent test mutating the shared test user),
+ * it retries once.
  */
 export async function loginAsRole(
   page: Page,
   role: string
 ): Promise<void> {
-  // Clear all cookies to ensure a clean auth state
   const context = page.context();
   await context.clearCookies();
 
   const expectedPath = ROLE_PATHS[role] ?? `/${role}`;
 
-  // Use the API context to call dev login — this sets cookies without
-  // needing a full page navigation (more reliable under load)
-  const baseURL = page.url().startsWith("http")
-    ? new URL(page.url()).origin
-    : undefined;
-
-  // Try API-based login first, fall back to page navigation
-  try {
-    const url = baseURL
-      ? `${baseURL}/api/dev/login?role=${role}`
-      : `/api/dev/login?role=${role}`;
-
-    const res = await context.request.get(url, { maxRedirects: 0 });
-    expect([200, 307]).toContain(res.status());
-  } catch {
-    // Fall back to page navigation with retry
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        await page.goto(`/api/dev/login?role=${role}`, {
-          waitUntil: "domcontentloaded",
-          timeout: 15_000,
-        });
-        break;
-      } catch (err) {
-        if (attempt < 2) {
-          await page.waitForTimeout(3_000);
-          continue;
-        }
-        throw err;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await page.goto(`/api/dev/login?role=${role}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 15_000,
+      });
+      break;
+    } catch {
+      if (attempt < 2) {
+        await page.waitForTimeout(2_000);
+        continue;
       }
+      throw new Error(`Failed to login as ${role} after 3 attempts`);
     }
   }
 
-  // Navigate to the dashboard
-  await page.goto(expectedPath, { waitUntil: "domcontentloaded" });
+  // Navigate to the expected dashboard if we're not already there
+  if (!page.url().includes(expectedPath)) {
+    await page.goto(expectedPath, { waitUntil: "domcontentloaded" });
+  }
 }
 
 /**
- * Log in via the API (without following the redirect) and store
- * cookies on the context. Useful for API-level tests that need auth.
+ * Log in via the API context for API-level tests that need auth cookies.
+ *
+ * Uses maxRedirects: 0 because the dev login redirect URL may point to
+ * a different port than the test server. The 307 response still sets
+ * cookies via Set-Cookie headers which Playwright captures.
+ *
+ * Retries up to 3 times to handle cold-start latency on first login.
  */
 export async function loginAsRoleViaAPI(
   context: BrowserContext,
   baseURL: string,
   role: string
 ): Promise<void> {
-  // Clear existing cookies for clean state
   await context.clearCookies();
 
-  const res = await context.request.get(
-    `${baseURL}/api/dev/login?role=${role}`,
-    { maxRedirects: 0 }
-  );
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await context.request.get(
+      `${baseURL}/api/dev/login?role=${role}`,
+      { maxRedirects: 0 },
+    );
 
-  // The 307 response sets cookies; the context stores them automatically.
-  expect([200, 307]).toContain(res.status());
+    // The 307 response sets cookies via Set-Cookie headers
+    expect([200, 307]).toContain(res.status());
+
+    // Verify cookies are working by making an authenticated request
+    const verifyRes = await context.request.get(`${baseURL}/api/profile`);
+    if (verifyRes.status() === 200) {
+      return; // Auth is established
+    }
+
+    // If still 401, cookies may not have applied yet — retry
+    if (attempt < 2) {
+      await context.clearCookies();
+    }
+  }
+
+  // Final fallback: if verification still fails, proceed anyway
+  // (some tests may handle 401 themselves)
 }

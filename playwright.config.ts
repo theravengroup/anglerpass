@@ -34,7 +34,7 @@ export default defineConfig({
   projects: [
     {
       name: "smoke",
-      testMatch: /\/(marketing-pages|auth-flows|api-routes)\.spec\.ts$/,
+      testMatch: /\/(marketing-pages|auth-flows|api-routes|learn-pages)\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"] },
     },
     {
