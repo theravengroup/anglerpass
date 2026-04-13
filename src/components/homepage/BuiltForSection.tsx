@@ -33,7 +33,7 @@ export default function BuiltForSection() {
           </div>
           <div className="built-for-row reveal">
             <div className="built-for-img">
-              <img src="/images/patagonia.webp" alt="Angler fly fishing in turquoise water with Patagonian mountains" />
+              <img src="/images/river-mountains-angler.webp" alt="Angler fly fishing in turquoise river with mountains" />
             </div>
             <div className="built-for-text">
               <span className="built-for-label">For Anglers</span>

@@ -23,7 +23,7 @@ export default function WhySection() {
 
   return (
     <section className="why" id="why">
-      <div className="why-bg" id="whyBg" ref={bgRef} style={{ backgroundImage: "url('/images/patagonia.webp')" }}></div>
+      <div className="why-bg" id="whyBg" ref={bgRef} style={{ backgroundImage: "url('/images/river-mountains-angler.webp')" }}></div>
       <div className="why-overlay"></div>
       <div className="why-grain"></div>
       <div className="container">
