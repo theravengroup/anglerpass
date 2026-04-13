@@ -293,7 +293,7 @@ export async function evaluateSegment(
 
   // Post-query filtering for activity level (requires booking data)
   if (filters.activity_level && filters.activity_level.length > 0 && result.data) {
-    const memberIds = (result.data as Array<{ user_id: string }>).map(
+    const memberIds = (result.data as unknown as Array<{ user_id: string }>).map(
       (m) => m.user_id
     );
     if (memberIds.length > 0) {
@@ -314,7 +314,7 @@ export async function evaluateSegment(
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-      result.data = (result.data as Array<{ user_id: string }>).filter((m) => {
+      (result as { data: unknown }).data = (result.data as unknown as Array<{ user_id: string }>).filter((m) => {
         const lastBooking = lastBookingMap.get(m.user_id);
         const lastDate = lastBooking ? new Date(lastBooking) : null;
 
@@ -340,7 +340,7 @@ export async function evaluateSegment(
       (assignments ?? []).map((a) => a.membership_id)
     );
 
-    result.data = (result.data as Array<{ id: string }>).filter((m) =>
+    (result as { data: unknown }).data = (result.data as unknown as Array<{ id: string }>).filter((m) =>
       groupMemberIds.has(m.id)
     );
   }

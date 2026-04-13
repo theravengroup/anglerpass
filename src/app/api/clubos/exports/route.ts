@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonError,
   requireAuth,
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const { format, resource, event_id, date_from, date_to } = parsed.data;
 
     // Fetch data based on resource type
@@ -66,7 +66,7 @@ interface ExportFilters {
 }
 
 async function fetchExportData(
-  admin: ReturnType<typeof createAdminClient>,
+  admin: ReturnType<typeof createUntypedAdminClient>,
   clubId: string,
   resource: string,
   filters: ExportFilters
@@ -105,7 +105,7 @@ async function fetchExportData(
         .order("registered_at", { ascending: true });
 
       const rows = (data ?? []).map((r) => {
-        const membership = r.membership as { profile: { full_name: string; email: string } } | null;
+        const membership = r.membership as unknown as { profile: { full_name: string; email: string } } | null;
         return {
           name: membership?.profile?.full_name ?? "Unknown",
           email: membership?.profile?.email ?? "",
@@ -154,8 +154,8 @@ async function fetchExportData(
         .order("signed_at", { ascending: false });
 
       const rows = (data ?? []).map((s) => {
-        const waiver = s.waiver as { title: string } | null;
-        const membership = s.membership as { profile: { full_name: string; email: string } } | null;
+        const waiver = s.waiver as unknown as { title: string } | null;
+        const membership = s.membership as unknown as { profile: { full_name: string; email: string } } | null;
         return {
           waiver_title: waiver?.title ?? "",
           member_name: membership?.profile?.full_name ?? "Unknown",
@@ -188,7 +188,7 @@ async function fetchExportData(
 
       const { data } = await query;
       const rows = (data ?? []).map((e) => {
-        const membership = e.membership as { profile: { full_name: string; email: string } } | null;
+        const membership = e.membership as unknown as { profile: { full_name: string; email: string } } | null;
         return {
           member_name: membership?.profile?.full_name ?? "Unknown",
           member_email: membership?.profile?.email ?? "",

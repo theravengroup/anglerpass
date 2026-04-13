@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Get event details
     const { data: event } = await admin
@@ -45,13 +45,13 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = createRegistrationSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
     const data = parsed.data;
 
     // Determine membership_id — use provided or look up from auth user
-    let membershipId = data.membership_id;
+    let membershipId: string = data.membership_id ?? "";
     if (!membershipId) {
       const { data: membership } = await admin
         .from("club_memberships")
@@ -117,18 +117,20 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
 
     // Update event counts
     if (status === "registered") {
-      await admin.rpc("increment_field", {
-        table_name: "club_events",
-        row_id: eventId,
-        field_name: "registered_count",
-        amount: spotsNeeded,
-      }).then(() => null).catch(() => {
+      try {
+        await admin.rpc("increment_field", {
+          table_name: "club_events",
+          row_id: eventId,
+          field_name: "registered_count",
+          amount: spotsNeeded,
+        });
+      } catch {
         // Fallback: direct update
-        return admin
+        await admin
           .from("club_events")
           .update({ registered_count: event.registered_count + spotsNeeded })
           .eq("id", eventId);
-      });
+      }
     } else {
       await admin
         .from("club_events")
@@ -161,7 +163,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Get event to verify club access
     const { data: event } = await admin

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     if (!club_id) return jsonError("club_id is required", 400);
 
     // Any club member can report an incident
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const { data: membership } = await admin
       .from("club_memberships")
       .select("id")
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const parsed = createIncidentSchema.safeParse(incidentData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
     const data = parsed.data;
@@ -107,12 +107,12 @@ export async function GET(req: NextRequest) {
     });
 
     if (!queryParsed.success) {
-      return jsonError(queryParsed.error.errors[0].message, 400);
+      return jsonError(queryParsed.error.issues[0].message, 400);
     }
 
     const { status, severity, type, page, limit } = queryParsed.data;
     const offset = (page - 1) * limit;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     let query = admin
       .from("club_incidents")

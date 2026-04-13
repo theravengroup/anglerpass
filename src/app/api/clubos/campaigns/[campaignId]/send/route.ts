@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -30,7 +30,7 @@ export async function POST(
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { campaignId } = await params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Load campaign
     const { data: campaign, error: campError } = await admin
@@ -101,7 +101,7 @@ export async function POST(
         .in("id", membershipIds)
         .eq("status", "active");
 
-      members = (data ?? []) as typeof members;
+      members = (data ?? []) as unknown as typeof members;
     } else if (campaign.segment_filters) {
       // Use segment filters
       const { data } = await evaluateSegment(
@@ -109,7 +109,7 @@ export async function POST(
         campaign.club_id,
         campaign.segment_filters as Record<string, unknown>
       );
-      members = (data ?? []) as typeof members;
+      members = (data ?? []) as unknown as typeof members;
     } else {
       // Broadcast to all active members
       const { data } = await admin
@@ -118,7 +118,7 @@ export async function POST(
         .eq("club_id", campaign.club_id)
         .eq("status", "active");
 
-      members = (data ?? []) as typeof members;
+      members = (data ?? []) as unknown as typeof members;
     }
 
     // Filter out suppressed emails

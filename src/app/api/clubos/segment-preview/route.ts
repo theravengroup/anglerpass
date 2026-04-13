@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth, requireClubRole } from "@/lib/api/helpers";
 import { P } from "@/lib/permissions/constants";
 import { segmentPreviewRequestSchema } from "@/lib/validations/clubos-communications";
@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = segmentPreviewRequestSchema.safeParse(filterData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Get full count
     const countResult = await evaluateSegment(admin, club_id, parsed.data.filters, {
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       limit: 10,
     });
 
-    const sample = ((sampleResult.data ?? []) as Array<{
+    const sample = ((sampleResult.data ?? []) as unknown as Array<{
       id: string;
       user_id: string;
       role: string;

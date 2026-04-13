@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { updateCommPreferencesSchema } from "@/lib/validations/clubos-communications";
 
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       return jsonError("membership_id and club_id are required", 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Verify the membership belongs to the authenticated user
     const { data: membership } = await admin
@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
       return jsonError("membership_id and club_id are required", 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Verify membership belongs to auth user
     const { data: membership } = await admin
@@ -89,7 +89,7 @@ export async function PUT(req: NextRequest) {
 
     const parsed = updateCommPreferencesSchema.safeParse(prefsData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
     // Upsert preferences

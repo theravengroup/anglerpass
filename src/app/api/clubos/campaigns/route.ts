@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = createClubCampaignSchema.safeParse(campaignData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const data = parsed.data;
 
     // Determine initial status
@@ -95,12 +95,12 @@ export async function GET(req: NextRequest) {
     });
 
     if (!queryParsed.success) {
-      return jsonError(queryParsed.error.errors[0].message, 400);
+      return jsonError(queryParsed.error.issues[0].message, 400);
     }
 
     const { status, page, limit } = queryParsed.data;
     const offset = (page - 1) * limit;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     let query = admin
       .from("club_campaigns")

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/clubos/track/click/[recipientId]?url=... — Click tracking redirect
@@ -18,13 +18,15 @@ export async function GET(
   }
 
   // Fire and forget — record the click asynchronously
-  const admin = createAdminClient();
+  const admin = createUntypedAdminClient();
 
-  admin
-    .from("club_campaign_recipients")
-    .select("id, click_count, status")
-    .eq("id", recipientId)
-    .single()
+  Promise.resolve(
+    admin
+      .from("club_campaign_recipients")
+      .select("id, click_count, status")
+      .eq("id", recipientId)
+      .single()
+  )
     .then(({ data }) => {
       if (data) {
         const updates: Record<string, unknown> = {
@@ -49,7 +51,7 @@ export async function GET(
           .eq("id", recipientId);
       }
     })
-    .catch((err) => {
+    .catch((err: unknown) => {
       console.error("[clubos/track/click] Error:", err);
     });
 

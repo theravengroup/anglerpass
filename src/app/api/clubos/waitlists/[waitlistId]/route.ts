@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waitlistId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: entry } = await admin
       .from("club_waitlists")
@@ -48,7 +48,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
         if (entry.status !== "waiting") return jsonError("Can only offer to waiting entries", 400);
 
         const parsed = offerWaitlistSchema.safeParse(body);
-        if (!parsed.success) return jsonError(parsed.error.errors[0].message, 400);
+        if (!parsed.success) return jsonError(parsed.error.issues[0].message, 400);
 
         // Default expiration: 7 days from now
         const expiresAt = parsed.data.offer_expires_at ??

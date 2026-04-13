@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: event, error } = await admin
       .from("club_events")
@@ -48,7 +48,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Fetch existing event to get club_id
     const { data: existing } = await admin
@@ -65,7 +65,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = updateClubEventSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
     const updates: Record<string, unknown> = {};
@@ -120,7 +120,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: existing } = await admin
       .from("club_events")
