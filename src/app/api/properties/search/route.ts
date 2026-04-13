@@ -24,11 +24,11 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
+        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, created_by_club_id"
       )
       .eq("status", "published")
       .order("name")
-      .limit(limit);
+      .limit(limit * 2); // Over-fetch to account for inactive-club filtering
 
     if (waterType) {
       query = query.eq("water_type", waterType);
@@ -68,14 +68,44 @@ export async function GET(request: Request) {
       }
     }
 
-    const { data: properties, error } = await query;
+    const { data: rawProperties, error } = await query;
 
     if (error) {
       console.error("[properties/search] Error:", error);
       return jsonError("Failed to search properties", 500);
     }
 
-    return jsonOk({ properties: properties ?? [] });
+    // Filter out properties belonging to inactive clubs
+    const clubIds = [
+      ...new Set(
+        (rawProperties ?? [])
+          .map((p) => p.created_by_club_id)
+          .filter((id): id is string => id !== null)
+      ),
+    ];
+
+    let inactiveClubIds = new Set<string>();
+    if (clubIds.length > 0) {
+      const { data: inactiveClubs } = await admin
+        .from("clubs")
+        .select("id")
+        .in("id", clubIds)
+        .eq("is_active", false);
+
+      inactiveClubIds = new Set(
+        (inactiveClubs ?? []).map((c) => c.id)
+      );
+    }
+
+    const properties = (rawProperties ?? [])
+      .filter(
+        (p) =>
+          !p.created_by_club_id ||
+          !inactiveClubIds.has(p.created_by_club_id)
+      )
+      .slice(0, limit);
+
+    return jsonOk({ properties });
   } catch (err) {
     console.error("[properties/search] Unexpected error:", err);
     return jsonError("Internal server error", 500);

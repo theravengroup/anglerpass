@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     // Build query
     let query = admin
       .from("clubs")
-      .select("id, name, description, location, owner_id, subscription_tier, created_at", {
+      .select("id, name, description, location, owner_id, subscription_tier, is_active, created_at", {
         count: "exact",
       });
 
@@ -127,6 +127,7 @@ export async function GET(request: Request) {
         location: string | null;
         owner_id: string;
         subscription_tier: string;
+        is_active: boolean;
         created_at: string;
       }) => ({
         id: c.id,
@@ -138,6 +139,7 @@ export async function GET(request: Request) {
         member_count: memberCountMap[c.id] ?? 0,
         property_count: propertyCountMap[c.id] ?? 0,
         subscription_tier: c.subscription_tier,
+        is_active: c.is_active,
         created_at: c.created_at,
       })
     );

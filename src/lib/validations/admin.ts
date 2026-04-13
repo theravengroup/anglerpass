@@ -19,6 +19,7 @@ export const adminClubUpdateSchema = z.object({
   rules: z.string().max(5000).nullable().optional(),
   website: z.string().url().max(500).nullable().optional(),
   subscription_tier: z.enum(["starter", "standard", "pro"]).optional(),
+  is_active: z.boolean().optional(),
 });
 
 export type AdminClubUpdateInput = z.infer<typeof adminClubUpdateSchema>;

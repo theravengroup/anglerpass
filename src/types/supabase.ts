@@ -1032,6 +1032,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_active: boolean
           initiation_fee: number | null
           location: string | null
           logo_url: string | null
@@ -1058,6 +1059,7 @@ export type Database = {
           description?: string | null
           id?: string
           initiation_fee?: number | null
+          is_active?: boolean
           location?: string | null
           logo_url?: string | null
           membership_application_required?: boolean
@@ -1083,6 +1085,7 @@ export type Database = {
           description?: string | null
           id?: string
           initiation_fee?: number | null
+          is_active?: boolean
           location?: string | null
           logo_url?: string | null
           membership_application_required?: boolean

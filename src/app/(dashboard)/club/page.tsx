@@ -29,6 +29,7 @@ import ClubOnboardingChecklist from "@/components/clubs/ClubOnboardingChecklist"
 import BookingAlertsCard from "@/components/clubs/BookingAlertsCard";
 import ClubEmbedWidget from "@/components/clubs/ClubEmbedWidget";
 import CalendarFeedCard from "@/components/shared/CalendarFeedCard";
+import ClubActivationToggle from "@/components/clubs/ClubActivationToggle";
 import Link from "next/link";
 import SmsConsentCard from "@/components/shared/SmsConsentCard";
 
@@ -38,6 +39,7 @@ interface ClubData {
   description: string | null;
   location: string | null;
   subscription_tier: string;
+  is_active: boolean;
 }
 
 interface ClubStats {
@@ -236,6 +238,7 @@ function ActiveClubDashboard({
   club: ClubData;
   stats: ClubStats | null;
 }) {
+  const [isActive, setIsActive] = useState(club.is_active);
   const statCards = [
     {
       label: "Active Members",
@@ -288,6 +291,14 @@ function ActiveClubDashboard({
           </Button>
         </Link>
       </div>
+
+      {/* Activation Toggle */}
+      <ClubActivationToggle
+        clubId={club.id}
+        isActive={isActive}
+        hasProperties={(stats?.active_properties ?? 0) + (stats?.pending_properties ?? 0) > 0}
+        onToggle={setIsActive}
+      />
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">

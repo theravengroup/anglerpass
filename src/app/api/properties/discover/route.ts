@@ -39,11 +39,33 @@ export async function GET(request: Request) {
 
     const clubIds = memberships.map((m) => m.club_id);
 
+    // Filter out inactive clubs — anglers can only discover through active clubs
+    const { data: activeClubs } = await admin
+      .from("clubs")
+      .select("id")
+      .in("id", clubIds)
+      .eq("is_active", true);
+
+    const activeClubIds = (activeClubs ?? []).map((c) => c.id);
+
+    if (activeClubIds.length === 0) {
+      return jsonOk({
+        properties: [],
+        memberships: memberships.map((m) => ({
+          id: m.id,
+          club_id: m.club_id,
+          club_name: (m.clubs as { name: string } | null)?.name ?? "Unknown",
+        })),
+        message:
+          "Your clubs are not yet active on AnglerPass.",
+      });
+    }
+
     // Get property IDs accessible through these clubs
     const { data: accessRecords } = await admin
       .from("club_property_access")
       .select("property_id, club_id")
-      .in("club_id", clubIds)
+      .in("club_id", activeClubIds)
       .eq("status", "approved");
 
     // Note: even with no direct access records, the angler may have
@@ -66,7 +88,7 @@ export async function GET(request: Request) {
     // Find additional properties reachable through cross-club agreements
     const crossClubResults = await discoverCrossClubProperties(
       admin,
-      clubIds,
+      activeClubIds,
       directPropertyIds
     );
 

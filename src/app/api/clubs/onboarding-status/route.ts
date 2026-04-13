@@ -26,7 +26,7 @@ export async function GET() {
     const { data: club } = await admin
       .from("clubs")
       .select(
-        "id, name, description, location, subscription_tier, stripe_subscription_id, stripe_connect_account_id, stripe_connect_onboarded"
+        "id, name, description, location, subscription_tier, stripe_subscription_id, stripe_connect_account_id, stripe_connect_onboarded, is_active"
       )
       .eq("owner_id", user.id)
       .maybeSingle();
@@ -83,7 +83,11 @@ export async function GET() {
       });
     }
 
-    return jsonOk({ state: "active", club: { id: club.id, name: club.name } });
+    return jsonOk({
+      state: "active",
+      club: { id: club.id, name: club.name, is_active: club.is_active },
+      checklist,
+    });
   } catch (err) {
     console.error("[clubs/onboarding-status] Error:", err);
     return jsonError("Internal server error", 500);

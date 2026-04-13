@@ -30,6 +30,7 @@ interface Club {
   member_count: number;
   property_count: number;
   subscription_tier: string | null;
+  is_active: boolean;
   created_at: string;
 }
 
@@ -168,6 +169,16 @@ export default function ClubsPage() {
                           }`}
                         >
                           {tierLabel(club.subscription_tier)}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className={`shrink-0 text-[10px] ${
+                            club.is_active
+                              ? "bg-forest/10 text-forest border-forest/20"
+                              : "bg-stone/10 text-text-secondary border-stone/20"
+                          }`}
+                        >
+                          {club.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </div>
 

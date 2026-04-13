@@ -24,6 +24,7 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
+  Power,
 } from "lucide-react";
 
 interface ClubMember {
@@ -50,6 +51,7 @@ interface ClubDetail {
   rules: string | null;
   website: string | null;
   subscription_tier: string | null;
+  is_active: boolean;
   owner_name: string | null;
   owner_email: string | null;
   created_at: string;
@@ -113,6 +115,9 @@ export default function ClubDetailPage() {
   const [formWebsite, setFormWebsite] = useState("");
   const [formTier, setFormTier] = useState("free");
 
+  const [formIsActive, setFormIsActive] = useState(false);
+  const [activating, setActivating] = useState(false);
+
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -138,6 +143,7 @@ export default function ClubDetailPage() {
         setFormRules(data.rules ?? "");
         setFormWebsite(data.website ?? "");
         setFormTier(data.subscription_tier ?? "free");
+        setFormIsActive(data.is_active ?? false);
       } catch {
         setError("An unexpected error occurred");
       } finally {
@@ -147,6 +153,34 @@ export default function ClubDetailPage() {
 
     fetchClub();
   }, [id]);
+
+  async function handleToggleActive() {
+    setActivating(true);
+    setSaveError(null);
+
+    try {
+      const res = await fetch(`/api/admin/clubs/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: !formIsActive }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setSaveError(data.error ?? "Failed to toggle club status");
+        return;
+      }
+
+      setFormIsActive(!formIsActive);
+      setClub((prev) =>
+        prev ? { ...prev, is_active: !formIsActive } : prev
+      );
+    } catch {
+      setSaveError("An unexpected error occurred");
+    } finally {
+      setActivating(false);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -211,7 +245,7 @@ export default function ClubDetailPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <Link href="/admin/clubs">
             <Button variant="ghost" size="sm">
@@ -233,6 +267,17 @@ export default function ClubDetailPage() {
               >
                 {tierLabel(club.subscription_tier)}
               </Badge>
+              <Badge
+                variant="outline"
+                className={
+                  formIsActive
+                    ? "bg-forest/10 text-forest border-forest/20"
+                    : "bg-stone/10 text-text-secondary border-stone/20"
+                }
+              >
+                <Power className="mr-1 size-3" />
+                {formIsActive ? "Active" : "Inactive"}
+              </Badge>
             </div>
             <div className="mt-1 flex items-center gap-3 text-sm text-text-light">
               {club.location && (
@@ -252,6 +297,21 @@ export default function ClubDetailPage() {
             </div>
           </div>
         </div>
+        <Button
+          size="sm"
+          variant={formIsActive ? "outline" : "default"}
+          className={
+            formIsActive
+              ? "border-red-200 text-red-600 hover:bg-red-50"
+              : "bg-forest text-white hover:bg-forest-deep"
+          }
+          onClick={handleToggleActive}
+          disabled={activating}
+        >
+          {activating && <Loader2 className="mr-1 size-3 animate-spin" />}
+          <Power className="mr-1 size-3" />
+          {formIsActive ? "Deactivate" : "Activate"}
+        </Button>
       </div>
 
       {/* Members Card */}
