@@ -16,6 +16,14 @@ const ROLE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
+const ROLE_QUESTIONS: Record<string, string> = {
+  angler: "What\u2019s your biggest frustration with accessing private water today?",
+  landowner: "Do you currently allow fishing on your property?",
+  club: "How many members does your club currently have?",
+  guide: "How many years have you been guiding and where?",
+  corporate: "What company are you with?",
+};
+
 const INVESTOR_TYPE_LABELS: Record<string, string> = {
   angel: "Angel Investor",
   vc: "Venture Capital",
@@ -72,7 +80,7 @@ async function sendWaitlistEmails(data: {
           <tr><td style="padding-right: 16px; color: #888;"><strong>Email</strong></td><td><a href="mailto:${data.email}">${data.email}</a></td></tr>
           <tr><td style="padding-right: 16px; color: #888;"><strong>Role</strong></td><td>${roleLabel}</td></tr>
           ${data.state ? `<tr><td style="padding-right: 16px; color: #888;"><strong>State</strong></td><td>${data.state}</td></tr>` : ""}
-          ${data.roleResponse ? `<tr><td style="padding-right: 16px; color: #888;"><strong>Role Q&amp;A</strong></td><td>${data.roleResponse}</td></tr>` : ""}
+          ${data.roleResponse ? `<tr><td style="padding-right: 16px; color: #888;"><strong>${ROLE_QUESTIONS[data.interestType] ?? "Role Q&amp;A"}</strong></td><td>${data.roleResponse}</td></tr>` : ""}
           ${data.message ? `<tr><td style="padding-right: 16px; color: #888;"><strong>Message</strong></td><td>${data.message}</td></tr>` : ""}
         </table>
       </div>
