@@ -6,9 +6,12 @@ import { loginAsRole, ROLE_PATHS } from "./helpers/auth";
  * shows the sidebar with correct navigation items, and renders
  * main content without errors.
  *
- * Runs after the "smoke" project finishes to avoid overwhelming
- * the dev server with parallel connections.
+ * ALL dashboard tests are in this single file because the dev login
+ * endpoint mutates a shared test user. With fullyParallel: false,
+ * tests within a file run sequentially — preventing role race conditions.
  */
+
+// ─── Role Dashboard Basics ────────────────────────────────────────
 
 test.describe("Dashboard smoke tests", () => {
   const ROLE_CONFIGS: Array<{
@@ -75,7 +78,26 @@ test.describe("Dashboard smoke tests", () => {
       expect(await navItem.count()).toBeGreaterThan(0);
     }
   });
+
+  test("affiliate dashboard loads with sidebar", async ({ page }) => {
+    await loginAsRole(page, "affiliate");
+
+    expect(page.url()).toContain("/affiliate");
+
+    const body = await page.textContent("body");
+    expect(body).not.toContain("Internal Server Error");
+
+    const heading = page.locator("h1, h2").first();
+    await expect(heading).toBeVisible({ timeout: 10_000 });
+
+    for (const item of ["Products", "Click Tracking", "Revenue"]) {
+      const navItem = page.getByText(item, { exact: false });
+      expect(await navItem.count()).toBeGreaterThan(0);
+    }
+  });
 });
+
+// ─── Dashboard Sub-Pages ──────────────────────────────────────────
 
 test.describe("Dashboard sub-pages", () => {
   test("corporate sub-pages load without 500s", async ({ page }) => {
@@ -119,6 +141,8 @@ test.describe("Dashboard sub-pages", () => {
     const subPages = [
       "/landowner/properties",
       "/landowner/bookings",
+      "/landowner/documents",
+      "/landowner/financials",
     ];
 
     for (const subPage of subPages) {
@@ -128,4 +152,96 @@ test.describe("Dashboard sub-pages", () => {
       expect(response?.status()).toBeLessThan(500);
     }
   });
+});
+
+// ─── Club Dashboard & ClubOS ──────────────────────────────────────
+
+test.describe("Club dashboard", () => {
+  test("club dashboard loads at /club", async ({ page }) => {
+    await loginAsRole(page, "club_admin");
+
+    expect(page.url()).toContain("/club");
+
+    const body = await page.textContent("body");
+    expect(body).not.toContain("Internal Server Error");
+
+    const heading = page.locator("h1, h2").first();
+    await expect(heading).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("ClubOS hub loads at /club/clubos", async ({ page }) => {
+    await loginAsRole(page, "club_admin");
+
+    const response = await page.goto("/club/clubos", {
+      waitUntil: "domcontentloaded",
+    });
+
+    expect(response?.status()).toBeLessThan(500);
+
+    const heading = page.locator("h1, h2").first();
+    await expect(heading).toBeVisible({ timeout: 10_000 });
+
+    const body = await page.textContent("body");
+    expect(body).toContain("ClubOS");
+  });
+});
+
+test.describe("ClubOS sub-pages", () => {
+  const CLUBOS_PAGES = [
+    "/club/clubos/communications",
+    "/club/clubos/operations",
+    "/club/clubos/operations/events",
+    "/club/clubos/operations/waitlists",
+    "/club/clubos/operations/incidents",
+    "/club/clubos/operations/waivers",
+    "/club/clubos/operations/exports",
+  ];
+
+  for (const subPage of CLUBOS_PAGES) {
+    test(`${subPage} loads without 500`, async ({ page }) => {
+      await loginAsRole(page, "club_admin");
+
+      const response = await page.goto(subPage, {
+        waitUntil: "domcontentloaded",
+      });
+
+      expect(response?.status()).toBeLessThan(500);
+
+      const heading = page.locator("h1, h2").first();
+      await expect(heading).toBeVisible({ timeout: 10_000 });
+
+      const body = await page.textContent("body");
+      expect(body).toContain("ClubOS");
+    });
+  }
+});
+
+// ─── Guide Dashboard ──────────────────────────────────────────────
+
+test.describe("Guide dashboard", () => {
+  const GUIDE_PAGES = [
+    { path: "/guide", label: "Guide dashboard" },
+    { path: "/guide/profile", label: "Guide profile" },
+    { path: "/guide/availability", label: "Guide availability" },
+    { path: "/guide/bookings", label: "Guide bookings" },
+    { path: "/guide/verification", label: "Guide verification" },
+  ];
+
+  for (const { path, label } of GUIDE_PAGES) {
+    test(`${label} loads at ${path}`, async ({ page }) => {
+      await loginAsRole(page, "guide");
+
+      const response = await page.goto(path, {
+        waitUntil: "domcontentloaded",
+      });
+
+      expect(response?.status()).toBeLessThan(500);
+
+      const body = await page.textContent("body");
+      expect(body).not.toContain("Internal Server Error");
+
+      const heading = page.locator("h1, h2").first();
+      await expect(heading).toBeVisible({ timeout: 10_000 });
+    });
+  }
 });

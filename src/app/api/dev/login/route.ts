@@ -4,49 +4,58 @@ import { jsonError } from "@/lib/api/helpers";
 import { PLATFORM_ROLES } from "@/lib/permissions/constants";
 import type { PlatformRole } from "@/lib/permissions/constants";
 
-const TEST_EMAIL = "dev-test@anglerpass.local";
-const TEST_PASSWORD = "dev-test-password-2024";
-
 /**
- * Dev-only login endpoint. Creates a test user if needed,
- * signs them in, sets auth cookies, and redirects to the dashboard.
+ * Dev-only login endpoint. Creates per-role test users (to prevent race
+ * conditions when parallel tests log in as different roles), signs them
+ * in, sets auth cookies, and redirects to the dashboard.
  *
  * GET  /api/dev/login                        → login as landowner
  * GET  /api/dev/login?role=admin             → login as super_admin
  * GET  /api/dev/login?role=admin&staff=support_agent → login as support_agent
  * POST /api/dev/login                        → { role: "landowner", staff: "support_agent" }
  */
+
+const BASE_EMAIL = "dev-test";
+const EMAIL_DOMAIN = "anglerpass.local";
+const TEST_PASSWORD = "dev-test-password-2024";
+
+/** Each role gets its own test user to prevent race conditions. */
+function emailForRole(role: string): string {
+  return `${BASE_EMAIL}-${role}@${EMAIL_DOMAIN}`;
+}
+
 export async function GET(request: NextRequest) {
   const role = request.nextUrl.searchParams.get("role") ?? "landowner";
   const staff = request.nextUrl.searchParams.get("staff") ?? null;
-  return devLogin(role, staff);
+  return devLogin(role, staff, request.nextUrl.origin);
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const role = (body as { role?: string }).role ?? "landowner";
   const staff = (body as { staff?: string }).staff ?? null;
-  return devLogin(role, staff);
+  return devLogin(role, staff, request.nextUrl.origin);
 }
 
-async function devLogin(role: string, staffRole: string | null) {
+async function devLogin(role: string, staffRole: string | null, requestUrl?: string) {
   if (process.env.NODE_ENV !== "development") {
     return jsonError("Not available", 404);
   }
 
   const admin = createAdminClient();
+  const email = emailForRole(role);
 
-  // Find or create the test user
+  // Find or create the role-specific test user
   const { data: listData } = await admin.auth.admin.listUsers();
-  let user = listData?.users?.find((u) => u.email === TEST_EMAIL);
+  let user = listData?.users?.find((u) => u.email === email);
 
   if (!user) {
     const { data: created, error: createErr } =
       await admin.auth.admin.createUser({
-        email: TEST_EMAIL,
+        email,
         password: TEST_PASSWORD,
         email_confirm: true,
-        user_metadata: { full_name: "Dev Test User" },
+        user_metadata: { full_name: "Dev Test User", role, display_name: "Dev Test User" },
       });
 
     if (createErr || !created.user) {
@@ -118,7 +127,7 @@ async function devLogin(role: string, staffRole: string | null) {
         "Content-Type": "application/json",
         apikey: supabaseAnonKey,
       },
-      body: JSON.stringify({ email: TEST_EMAIL, password: TEST_PASSWORD }),
+      body: JSON.stringify({ email, password: TEST_PASSWORD }),
     }
   );
 
@@ -152,11 +161,11 @@ async function devLogin(role: string, staffRole: string | null) {
     chunks.push(sessionPayload.slice(i, i + CHUNK_SIZE));
   }
 
-  // Redirect to the role's dashboard
+  // Redirect to the role's dashboard — use the request origin so it works
+  // on any port (e.g. tests on :3001 vs default :3000)
   const redirectPath = role === "club_admin" ? "/club" : `/${role}`;
-  const response = NextResponse.redirect(
-    new URL(redirectPath, process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000")
-  );
+  const origin = requestUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const response = NextResponse.redirect(new URL(redirectPath, origin));
 
   // Set chunked cookies
   const cookieOpts = {
