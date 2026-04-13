@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * POST /api/clubos/webhooks — Resend webhook handler for delivery events
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       return new Response("Invalid webhook payload", { status: 400 });
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Look up the recipient by ESP message ID
     const espMessageId = data.email_id;

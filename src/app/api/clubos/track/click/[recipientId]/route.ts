@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/clubos/track/click/[recipientId]?url=... — Click tracking redirect
@@ -18,7 +18,7 @@ export async function GET(
   }
 
   // Fire and forget — record the click asynchronously
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
 
   Promise.resolve(
     admin

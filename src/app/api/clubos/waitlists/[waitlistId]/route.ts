@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waitlistId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const { data: entry } = await admin
       .from("club_waitlists")

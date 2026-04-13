@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get event details
     const { data: event } = await admin
@@ -70,8 +70,9 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     }
 
     // Check guest limit
-    if (event.guest_allowed && data.guest_count > event.guest_limit_per_member) {
-      return jsonError(`Maximum ${event.guest_limit_per_member} guests allowed`, 400);
+    const guestLimit = event.guest_limit_per_member ?? 0;
+    if (event.guest_allowed && data.guest_count > guestLimit) {
+      return jsonError(`Maximum ${guestLimit} guests allowed`, 400);
     }
     if (!event.guest_allowed && data.guest_count > 0) {
       return jsonError("Guests are not allowed for this event", 400);
@@ -117,20 +118,10 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
 
     // Update event counts
     if (status === "registered") {
-      try {
-        await admin.rpc("increment_field", {
-          table_name: "club_events",
-          row_id: eventId,
-          field_name: "registered_count",
-          amount: spotsNeeded,
-        });
-      } catch {
-        // Fallback: direct update
-        await admin
-          .from("club_events")
-          .update({ registered_count: event.registered_count + spotsNeeded })
-          .eq("id", eventId);
-      }
+      await admin
+        .from("club_events")
+        .update({ registered_count: event.registered_count + spotsNeeded })
+        .eq("id", eventId);
     } else {
       await admin
         .from("club_events")
@@ -163,7 +154,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get event to verify club access
     const { data: event } = await admin

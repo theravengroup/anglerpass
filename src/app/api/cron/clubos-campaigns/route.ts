@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { processClubCampaignBatch } from "@/lib/clubos/email-sender";
 
 /**
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
   const results: Array<{
     campaignId: string;
     action: string;

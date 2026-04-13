@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { incidentId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const { data: incident, error } = await admin
       .from("club_incidents")
@@ -56,7 +56,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { incidentId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const { data: existing } = await admin
       .from("club_incidents")

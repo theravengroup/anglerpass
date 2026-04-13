@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get event
     const { data: event } = await admin

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * GET /api/clubos/track/open/[recipientId] — Tracking pixel endpoint
@@ -13,48 +13,35 @@ export async function GET(
   const { recipientId } = await params;
 
   // Fire and forget — don't block the pixel response
-  const admin = createUntypedAdminClient();
+  const admin = createAdminClient();
 
+  // Fetch current recipient, then update status and increment open_count
   Promise.resolve(
     admin
       .from("club_campaign_recipients")
-      .update({
-        status: "opened",
-        opened_at: new Date().toISOString(),
-        open_count: undefined, // Will be incremented below
-      })
+      .select("id, status, open_count")
       .eq("id", recipientId)
-      .eq("status", "delivered")
-  )
-    .then(() => {
-      // Increment open_count using raw RPC or follow-up query
-      return admin.rpc("increment_recipient_open_count", {
-        recipient_id: recipientId,
-      });
-    })
-    .catch((err: unknown) => {
-      console.error("[clubos/track/open] Error:", err);
-    });
-
-  // Also update on already-opened recipients (increment count only)
-  Promise.resolve(
-    admin
-      .from("club_campaign_recipients")
-      .select("id, open_count")
-      .eq("id", recipientId)
-      .in("status", ["opened", "clicked"])
+      .in("status", ["delivered", "opened", "clicked"])
       .single()
   )
     .then(({ data }) => {
-      if (data) {
-        return admin
-          .from("club_campaign_recipients")
-          .update({ open_count: (data.open_count ?? 0) + 1 })
-          .eq("id", recipientId);
+      if (!data) return;
+      const newCount = (data.open_count ?? 0) + 1;
+      const updates: { open_count: number; opened_at?: string; status?: string } = {
+        open_count: newCount,
+      };
+      // Only set status/opened_at on first open (delivered → opened)
+      if (data.status === "delivered") {
+        updates.status = "opened";
+        updates.opened_at = new Date().toISOString();
       }
+      return admin
+        .from("club_campaign_recipients")
+        .update(updates)
+        .eq("id", recipientId);
     })
-    .catch((_err: unknown) => {
-      // Silently ignore — tracking pixel should not fail
+    .catch((err: unknown) => {
+      console.error("[clubos/track/open] Error:", err);
     });
 
   // Return 1x1 transparent GIF

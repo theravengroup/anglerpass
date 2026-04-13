@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/supabase";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (!club_id) return jsonError("club_id is required", 400);
 
     // Any club member can report an incident
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const { data: membership } = await admin
       .from("club_memberships")
       .select("id")
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         title: data.title,
         description: data.description,
         occurred_at: data.occurred_at ?? null,
-        vertical_context: data.vertical_context ?? null,
+        vertical_context: (data.vertical_context ?? null) as Json,
         reported_by: auth.user.id,
       })
       .select()
@@ -112,7 +113,7 @@ export async function GET(req: NextRequest) {
 
     const { status, severity, type, page, limit } = queryParsed.data;
     const offset = (page - 1) * limit;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     let query = admin
       .from("club_incidents")

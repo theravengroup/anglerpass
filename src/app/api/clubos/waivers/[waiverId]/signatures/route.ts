@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waiverId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get waiver
     const { data: waiver } = await admin
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waiverId } = await ctx.params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get waiver to check club
     const { data: waiver } = await admin

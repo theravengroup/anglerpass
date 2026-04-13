@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/supabase";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
       return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const data = parsed.data;
 
     // Determine initial status
@@ -51,12 +52,12 @@ export async function POST(req: NextRequest) {
         body_html: data.body_html,
         body_text: data.body_text ?? "",
         template_id: data.template_id ?? null,
-        segment_filters: data.segment_filters ?? null,
+        segment_filters: (data.segment_filters ?? null) as Json,
         group_id: data.group_id ?? null,
         status,
         scheduled_at: data.scheduled_at ?? null,
         sender_user_id: auth.user.id,
-        vertical_context: data.vertical_context ?? null,
+        vertical_context: (data.vertical_context ?? null) as Json,
       })
       .select()
       .single();
@@ -100,7 +101,7 @@ export async function GET(req: NextRequest) {
 
     const { status, page, limit } = queryParsed.data;
     const offset = (page - 1) * limit;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     let query = admin
       .from("club_campaigns")

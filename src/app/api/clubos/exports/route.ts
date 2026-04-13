@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonError,
   requireAuth,
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const { format, resource, event_id, date_from, date_to } = parsed.data;
 
     // Fetch data based on resource type
@@ -38,13 +38,15 @@ export async function POST(req: NextRequest) {
       admin, club_id, resource, { event_id, date_from, date_to }
     );
 
-    // Log the export (best effort — table resolves after type regeneration)
-    await admin.from("club_member_activity_events").insert({
-      membership_id: role.membership?.id ?? null,
-      club_id,
-      event_type: "data_exported",
-      metadata: { resource, format, row_count: rows.length, exported_by: auth.user.id },
-    }).then(() => null, () => null);
+    // Log the export (best effort — skip if no membership available)
+    if (role.membership?.id) {
+      await admin.from("club_member_activity_events").insert({
+        membership_id: role.membership.id,
+        club_id,
+        event_type: "data_exported",
+        metadata: { resource, format, row_count: rows.length, exported_by: auth.user.id },
+      }).then(() => null, () => null);
+    }
 
     if (format === "csv") {
       return streamCsv(columns, rows, `${resource}-export`);
@@ -66,7 +68,7 @@ interface ExportFilters {
 }
 
 async function fetchExportData(
-  admin: ReturnType<typeof createUntypedAdminClient>,
+  admin: ReturnType<typeof createAdminClient>,
   clubId: string,
   resource: string,
   filters: ExportFilters
