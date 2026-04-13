@@ -9,7 +9,7 @@ const faqItems = [
   },
   {
     question: 'Who is AnglerPass for?',
-    answer: 'AnglerPass serves three core audiences: private landowners who want to manage water access professionally, fly fishing clubs that need membership and scheduling tools, and individual anglers looking to discover and book private fly fishing experiences.',
+    answer: 'AnglerPass serves three core audiences: private landowners who want to manage water access professionally, fly fishing clubs that need membership and scheduling tools, and individual anglers looking to discover and book private fly fishing experiences. Every property listing shows its daily rod capacity so anglers know upfront how many rods may share the water on any given\u00a0day.',
   },
   {
     question: 'Is the platform available yet?',
