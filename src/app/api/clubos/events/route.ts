@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/supabase";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
       return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const data = parsed.data;
 
     const { data: event, error } = await admin
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         guest_allowed: data.guest_allowed,
         guest_limit_per_member: data.guest_limit_per_member,
         status: data.status,
-        vertical_context: data.vertical_context ?? null,
+        vertical_context: (data.vertical_context ?? null) as Json,
         created_by: auth.user.id,
       })
       .select()
@@ -86,7 +87,7 @@ export async function GET(req: NextRequest) {
     if (!clubId) return jsonError("club_id is required", 400);
 
     // Any club member can view published events
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const queryParsed = getEventsQuerySchema.safeParse({
       status: searchParams.get("status") ?? undefined,

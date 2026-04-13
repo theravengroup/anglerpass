@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const role = await requireClubRole(auth.user.id, clubId, P.OPS_VIEW_ACTIVITY);
     if (!role?.isStaff) return jsonError("Forbidden", 403);
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const membershipId = searchParams.get("membership_id");
     const eventType = searchParams.get("event_type");
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10) || 50, 200);

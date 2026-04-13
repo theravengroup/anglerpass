@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth, requireClubRole } from "@/lib/api/helpers";
 import { P } from "@/lib/permissions/constants";
 
@@ -17,7 +17,7 @@ export async function GET(
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { campaignId } = await params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Load campaign
     const { data: campaign } = await admin

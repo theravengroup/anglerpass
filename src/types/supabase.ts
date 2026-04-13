@@ -12,33 +12,324 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
+      affiliate_brands: {
+        Row: {
+          affiliate_program_id: string | null
+          commission_rate: number | null
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          network_id: string | null
+          slug: string
+          tier: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          affiliate_program_id?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          network_id?: string | null
+          slug: string
+          tier?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          affiliate_program_id?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          network_id?: string | null
+          slug?: string
+          tier?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_brands_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_clicks: {
+        Row: {
+          clicked_at: string
+          context: Json
+          id: string
+          ip_hash: string | null
+          product_id: string
+          session_id: string | null
+          source: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          context?: Json
+          id?: string
+          ip_hash?: string | null
+          product_id: string
+          session_id?: string | null
+          source?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          context?: Json
+          id?: string
+          ip_hash?: string | null
+          product_id?: string
+          session_id?: string | null
+          source?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_clicks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_conversions: {
+        Row: {
+          approved_at: string | null
+          click_id: string | null
+          commission_cents: number
+          converted_at: string
+          created_at: string
+          id: string
+          network_id: string | null
+          network_transaction_id: string | null
+          order_amount_cents: number | null
+          product_id: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          click_id?: string | null
+          commission_cents: number
+          converted_at?: string
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          network_transaction_id?: string | null
+          order_amount_cents?: number | null
+          product_id: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          click_id?: string | null
+          commission_cents?: number
+          converted_at?: string
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          network_transaction_id?: string | null
+          order_amount_cents?: number | null
+          product_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_conversions_click_id_fkey"
+            columns: ["click_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_clicks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_conversions_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_conversions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_networks: {
+        Row: {
+          api_key_encrypted: string | null
+          base_url: string | null
+          created_at: string
+          default_commission_rate: number | null
+          id: string
+          is_active: boolean
+          name: string
+          network_type: string
+          updated_at: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          base_url?: string | null
+          created_at?: string
+          default_commission_rate?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          network_type: string
+          updated_at?: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          base_url?: string | null
+          created_at?: string
+          default_commission_rate?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          network_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      affiliate_products: {
+        Row: {
+          affiliate_url: string
+          brand_id: string
+          category: string
+          created_at: string
+          description: string | null
+          fallback_url: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          price_cents: number | null
+          season_tags: string[]
+          slug: string
+          sort_priority: number
+          species_tags: string[]
+          tags: string[]
+          updated_at: string
+          water_type_tags: string[]
+        }
+        Insert: {
+          affiliate_url: string
+          brand_id: string
+          category: string
+          created_at?: string
+          description?: string | null
+          fallback_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          price_cents?: number | null
+          season_tags?: string[]
+          slug: string
+          sort_priority?: number
+          species_tags?: string[]
+          tags?: string[]
+          updated_at?: string
+          water_type_tags?: string[]
+        }
+        Update: {
+          affiliate_url?: string
+          brand_id?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          fallback_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          price_cents?: number | null
+          season_tags?: string[]
+          slug?: string
+          sort_priority?: number
+          species_tags?: string[]
+          tags?: string[]
+          updated_at?: string
+          water_type_tags?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_revenue_monthly: {
+        Row: {
+          brand_id: string | null
+          clicks: number
+          conversions: number
+          created_at: string
+          id: string
+          network_id: string | null
+          period: string
+          revenue_cents: number
+        }
+        Insert: {
+          brand_id?: string | null
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          period: string
+          revenue_cents?: number
+        }
+        Update: {
+          brand_id?: string | null
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          period?: string
+          revenue_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_revenue_monthly_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_revenue_monthly_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       angler_club_invitations: {
         Row: {
           admin_email: string
@@ -785,6 +1076,494 @@ export type Database = {
           },
         ]
       }
+      club_calendar_tokens: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          token: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          token?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_calendar_tokens_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_campaign_recipients: {
+        Row: {
+          bounce_reason: string | null
+          bounced_at: string | null
+          campaign_id: string
+          click_count: number | null
+          clicked_at: string | null
+          created_at: string
+          delivered_at: string | null
+          email: string
+          error_message: string | null
+          esp_message_id: string | null
+          id: string
+          membership_id: string
+          open_count: number | null
+          opened_at: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id: string
+          click_count?: number | null
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email: string
+          error_message?: string | null
+          esp_message_id?: string | null
+          id?: string
+          membership_id: string
+          open_count?: number | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id?: string
+          click_count?: number | null
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email?: string
+          error_message?: string | null
+          esp_message_id?: string | null
+          id?: string
+          membership_id?: string
+          open_count?: number | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "club_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_campaign_recipients_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_campaigns: {
+        Row: {
+          body_html: string
+          body_text: string
+          bounce_count: number | null
+          click_count: number | null
+          club_id: string
+          created_at: string
+          failed_reason: string | null
+          group_id: string | null
+          id: string
+          open_count: number | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          segment_filters: Json | null
+          sender_user_id: string
+          sending_started_at: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_id: string | null
+          type: string
+          updated_at: string
+          vertical_context: Json | null
+        }
+        Insert: {
+          body_html?: string
+          body_text?: string
+          bounce_count?: number | null
+          click_count?: number | null
+          club_id: string
+          created_at?: string
+          failed_reason?: string | null
+          group_id?: string | null
+          id?: string
+          open_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          segment_filters?: Json | null
+          sender_user_id: string
+          sending_started_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string | null
+          type: string
+          updated_at?: string
+          vertical_context?: Json | null
+        }
+        Update: {
+          body_html?: string
+          body_text?: string
+          bounce_count?: number | null
+          click_count?: number | null
+          club_id?: string
+          created_at?: string
+          failed_reason?: string | null
+          group_id?: string | null
+          id?: string
+          open_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          segment_filters?: Json | null
+          sender_user_id?: string
+          sending_started_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string | null
+          type?: string
+          updated_at?: string
+          vertical_context?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_campaigns_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_campaigns_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_member_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_campaigns_sender_user_id_fkey"
+            columns: ["sender_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_campaigns_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "club_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_communication_preferences: {
+        Row: {
+          club_id: string
+          email_broadcasts: boolean
+          email_digest: boolean
+          email_event_notices: boolean
+          email_targeted: boolean
+          id: string
+          membership_id: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          email_broadcasts?: boolean
+          email_digest?: boolean
+          email_event_notices?: boolean
+          email_targeted?: boolean
+          id?: string
+          membership_id: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          email_broadcasts?: boolean
+          email_digest?: boolean
+          email_event_notices?: boolean
+          email_targeted?: boolean
+          id?: string
+          membership_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_communication_preferences_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_communication_preferences_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_event_registrations: {
+        Row: {
+          cancelled_at: string | null
+          checked_in_at: string | null
+          created_at: string
+          event_id: string
+          guest_count: number
+          id: string
+          membership_id: string
+          notes: string | null
+          promoted_at: string | null
+          registered_at: string
+          status: string
+          vertical_context: Json | null
+          waitlist_position: number | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          checked_in_at?: string | null
+          created_at?: string
+          event_id: string
+          guest_count?: number
+          id?: string
+          membership_id: string
+          notes?: string | null
+          promoted_at?: string | null
+          registered_at?: string
+          status?: string
+          vertical_context?: Json | null
+          waitlist_position?: number | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          checked_in_at?: string | null
+          created_at?: string
+          event_id?: string
+          guest_count?: number
+          id?: string
+          membership_id?: string
+          notes?: string | null
+          promoted_at?: string | null
+          registered_at?: string
+          status?: string
+          vertical_context?: Json | null
+          waitlist_position?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "club_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_event_registrations_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_events: {
+        Row: {
+          all_day: boolean
+          attended_count: number
+          cancelled_reason: string | null
+          club_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string | null
+          guest_allowed: boolean
+          guest_limit_per_member: number | null
+          id: string
+          location: string | null
+          registered_count: number
+          rsvp_deadline: string | null
+          rsvp_limit: number | null
+          starts_at: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          vertical_context: Json | null
+          waitlist_count: number
+          waitlist_enabled: boolean
+        }
+        Insert: {
+          all_day?: boolean
+          attended_count?: number
+          cancelled_reason?: string | null
+          club_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at?: string | null
+          guest_allowed?: boolean
+          guest_limit_per_member?: number | null
+          id?: string
+          location?: string | null
+          registered_count?: number
+          rsvp_deadline?: string | null
+          rsvp_limit?: number | null
+          starts_at: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          vertical_context?: Json | null
+          waitlist_count?: number
+          waitlist_enabled?: boolean
+        }
+        Update: {
+          all_day?: boolean
+          attended_count?: number
+          cancelled_reason?: string | null
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string | null
+          guest_allowed?: boolean
+          guest_limit_per_member?: number | null
+          id?: string
+          location?: string | null
+          registered_count?: number
+          rsvp_deadline?: string | null
+          rsvp_limit?: number | null
+          starts_at?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          vertical_context?: Json | null
+          waitlist_count?: number
+          waitlist_enabled?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_incidents: {
+        Row: {
+          assigned_to: string | null
+          closed_at: string | null
+          club_id: string
+          created_at: string
+          description: string
+          id: string
+          occurred_at: string | null
+          reported_by: string
+          resolution: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          vertical_context: Json | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          closed_at?: string | null
+          club_id: string
+          created_at?: string
+          description: string
+          id?: string
+          occurred_at?: string | null
+          reported_by: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          vertical_context?: Json | null
+        }
+        Update: {
+          assigned_to?: string | null
+          closed_at?: string | null
+          club_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          occurred_at?: string | null
+          reported_by?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          vertical_context?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_incidents_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_incidents_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_incidents_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_invitations: {
         Row: {
           admin_email: string
@@ -842,6 +1621,145 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_member_activity_events: {
+        Row: {
+          club_id: string
+          event_type: string
+          id: string
+          membership_id: string
+          metadata: Json | null
+          occurred_at: string
+        }
+        Insert: {
+          club_id: string
+          event_type: string
+          id?: string
+          membership_id: string
+          metadata?: Json | null
+          occurred_at?: string
+        }
+        Update: {
+          club_id?: string
+          event_type?: string
+          id?: string
+          membership_id?: string
+          metadata?: Json | null
+          occurred_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_member_activity_events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_activity_events_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_member_group_assignments: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          group_id: string
+          membership_id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          group_id: string
+          membership_id: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          group_id?: string
+          membership_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_member_group_assignments_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_group_assignments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "club_member_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_group_assignments_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_member_groups: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_smart: boolean
+          member_count: number | null
+          name: string
+          smart_filters: Json | null
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_smart?: boolean
+          member_count?: number | null
+          name: string
+          smart_filters?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_smart?: boolean
+          member_count?: number | null
+          name?: string
+          smart_filters?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_member_groups_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_member_groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1024,6 +1942,218 @@ export type Database = {
           },
         ]
       }
+      club_templates: {
+        Row: {
+          body_template: string
+          club_id: string | null
+          created_at: string
+          id: string
+          is_system_default: boolean
+          name: string
+          subject_template: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          body_template?: string
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          is_system_default?: boolean
+          name: string
+          subject_template?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          body_template?: string
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          is_system_default?: boolean
+          name?: string
+          subject_template?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_templates_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_waitlists: {
+        Row: {
+          accepted_at: string | null
+          cancelled_at: string | null
+          club_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          offer_expires_at: string | null
+          offered_at: string | null
+          position: number
+          reference_id: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+          vertical_context: Json | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          cancelled_at?: string | null
+          club_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          offer_expires_at?: string | null
+          offered_at?: string | null
+          position: number
+          reference_id?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+          vertical_context?: Json | null
+        }
+        Update: {
+          accepted_at?: string | null
+          cancelled_at?: string | null
+          club_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          offer_expires_at?: string | null
+          offered_at?: string | null
+          position?: number
+          reference_id?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          vertical_context?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_waitlists_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_waitlists_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_waiver_signatures: {
+        Row: {
+          expires_at: string | null
+          id: string
+          ip_address: unknown
+          membership_id: string
+          signed_at: string
+          user_agent: string | null
+          waiver_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown
+          membership_id: string
+          signed_at?: string
+          user_agent?: string | null
+          waiver_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown
+          membership_id?: string
+          signed_at?: string
+          user_agent?: string | null
+          waiver_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_waiver_signatures_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "club_memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_waiver_signatures_waiver_id_fkey"
+            columns: ["waiver_id"]
+            isOneToOne: false
+            referencedRelation: "club_waivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_waivers: {
+        Row: {
+          body_text: string
+          club_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          requires_annual_renewal: boolean
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          body_text: string
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          requires_annual_renewal?: boolean
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          body_text?: string
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          requires_annual_renewal?: boolean
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_waivers_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_waivers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clubs: {
         Row: {
           annual_dues: number | null
@@ -1032,8 +2162,8 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          is_active: boolean
           initiation_fee: number | null
+          is_active: boolean
           location: string | null
           logo_url: string | null
           membership_application_required: boolean
@@ -3310,6 +4440,35 @@ export type Database = {
           },
         ]
       }
+      landowner_calendar_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "landowner_calendar_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           converted_at: string | null
@@ -5126,7 +6285,11 @@ export type Database = {
         Args: { p_period: string; p_user_id: string }
         Returns: number
       }
+      is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
+      is_club_member: { Args: { p_club_id: string }; Returns: boolean }
+      is_club_staff: { Args: { p_club_id: string }; Returns: boolean }
       is_cross_club_eligible: { Args: { p_club_id: string }; Returns: boolean }
+      is_platform_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -5255,9 +6418,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

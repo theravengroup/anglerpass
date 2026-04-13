@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       if (!role?.isStaff) return jsonError("Forbidden", 403);
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     // Get next position
     const { count } = await admin
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
     const role = await requireClubRole(auth.user.id, clubId, P.OPS_MANAGE_WAITLISTS);
     if (!role?.isStaff) return jsonError("Forbidden", 403);
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const type = searchParams.get("type");
     const status = searchParams.get("status");
 

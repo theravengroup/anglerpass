@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const data = parsed.data;
 
     const { data: waiver, error } = await admin
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     const clubId = searchParams.get("club_id");
     if (!clubId) return jsonError("club_id is required", 400);
 
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
     const activeOnly = searchParams.get("active_only") === "true";
 
     let query = admin

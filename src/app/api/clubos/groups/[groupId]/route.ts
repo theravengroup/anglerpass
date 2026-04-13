@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createUntypedAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth, requireClubRole } from "@/lib/api/helpers";
 import { P } from "@/lib/permissions/constants";
 import { updateMemberGroupSchema } from "@/lib/validations/clubos-communications";
@@ -16,7 +16,7 @@ export async function PATCH(
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { groupId } = await params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const { data: existing } = await admin
       .from("club_member_groups")
@@ -110,7 +110,7 @@ export async function DELETE(
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { groupId } = await params;
-    const admin = createUntypedAdminClient();
+    const admin = createAdminClient();
 
     const { data: existing } = await admin
       .from("club_member_groups")
