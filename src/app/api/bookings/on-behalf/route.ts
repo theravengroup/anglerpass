@@ -148,6 +148,22 @@ export async function POST(request: Request) {
 
     const isMultiDay = numberOfDays > 1;
 
+    // Property availability check — reject blocked/maintenance dates
+    const { data: blockedPropertyDates } = await admin
+      .from("property_availability")
+      .select("date, status")
+      .eq("property_id", property_id)
+      .in("date", allDates)
+      .in("status", ["blocked", "maintenance"]);
+
+    if (blockedPropertyDates && blockedPropertyDates.length > 0) {
+      const blockedList = blockedPropertyDates.map((d) => d.date).join(", ");
+      return jsonError(
+        `This property is not available on the following date(s): ${blockedList}`,
+        409
+      );
+    }
+
     // Capacity checks
     const maxRods = property.max_rods;
     const maxGuests = property.max_guests;
