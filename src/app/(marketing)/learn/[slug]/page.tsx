@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPostBySlug, getRelatedPosts } from '@/lib/posts';
@@ -22,6 +23,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post || new Date(post.publishedAt).getTime() > Date.now()) return {};
 
   const url = `${SITE_URL}/learn/${post.slug}`;
+  const ogImage = post.image
+    ? `${SITE_URL}${post.image}`
+    : `${SITE_URL}/og?title=${encodeURIComponent(post.title)}`;
 
   return {
     title: post.title,
@@ -35,11 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'AnglerPass',
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
+      images: [ogImage],
     },
   };
 }
@@ -54,11 +60,16 @@ export default async function LearnPostPage({ params }: PageProps) {
 
   const related = getRelatedPosts(slug, 3);
 
+  const articleImage = post.image
+    ? `${SITE_URL}${post.image}`
+    : `${SITE_URL}/og?title=${encodeURIComponent(post.title)}`;
+
   const articleJsonLd = buildJsonLd({
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.description,
+    image: articleImage,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
     author: {
@@ -162,6 +173,24 @@ export default async function LearnPostPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* Hero Image */}
+      {post.image && (
+        <section className="bg-offwhite">
+          <div className="max-w-[720px] mx-auto px-8 pt-10">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 720px"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Direct Answer Block */}
       <section className="bg-offwhite py-8">
         <div className="max-w-[720px] mx-auto px-8">
@@ -196,14 +225,27 @@ export default async function LearnPostPage({ params }: PageProps) {
                 <Link
                   key={r.slug}
                   href={`/learn/${r.slug}`}
-                  className="group bg-white border border-parchment rounded-xl px-5 py-5 no-underline hover:border-bronze/30 transition-colors"
+                  className="group bg-white border border-parchment rounded-xl overflow-hidden no-underline hover:border-bronze/30 transition-colors"
                 >
-                  <h3 className="font-heading text-[16px] font-semibold text-forest mb-1 group-hover:text-forest-deep transition-colors">
-                    {r.title}
-                  </h3>
-                  <p className="text-[13px] text-text-light m-0">
-                    {r.readingTime}
-                  </p>
+                  {r.image && (
+                    <div className="relative aspect-[16/9] w-full overflow-hidden">
+                      <Image
+                        src={r.image}
+                        alt={r.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    </div>
+                  )}
+                  <div className="px-5 py-5">
+                    <h3 className="font-heading text-[16px] font-semibold text-forest mb-1 group-hover:text-forest-deep transition-colors">
+                      {r.title}
+                    </h3>
+                    <p className="text-[13px] text-text-light m-0">
+                      {r.readingTime}
+                    </p>
+                  </div>
                 </Link>
               ))}
             </div>

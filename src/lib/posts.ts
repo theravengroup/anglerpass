@@ -11,6 +11,14 @@ export interface Post {
   readingTime: string;
   directAnswer: string;
   content: string;
+  image?: string;
+}
+
+/** Returns the image path for a post if it exists, or undefined. */
+export function getPostImagePath(slug: string): string | undefined {
+  const imagePath = `/images/posts-images/${slug}.webp`;
+  const fsPath = path.join(process.cwd(), 'public', imagePath);
+  return fs.existsSync(fsPath) ? imagePath : undefined;
 }
 
 const postsDirectory = path.join(process.cwd(), 'posts');
@@ -26,7 +34,9 @@ export function getAllPosts(): Post[] {
     const filePath = path.join(postsDirectory, fileName);
     const fileContents = fs.readFileSync(filePath, 'utf8');
     try {
-      acc.push(JSON.parse(fileContents) as Post);
+      const post = JSON.parse(fileContents) as Post;
+      post.image = getPostImagePath(post.slug);
+      acc.push(post);
     } catch {
       console.error(`[posts] Failed to parse ${fileName}, skipping`);
     }
@@ -53,7 +63,9 @@ export function getPostBySlug(slug: string): Post | undefined {
 
   const fileContents = fs.readFileSync(filePath, 'utf8');
   try {
-    return JSON.parse(fileContents) as Post;
+    const post = JSON.parse(fileContents) as Post;
+    post.image = getPostImagePath(post.slug);
+    return post;
   } catch {
     console.error(`[posts] Failed to parse ${slug}.json`);
     return undefined;

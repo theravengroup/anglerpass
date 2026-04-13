@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface PostSummary {
@@ -10,6 +11,7 @@ interface PostSummary {
   publishedAt: string;
   tags: string[];
   readingTime: string;
+  image?: string;
 }
 
 const PAGE_SIZE = 6;
@@ -26,8 +28,20 @@ export default function LearnPostGrid({ posts }: { posts: PostSummary[] }) {
           <Link
             key={post.slug}
             href={`/learn/${post.slug}`}
-            className="group bg-white border border-parchment rounded-[14px] px-7 py-8 no-underline transition-all duration-300 hover:border-bronze/30 hover:shadow-sm"
+            className="group bg-white border border-parchment rounded-[14px] overflow-hidden no-underline transition-all duration-300 hover:border-bronze/30 hover:shadow-sm"
           >
+            {post.image && (
+              <div className="relative aspect-[16/9] w-full overflow-hidden">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+            )}
+            <div className={post.image ? "px-7 py-6" : "px-7 py-8"}>
             <div className="flex flex-wrap gap-2 mb-3">
               {post.tags.slice(0, 3).map((tag) => (
                 <span
@@ -54,6 +68,7 @@ export default function LearnPostGrid({ posts }: { posts: PostSummary[] }) {
                   year: "numeric",
                 })}
               </time>
+            </div>
             </div>
           </Link>
         ))}
