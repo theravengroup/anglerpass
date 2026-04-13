@@ -1,5 +1,6 @@
 import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyClubDeactivated } from "@/lib/notifications";
 
 /**
  * PATCH /api/clubs/[id]/activate
@@ -10,9 +11,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * Body: { is_active: boolean }
  *
- * Requires at least one approved property before activating.
- * When deactivating, all club properties are hidden from public pages
- * (handled at query time via the clubs.is_active flag).
+ * Requires at least one property before activating.
+ * When deactivating, all affiliated properties are hidden from public pages
+ * and all affected landowners are notified.
  */
 export async function PATCH(
   request: Request,
@@ -29,7 +30,7 @@ export async function PATCH(
     // Fetch the club
     const { data: club, error: clubError } = await admin
       .from("clubs")
-      .select("id, owner_id, is_active")
+      .select("id, owner_id, name, is_active")
       .eq("id", id)
       .maybeSingle();
 
@@ -60,20 +61,19 @@ export async function PATCH(
       return jsonError("is_active must be a boolean", 400);
     }
 
-    // If activating, require at least one property
+    // If activating, require at least one affiliated property
     if (isActive) {
-      const { count: propertyCount } = await admin
+      const { count: accessCount } = await admin
         .from("club_property_access")
         .select("id", { count: "exact", head: true })
         .eq("club_id", id);
 
-      // Also check club-created properties
       const { count: createdCount } = await admin
         .from("properties")
         .select("id", { count: "exact", head: true })
         .eq("created_by_club_id", id);
 
-      const totalProperties = (propertyCount ?? 0) + (createdCount ?? 0);
+      const totalProperties = (accessCount ?? 0) + (createdCount ?? 0);
 
       if (totalProperties === 0) {
         return jsonError(
@@ -97,6 +97,16 @@ export async function PATCH(
     if (updateError) {
       console.error("[clubs/activate] Update error:", updateError);
       return jsonError("Failed to update club status", 500);
+    }
+
+    // Notify landowners when club is deactivated
+    if (!isActive) {
+      notifyClubDeactivated(admin, {
+        clubId: id,
+        clubName: club.name,
+      }).catch((err) =>
+        console.error("[clubs/activate] Notification error:", err)
+      );
     }
 
     return jsonOk({ club: updated });

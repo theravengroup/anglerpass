@@ -1,5 +1,6 @@
 import { escapeIlike, jsonError, jsonOk } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getHiddenPropertyIds } from "@/lib/club-active-filter";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 // GET: Public search endpoint — returns published properties (no auth required)
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
     let query = admin
       .from("properties")
       .select(
-        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, created_by_club_id"
+        "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
       )
       .eq("status", "published")
       .order("name")
@@ -75,34 +76,12 @@ export async function GET(request: Request) {
       return jsonError("Failed to search properties", 500);
     }
 
-    // Filter out properties belonging to inactive clubs
-    const clubIds = [
-      ...new Set(
-        (rawProperties ?? [])
-          .map((p) => p.created_by_club_id)
-          .filter((id): id is string => id !== null)
-      ),
-    ];
-
-    let inactiveClubIds = new Set<string>();
-    if (clubIds.length > 0) {
-      const { data: inactiveClubs } = await admin
-        .from("clubs")
-        .select("id")
-        .in("id", clubIds)
-        .eq("is_active", false);
-
-      inactiveClubIds = new Set(
-        (inactiveClubs ?? []).map((c) => c.id)
-      );
-    }
+    // Filter out properties whose affiliated clubs are all inactive
+    const propertyIds = (rawProperties ?? []).map((p) => p.id);
+    const hiddenIds = await getHiddenPropertyIds(admin, propertyIds);
 
     const properties = (rawProperties ?? [])
-      .filter(
-        (p) =>
-          !p.created_by_club_id ||
-          !inactiveClubIds.has(p.created_by_club_id)
-      )
+      .filter((p) => !hiddenIds.has(p.id))
       .slice(0, limit);
 
     return jsonOk({ properties });

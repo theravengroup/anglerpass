@@ -51,7 +51,9 @@ export type NotificationType =
   | "booking_limit_warning"
   | "booking_standing_changed"
   | "booking_abuse_flagged"
-  | "booking_late_cancel_fee";
+  | "booking_late_cancel_fee"
+  | "club_deactivated"
+  | "property_deactivated";
 
 interface EmailAttachment {
   filename: string;
@@ -109,6 +111,8 @@ const EMAIL_PREF_MAP: Partial<Record<NotificationType, string>> = {
   booking_standing_changed: "email_booking_cancelled",
   booking_abuse_flagged: "email_booking_cancelled",
   booking_late_cancel_fee: "email_booking_cancelled",
+  club_deactivated: "email_property_access",
+  property_deactivated: "email_property_access",
 };
 
 // ─── Core ───────────────────────────────────────────────────────────
@@ -1140,6 +1144,125 @@ export async function notifyLateCancelFee(
     body: `A $${opts.fee} late cancellation fee has been recorded for your ${formatDate(opts.bookingDate)} booking at ${opts.propertyName}.`,
     link: "/angler/bookings",
   });
+}
+
+// ─── Club / Property Activation ────────────────────────────────────
+
+/**
+ * Notify all landowners whose properties are affiliated with a club
+ * that the club has been deactivated. Their properties will no longer
+ * appear in searches or be available for booking.
+ */
+export async function notifyClubDeactivated(
+  admin: SupabaseClient,
+  opts: {
+    clubId: string;
+    clubName: string;
+  }
+) {
+  // Find all properties affiliated with this club via club_property_access
+  const { data: accessRecords } = await admin
+    .from("club_property_access")
+    .select("property_id")
+    .eq("club_id", opts.clubId)
+    .eq("status", "approved");
+
+  // Also find club-created properties
+  const { data: createdProps } = await admin
+    .from("properties")
+    .select("id")
+    .eq("created_by_club_id", opts.clubId);
+
+  const propertyIds = [
+    ...new Set([
+      ...(accessRecords ?? []).map((r) => r.property_id),
+      ...(createdProps ?? []).map((p) => p.id),
+    ]),
+  ];
+
+  if (propertyIds.length === 0) return;
+
+  // Fetch property owners
+  const { data: properties } = await admin
+    .from("properties")
+    .select("id, name, owner_id")
+    .in("id", propertyIds);
+
+  // Dedupe by owner — each landowner gets one notification
+  const ownerProperties = new Map<string, string[]>();
+  for (const prop of properties ?? []) {
+    if (!prop.owner_id) continue;
+    if (!ownerProperties.has(prop.owner_id)) {
+      ownerProperties.set(prop.owner_id, []);
+    }
+    ownerProperties.get(prop.owner_id)!.push(prop.name);
+  }
+
+  for (const [ownerId, propNames] of ownerProperties) {
+    const propertyList =
+      propNames.length === 1
+        ? propNames[0]
+        : `${propNames.length} properties`;
+
+    await notify(admin, {
+      userId: ownerId,
+      type: "club_deactivated",
+      title: `${opts.clubName} has been deactivated`,
+      body: `${opts.clubName} has been deactivated on AnglerPass. Your affiliated ${propertyList} will not appear in searches or be available for booking until the club is reactivated.`,
+      link: "/landowner",
+    });
+  }
+}
+
+/**
+ * Notify the affiliated club(s) when a landowner deactivates a property
+ * (withdraws it from published → draft, or it gets archived).
+ */
+export async function notifyPropertyDeactivated(
+  admin: SupabaseClient,
+  opts: {
+    propertyId: string;
+    propertyName: string;
+  }
+) {
+  // Find all clubs affiliated with this property
+  const { data: accessRecords } = await admin
+    .from("club_property_access")
+    .select("club_id")
+    .eq("property_id", opts.propertyId)
+    .eq("status", "approved");
+
+  // Also check created_by_club_id
+  const { data: prop } = await admin
+    .from("properties")
+    .select("created_by_club_id")
+    .eq("id", opts.propertyId)
+    .maybeSingle();
+
+  const clubIds = [
+    ...new Set([
+      ...(accessRecords ?? []).map((r) => r.club_id),
+      ...(prop?.created_by_club_id ? [prop.created_by_club_id] : []),
+    ]),
+  ];
+
+  if (clubIds.length === 0) return;
+
+  // Notify each club's owner
+  const { data: clubs } = await admin
+    .from("clubs")
+    .select("id, owner_id, name")
+    .in("id", clubIds);
+
+  for (const club of clubs ?? []) {
+    await notify(admin, {
+      userId: club.owner_id,
+      type: "property_deactivated",
+      title: `${opts.propertyName} is no longer active`,
+      body: `${opts.propertyName}, affiliated with ${club.name}, has been deactivated and will no longer appear in searches or be available for booking.`,
+      link: "/club/properties",
+    });
+  }
 }
 
 // ─── Utilities ──────────────────────────────────────────────────────

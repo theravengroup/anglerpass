@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getHiddenPropertyIds } from "@/lib/club-active-filter";
 import ExploreClient from "@/components/map/ExploreClient";
 
 export const metadata: Metadata = {
@@ -33,45 +34,21 @@ interface SearchProperty {
 export default async function ExplorePage() {
   const admin = createAdminClient();
 
-  // Fetch published properties, then filter out those belonging to inactive clubs
   const { data: allProperties } = await admin
     .from("properties")
     .select(
-      "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude, created_by_club_id"
+      "id, name, description, location_description, water_type, species, photos, max_rods, max_guests, rate_adult_full_day, rate_adult_half_day, half_day_allowed, water_miles, latitude, longitude"
     )
     .eq("status", "published")
     .order("name")
     .limit(200);
 
-  // Find inactive club IDs among club-created properties
-  const clubIds = [
-    ...new Set(
-      (allProperties ?? [])
-        .map((p) => p.created_by_club_id)
-        .filter((id): id is string => id !== null)
-    ),
-  ];
+  // Filter out properties whose affiliated clubs are all inactive
+  const propertyIds = (allProperties ?? []).map((p) => p.id);
+  const hiddenIds = await getHiddenPropertyIds(admin, propertyIds);
 
-  let inactiveClubIds = new Set<string>();
-  if (clubIds.length > 0) {
-    const { data: inactiveClubs } = await admin
-      .from("clubs")
-      .select("id")
-      .in("id", clubIds)
-      .eq("is_active", false);
-
-    inactiveClubIds = new Set(
-      (inactiveClubs ?? []).map((c) => c.id)
-    );
-  }
-
-  // Filter out properties from inactive clubs
   const properties = (allProperties ?? [])
-    .filter(
-      (p) =>
-        !p.created_by_club_id ||
-        !inactiveClubIds.has(p.created_by_club_id)
-    )
+    .filter((p) => !hiddenIds.has(p.id))
     .slice(0, 100);
 
   return (

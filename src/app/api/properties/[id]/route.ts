@@ -2,6 +2,7 @@ import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { propertySchema, propertyStatusTransition, MIN_PHOTOS } from "@/lib/validations/properties";
 import { parseCoordinates } from "@/lib/geo";
+import { notifyPropertyDeactivated } from "@/lib/notifications";
 
 export async function GET(
   _request: Request,
@@ -152,6 +153,19 @@ export async function PATCH(
       if (error) {
         console.error("[properties] Status update error:", error);
         return jsonError("Failed to update status", 500);
+      }
+
+      // Notify affiliated clubs when a published property is withdrawn
+      if (
+        existing.status === "published" &&
+        statusResult.data.status === "draft"
+      ) {
+        notifyPropertyDeactivated(admin, {
+          propertyId: id,
+          propertyName: existing.name,
+        }).catch((err) =>
+          console.error("[properties] Deactivation notification error:", err)
+        );
       }
 
       return jsonOk({ property: data });

@@ -1,5 +1,6 @@
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api/helpers";
 import { moderationActionSchema } from "@/lib/validations/moderation";
+import { notifyPropertyDeactivated } from "@/lib/notifications";
 import type { Json } from "@/types/supabase";
 
 const ACTION_TO_STATUS: Record<string, string> = {
@@ -90,6 +91,16 @@ export async function POST(
 
     if (auditError) {
       console.error("[moderation] Audit log error:", auditError);
+    }
+
+    // Notify affiliated clubs when a property is rejected/archived
+    if (action === "rejected") {
+      notifyPropertyDeactivated(admin, {
+        propertyId: id,
+        propertyName: property.name,
+      }).catch((err) =>
+        console.error("[moderation] Deactivation notification error:", err)
+      );
     }
 
     return jsonOk({ property: { id, status: newStatus } });
