@@ -40,7 +40,7 @@ CREATE INDEX idx_club_events_created_by ON club_events(created_by);
 
 CREATE TRIGGER set_club_events_updated_at
   BEFORE UPDATE ON club_events
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION clubos_set_updated_at();
 
 ALTER TABLE club_events ENABLE ROW LEVEL SECURITY;
 
@@ -158,7 +158,7 @@ CREATE UNIQUE INDEX idx_club_waitlists_unique_active
 
 CREATE TRIGGER set_club_waitlists_updated_at
   BEFORE UPDATE ON club_waitlists
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION clubos_set_updated_at();
 
 ALTER TABLE club_waitlists ENABLE ROW LEVEL SECURITY;
 
@@ -203,7 +203,7 @@ CREATE INDEX idx_club_waivers_active ON club_waivers(club_id) WHERE is_active = 
 
 CREATE TRIGGER set_club_waivers_updated_at
   BEFORE UPDATE ON club_waivers
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION clubos_set_updated_at();
 
 ALTER TABLE club_waivers ENABLE ROW LEVEL SECURITY;
 
@@ -293,7 +293,7 @@ CREATE INDEX idx_club_incidents_severity ON club_incidents(club_id, severity) WH
 
 CREATE TRIGGER set_club_incidents_updated_at
   BEFORE UPDATE ON club_incidents
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION clubos_set_updated_at();
 
 ALTER TABLE club_incidents ENABLE ROW LEVEL SECURITY;
 
