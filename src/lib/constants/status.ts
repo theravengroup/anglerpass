@@ -65,6 +65,53 @@ export const STATUS_BADGE_COLORS: Record<string, string> = {
   completed: "text-river bg-river/10",
 };
 
+// ─── Club Campaign Status ──────────────────────────────────────────
+
+export const CLUB_CAMPAIGN_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  scheduled: {
+    label: "Scheduled",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  sending: {
+    label: "Sending",
+    icon: Send,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  sent: {
+    label: "Sent",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  partially_sent: {
+    label: "Partially Sent",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  failed: {
+    label: "Failed",
+    icon: XCircle,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+  cancelled: {
+    label: "Cancelled",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+};
+
 // ─── Membership Status ──────────────────────────────────────────────
 
 export const MEMBERSHIP_STATUS: Record<string, StatusConfig> = {
