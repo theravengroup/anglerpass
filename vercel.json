@@ -54,7 +54,7 @@
     },
     {
       "path": "/api/cron/clubos-campaigns",
-      "schedule": "0 */4 * * *"
+      "schedule": "0 15 * * *"
     }
   ]
 }
