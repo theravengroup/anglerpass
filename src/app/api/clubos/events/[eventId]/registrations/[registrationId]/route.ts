@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -22,7 +22,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { eventId, registrationId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Get the registration with event details
     const { data: registration } = await admin

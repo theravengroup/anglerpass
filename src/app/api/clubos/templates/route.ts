@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = createClubTemplateSchema.safeParse(templateData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const data = parsed.data;
 
     const { data: template, error } = await admin
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     const role = await requireClubRole(auth.user.id, clubId, P.MESSAGING_SEND_BULK);
     if (!role?.allowed) return jsonError("Forbidden", 403);
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     // Get club-specific templates + system defaults
     const { data: templates, error } = await admin

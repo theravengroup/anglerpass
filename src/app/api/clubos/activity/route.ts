@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const role = await requireClubRole(auth.user.id, clubId, P.OPS_VIEW_ACTIVITY);
     if (!role?.isStaff) return jsonError("Forbidden", 403);
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const membershipId = searchParams.get("membership_id");
     const eventType = searchParams.get("event_type");
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10) || 50, 200);
@@ -32,14 +32,10 @@ export async function GET(req: NextRequest) {
 
     let query = admin
       .from("club_member_activity_events")
-      .select(`
-        *,
-        membership:club_memberships(
-          id,
-          user_id,
-          profile:profiles(full_name, email)
-        )
-      `, { count: "exact" })
+      .select(
+        "*, membership:club_memberships(id, user_id, profile:profiles(full_name, email))",
+        { count: "exact" },
+      )
       .eq("club_id", clubId)
       .order("occurred_at", { ascending: false })
       .range(offset, offset + limit - 1);

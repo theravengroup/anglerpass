@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import { processClubCampaignBatch } from "@/lib/clubos/email-sender";
 
 /**
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const admin = createAdminClient();
+  const admin = createUntypedAdminClient();
   const results: Array<{
     campaignId: string;
     action: string;
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
 
       // Create recipient rows
       const recipientRows = members.map((m) => {
-        const profile = (m as { profiles: { email: string } }).profiles;
+        const profile = (m as unknown as { profiles: { email: string } }).profiles;
         return {
           campaign_id: campaign.id,
           membership_id: m.id,

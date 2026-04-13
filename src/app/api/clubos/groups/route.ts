@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonCreated,
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = createMemberGroupSchema.safeParse(groupData);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
     const data = parsed.data;
 
     // Create the group
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
     const role = await requireClubRole(auth.user.id, clubId, P.CLUB_MANAGE_MEMBERS);
     if (!role?.allowed) return jsonError("Forbidden", 403);
 
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: groups, error } = await admin
       .from("club_member_groups")

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createUntypedAdminClient } from "@/lib/supabase/admin";
 import {
   jsonOk,
   jsonError,
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waiverId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: waiver, error } = await admin
       .from("club_waivers")
@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     if (!auth) return jsonError("Unauthorized", 401);
 
     const { waiverId } = await ctx.params;
-    const admin = createAdminClient();
+    const admin = createUntypedAdminClient();
 
     const { data: existing } = await admin
       .from("club_waivers")
@@ -83,7 +83,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
     const body = await req.json();
     const parsed = updateWaiverSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError(parsed.error.errors[0].message, 400);
+      return jsonError(parsed.error.issues[0].message, 400);
     }
 
     const updates: Record<string, unknown> = {};
