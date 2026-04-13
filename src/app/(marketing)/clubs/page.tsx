@@ -1,6 +1,23 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Building2, DollarSign, Users } from 'lucide-react';
+import {
+  Building2,
+  DollarSign,
+  Users,
+  Megaphone,
+  Filter,
+  FileText,
+  Clock,
+  Newspaper,
+  UsersRound,
+  Settings,
+  BarChart3,
+  CalendarCheck,
+  Activity,
+  Download,
+  ShieldCheck,
+  ListOrdered,
+} from 'lucide-react';
 import ClubFaqSection from '@/components/clubs/ClubFaqSection';
 import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
 import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
@@ -67,6 +84,90 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
       </svg>
     ),
+  },
+];
+
+const clubOsComms = [
+  {
+    title: 'Club Broadcasts',
+    description:
+      'Send announcements to every member at once. One click, full\u00a0reach.',
+    icon: <Megaphone size={22} />,
+  },
+  {
+    title: 'Targeted Messaging',
+    description:
+      'Filter by membership tier, status, activity level, or renewal state. Send the right message to the right\u00a0members.',
+    icon: <Filter size={22} />,
+  },
+  {
+    title: 'Event & Season Templates',
+    description:
+      'Pre-built templates for tournaments, season openers, closures, and annual meetings. Customize and\u00a0send.',
+    icon: <FileText size={22} />,
+  },
+  {
+    title: 'Scheduled Sends',
+    description:
+      'Write it now, send it later. Set announcements on a schedule and move\u00a0on.',
+    icon: <Clock size={22} />,
+  },
+  {
+    title: 'Newsletter Digest',
+    description:
+      'Auto-generated recurring digest that summarizes club activity, upcoming events, and recent\u00a0bookings.',
+    icon: <Newspaper size={22} />,
+  },
+  {
+    title: 'Custom Groups',
+    description:
+      'Create member groups for committees, property teams, or any segment you\u00a0need.',
+    icon: <UsersRound size={22} />,
+  },
+  {
+    title: 'Communication Preferences',
+    description:
+      'Members control what they receive. Built-in CAN-SPAM\u00a0compliance.',
+    icon: <Settings size={22} />,
+  },
+  {
+    title: 'Analytics Dashboard',
+    description:
+      'Open rates, bounce tracking, delivery history. Know what lands and what\u00a0doesn\u2019t.',
+    icon: <BarChart3 size={22} />,
+  },
+];
+
+const clubOsOps = [
+  {
+    title: 'Event Management',
+    description:
+      'Tournaments, outings, work days. RSVPs, waitlists, reminders, and calendar\u00a0sync.',
+    icon: <CalendarCheck size={22} />,
+  },
+  {
+    title: 'Member Activity Dashboard',
+    description:
+      'See who\u2019s active, who\u2019s dormant, and who\u2019s at risk of lapsing. Real engagement metrics, not just login\u00a0counts.',
+    icon: <Activity size={22} />,
+  },
+  {
+    title: 'Data Exports',
+    description:
+      'Export members, financials, and bookings as CSV or print-ready PDF. Your data, your\u00a0way.',
+    icon: <Download size={22} />,
+  },
+  {
+    title: 'Tier Limit Enforcement',
+    description:
+      'Automatic caps on members and properties based on your plan. Upgrade prompts when you\u2019re ready to\u00a0grow.',
+    icon: <ShieldCheck size={22} />,
+  },
+  {
+    title: 'Waitlist Management',
+    description:
+      'Property-level and membership-level waitlists with automated notifications when spots\u00a0open.',
+    icon: <ListOrdered size={22} />,
   },
 ];
 
@@ -178,6 +279,89 @@ export default function ClubsPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ClubOS */}
+      <section id="clubos" className="py-[120px] bg-white relative">
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-parchment to-transparent" />
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="reveal text-center mb-[72px]">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-river">
+              ClubOS
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
+              The Operating System Your Club Has Been&nbsp;Missing
+            </h2>
+            <p className="text-[16px] text-text-secondary max-w-[620px] mx-auto leading-[1.65]">
+              Every club plan includes ClubOS &mdash; 13 tools that turn AnglerPass
+              into your club&rsquo;s command center for communications, operations,
+              and member&nbsp;intelligence.
+            </p>
+          </div>
+
+          {/* Communications */}
+          <div className="mb-16">
+            <h3 className="reveal font-heading text-[24px] font-semibold text-forest mb-8 tracking-[-0.2px]">
+              Communications
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {clubOsComms.map((feature, i) => (
+                <div
+                  key={feature.title}
+                  className={`reveal d${(i % 4) + 1} bg-offwhite border border-parchment rounded-[14px] px-7 py-8 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] hover:border-river/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:-translate-y-[3px]`}
+                >
+                  <div className="w-[44px] h-[44px] rounded-[10px] bg-river/8 flex items-center justify-center mb-5 text-river">
+                    {feature.icon}
+                  </div>
+                  <h4 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[14px] leading-[1.7] text-text-secondary m-0">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Operations */}
+          <div className="mb-16">
+            <h3 className="reveal font-heading text-[24px] font-semibold text-forest mb-8 tracking-[-0.2px]">
+              Operations
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {clubOsOps.map((feature, i) => (
+                <div
+                  key={feature.title}
+                  className={`reveal d${(i % 3) + 1} bg-offwhite border border-parchment rounded-[14px] px-7 py-8 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] hover:border-river/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:-translate-y-[3px]`}
+                >
+                  <div className="w-[44px] h-[44px] rounded-[10px] bg-river/8 flex items-center justify-center mb-5 text-river">
+                    {feature.icon}
+                  </div>
+                  <h4 className="font-heading text-[18px] font-semibold text-forest mb-2 tracking-[-0.2px]">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[14px] leading-[1.7] text-text-secondary m-0">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="reveal text-center">
+            <p className="text-[14.5px] text-text-light italic mb-6">
+              ClubOS is included with every club plan. No add-ons, no upgrades&nbsp;required.
+            </p>
+            <a
+              href="#waitlist"
+              className="inline-flex items-center gap-2 rounded-[6px] bg-river px-8 py-4 text-[14px] font-medium text-white tracking-[0.3px] transition-all duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] hover:bg-river-light hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(58,107,124,0.3)]"
+            >
+              Join the Waitlist &rarr;
+            </a>
           </div>
         </div>
       </section>
