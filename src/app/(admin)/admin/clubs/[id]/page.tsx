@@ -38,9 +38,10 @@ interface ClubMember {
 
 interface ClubProperty {
   id: string;
-  name: string;
-  status: string;
-  location: string | null;
+  property_id: string;
+  property_name: string;
+  property_status: string;
+  access_status: string;
 }
 
 interface ClubDetail {
@@ -133,7 +134,12 @@ export default function ClubDetailPage() {
           return;
         }
 
-        const data: ClubDetail = await res.json();
+        const { club: clubData, members, properties } = await res.json();
+        const data: ClubDetail = {
+          ...clubData,
+          members: members ?? [],
+          properties: properties ?? [],
+        };
         setClub(data);
 
         // Populate form
@@ -207,7 +213,7 @@ export default function ClubDetailPage() {
         return;
       }
 
-      const updated = await res.json();
+      const { club: updated } = await res.json();
       setClub((prev) => (prev ? { ...prev, ...updated } : prev));
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -400,40 +406,42 @@ export default function ClubDetailPage() {
           ) : (
             <div className="space-y-0">
               {/* Header row */}
-              <div className="grid grid-cols-[2fr_1fr_2fr] gap-4 border-b border-stone-light/15 pb-2 text-xs font-medium uppercase tracking-wider text-text-light">
+              <div className="grid grid-cols-[2fr_1fr_1fr] gap-4 border-b border-stone-light/15 pb-2 text-xs font-medium uppercase tracking-wider text-text-light">
                 <span>Name</span>
-                <span>Status</span>
-                <span>Location</span>
+                <span>Property Status</span>
+                <span>Access Status</span>
               </div>
 
               {club.properties.map((property) => (
                 <Link
                   key={property.id}
-                  href={`/admin/moderation/${property.id}`}
-                  className="grid grid-cols-[2fr_1fr_2fr] items-center gap-4 border-b border-stone-light/10 py-2.5 text-sm transition-colors last:border-b-0 hover:bg-offwhite/50"
+                  href={`/admin/moderation/${property.property_id}`}
+                  className="grid grid-cols-[2fr_1fr_1fr] items-center gap-4 border-b border-stone-light/10 py-2.5 text-sm transition-colors last:border-b-0 hover:bg-offwhite/50"
                 >
                   <span className="truncate font-medium text-text-primary">
-                    {property.name}
+                    {property.property_name}
                   </span>
                   <span>
                     <Badge
                       variant="outline"
                       className={`text-[10px] ${
-                        PROPERTY_STATUS_COLORS[property.status] ??
+                        PROPERTY_STATUS_COLORS[property.property_status] ??
                         PROPERTY_STATUS_COLORS.draft
                       }`}
                     >
-                      {statusLabel(property.status)}
+                      {statusLabel(property.property_status)}
                     </Badge>
                   </span>
-                  <span className="flex items-center gap-1 truncate text-xs text-text-light">
-                    {property.location && (
-                      <>
-                        <MapPin className="size-3 shrink-0" />
-                        {property.location}
-                      </>
-                    )}
-                    {!property.location && "---"}
+                  <span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] ${
+                        STATUS_COLORS[property.access_status] ??
+                        STATUS_COLORS.pending
+                      }`}
+                    >
+                      {statusLabel(property.access_status)}
+                    </Badge>
                   </span>
                 </Link>
               ))}
