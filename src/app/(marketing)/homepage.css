@@ -280,6 +280,28 @@ body{font-family:var(--body);color:var(--text-primary);background:var(--offwhite
 .feature-item h4{font-family:var(--heading);font-size:21px;font-weight:600;margin-bottom:8px;position:relative;z-index:1}
 .feature-item p{font-size:13.5px;color:var(--text-secondary);line-height:1.65;position:relative;z-index:1}
 
+/* ═══ CLUBOS ═══ */
+.clubos{padding:var(--section-pad) 0;background:var(--offwhite);position:relative}
+.clubos::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.clubos-header{text-align:center;max-width:700px;margin:0 auto 40px}
+.clubos-header .section-heading{margin:16px 0 20px}
+.clubos-intro{max-width:680px;margin:0 auto 64px;text-align:center}
+.clubos-intro-text{font-size:16px;color:var(--text-secondary);line-height:1.75}
+.clubos-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:56px}
+.clubos-card{padding:36px 32px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--parchment-light);transition:all .5s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.clubos-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:0;background:linear-gradient(180deg,transparent,rgba(58,107,124,.03));transition:height .5s}
+.clubos-card:hover::after{height:100%}
+.clubos-card:hover{border-color:rgba(58,107,124,.18);box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.clubos-card-icon{width:44px;height:44px;border-radius:12px;background:rgba(58,107,124,.08);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.clubos-card-icon svg{width:20px;height:20px;stroke:var(--river);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.clubos-card-title{font-family:var(--heading);font-size:24px;font-weight:600;margin-bottom:20px;color:var(--text-primary)}
+.clubos-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+.clubos-list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text-secondary);line-height:1.55}
+.clubos-check{width:16px;height:16px;stroke:var(--river);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.clubos-footer{text-align:center}
+.clubos-footer-note{font-size:14px;color:var(--text-light);margin-bottom:24px;font-style:italic}
+.clubos-footer .btn{padding:14px 30px;font-size:14px}
+
 /* ═══ WHY IT MATTERS ═══ */
 .why{padding:var(--section-pad) 0;position:relative;overflow:hidden;background:var(--forest-deep);color:#fff}
 .why-bg{position:absolute;inset:-30% 0;background-size:cover;background-position:center;filter:brightness(.18) saturate(.8);will-change:transform}
@@ -648,6 +670,7 @@ footer{padding:60px 0 44px;background:var(--forest-deep);color:rgba(255,255,255,
 .cross-club-benefits{grid-template-columns:1fr;gap:16px}
 .cross-club-visual{margin:0 0 28px}
 .features-grid{grid-template-columns:1fr}
+.clubos-grid{grid-template-columns:1fr}
 .built-for-row{grid-template-columns:1fr;gap:24px}
 .built-for-row:nth-child(even){direction:ltr}
 .form-row{grid-template-columns:1fr}

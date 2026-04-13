@@ -3,6 +3,7 @@ import HeroSection from '@/components/homepage/HeroSection';
 import ProblemSection from '@/components/homepage/ProblemSection';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
 import FeaturesSection from '@/components/homepage/FeaturesSection';
+import ClubOsSection from '@/components/homepage/ClubOsSection';
 import CompassSection from '@/components/homepage/CompassSection';
 import WhySection from '@/components/homepage/WhySection';
 import BuiltForSection from '@/components/homepage/BuiltForSection';
@@ -68,6 +69,7 @@ export default function HomePage() {
       <ProblemSection />
       <HowItWorksSection />
       <FeaturesSection />
+      <ClubOsSection />
       <CompassSection />
       <WhySection />
       <BuiltForSection />
