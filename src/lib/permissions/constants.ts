@@ -54,6 +54,14 @@ export const P = {
   FINANCIAL_EXPORT_REPORTS: "financial.export_reports",
   FINANCIAL_MANAGE_PAYOUTS: "financial.manage_payouts",
 
+  // Operations (ClubOS)
+  OPS_MANAGE_EVENTS: "ops.manage_events",
+  OPS_MANAGE_WAIVERS: "ops.manage_waivers",
+  OPS_MANAGE_INCIDENTS: "ops.manage_incidents",
+  OPS_VIEW_ACTIVITY: "ops.view_activity",
+  OPS_EXPORT_DATA: "ops.export_data",
+  OPS_MANAGE_WAITLISTS: "ops.manage_waitlists",
+
   // Messaging
   MESSAGING_VIEW_TRIP: "messaging.view_trip",
   MESSAGING_SEND_TRIP: "messaging.send_trip",

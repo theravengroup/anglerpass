@@ -112,6 +112,128 @@ export const CLUB_CAMPAIGN_STATUS: Record<string, StatusConfig> = {
   },
 };
 
+// ─── Club Event Status ────────────────────────────────────────────
+
+export const CLUB_EVENT_STATUS: Record<string, StatusConfig> = {
+  draft: {
+    label: "Draft",
+    icon: FileEdit,
+    color: "text-text-light",
+    bg: "bg-offwhite",
+  },
+  published: {
+    label: "Published",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  cancelled: {
+    label: "Cancelled",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+  completed: {
+    label: "Completed",
+    icon: CheckCircle2,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+};
+
+// ─── Event Registration Status ────────────────────────────────────
+
+export const EVENT_REGISTRATION_STATUS: Record<string, StatusConfig> = {
+  registered: {
+    label: "Registered",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  waitlisted: {
+    label: "Waitlisted",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  cancelled: {
+    label: "Cancelled",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+  attended: {
+    label: "Attended",
+    icon: CheckCircle2,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  no_show: {
+    label: "No Show",
+    icon: XCircle,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+};
+
+// ─── Incident Status ──────────────────────────────────────────────
+
+export const INCIDENT_STATUS: Record<string, StatusConfig> = {
+  open: {
+    label: "Open",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  investigating: {
+    label: "Investigating",
+    icon: Eye,
+    color: "text-river",
+    bg: "bg-river/10",
+  },
+  resolved: {
+    label: "Resolved",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  closed: {
+    label: "Closed",
+    icon: Ban,
+    color: "text-text-light",
+    bg: "bg-stone-light/10",
+  },
+};
+
+// ─── Incident Severity ────────────────────────────────────────────
+
+export const INCIDENT_SEVERITY: Record<string, StatusConfig> = {
+  low: {
+    label: "Low",
+    icon: CheckCircle2,
+    color: "text-forest",
+    bg: "bg-forest/10",
+  },
+  medium: {
+    label: "Medium",
+    icon: Clock,
+    color: "text-bronze",
+    bg: "bg-bronze/10",
+  },
+  high: {
+    label: "High",
+    icon: ShieldAlert,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+  critical: {
+    label: "Critical",
+    icon: XCircle,
+    color: "text-red-600",
+    bg: "bg-red-50",
+  },
+};
+
 // ─── Membership Status ──────────────────────────────────────────────
 
 export const MEMBERSHIP_STATUS: Record<string, StatusConfig> = {
