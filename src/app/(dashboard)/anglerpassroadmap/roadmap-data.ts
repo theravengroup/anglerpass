@@ -202,8 +202,9 @@ export const PHASES: RoadmapPhase[] = [
         id: "complete-learn",
         title: "Learn / Education",
         items: [
-          { id: "c-learn-system", label: "Learn center with 20 educational posts (MDX, categories, SEO)", done: true },
-          { id: "c-learn-sitemap", label: "Dynamic sitemap generation for learn posts", done: true },
+          { id: "c-learn-system", label: "Learn center with 20 educational posts (JSON, categories, SEO)", done: true },
+          { id: "c-learn-images", label: "All 20 articles have hero images (cinematic photography)", done: true },
+          { id: "c-learn-sitemap", label: "Dynamic sitemap generation for learn posts + all marketing pages", done: true },
         ],
       },
       {
@@ -224,9 +225,14 @@ export const PHASES: RoadmapPhase[] = [
         id: "complete-testing",
         title: "Testing & Quality",
         items: [
-          { id: "c-playwright", label: "Playwright E2E test suite (48 tests: marketing, auth, API, dashboards)", done: true },
-          { id: "c-test-auth-helper", label: "Dev login test helper (cookie-based auth for all 6 roles)", done: true },
+          { id: "c-playwright", label: "Playwright E2E suite (94 tests: marketing, auth, API, forms, unsubscribe, learn, dashboards)", done: true },
+          { id: "c-vitest", label: "Vitest unit suite (617 tests: 30 files covering all validation schemas, posts, middleware)", done: true },
+          { id: "c-test-auth-helper", label: "Dev login test helper (per-role test users, cookie-based auth for all 7 roles)", done: true },
           { id: "c-test-projects", label: "Two-project Playwright config (smoke → dashboards dependency chain)", done: true },
+          { id: "c-test-forms", label: "Form submission E2E tests (waitlist API, contact API, page-level form validation)", done: true },
+          { id: "c-test-unsubscribe", label: "Email unsubscribe E2E tests (GET/POST token validation, HMAC verification)", done: true },
+          { id: "c-test-dashboards", label: "Dashboard E2E tests (all 7 roles, sub-pages, ClubOS, guide pages)", done: true },
+          { id: "c-test-validations", label: "Validation schema unit tests (10 files: auth, leads, contact, clubs, stripe, proposals, campaigns, docs, notifications, support)", done: true },
         ],
       },
       {
@@ -304,8 +310,9 @@ export const PHASES: RoadmapPhase[] = [
         title: "OpenGraph & Social Sharing",
         items: [
           { id: "c-og-redesign", label: "Cinematic OG images (photo backgrounds, prominent logo, bold taglines)", done: true },
-          { id: "c-og-audiences", label: "Audience-specific OG images (bronze/anglers, blue/clubs, green/landowners)", done: true },
+          { id: "c-og-audiences", label: "Audience-specific OG images for all 11 marketing pages (themed overlays + accent colors)", done: true },
           { id: "c-og-dynamic", label: "Dynamic OG route with configurable type, title, and subtitle parameters", done: true },
+          { id: "c-og-posts", label: "All 20 learn articles have dedicated OG images via post hero images", done: true },
         ],
       },
     ],
