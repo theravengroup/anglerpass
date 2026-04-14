@@ -1,8 +1,12 @@
 import { jsonError, jsonOk } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // GET: Fetch invitation details by token (public — used during signup flow)
 export async function GET(request: Request) {
+  const limited = rateLimit("invitation-lookup", getClientIp(request), 60, 60_000);
+  if (limited) return limited;
+
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");

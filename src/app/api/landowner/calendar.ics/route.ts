@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createUntypedAdmin } from "@/lib/supabase/untyped";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { toDateString } from "@/lib/utils";
 import {
   generateICalFeed,
@@ -14,6 +15,9 @@ import {
  * Auto-updates when properties are added or removed.
  */
 export async function GET(request: Request) {
+  const limited = rateLimit("calendar-ics", getClientIp(request), 60, 60_000);
+  if (limited) return limited;
+
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");

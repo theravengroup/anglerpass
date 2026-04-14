@@ -1,4 +1,5 @@
 import { jsonOk, jsonError } from "@/lib/api/helpers";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { verifyTurnstileSchema } from "@/lib/validations/auth";
 
 interface TurnstileVerifyResponse {
@@ -7,6 +8,9 @@ interface TurnstileVerifyResponse {
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimit("turnstile", getClientIp(request), 10, 60_000);
+  if (limited) return limited;
+
   const body: unknown = await request.json().catch(() => null);
 
   if (!body) {
