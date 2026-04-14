@@ -125,6 +125,21 @@ export function escapeIlike(value: string): string {
   return value.replace(/[%_\\]/g, "\\$&");
 }
 
+// RFC 4122 v1-v5 UUID pattern. Case-insensitive.
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Returns true when `value` is a canonical UUID string. Use this to gate
+ * request inputs (route params, query strings, form fields) before
+ * embedding them into PostgREST `.or(...)` fragments or storage paths,
+ * where a malformed id would either break the query parser or allow
+ * path/filter confusion.
+ */
+export function isUuid(value: unknown): value is string {
+  return typeof value === "string" && UUID_RE.test(value);
+}
+
 // ─── Error Classification ──────────────────────────────────────────
 
 /**

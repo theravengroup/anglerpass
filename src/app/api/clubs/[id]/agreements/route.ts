@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireClubManager, jsonOk, jsonCreated, jsonError, requireAuth} from "@/lib/api/helpers";
+import { requireClubManager, jsonOk, jsonCreated, jsonError, requireAuth, isUuid } from "@/lib/api/helpers";
 import { proposeAgreementSchema } from "@/lib/validations/clubs";
 
 // GET: List all cross-club agreements for a club
@@ -9,6 +9,7 @@ export async function GET(
 ) {
   try {
     const { id: clubId } = await params;
+    if (!isUuid(clubId)) return jsonError("Invalid club id", 400);
     const auth = await requireAuth();
 
     if (!auth) return jsonError("Unauthorized", 401);
@@ -101,6 +102,7 @@ export async function POST(
 ) {
   try {
     const { id: clubId } = await params;
+    if (!isUuid(clubId)) return jsonError("Invalid club id", 400);
     const auth = await requireAuth();
 
     if (!auth) return jsonError("Unauthorized", 401);

@@ -1,6 +1,7 @@
 import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_PHOTOS } from "@/lib/validations/properties";
+import { sniffMimeType } from "@/lib/api/file-type";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB server-side limit
 
@@ -23,6 +24,16 @@ export async function POST(request: Request) {
     // Server-side file size check
     if (file.size > MAX_FILE_SIZE) {
       return jsonError("File is too large. Maximum size is 5MB.", 413);
+    }
+
+    // Validate by magic bytes, not the client-reported MIME. The bucket
+    // is served publicly, so we must not let non-WebP bytes land here.
+    const sniffed = await sniffMimeType(file);
+    if (sniffed !== "image/webp") {
+      return jsonError(
+        "Only WebP images are accepted (client should convert first).",
+        400
+      );
     }
 
     // Verify property ownership and check current photo count
