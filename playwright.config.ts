@@ -4,6 +4,13 @@ const PORT = Number(process.env.PORT ?? 3000);
 const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
 
 /**
+ * Set PROD_SMOKE=1 to run the read-only production smoke suite against
+ * BASE_URL without starting a local dev server. Used by the every-5-min
+ * synthetic monitor workflow.
+ */
+const IS_PROD_SMOKE = process.env.PROD_SMOKE === "1";
+
+/**
  * Playwright E2E test configuration for AnglerPass.
  *
  * Runs against the Next.js dev server. Set PORT or BASE_URL env vars
@@ -31,25 +38,37 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
 
-  projects: [
-    {
-      name: "smoke",
-      testMatch: /\/(marketing-pages|auth-flows|api-routes|learn-pages|unsubscribe|form-submissions)\.spec\.ts$/,
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "dashboards",
-      testMatch: /\/dashboards\.spec\.ts$/,
-      use: { ...devices["Desktop Chrome"] },
-      dependencies: ["smoke"],
-      fullyParallel: false,
-    },
-  ],
+  projects: IS_PROD_SMOKE
+    ? [
+        {
+          name: "prod-smoke",
+          testMatch: /\/prod-smoke\.spec\.ts$/,
+          use: { ...devices["Desktop Chrome"] },
+        },
+      ]
+    : [
+        {
+          name: "smoke",
+          testMatch:
+            /\/(marketing-pages|auth-flows|api-routes|learn-pages|unsubscribe|form-submissions)\.spec\.ts$/,
+          use: { ...devices["Desktop Chrome"] },
+        },
+        {
+          name: "dashboards",
+          testMatch: /\/dashboards\.spec\.ts$/,
+          use: { ...devices["Desktop Chrome"] },
+          dependencies: ["smoke"],
+          fullyParallel: false,
+        },
+      ],
 
-  webServer: {
-    command: "npm run dev",
-    port: PORT,
-    reuseExistingServer: true,
-    timeout: 30_000,
-  },
+  // No local web server when targeting production.
+  webServer: IS_PROD_SMOKE
+    ? undefined
+    : {
+        command: "npm run dev",
+        port: PORT,
+        reuseExistingServer: true,
+        timeout: 30_000,
+      },
 });
