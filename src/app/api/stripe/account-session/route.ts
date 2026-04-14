@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer } from "@/lib/stripe/server";
 
@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
 
     return jsonOk({ clientSecret: accountSession.client_secret });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/account-session] POST error:", err);
     return jsonError("Failed to create account session", 500);
   }

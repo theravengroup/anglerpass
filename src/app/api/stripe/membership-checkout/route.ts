@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -288,6 +288,8 @@ export async function POST(request: Request) {
 
     return jsonOk(result);
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     captureApiError(err, {
       route: "stripe/membership-checkout",
       userId: auth.user.id,

@@ -1,4 +1,4 @@
-import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
@@ -142,6 +142,8 @@ export async function POST() {
 
     return jsonOk({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     captureApiError(err, { route: "guides/verification" });
     return jsonError("Failed to create payment", 500);
   }

@@ -1,4 +1,4 @@
-import { jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { proposalResponseSchema } from "@/lib/validations/proposals";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
@@ -358,6 +358,8 @@ export async function POST(
 
     return jsonError("Invalid response", 400);
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[proposals] Unexpected error:", err);
     return jsonError("Internal server error", 500);
   }

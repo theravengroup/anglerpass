@@ -1,4 +1,4 @@
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer, createSetupIntent } from "@/lib/stripe/server";
@@ -45,6 +45,8 @@ export async function POST(request: Request) {
 
     return jsonOk({ clientSecret: setupIntent.client_secret });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/setup-intent] Error:", err);
     return jsonError("Failed to create setup intent", 500);
   }

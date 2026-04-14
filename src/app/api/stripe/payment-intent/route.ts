@@ -1,4 +1,4 @@
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -99,6 +99,8 @@ export async function POST(request: Request) {
       paymentIntentId: paymentIntent.id,
     });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/payment-intent] Error:", err);
     return jsonError("Failed to create payment intent", 500);
   }

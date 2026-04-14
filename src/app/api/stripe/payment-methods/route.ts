@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -83,6 +83,8 @@ export async function GET() {
 
     return jsonOk({ cards, bankAccounts });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/payment-methods] GET error:", err);
     return jsonError("Failed to list payment methods", 500);
   }
@@ -116,6 +118,8 @@ export async function DELETE(request: NextRequest) {
     await detachPaymentMethod(paymentMethodId);
     return jsonOk({ detached: true });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/payment-methods] DELETE error:", err);
     return jsonError("Failed to remove payment method", 500);
   }
@@ -148,6 +152,8 @@ export async function PUT(request: NextRequest) {
 
     return jsonOk({ default: paymentMethodId });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/payment-methods] PUT error:", err);
     return jsonError("Failed to set default payment method", 500);
   }

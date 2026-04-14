@@ -1,4 +1,4 @@
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer } from "@/lib/stripe/server";
 
@@ -37,6 +37,8 @@ export async function POST() {
 
     return jsonOk({ customerId });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/customer] Error:", err);
     return jsonError("Failed to create Stripe customer", 500);
   }
