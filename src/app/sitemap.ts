@@ -16,6 +16,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/about`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/pricing`, changeFrequency: 'monthly', priority: 1.0 },
     { url: `${SITE_URL}/learn`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${SITE_URL}/guides`, changeFrequency: 'monthly', priority: 1.0 },
+    {
+      url: `${SITE_URL}/corporates`,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/conservation`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    { url: `${SITE_URL}/explore`, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${SITE_URL}/press`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITE_URL}/team`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITE_URL}/terms`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/policies`, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
   // State pages

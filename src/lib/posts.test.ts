@@ -12,7 +12,7 @@ describe("getPostImagePath", () => {
   });
 
   it("returns undefined for a slug without a matching image", () => {
-    const result = getPostImagePath("digital-gap-in-fly-fishing-club-management");
+    const result = getPostImagePath("nonexistent-slug-with-no-image-file");
     expect(result).toBeUndefined();
   });
 
@@ -70,13 +70,12 @@ describe("getAllPosts", () => {
     );
   });
 
-  it("leaves image undefined for posts without a matching image file", () => {
+  it("all posts have images since all post images were added", () => {
     const posts = getAllPosts();
-    const postWithoutImage = posts.find(
-      (p) => p.slug === "digital-gap-in-fly-fishing-club-management"
-    );
-    expect(postWithoutImage).toBeDefined();
-    expect(postWithoutImage!.image).toBeUndefined();
+    for (const post of posts) {
+      expect(post.image).toBeTruthy();
+      expect(post.image).toMatch(/^\/images\/posts-images\/.+\.webp$/);
+    }
   });
 });
 
@@ -104,10 +103,12 @@ describe("getPostBySlug", () => {
     );
   });
 
-  it("leaves image undefined when slug has no matching image", () => {
+  it("attaches image for all posts with matching files", () => {
     const post = getPostBySlug("digital-gap-in-fly-fishing-club-management");
     expect(post).toBeDefined();
-    expect(post!.image).toBeUndefined();
+    expect(post!.image).toBe(
+      "/images/posts-images/digital-gap-in-fly-fishing-club-management.webp"
+    );
   });
 });
 

@@ -1,24 +1,9 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
 import DashboardPreviewSection from '@/components/shared/DashboardPreviewSection';
+import { PAGES_SEO } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'For Guides — AnglerPass',
-  description:
-    'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass — the platform for professional fly fishing guides.',
-  openGraph: {
-    title: 'For Guides — AnglerPass',
-    description:
-      'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'For Guides — AnglerPass',
-    description:
-      'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass.',
-  },
-};
+export const metadata = PAGES_SEO.guides;
 
 const features = [
   {

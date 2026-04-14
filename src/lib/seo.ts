@@ -138,6 +138,7 @@ export const PAGES_SEO = {
     description:
       'AnglerPass is the only platform that connects fly anglers, fly fishing clubs, and private landowners in a single marketplace for private water access.',
     path: '/about',
+    image: `${SITE_URL}/about/opengraph-image`,
     keywords: [
       'about anglerpass',
       'private water fly fishing platform',
@@ -149,6 +150,7 @@ export const PAGES_SEO = {
     description:
       'Transparent pricing for clubs, landowners, anglers, and guides. See exactly what you pay and what you receive on AnglerPass.',
     path: '/pricing',
+    image: `${SITE_URL}/pricing/opengraph-image`,
     keywords: [
       'fly fishing club pricing',
       'private water fishing cost',
@@ -161,6 +163,7 @@ export const PAGES_SEO = {
     description:
       'Meet the team behind AnglerPass — the platform modernizing private fly fishing access for landowners, clubs, and anglers.',
     path: '/team',
+    image: `${SITE_URL}/team/opengraph-image`,
     keywords: [
       'anglerpass team',
       'fly fishing startup team',
@@ -172,11 +175,64 @@ export const PAGES_SEO = {
     description:
       'Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and guides.',
     path: '/press',
+    image: `${SITE_URL}/press/opengraph-image`,
     keywords: [
       'anglerpass press',
       'anglerpass media kit',
       'private water fly fishing press release',
       'fly fishing marketplace news',
+    ],
+  }),
+  guides: buildMetadata({
+    title: 'For Guides — AnglerPass',
+    description:
+      'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass — the platform for professional fly fishing guides.',
+    path: '/guides',
+    image: `${SITE_URL}/guides/opengraph-image`,
+    keywords: [
+      'fly fishing guide platform',
+      'private water guide',
+      'fly fishing guide bookings',
+      'fishing guide management',
+    ],
+  }),
+  corporates: buildMetadata({
+    title: 'Corporate Fly Fishing Memberships | AnglerPass for Companies',
+    description:
+      'Give your team access to private fly fishing through a corporate club membership on AnglerPass. One initiation fee, unlimited employee access.',
+    path: '/corporates',
+    image: `${SITE_URL}/corporates/opengraph-image`,
+    keywords: [
+      'corporate fly fishing',
+      'company fly fishing membership',
+      'corporate fishing retreat',
+      'team fishing access',
+    ],
+  }),
+  conservation: buildMetadata({
+    title: 'Conservation — AnglerPass',
+    description:
+      'Our commitment to conservation, habitat preservation, and responsible private water access through managed fly fishing.',
+    path: '/conservation',
+    image: `${SITE_URL}/conservation/opengraph-image`,
+    keywords: [
+      'fly fishing conservation',
+      'private water stewardship',
+      'habitat preservation fishing',
+      'responsible fishing access',
+    ],
+  }),
+  explore: buildMetadata({
+    title: 'Explore Private Waters — AnglerPass',
+    description:
+      'Browse exclusive fly fishing properties available through AnglerPass. Find your next adventure on private waters.',
+    path: '/explore',
+    image: `${SITE_URL}/explore/opengraph-image`,
+    keywords: [
+      'private fly fishing properties',
+      'explore private water',
+      'fly fishing property search',
+      'private trout stream map',
     ],
   }),
 } as const;
