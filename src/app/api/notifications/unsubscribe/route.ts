@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { verifyUnsubscribeToken } from "@/lib/unsubscribe";
 import { NextRequest, NextResponse } from "next/server";
 import { SITE_URL } from "@/lib/constants";
@@ -15,6 +16,9 @@ import { SITE_URL } from "@/lib/constants";
  * RFC 8058 List-Unsubscribe-Post compliant one-click unsubscribe.
  */
 export async function GET(request: NextRequest) {
+  const limited = rateLimit("unsubscribe", getClientIp(request), 20, 60_000);
+  if (limited) return limited;
+
   const token = request.nextUrl.searchParams.get("token");
   if (!token) {
     return htmlResponse(
@@ -43,6 +47,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit("unsubscribe", getClientIp(request), 20, 60_000);
+  if (limited) return limited;
+
   try {
     // Support both form-encoded (RFC 8058) and JSON bodies
     const contentType = request.headers.get("content-type") ?? "";

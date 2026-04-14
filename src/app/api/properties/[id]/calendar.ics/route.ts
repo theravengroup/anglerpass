@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { toDateString } from "@/lib/utils";
 import {
   generateICalFeed,
@@ -12,6 +13,9 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = rateLimit("calendar-ics", getClientIp(request), 60, 60_000);
+  if (limited) return limited;
+
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);

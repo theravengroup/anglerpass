@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCircuitState } from "@/lib/stripe/circuit-breaker";
+import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 /**
  * GET /api/health — lightweight health probe for synthetic monitoring.
@@ -29,7 +30,10 @@ interface HealthReport {
   env?: string;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const limited = rateLimit("health", getClientIp(request), 60, 60_000);
+  if (limited) return limited;
+
   const report: HealthReport = {
     ok: true,
     checks: {
