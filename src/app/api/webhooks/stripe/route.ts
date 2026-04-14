@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createHmac, timingSafeEqual } from "crypto";
 import { toDateString } from "@/lib/utils";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 /**
  * Main Stripe webhook handler for AnglerPass.
@@ -600,7 +601,10 @@ export async function POST(request: NextRequest) {
       data: { object_id: obj.id },
     });
   } catch (err) {
-    console.error(`[stripe-webhook] Error processing ${event.type}:`, err);
+    captureApiError(err, {
+      route: "webhooks/stripe",
+      extra: { event_type: event.type, event_id: event.id },
+    });
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

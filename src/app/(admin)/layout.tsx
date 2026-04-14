@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
 import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
+import SentryUserContext from "@/components/shared/SentryUserContext";
 import { getProfile } from "@/lib/auth/get-profile";
 import { getPlatformStaffRole } from "@/lib/permissions/db";
 import type { PlatformRole } from "@/lib/permissions/constants";
@@ -154,6 +155,7 @@ export default async function AdminLayout({
 
   return (
     <StaffRoleProvider role={staffRole}>
+      <SentryUserContext userId={profile.id} role="admin" />
       <AdminShellFiltered
         allItems={ALL_ADMIN_SIDEBAR_ITEMS}
         pageTitles={PAGE_TITLES}

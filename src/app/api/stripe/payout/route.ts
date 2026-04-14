@@ -4,6 +4,7 @@ import { createTransfer } from "@/lib/stripe/server";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import { payoutSchema } from "@/lib/validations/stripe";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 /**
  * POST /api/stripe/payout
@@ -326,7 +327,10 @@ export async function POST(request: Request) {
       })),
     });
   } catch (err) {
-    console.error("[stripe/payout] Error:", err);
+    captureApiError(err, {
+      route: "stripe/payout",
+      userId: auth.user.id,
+    });
     return jsonError("Failed to distribute payout", 500);
   }
 }

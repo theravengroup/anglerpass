@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyWebhookSignature } from "@/lib/checkr";
 import { evaluateVerification } from "@/lib/guide-verification";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 /**
  * POST: Checkr webhook handler.
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     // Acknowledge all events
     return NextResponse.json({ received: true });
   } catch (err) {
-    console.error("[checkr] Webhook error:", err);
+    captureApiError(err, { route: "webhooks/checkr" });
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

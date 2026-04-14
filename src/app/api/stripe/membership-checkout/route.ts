@@ -10,6 +10,7 @@ import {
 import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 import { membershipCheckoutSchema } from "@/lib/validations/stripe";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 /**
  * POST /api/stripe/membership-checkout
@@ -287,7 +288,10 @@ export async function POST(request: Request) {
 
     return jsonOk(result);
   } catch (err) {
-    console.error("[stripe/membership-checkout] Error:", err);
+    captureApiError(err, {
+      route: "stripe/membership-checkout",
+      userId: auth.user.id,
+    });
     return jsonError("Failed to process membership checkout", 500);
   }
 }

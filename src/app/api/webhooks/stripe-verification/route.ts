@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createCandidate, createInvitation } from "@/lib/checkr";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 const STRIPE_SECRET = () => process.env.STRIPE_SECRET_KEY!;
@@ -219,7 +220,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (err) {
-    console.error("[stripe-verification] Webhook error:", err);
+    captureApiError(err, { route: "webhooks/stripe-verification" });
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

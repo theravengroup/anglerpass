@@ -34,6 +34,7 @@ import {
   Blocks,
 } from "lucide-react";
 import DashboardShell from "@/components/shared/DashboardShell";
+import SentryUserContext from "@/components/shared/SentryUserContext";
 import { getProfile } from "@/lib/auth/get-profile";
 import type { SidebarItem } from "@/components/shared/DashboardSidebar";
 
@@ -376,6 +377,7 @@ export default async function DashboardLayout({
 
   return (
     <ImpersonationWrapper>
+      <SentryUserContext userId={profile.id} role={profile.role} />
       <DashboardShell
         sidebarItems={sidebarItems}
         pageTitles={PAGE_TITLES}

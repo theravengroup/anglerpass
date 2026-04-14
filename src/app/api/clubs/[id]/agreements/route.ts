@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireClubManager, jsonOk, jsonCreated, jsonError, requireAuth, isUuid } from "@/lib/api/helpers";
 import { proposeAgreementSchema } from "@/lib/validations/clubs";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 // GET: List all cross-club agreements for a club
 export async function GET(
@@ -91,7 +92,7 @@ export async function GET(
 
     return jsonOk({ agreements: enriched });
   } catch (err) {
-    console.error("[agreements] Unexpected error:", err);
+    captureApiError(err, { route: "clubs/agreements" });
     return jsonError("Internal server error", 500);
   }
 }
@@ -206,7 +207,7 @@ export async function POST(
 
     return jsonCreated({ agreement });
   } catch (err) {
-    console.error("[agreements] Unexpected error:", err);
+    captureApiError(err, { route: "clubs/agreements" });
     return jsonError("Internal server error", 500);
   }
 }
