@@ -1,4 +1,4 @@
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cancelPaymentIntent } from "@/lib/stripe/server";
@@ -97,6 +97,8 @@ export async function POST(request: Request) {
 
     return jsonOk({ cancelled: true });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/cancel-hold] Error:", err);
     return jsonError("Failed to cancel payment hold", 500);
   }

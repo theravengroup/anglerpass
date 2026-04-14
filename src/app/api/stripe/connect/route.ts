@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
+import { jsonError, jsonOk, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createConnectAccount,
@@ -120,6 +120,8 @@ export async function POST(request: NextRequest) {
     // component handles the onboarding flow inline via Account Sessions
     return jsonOk({ accountId });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/connect] POST error:", err);
     return jsonError("Failed to create Stripe Connect account", 500);
   }
@@ -177,6 +179,8 @@ export async function GET(request: NextRequest) {
       accountId: entity.stripeAccountId,
     });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/connect] GET error:", err);
     return jsonError("Failed to check onboarding status", 500);
   }

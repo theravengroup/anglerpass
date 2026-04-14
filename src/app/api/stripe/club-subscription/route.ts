@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateCustomer, stripe } from "@/lib/stripe/server";
@@ -157,6 +157,8 @@ export async function POST(request: Request) {
       status: subscription.status,
     });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     console.error("[stripe/club-subscription] Error:", err);
     return jsonError("Failed to create club subscription", 500);
   }

@@ -21,6 +21,41 @@ export function jsonError(message: string, status = 500) {
   return Response.json({ error: message }, { status });
 }
 
+/**
+ * 503 with a Retry-After header. Use when an upstream dependency
+ * (Stripe, email provider, etc) is known-unhealthy and the client
+ * should back off for a specific window.
+ */
+export function jsonUnavailable(message: string, retryAfterSeconds: number) {
+  return Response.json(
+    { error: message, retryAfter: retryAfterSeconds },
+    {
+      status: 503,
+      headers: { "Retry-After": String(retryAfterSeconds) },
+    }
+  );
+}
+
+/**
+ * Converts a thrown Stripe error into an HTTP response.
+ * - CircuitOpenError → 503 with Retry-After
+ * - Other errors → re-thrown so the caller's catch can observability-log
+ */
+export function handleStripeError(err: unknown): Response | null {
+  // Lazy import to keep this module client-safe (helpers.ts is server-only
+  // anyway, but circuit-breaker.ts uses server-only).
+  const name = (err as { name?: string } | null)?.name;
+  if (name === "CircuitOpenError") {
+    const retryMs =
+      (err as { retryAfterMs?: number }).retryAfterMs ?? 30_000;
+    return jsonUnavailable(
+      "Payments are temporarily unavailable. Please try again in a moment.",
+      Math.ceil(retryMs / 1000)
+    );
+  }
+  return null;
+}
+
 // ─── Authentication Helpers ─────────────────────────────────────────
 
 interface AuthResult {

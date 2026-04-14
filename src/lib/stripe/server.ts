@@ -1,10 +1,15 @@
 import "server-only";
 
 import Stripe from "stripe";
+import { withStripeBreaker } from "./circuit-breaker";
 
 /**
  * Server-side Stripe instance (lazy singleton).
  * Only use in API routes and server actions — never import on the client.
+ *
+ * Timeout is aggressive (10s) — Stripe's default is 80s, which would
+ * starve our Vercel concurrency budget during any Stripe slowdown.
+ * The circuit breaker picks up the slack when calls start failing.
  */
 let _stripe: Stripe | null = null;
 
@@ -17,6 +22,8 @@ export function getStripeServer(): Stripe {
     _stripe = new Stripe(key, {
       apiVersion: "2026-03-25.dahlia",
       typescript: true,
+      timeout: 10_000,
+      maxNetworkRetries: 1,
     });
   }
   return _stripe;
@@ -37,32 +44,36 @@ export async function getOrCreateCustomer(
   email: string,
   name?: string
 ): Promise<string> {
-  // Search for existing customer by metadata
-  const existing = await stripe.customers.list({
-    limit: 1,
-    email,
+  return withStripeBreaker(async () => {
+    // Search for existing customer by metadata
+    const existing = await stripe.customers.list({
+      limit: 1,
+      email,
+    });
+
+    if (existing.data.length > 0) {
+      return existing.data[0].id;
+    }
+
+    const customer = await stripe.customers.create({
+      email,
+      name: name ?? undefined,
+      metadata: { supabase_user_id: userId },
+    });
+
+    return customer.id;
   });
-
-  if (existing.data.length > 0) {
-    return existing.data[0].id;
-  }
-
-  const customer = await stripe.customers.create({
-    email,
-    name: name ?? undefined,
-    metadata: { supabase_user_id: userId },
-  });
-
-  return customer.id;
 }
 
 // ─── SetupIntent (save payment method without charging) ────────────
 
 export async function createSetupIntent(customerId: string) {
-  return stripe.setupIntents.create({
-    customer: customerId,
-    payment_method_types: ["card", "us_bank_account"],
-  });
+  return withStripeBreaker(() =>
+    stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ["card", "us_bank_account"],
+    })
+  );
 }
 
 // ─── PaymentIntent (authorize / capture) ───────────────────────────
@@ -75,56 +86,68 @@ export async function createPaymentIntent(opts: {
   paymentMethodId?: string;
   transferGroup?: string;
 }) {
-  return stripe.paymentIntents.create({
-    amount: opts.amountCents,
-    currency: "usd",
-    customer: opts.customerId,
-    capture_method: opts.captureMethod ?? "manual",
-    metadata: opts.metadata,
-    payment_method: opts.paymentMethodId ?? undefined,
-    transfer_group: opts.transferGroup ?? undefined,
-  });
+  return withStripeBreaker(() =>
+    stripe.paymentIntents.create({
+      amount: opts.amountCents,
+      currency: "usd",
+      customer: opts.customerId,
+      capture_method: opts.captureMethod ?? "manual",
+      metadata: opts.metadata,
+      payment_method: opts.paymentMethodId ?? undefined,
+      transfer_group: opts.transferGroup ?? undefined,
+    })
+  );
 }
 
 export async function capturePaymentIntent(paymentIntentId: string) {
-  return stripe.paymentIntents.capture(paymentIntentId);
+  return withStripeBreaker(() =>
+    stripe.paymentIntents.capture(paymentIntentId)
+  );
 }
 
 export async function cancelPaymentIntent(paymentIntentId: string) {
-  return stripe.paymentIntents.cancel(paymentIntentId);
+  return withStripeBreaker(() =>
+    stripe.paymentIntents.cancel(paymentIntentId)
+  );
 }
 
 // ─── Payment Methods ───────────────────────────────────────────────
 
 export async function listPaymentMethods(customerId: string) {
-  const [cards, bankAccounts] = await Promise.all([
-    stripe.paymentMethods.list({
-      customer: customerId,
-      type: "card",
-    }),
-    stripe.paymentMethods.list({
-      customer: customerId,
-      type: "us_bank_account",
-    }),
-  ]);
+  return withStripeBreaker(async () => {
+    const [cards, bankAccounts] = await Promise.all([
+      stripe.paymentMethods.list({
+        customer: customerId,
+        type: "card",
+      }),
+      stripe.paymentMethods.list({
+        customer: customerId,
+        type: "us_bank_account",
+      }),
+    ]);
 
-  return {
-    cards: cards.data,
-    bankAccounts: bankAccounts.data,
-  };
+    return {
+      cards: cards.data,
+      bankAccounts: bankAccounts.data,
+    };
+  });
 }
 
 export async function detachPaymentMethod(paymentMethodId: string) {
-  return stripe.paymentMethods.detach(paymentMethodId);
+  return withStripeBreaker(() =>
+    stripe.paymentMethods.detach(paymentMethodId)
+  );
 }
 
 export async function setDefaultPaymentMethod(
   customerId: string,
   paymentMethodId: string
 ) {
-  return stripe.customers.update(customerId, {
-    invoice_settings: { default_payment_method: paymentMethodId },
-  });
+  return withStripeBreaker(() =>
+    stripe.customers.update(customerId, {
+      invoice_settings: { default_payment_method: paymentMethodId },
+    })
+  );
 }
 
 // ─── Subscriptions ─────────────────────────────────────────────────
@@ -135,21 +158,25 @@ export async function createSubscription(opts: {
   metadata?: Record<string, string>;
   paymentMethodId?: string;
 }) {
-  return stripe.subscriptions.create({
-    customer: opts.customerId,
-    items: [{ price: opts.priceId }],
-    metadata: opts.metadata ?? {},
-    default_payment_method: opts.paymentMethodId ?? undefined,
-    payment_behavior: "default_incomplete",
-    payment_settings: {
-      save_default_payment_method: "on_subscription",
-    },
-    expand: ["latest_invoice.payment_intent"],
-  });
+  return withStripeBreaker(() =>
+    stripe.subscriptions.create({
+      customer: opts.customerId,
+      items: [{ price: opts.priceId }],
+      metadata: opts.metadata ?? {},
+      default_payment_method: opts.paymentMethodId ?? undefined,
+      payment_behavior: "default_incomplete",
+      payment_settings: {
+        save_default_payment_method: "on_subscription",
+      },
+      expand: ["latest_invoice.payment_intent"],
+    })
+  );
 }
 
 export async function cancelSubscription(subscriptionId: string) {
-  return stripe.subscriptions.cancel(subscriptionId);
+  return withStripeBreaker(() =>
+    stripe.subscriptions.cancel(subscriptionId)
+  );
 }
 
 // ─── Connect Transfers ─────────────────────────────────────────────
@@ -163,31 +190,35 @@ export async function createTransfer(
   },
   requestOptions?: { idempotencyKey?: string }
 ) {
-  return stripe.transfers.create(
-    {
-      amount: opts.amountCents,
-      currency: "usd",
-      destination: opts.destinationAccountId,
-      transfer_group: opts.transferGroup ?? undefined,
-      metadata: opts.metadata ?? {},
-    },
-    requestOptions?.idempotencyKey
-      ? { idempotencyKey: requestOptions.idempotencyKey }
-      : undefined
+  return withStripeBreaker(() =>
+    stripe.transfers.create(
+      {
+        amount: opts.amountCents,
+        currency: "usd",
+        destination: opts.destinationAccountId,
+        transfer_group: opts.transferGroup ?? undefined,
+        metadata: opts.metadata ?? {},
+      },
+      requestOptions?.idempotencyKey
+        ? { idempotencyKey: requestOptions.idempotencyKey }
+        : undefined
+    )
   );
 }
 
 // ─── Connect Account Helpers ───────────────────────────────────────
 
 export async function createConnectAccount(email: string) {
-  return stripe.accounts.create({
-    type: "express",
-    email,
-    capabilities: {
-      card_payments: { requested: true },
-      transfers: { requested: true },
-    },
-  });
+  return withStripeBreaker(() =>
+    stripe.accounts.create({
+      type: "express",
+      email,
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+    })
+  );
 }
 
 export async function createAccountLink(
@@ -195,14 +226,16 @@ export async function createAccountLink(
   returnUrl: string,
   refreshUrl: string
 ) {
-  return stripe.accountLinks.create({
-    account: accountId,
-    type: "account_onboarding",
-    return_url: returnUrl,
-    refresh_url: refreshUrl,
-  });
+  return withStripeBreaker(() =>
+    stripe.accountLinks.create({
+      account: accountId,
+      type: "account_onboarding",
+      return_url: returnUrl,
+      refresh_url: refreshUrl,
+    })
+  );
 }
 
 export async function getConnectAccount(accountId: string) {
-  return stripe.accounts.retrieve(accountId);
+  return withStripeBreaker(() => stripe.accounts.retrieve(accountId));
 }

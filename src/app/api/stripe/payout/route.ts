@@ -1,4 +1,4 @@
-import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { jsonOk, jsonError, requireAuth, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createTransfer } from "@/lib/stripe/server";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
@@ -327,6 +327,8 @@ export async function POST(request: Request) {
       })),
     });
   } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
     captureApiError(err, {
       route: "stripe/payout",
       userId: auth.user.id,

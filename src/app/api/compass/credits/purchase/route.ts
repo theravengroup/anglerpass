@@ -1,4 +1,4 @@
-import { requireAuth, jsonError, jsonOk } from "@/lib/api/helpers";
+import { requireAuth, jsonError, jsonOk, handleStripeError } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { getCreditPack } from "@/lib/constants/compass-usage";
@@ -30,44 +30,50 @@ export async function POST(request: Request) {
     return jsonError("Invalid pack key", 400);
   }
 
-  const stripe = getStripeServer();
-  const typedAdmin = createAdminClient();
-  const admin = createAdminClient();
+  try {
+    const stripe = getStripeServer();
+    const typedAdmin = createAdminClient();
+    const admin = createAdminClient();
 
-  // Get user email for Stripe customer
-  const { data: userData } = await typedAdmin.auth.admin.getUserById(auth.user.id);
-  const email = userData?.user?.email ?? "";
+    // Get user email for Stripe customer
+    const { data: userData } = await typedAdmin.auth.admin.getUserById(auth.user.id);
+    const email = userData?.user?.email ?? "";
 
-  // Get or create Stripe customer
-  const customerId = await getOrCreateCustomer(
-    auth.user.id,
-    email,
-    userData?.user?.user_metadata?.display_name
-  );
+    // Get or create Stripe customer
+    const customerId = await getOrCreateCustomer(
+      auth.user.id,
+      email,
+      userData?.user?.user_metadata?.display_name
+    );
 
-  // Create PaymentIntent
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: pack.priceCents,
-    currency: "usd",
-    customer: customerId,
-    capture_method: "automatic",
-    metadata: {
-      type: "compass_credit_purchase",
+    // Create PaymentIntent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: pack.priceCents,
+      currency: "usd",
+      customer: customerId,
+      capture_method: "automatic",
+      metadata: {
+        type: "compass_credit_purchase",
+        user_id: auth.user.id,
+        pack_key: pack.key,
+        messages: String(pack.messages),
+      },
+    });
+
+    // Record pending purchase
+    await admin.from("compass_credit_purchases").insert({
       user_id: auth.user.id,
+      stripe_payment_intent_id: paymentIntent.id,
       pack_key: pack.key,
-      messages: String(pack.messages),
-    },
-  });
+      messages_purchased: pack.messages,
+      amount_cents: pack.priceCents,
+      status: "pending",
+    });
 
-  // Record pending purchase
-  await admin.from("compass_credit_purchases").insert({
-    user_id: auth.user.id,
-    stripe_payment_intent_id: paymentIntent.id,
-    pack_key: pack.key,
-    messages_purchased: pack.messages,
-    amount_cents: pack.priceCents,
-    status: "pending",
-  });
-
-  return jsonOk({ clientSecret: paymentIntent.client_secret });
+    return jsonOk({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    const breakerResponse = handleStripeError(err);
+    if (breakerResponse) return breakerResponse;
+    return jsonError("Failed to create payment", 500);
+  }
 }
