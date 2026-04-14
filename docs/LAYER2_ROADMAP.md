@@ -187,6 +187,39 @@ Full codebase audit and refactor pass — production-safety improvements, securi
 - ✅ Admin dashboard, finance-ops, CRM, and compass routes confirmed working with proper auth
 - ✅ Component renders verified after all splits (no regressions)
 
+### Launch Readiness Sprint (April 13, 2026)
+
+Full test suite buildout, Vercel deployment fixes, SEO completeness, and OG image coverage for all public pages.
+
+#### Vercel Deployment Fixes
+- ✅ **Cron schedule fix** — `clubos-campaigns` changed from every 5 minutes to every 4 hours
+- ✅ **ClubOS TypeScript errors** — Fixed 28 API route files (ZodError `.errors`→`.issues`, type casts, PromiseLike `.catch()`, missing RPCs replaced with direct queries)
+- ✅ **Supabase types regenerated** — Added 13 ClubOS tables to generated types (5,264→6,424 lines), eliminated all "excessively deep" type errors
+
+#### Test Suite Expansion (309 → 711 tests)
+- ✅ **Vitest: 617 tests across 30 files** — up from 309 tests / 18 files
+  - 10 new validation schema test files (213 tests): auth, leads, contact, clubs, stripe, proposals, campaigns, documents, notifications, support-ticket
+  - 59 ClubOS validation schema tests
+  - Updated posts tests to cover all 20 articles with images
+- ✅ **Playwright: 94 E2E tests across 8 spec files** — up from 48 tests
+  - New: `form-submissions.spec.ts` (10 tests) — waitlist API, contact API, page-level form validation
+  - New: `unsubscribe.spec.ts` (6 tests) — GET/POST token validation, HMAC verification
+  - New: `learn-pages.spec.ts` (7 tests) — grid, cards, articles, hero images, OpenGraph meta
+  - Expanded: `auth-flows.spec.ts` (+7 tests) — role mismatch redirects, admin redirects, cache-control, login redirect preservation
+  - Consolidated: all dashboard tests into single `dashboards.spec.ts` (24 tests, 7 roles + sub-pages + ClubOS)
+- ✅ **Dev login race condition fixed** — switched from shared test user to per-role users (`dev-test-{role}@anglerpass.local`)
+- ✅ **Dev login port mismatch fixed** — redirect uses `request.nextUrl.origin` instead of hardcoded localhost:3000
+
+#### SEO & Sitemap Completeness
+- ✅ **Sitemap expanded** — Added 9 missing pages: /guides, /corporates, /conservation, /explore, /press, /team, /terms, /privacy, /policies
+- ✅ **PAGES_SEO expanded** — Added metadata configs with keywords for guides, corporates, conservation, explore
+
+#### OpenGraph Images for All Pages
+- ✅ **8 new OG images** — cinematic `opengraph-image.tsx` for: about, pricing, team, press, guides, corporates, conservation, explore
+- ✅ **12 total OG images** — every marketing page has a dedicated cinematic OG image with logo, themed overlay, and accent colors
+- ✅ **All 20 learn articles** have OG images via post hero `.webp` files
+- ✅ **6 missing blog post images** added to git tracking
+
 ---
 
 ## Phase 2: Landowner Property Management
