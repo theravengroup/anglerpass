@@ -48,7 +48,7 @@ export async function POST(request: Request) {
 
       const { data: invitation } = await admin
         .from("corporate_invitations")
-        .select("id, status, club_id, corporate_member_id")
+        .select("id, status, club_id, corporate_member_id, email")
         .eq("token", invitationToken)
         .maybeSingle();
 
@@ -60,6 +60,17 @@ export async function POST(request: Request) {
       }
       if (invitation.club_id !== clubId) {
         return jsonError("Club ID mismatch", 400);
+      }
+
+      // Bind the invitation to the email it was sent to. A leaked token
+      // otherwise lets any signed-in user consume the sponsor's seat.
+      const userEmail = auth.user.email?.toLowerCase() ?? "";
+      const invitedEmail = invitation.email?.toLowerCase() ?? "";
+      if (!userEmail || !invitedEmail || userEmail !== invitedEmail) {
+        return jsonError(
+          "This invitation was sent to a different email address. Sign in with the invited address to accept it.",
+          403
+        );
       }
 
       // Look up the corporate sponsor's membership

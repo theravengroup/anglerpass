@@ -46,7 +46,8 @@ export async function POST(request: Request) {
         booking_date,
         booking_end_date,
         guide_id,
-        club_membership_id
+        club_membership_id,
+        payout_distributed_at
       `)
       .eq("id", bookingId)
       .maybeSingle();
@@ -57,6 +58,14 @@ export async function POST(request: Request) {
 
     if (booking.payment_status !== "succeeded") {
       return jsonError("Payment must be captured before payout", 409);
+    }
+
+    // Idempotency guard — if a prior call already distributed this payout,
+    // short-circuit instead of double-paying every recipient. Stripe-level
+    // idempotency_keys below provide a second layer of safety against
+    // partial-failure retries, but this check avoids the round-trip entirely.
+    if (booking.payout_distributed_at) {
+      return jsonError("Payout has already been distributed for this booking", 409);
     }
 
     // Verify permissions (admin or property owner)
@@ -157,15 +166,18 @@ export async function POST(request: Request) {
 
       if (ownerProfile?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.landownerPayout * 100);
-        await createTransfer({
-          amountCents,
-          destinationAccountId: ownerProfile.stripe_connect_account_id,
-          transferGroup,
-          metadata: {
-            booking_id: bookingId,
-            type: "landowner_payout",
+        await createTransfer(
+          {
+            amountCents,
+            destinationAccountId: ownerProfile.stripe_connect_account_id,
+            transferGroup,
+            metadata: {
+              booking_id: bookingId,
+              type: "landowner_payout",
+            },
           },
-        });
+          { idempotencyKey: `payout:${bookingId}:landowner` }
+        );
         transfers.push({
           recipient: "landowner",
           amount: fees.landownerPayout,
@@ -184,15 +196,18 @@ export async function POST(request: Request) {
 
       if (club?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.clubCommission * 100);
-        await createTransfer({
-          amountCents,
-          destinationAccountId: club.stripe_connect_account_id,
-          transferGroup,
-          metadata: {
-            booking_id: bookingId,
-            type: "club_commission",
+        await createTransfer(
+          {
+            amountCents,
+            destinationAccountId: club.stripe_connect_account_id,
+            transferGroup,
+            metadata: {
+              booking_id: bookingId,
+              type: "club_commission",
+            },
           },
-        });
+          { idempotencyKey: `payout:${bookingId}:club` }
+        );
         transfers.push({
           recipient: "club",
           amount: fees.clubCommission,
@@ -218,15 +233,18 @@ export async function POST(request: Request) {
 
         if (homeClub?.stripe_connect_account_id) {
           const amountCents = Math.round(fees.homeClubReferral * 100);
-          await createTransfer({
-            amountCents,
-            destinationAccountId: homeClub.stripe_connect_account_id,
-            transferGroup,
-            metadata: {
-              booking_id: bookingId,
-              type: "home_club_referral",
+          await createTransfer(
+            {
+              amountCents,
+              destinationAccountId: homeClub.stripe_connect_account_id,
+              transferGroup,
+              metadata: {
+                booking_id: bookingId,
+                type: "home_club_referral",
+              },
             },
-          });
+            { idempotencyKey: `payout:${bookingId}:home_club` }
+          );
           transfers.push({
             recipient: "home_club",
             amount: fees.homeClubReferral,
@@ -246,15 +264,18 @@ export async function POST(request: Request) {
 
       if (guideProfile?.stripe_connect_account_id) {
         const amountCents = Math.round(fees.guidePayout * 100);
-        await createTransfer({
-          amountCents,
-          destinationAccountId: guideProfile.stripe_connect_account_id,
-          transferGroup,
-          metadata: {
-            booking_id: bookingId,
-            type: "guide_payout",
+        await createTransfer(
+          {
+            amountCents,
+            destinationAccountId: guideProfile.stripe_connect_account_id,
+            transferGroup,
+            metadata: {
+              booking_id: bookingId,
+              type: "guide_payout",
+            },
           },
-        });
+          { idempotencyKey: `payout:${bookingId}:guide` }
+        );
         transfers.push({
           recipient: "guide",
           amount: fees.guidePayout,
@@ -262,6 +283,12 @@ export async function POST(request: Request) {
         });
       }
     }
+
+    // Mark payout as distributed (idempotency guard for future retries).
+    await admin
+      .from("bookings")
+      .update({ payout_distributed_at: new Date().toISOString() })
+      .eq("id", bookingId);
 
     // Audit log
     await admin.from("audit_log").insert({

@@ -13,11 +13,12 @@ import { publishEligibleReviews } from "@/lib/reviews";
  * Protected by a secret token in the Authorization header.
  */
 export async function POST(request: Request) {
-  // Verify cron secret — Vercel sends this automatically for cron jobs
+  // Verify cron secret — Vercel sends this automatically for cron jobs.
+  // Fail closed — an unset secret means the endpoint is not safe to call.
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return jsonError("Unauthorized", 401);
   }
 

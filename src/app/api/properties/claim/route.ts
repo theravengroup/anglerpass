@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   // Find the invitation
   const { data: invitation } = await admin
     .from("property_claim_invitations")
-    .select("id, property_id, club_id, status")
+    .select("id, property_id, club_id, status, landowner_email")
     .eq("token", result.data.token)
     .maybeSingle();
 
@@ -32,6 +32,18 @@ export async function POST(request: Request) {
 
   if (invitation.status !== "pending") {
     return jsonError("This invitation has already been used", 400);
+  }
+
+  // The invitation is bound to a specific email address. The authenticated
+  // user must own that address, otherwise a leaked token could be claimed
+  // by any signed-in account.
+  const userEmail = auth.user.email?.toLowerCase() ?? "";
+  const invitedEmail = invitation.landowner_email?.toLowerCase() ?? "";
+  if (!userEmail || !invitedEmail || userEmail !== invitedEmail) {
+    return jsonError(
+      "This invitation was sent to a different email address. Sign in with the invited address to claim this property.",
+      403
+    );
   }
 
   // Verify the property still has no owner
