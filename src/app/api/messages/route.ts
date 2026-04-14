@@ -2,6 +2,7 @@ import { jsonCreated, jsonError, jsonOk, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { messageSchema } from "@/lib/validations/guides";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
+import { requireEnabled } from "@/lib/feature-flags";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
@@ -189,6 +190,9 @@ export async function GET() {
 
 // POST: Send a message (creates thread if needed)
 export async function POST(request: Request) {
+  const killed = await requireEnabled("messaging.send");
+  if (killed) return killed;
+
   const limited = rateLimit("messages-send", getClientIp(request), 20, 60_000);
   if (limited) return limited;
 

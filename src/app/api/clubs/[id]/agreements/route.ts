@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireClubManager, jsonOk, jsonCreated, jsonError, requireAuth, isUuid } from "@/lib/api/helpers";
 import { proposeAgreementSchema } from "@/lib/validations/clubs";
+import { requireEnabled } from "@/lib/feature-flags";
 
 // GET: List all cross-club agreements for a club
 export async function GET(
@@ -101,6 +102,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const killed = await requireEnabled("cross_club.agreements");
+    if (killed) return killed;
+
     const { id: clubId } = await params;
     if (!isUuid(clubId)) return jsonError("Invalid club id", 400);
     const auth = await requireAuth();

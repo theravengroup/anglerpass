@@ -9,6 +9,7 @@ import {
 } from "@/lib/stripe/server";
 import { MEMBERSHIP_PROCESSING_FEE_RATE, roundCurrency } from "@/lib/constants/fees";
 import { membershipCheckoutSchema } from "@/lib/validations/stripe";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST /api/stripe/membership-checkout
@@ -20,6 +21,9 @@ import { membershipCheckoutSchema } from "@/lib/validations/stripe";
  * Platform fee (5%) is added to both.
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("stripe.membership_checkout");
+  if (killed) return killed;
+
   const limited = rateLimit("stripe-membership", getClientIp(request), 5, 60_000);
   if (limited) return limited;
 

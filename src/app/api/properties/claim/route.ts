@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
 import { propertyClaimSchema } from "@/lib/validations/properties";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST /api/properties/claim
@@ -8,6 +9,9 @@ import { propertyClaimSchema } from "@/lib/validations/properties";
  * The authenticated user becomes the property owner.
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("property.claim");
+  if (killed) return killed;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

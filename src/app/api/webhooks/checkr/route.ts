@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyWebhookSignature } from "@/lib/checkr";
 import { evaluateVerification } from "@/lib/guide-verification";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST: Checkr webhook handler.
@@ -11,6 +12,9 @@ import { evaluateVerification } from "@/lib/guide-verification";
  * - report.suspended → reject the guide
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("webhooks.checkr");
+  if (killed) return killed;
+
   try {
     const payload = await request.text();
     const signature = request.headers.get("x-checkr-signature") ?? "";

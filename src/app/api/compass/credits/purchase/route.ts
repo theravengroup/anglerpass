@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { getCreditPack } from "@/lib/constants/compass-usage";
 import { compassCreditPurchaseSchema } from "@/lib/validations/compass-usage";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST /api/compass/credits/purchase
@@ -10,6 +11,9 @@ import { compassCreditPurchaseSchema } from "@/lib/validations/compass-usage";
  * Returns { clientSecret } for client-side confirmation.
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("stripe.compass_credits");
+  if (killed) return killed;
+
   const auth = await requireAuth();
   if (!auth) {
     return jsonError("Unauthorized", 401);

@@ -2,6 +2,7 @@ import { jsonError, jsonOk, requireAuth } from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
+import { requireEnabled } from "@/lib/feature-flags";
 
 // ─── GET: Verification status for the authenticated guide ──────────
 
@@ -56,6 +57,11 @@ export async function GET() {
 // ─── POST: Initiate verification — creates PaymentIntent for inline payment ─
 
 export async function POST() {
+  const killed = await requireEnabled("guide.verification_submit");
+  if (killed) return killed;
+  const stripeKilled = await requireEnabled("stripe.guide_verification");
+  if (stripeKilled) return stripeKilled;
+
   try {
     const auth = await requireAuth();
 

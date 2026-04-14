@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError } from "@/lib/api/helpers";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST /api/webhooks/resend
@@ -10,6 +11,9 @@ import { jsonOk, jsonError } from "@/lib/api/helpers";
  * Updates campaign_sends and manages the suppression list.
  */
 export async function POST(request: NextRequest) {
+  const killed = await requireEnabled("webhooks.resend");
+  if (killed) return killed;
+
   const rawBody = await request.text();
 
   // Verify Svix webhook signature.

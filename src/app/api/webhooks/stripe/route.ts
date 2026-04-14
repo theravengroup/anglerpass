@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createHmac, timingSafeEqual } from "crypto";
 import { toDateString } from "@/lib/utils";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * Main Stripe webhook handler for AnglerPass.
@@ -507,6 +508,9 @@ async function handleChargeDisputeCreated(
 // ─── Main Handler ──────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  const killed = await requireEnabled("webhooks.stripe");
+  if (killed) return killed;
+
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
     console.error("[stripe-webhook] Missing STRIPE_WEBHOOK_SECRET");
