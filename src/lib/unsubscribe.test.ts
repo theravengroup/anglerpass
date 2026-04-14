@@ -69,6 +69,17 @@ describe("verifyUnsubscribeToken", () => {
     const token = generateUnsubscribeToken(uuid);
     expect(verifyUnsubscribeToken(token)).toBe(uuid);
   });
+
+  it("round-trips an empty string userId", () => {
+    const token = generateUnsubscribeToken("");
+    expect(verifyUnsubscribeToken(token)).toBe("");
+  });
+
+  it("round-trips a userId with special characters", () => {
+    const userId = "user+foo@bar.com/baz";
+    const token = generateUnsubscribeToken(userId);
+    expect(verifyUnsubscribeToken(token)).toBe(userId);
+  });
 });
 
 describe("getUnsubscribeUrl", () => {
