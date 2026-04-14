@@ -4492,6 +4492,48 @@ export type Database = {
           },
         ]
       }
+      incidents_public: {
+        Row: {
+          affected_systems: string[]
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          resolved_at: string | null
+          severity: string
+          started_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_systems?: string[]
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          resolved_at?: string | null
+          severity: string
+          started_at?: string
+          status: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_systems?: string[]
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          resolved_at?: string | null
+          severity?: string
+          started_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       landowner_calendar_tokens: {
         Row: {
           created_at: string
