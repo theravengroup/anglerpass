@@ -6,7 +6,39 @@ import {
   listPaymentMethods,
   detachPaymentMethod,
   setDefaultPaymentMethod,
+  stripe,
 } from "@/lib/stripe/server";
+
+/**
+ * Verify that a payment method belongs to the authenticated user.
+ * Returns the Stripe customer ID on success, or null if the caller has
+ * no Stripe customer record yet.
+ */
+async function assertPaymentMethodOwnership(
+  userId: string,
+  paymentMethodId: string
+): Promise<{ ok: true; customerId: string } | { ok: false; status: number; error: string }> {
+  const admin = createAdminClient();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("stripe_customer_id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!profile?.stripe_customer_id) {
+    return { ok: false, status: 404, error: "No Stripe customer found" };
+  }
+
+  try {
+    const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+    if (pm.customer !== profile.stripe_customer_id) {
+      return { ok: false, status: 403, error: "Payment method does not belong to this user" };
+    }
+    return { ok: true, customerId: profile.stripe_customer_id };
+  } catch {
+    return { ok: false, status: 404, error: "Payment method not found" };
+  }
+}
 
 /**
  * GET /api/stripe/payment-methods
@@ -75,6 +107,11 @@ export async function DELETE(request: NextRequest) {
     return jsonError("Missing payment method ID", 400);
   }
 
+  const ownership = await assertPaymentMethodOwnership(auth.user.id, paymentMethodId);
+  if (!ownership.ok) {
+    return jsonError(ownership.error, ownership.status);
+  }
+
   try {
     await detachPaymentMethod(paymentMethodId);
     return jsonOk({ detached: true });
@@ -102,18 +139,12 @@ export async function PUT(request: NextRequest) {
       return jsonError("Missing paymentMethodId", 400);
     }
 
-    const admin = createAdminClient();
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("stripe_customer_id")
-      .eq("id", auth.user.id)
-      .maybeSingle();
-
-    if (!profile?.stripe_customer_id) {
-      return jsonError("No Stripe customer found", 404);
+    const ownership = await assertPaymentMethodOwnership(auth.user.id, paymentMethodId);
+    if (!ownership.ok) {
+      return jsonError(ownership.error, ownership.status);
     }
 
-    await setDefaultPaymentMethod(profile.stripe_customer_id, paymentMethodId);
+    await setDefaultPaymentMethod(ownership.customerId, paymentMethodId);
 
     return jsonOk({ default: paymentMethodId });
   } catch (err) {

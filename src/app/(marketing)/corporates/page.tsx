@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
+import CorporateInquiryCta from '@/components/shared/CorporateInquiryCta';
 import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
 
 export const metadata = PAGES_SEO.corporates;
@@ -122,12 +123,9 @@ export default function CorporateMembershipsPage() {
             no individual initiation fees for&nbsp;staff.
           </p>
           <div className="audience-hero-ctas flex gap-3.5 justify-center flex-wrap">
-            <Link
-              href="/#waitlist"
-              className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
-            >
-              Join the Waitlist &rarr;
-            </Link>
+            <CorporateInquiryCta className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms] cursor-pointer">
+              Request a Proposal &rarr;
+            </CorporateInquiryCta>
             <Link
               href="#how-it-works"
               className="inline-flex items-center gap-2 px-[34px] py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"
@@ -396,12 +394,9 @@ export default function CorporateMembershipsPage() {
             private fly fishing access as a corporate&nbsp;benefit.
           </p>
           <div className="flex gap-3.5 justify-center flex-wrap">
-            <Link
-              href="/#waitlist"
-              className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms]"
-            >
-              Join the Waitlist
-            </Link>
+            <CorporateInquiryCta className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-bronze text-white transition-all duration-[400ms] cursor-pointer">
+              Request a Proposal
+            </CorporateInquiryCta>
             <Link
               href="/clubs"
               className="inline-flex items-center gap-2 px-10 py-4 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-transparent text-parchment border border-parchment/20 transition-all duration-[400ms]"

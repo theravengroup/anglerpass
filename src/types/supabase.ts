@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       affiliate_brands: {
@@ -579,6 +604,7 @@ export type Database = {
           paid_at: string | null
           party_size: number
           payment_status: string | null
+          payout_distributed_at: string | null
           platform_fee: number
           platform_fee_cents: number | null
           property_id: string
@@ -634,6 +660,7 @@ export type Database = {
           paid_at?: string | null
           party_size?: number
           payment_status?: string | null
+          payout_distributed_at?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
           property_id: string
@@ -689,6 +716,7 @@ export type Database = {
           paid_at?: string | null
           party_size?: number
           payment_status?: string | null
+          payout_distributed_at?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
           property_id?: string
@@ -6241,6 +6269,51 @@ export type Database = {
       }
     }
     Views: {
+      property_availability_public: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          date: string | null
+          id: string | null
+          property_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string | null
+          property_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string | null
+          property_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_availability_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_availability_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_review_stats: {
         Row: {
           avg_rating: number | null
@@ -6280,6 +6353,18 @@ export type Database = {
       evaluate_segment_query: {
         Args: { query_params?: string; query_sql: string }
         Returns: Json
+      }
+      get_corporate_invitation_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          accepted_at: string
+          club_id: string
+          corporate_member_id: string
+          email: string
+          id: string
+          invited_at: string
+          status: string
+        }[]
       }
       increment_compass_usage: {
         Args: { p_period: string; p_user_id: string }
@@ -6418,7 +6503,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+

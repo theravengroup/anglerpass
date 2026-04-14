@@ -154,19 +154,27 @@ export async function cancelSubscription(subscriptionId: string) {
 
 // ─── Connect Transfers ─────────────────────────────────────────────
 
-export async function createTransfer(opts: {
-  amountCents: number;
-  destinationAccountId: string;
-  transferGroup?: string;
-  metadata?: Record<string, string>;
-}) {
-  return stripe.transfers.create({
-    amount: opts.amountCents,
-    currency: "usd",
-    destination: opts.destinationAccountId,
-    transfer_group: opts.transferGroup ?? undefined,
-    metadata: opts.metadata ?? {},
-  });
+export async function createTransfer(
+  opts: {
+    amountCents: number;
+    destinationAccountId: string;
+    transferGroup?: string;
+    metadata?: Record<string, string>;
+  },
+  requestOptions?: { idempotencyKey?: string }
+) {
+  return stripe.transfers.create(
+    {
+      amount: opts.amountCents,
+      currency: "usd",
+      destination: opts.destinationAccountId,
+      transfer_group: opts.transferGroup ?? undefined,
+      metadata: opts.metadata ?? {},
+    },
+    requestOptions?.idempotencyKey
+      ? { idempotencyKey: requestOptions.idempotencyKey }
+      : undefined
+  );
 }
 
 // ─── Connect Account Helpers ───────────────────────────────────────

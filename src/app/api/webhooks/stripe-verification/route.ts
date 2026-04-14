@@ -65,16 +65,15 @@ export async function POST(request: Request) {
     const payload = await request.text();
     const sigHeader = request.headers.get("stripe-signature") ?? "";
 
-    // Verify signature in production
-    if (process.env.NODE_ENV === "production") {
-      const valid = await verifyStripeSignature(payload, sigHeader);
-      if (!valid) {
-        console.error("[stripe-verification] Invalid signature");
-        return NextResponse.json(
-          { error: "Invalid signature" },
-          { status: 400 }
-        );
-      }
+    // Always verify signature — webhook endpoints are public and must not
+    // trust unsigned payloads in any environment.
+    const valid = await verifyStripeSignature(payload, sigHeader);
+    if (!valid) {
+      console.error("[stripe-verification] Invalid signature");
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 400 }
+      );
     }
 
     const event = JSON.parse(payload);

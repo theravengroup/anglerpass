@@ -10,18 +10,68 @@ import { jsonOk, jsonError } from "@/lib/api/helpers";
  * Updates campaign_sends and manages the suppression list.
  */
 export async function POST(request: NextRequest) {
-  // Verify webhook secret
+  const rawBody = await request.text();
+
+  // Verify Svix webhook signature.
+  // Resend uses Svix: signed payload is `${svix_id}.${svix_timestamp}.${rawBody}`,
+  // HMAC-SHA256 with the secret's base64 body (after the `whsec_` prefix).
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
   if (webhookSecret) {
-    const signature = request.headers.get("svix-signature");
-    if (!signature) {
+    const svixId = request.headers.get("svix-id");
+    const svixTimestamp = request.headers.get("svix-timestamp");
+    const svixSignature = request.headers.get("svix-signature");
+
+    if (!svixId || !svixTimestamp || !svixSignature) {
       return jsonError("Missing webhook signature", 401);
+    }
+
+    // Reject stale timestamps (>5 minutes drift) to prevent replay.
+    const ts = parseInt(svixTimestamp, 10);
+    if (!Number.isFinite(ts)) return jsonError("Invalid timestamp", 401);
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (Math.abs(nowSec - ts) > 300) {
+      return jsonError("Stale webhook signature", 401);
+    }
+
+    const secretBase64 = webhookSecret.startsWith("whsec_")
+      ? webhookSecret.slice("whsec_".length)
+      : webhookSecret;
+
+    let expected: string;
+    try {
+      const { createHmac } = await import("crypto");
+      const keyBytes = Buffer.from(secretBase64, "base64");
+      const signedPayload = `${svixId}.${svixTimestamp}.${rawBody}`;
+      expected = createHmac("sha256", keyBytes)
+        .update(signedPayload)
+        .digest("base64");
+    } catch {
+      return jsonError("Signature verification failed", 401);
+    }
+
+    // svix-signature is a space-separated list of `v1,<base64sig>` entries.
+    const provided = svixSignature
+      .split(" ")
+      .map((part) => part.split(",")[1])
+      .filter((v): v is string => Boolean(v));
+
+    const match = provided.some((sig) => {
+      if (sig.length !== expected.length) return false;
+      let result = 0;
+      for (let i = 0; i < expected.length; i++) {
+        result |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
+      }
+      return result === 0;
+    });
+
+    if (!match) {
+      return jsonError("Invalid webhook signature", 401);
     }
   }
 
   let payload: ResendWebhookPayload;
   try {
-    payload = (await request.json()) as ResendWebhookPayload;
+    payload = JSON.parse(rawBody) as ResendWebhookPayload;
   } catch {
     return jsonError("Invalid JSON", 400);
   }

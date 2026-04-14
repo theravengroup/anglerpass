@@ -190,6 +190,8 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-mkt-faqs", label: "FAQ accordions on all audience pages", done: true },
           { id: "c-mkt-waitlist", label: "Waitlist + investor lead capture with email confirmation", done: true },
           { id: "c-mkt-contact", label: "Contact form with department routing", done: true },
+          { id: "c-mkt-corp-inquiry", label: "Dedicated corporate inquiry form (company size, use case, regions, timeline — routes to partners@ with structured lead data)", done: true },
+          { id: "c-sec-hardening", label: "Pre-launch security hardening (migration 00088: role-escalation trigger, stripe webhook RLS, club-logos ACL, bookings financial guard, messages immutability, ClubOS search_path lockdown, corporate invitation token RPC — 17 findings fixed)", done: true },
           { id: "c-mkt-conservation", label: "Conservation page (habitat preservation, catch-and-release values)", done: true },
           { id: "c-mkt-ai", label: "AnglerPass Compass AI section (trip matching, planning, on-water guidance)", done: true },
           { id: "c-mkt-explore", label: "Public Explore Waters page (search properties without login)", done: true },

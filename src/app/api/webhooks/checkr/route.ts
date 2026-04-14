@@ -15,15 +15,14 @@ export async function POST(request: Request) {
     const payload = await request.text();
     const signature = request.headers.get("x-checkr-signature") ?? "";
 
-    // Verify signature in production
-    if (process.env.NODE_ENV === "production") {
-      if (!verifyWebhookSignature(payload, signature)) {
-        console.error("[checkr] Invalid webhook signature");
-        return NextResponse.json(
-          { error: "Invalid signature" },
-          { status: 400 }
-        );
-      }
+    // Always verify signature — webhook endpoints are public and must not
+    // trust unsigned payloads in any environment.
+    if (!verifyWebhookSignature(payload, signature)) {
+      console.error("[checkr] Invalid webhook signature");
+      return NextResponse.json(
+        { error: "Invalid signature" },
+        { status: 400 }
+      );
     }
 
     const event = JSON.parse(payload);

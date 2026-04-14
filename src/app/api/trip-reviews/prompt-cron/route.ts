@@ -16,11 +16,12 @@ import { processReviewPrompts } from "@/lib/reviews/prompts";
  * Protected by a secret token in the Authorization header.
  */
 export async function POST(request: Request) {
-  // Verify cron secret
+  // Verify cron secret. Fail closed — an unset secret means the endpoint
+  // is not safe to call and must return 401.
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return jsonError("Unauthorized", 401);
   }
 
