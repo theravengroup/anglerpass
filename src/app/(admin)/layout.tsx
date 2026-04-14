@@ -17,6 +17,8 @@ import {
   CalendarDays,
   Mail,
   Link2,
+  Flag,
+  AlertTriangle,
 } from "lucide-react";
 import { StaffRoleProvider } from "@/components/admin/StaffRoleProvider";
 import AdminShellFiltered from "@/components/admin/AdminShellFiltered";
@@ -112,6 +114,16 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     href: "/admin/audit-log",
     icon: <ScrollText />,
   },
+  {
+    label: "Feature Flags",
+    href: "/admin/feature-flags",
+    icon: <Flag />,
+  },
+  {
+    label: "Incidents",
+    href: "/admin/incidents",
+    icon: <AlertTriangle />,
+  },
 ];
 
 const PAGE_TITLES: Record<string, string> = {
@@ -126,6 +138,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/platform-staff": "Platform Staff Roles",
   "/admin/settings": "Platform Settings",
   "/admin/audit-log": "Audit Log",
+  "/admin/feature-flags": "Feature Flags",
+  "/admin/incidents": "Status Page Incidents",
   "/admin/support": "Support Tickets",
   "/admin/bookings": "Booking Management",
   "/admin/crm": "Marketing Automation",
