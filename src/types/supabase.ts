@@ -3453,6 +3453,30 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       finance_daily_snapshots: {
         Row: {
           booking_count: number
@@ -6510,4 +6534,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

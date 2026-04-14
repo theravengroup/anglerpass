@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { corporateInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { SITE_URL } from "@/lib/constants";
+import { requireEnabled } from "@/lib/feature-flags";
 
 // ─── GET: Fetch invitations for a corporate member ─────────────────
 
@@ -59,6 +60,9 @@ export async function GET(request: Request) {
 // ─── POST: Send invitations ────────────────────────────────────────
 
 export async function POST(request: Request) {
+  const killed = await requireEnabled("corporate.invitations");
+  if (killed) return killed;
+
   const limited = rateLimit("corporate-invite", getClientIp(request), 10, 60_000);
   if (limited) return limited;
 

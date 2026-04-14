@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createTransfer } from "@/lib/stripe/server";
 import { calculateFeeBreakdown } from "@/lib/constants/fees";
 import { payoutSchema } from "@/lib/validations/stripe";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * POST /api/stripe/payout
@@ -17,6 +18,9 @@ import { payoutSchema } from "@/lib/validations/stripe";
  * Only admins or the property owner can trigger payouts.
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("stripe.payout");
+  if (killed) return killed;
+
   const auth = await requireAuth();
   if (!auth) return jsonError("Unauthorized", 401);
 

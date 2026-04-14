@@ -9,6 +9,7 @@ import { auditBookingAction, AuditAction } from "@/lib/permissions";
 import { checkConcurrentLimit, checkPropertyLimit } from "@/lib/bookings/limits";
 import { fireCrmTrigger } from "@/lib/crm/triggers";
 import { toDateString } from "@/lib/utils";
+import { requireEnabled } from "@/lib/feature-flags";
 
 /**
  * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
@@ -30,6 +31,9 @@ function deduplicateMultiDayBookings<T extends { booking_group_id: string | null
 
 // POST: Create a booking request
 export async function POST(request: Request) {
+  const killed = await requireEnabled("bookings.create");
+  if (killed) return killed;
+
   const limited = rateLimit("bookings-create", getClientIp(request), 10, 60_000);
   if (limited) return limited;
 

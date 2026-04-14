@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createCandidate, createInvitation } from "@/lib/checkr";
+import { requireEnabled } from "@/lib/feature-flags";
 
 const STRIPE_API = "https://api.stripe.com/v1";
 const STRIPE_SECRET = () => process.env.STRIPE_SECRET_KEY!;
@@ -61,6 +62,9 @@ async function verifyStripeSignature(
  * 4. Stores Checkr candidate ID on guide profile
  */
 export async function POST(request: Request) {
+  const killed = await requireEnabled("webhooks.stripe_verification");
+  if (killed) return killed;
+
   try {
     const payload = await request.text();
     const sigHeader = request.headers.get("stripe-signature") ?? "";
