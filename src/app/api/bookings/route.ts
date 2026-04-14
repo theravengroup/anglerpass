@@ -10,6 +10,7 @@ import { checkConcurrentLimit, checkPropertyLimit } from "@/lib/bookings/limits"
 import { fireCrmTrigger } from "@/lib/crm/triggers";
 import { toDateString } from "@/lib/utils";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 /**
  * For multi-day bookings, only return the primary record (booking_date = booking_start_date).
@@ -464,7 +465,7 @@ export async function POST(request: Request) {
       booking_end_date: endDate,
     });
   } catch (err) {
-    console.error("[bookings] Unexpected error:", err);
+    captureApiError(err, { route: "bookings" });
     return jsonError("Internal server error", 500);
   }
 }
@@ -526,7 +527,7 @@ export async function GET(request: Request) {
     const bookings = deduplicateMultiDayBookings(rawBookings ?? []);
     return jsonOk({ bookings });
   } catch (err) {
-    console.error("[bookings] Unexpected error:", err);
+    captureApiError(err, { route: "bookings" });
     return jsonError("Internal server error", 500);
   }
 }

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { messageSchema } from "@/lib/validations/guides";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
@@ -183,7 +184,7 @@ export async function GET() {
 
     return jsonOk({ threads: enrichedThreads });
   } catch (err) {
-    console.error("[messages] Unexpected error:", err);
+    captureApiError(err, { route: "messages" });
     return jsonError("Internal server error", 500);
   }
 }
@@ -307,7 +308,7 @@ export async function POST(request: Request) {
 
     return jsonCreated({ message, thread_id: threadId });
   } catch (err) {
-    console.error("[messages] Unexpected error:", err);
+    captureApiError(err, { route: "messages" });
     return jsonError("Internal server error", 500);
   }
 }

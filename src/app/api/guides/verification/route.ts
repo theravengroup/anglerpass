@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeServer, getOrCreateCustomer } from "@/lib/stripe/server";
 import { GUIDE_VERIFICATION_FEE_CENTS } from "@/lib/constants/fees";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 // ─── GET: Verification status for the authenticated guide ──────────
 
@@ -49,7 +50,7 @@ export async function GET() {
       suspension_type: profile.suspension_type,
     });
   } catch (err) {
-    console.error("[guides/verification] GET error:", err);
+    captureApiError(err, { route: "guides/verification" });
     return jsonError("Internal server error", 500);
   }
 }
@@ -141,7 +142,7 @@ export async function POST() {
 
     return jsonOk({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
-    console.error("[guides/verification] POST error:", err);
+    captureApiError(err, { route: "guides/verification" });
     return jsonError("Failed to create payment", 500);
   }
 }

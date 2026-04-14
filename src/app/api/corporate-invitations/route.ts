@@ -5,6 +5,7 @@ import { corporateInviteSchema } from "@/lib/validations/clubs";
 import { rateLimit, getClientIp } from "@/lib/api/rate-limit";
 import { SITE_URL } from "@/lib/constants";
 import { requireEnabled } from "@/lib/feature-flags";
+import { captureApiError } from "@/lib/observability";
 
 // ─── GET: Fetch invitations for a corporate member ─────────────────
 
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
 
     return jsonOk({ invitations: invitations ?? [] });
   } catch (err) {
-    console.error("[corporate-invitations] Unexpected error:", err);
+    captureApiError(err, { route: "corporate-invitations" });
     return jsonError("Internal server error", 500);
   }
 }
@@ -215,7 +216,7 @@ export async function POST(request: Request) {
 
     return jsonOk({ sent, skipped });
   } catch (err) {
-    console.error("[corporate-invitations] Unexpected error:", err);
+    captureApiError(err, { route: "corporate-invitations" });
     return jsonError("Internal server error", 500);
   }
 }
