@@ -1,6 +1,14 @@
 import { jsonCreated, jsonError, requireAuth} from "@/lib/api/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CREDENTIAL_TYPES } from "@/lib/validations/guides";
+import { sniffMimeType, extForMime } from "@/lib/api/file-type";
+
+const ALLOWED_CREDENTIAL_MIMES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
 
 // POST: Upload a credential document to Supabase Storage
 export async function POST(request: Request) {
@@ -28,14 +36,10 @@ export async function POST(request: Request) {
       return jsonError("File size must be under 10MB", 400);
     }
 
-    // Validate file type
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
-    if (!allowedTypes.includes(file.type)) {
+    // Sniff the leading bytes — never trust file.type or file.name, both of
+    // which are client-controlled and can disguise an executable as a PDF.
+    const sniffed = await sniffMimeType(file);
+    if (!sniffed || !ALLOWED_CREDENTIAL_MIMES.includes(sniffed)) {
       return jsonError("File must be a PDF, JPEG, PNG, or WebP", 400);
     }
 
@@ -52,15 +56,17 @@ export async function POST(request: Request) {
       return jsonError("Guide profile not found. Create a profile first.", 404);
     }
 
-    // Upload to storage
-    const ext = file.name.split(".").pop() ?? "pdf";
+    // Upload to storage. Use a server-derived extension from the sniffed
+    // MIME, never `file.name` — the client name could contain path segments,
+    // multiple dots, or adversarial extensions.
+    const ext = extForMime(sniffed);
     const path = `${user.id}/${type}.${ext}`;
 
     const { error: uploadError } = await admin.storage
       .from("guide-credentials")
       .upload(path, file, {
         upsert: true,
-        contentType: file.type,
+        contentType: sniffed,
       });
 
     if (uploadError) {

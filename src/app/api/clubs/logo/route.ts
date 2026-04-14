@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonOk, jsonError, requireAuth } from "@/lib/api/helpers";
+import { sniffMimeType } from "@/lib/api/file-type";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB server-side limit
 
@@ -21,7 +22,9 @@ export async function POST(request: Request) {
       return jsonError("File is too large. Maximum size is 5MB.", 413);
     }
 
-    if (file.type !== "image/webp") {
+    // Validate by magic bytes, not the client-reported MIME.
+    const sniffed = await sniffMimeType(file);
+    if (sniffed !== "image/webp") {
       return jsonError("Only WebP images are accepted (client should convert first).", 400);
     }
 

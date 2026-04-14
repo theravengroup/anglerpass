@@ -6,6 +6,7 @@ import {
   jsonError,
   requireAuth,
   requireClubRole,
+  isUuid,
 } from "@/lib/api/helpers";
 import { P } from "@/lib/permissions/constants";
 import { createClubTemplateSchema } from "@/lib/validations/clubos-communications";
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest) {
 
     const clubId = req.nextUrl.searchParams.get("club_id");
     if (!clubId) return jsonError("club_id is required", 400);
+    if (!isUuid(clubId)) return jsonError("Invalid club_id", 400);
 
     const role = await requireClubRole(auth.user.id, clubId, P.MESSAGING_SEND_BULK);
     if (!role?.allowed) return jsonError("Forbidden", 403);
