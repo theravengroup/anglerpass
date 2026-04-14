@@ -1,30 +1,8 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import AudienceFaqAccordion from '@/components/shared/AudienceFaqAccordion';
-import { SITE_URL, buildJsonLd } from '@/lib/seo';
+import { PAGES_SEO, buildJsonLd } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Corporate Fly Fishing Memberships | AnglerPass for Companies',
-  description:
-    'Give your team access to private fly fishing through a corporate club membership on AnglerPass. One initiation fee, unlimited employee access, no individual initiation fees for staff.',
-  openGraph: {
-    title: 'Corporate Fly Fishing Memberships | AnglerPass',
-    description:
-      'Give your team access to private fly fishing through a corporate club membership. One fee, unlimited employee access.',
-    url: `${SITE_URL}/corporates`,
-    siteName: 'AnglerPass',
-    type: 'website',
-  },
-  keywords: [
-    'corporate fly fishing membership',
-    'company fly fishing access',
-    'corporate fishing club',
-    'team building fly fishing',
-    'corporate outdoor recreation',
-    'private water corporate access',
-    'fly fishing employee benefit',
-  ],
-};
+export const metadata = PAGES_SEO.corporates;
 
 const corporateFaqJsonLd = buildJsonLd({
   '@context': 'https://schema.org',

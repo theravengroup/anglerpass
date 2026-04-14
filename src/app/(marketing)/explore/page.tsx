@@ -1,14 +1,10 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getHiddenPropertyIds } from "@/lib/club-active-filter";
 import ExploreClient from "@/components/map/ExploreClient";
+import { PAGES_SEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Explore Private Waters — AnglerPass",
-  description:
-    "Browse exclusive fly fishing properties available through AnglerPass. Find your next adventure on private waters.",
-};
+export const metadata = PAGES_SEO.explore;
 
 // Revalidate every 5 minutes — properties don't change often
 export const revalidate = 300;

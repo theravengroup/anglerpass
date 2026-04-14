@@ -1,16 +1,7 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PAGES_SEO } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Conservation — AnglerPass',
-  description:
-    'Our commitment to conservation, habitat preservation, and responsible private water access.',
-  openGraph: {
-    title: 'Conservation — AnglerPass',
-    description:
-      'How AnglerPass supports conservation, catch-and-release practices, and sustainable access to private waters.',
-  },
-};
+export const metadata = PAGES_SEO.conservation;
 
 const TOC_ITEMS = [
   { href: '#commitment', label: 'Our Commitment' },
