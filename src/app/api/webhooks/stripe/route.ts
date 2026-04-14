@@ -60,9 +60,16 @@ async function handleCompassCreditPurchase(
   const messages = parseInt(metadata.messages, 10);
 
   if (!userId || !packKey || isNaN(messages)) {
+    // Don't log the raw metadata object — it contains user identifiers.
+    // Log only which required fields were present so we can debug the shape.
     console.error(
       "[stripe-webhook] compass_credit_purchase missing metadata",
-      metadata
+      {
+        payment_intent_id: paymentIntent.id,
+        has_user_id: Boolean(userId),
+        has_pack_key: Boolean(packKey),
+        has_messages: !isNaN(messages),
+      }
     );
     return;
   }
