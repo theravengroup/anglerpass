@@ -220,6 +220,30 @@ Full test suite buildout, Vercel deployment fixes, SEO completeness, and OG imag
 - ✅ **All 20 learn articles** have OG images via post hero `.webp` files
 - ✅ **6 missing blog post images** added to git tracking
 
+#### Security Hardening (`00088_security_hardening.sql`)
+- ✅ **C1 — Role escalation blocked** — BEFORE UPDATE trigger on `profiles` rejects self-edits to `role`/`roles` columns unless caller is already admin or service role
+- ✅ **C2 — `stripe_webhook_events` RLS enabled** — service-role-only (no policies) so the Stripe idempotency ledger can't be read/tampered with
+- ✅ **C3 — `club-logos` bucket scoped** — upload/update/delete require active club admin membership matching the folder = club_id
+- ✅ **H1 — `property-photos` INSERT scoped** — uploader must own the folder
+- ✅ **H2 — `properties` UPDATE** — added `WITH CHECK` + trigger blocks `owner_id` transfer
+- ✅ **H3/M8 — `bookings` financial columns locked** — trigger blocks user edits to `angler_id`, `property_id`, `platform_fee`, `total_amount`; `status='completed'` is service-role only
+- ✅ **H4 — `bookings` INSERT validates `club_membership_id`** — membership must belong to the angler
+- ✅ **H5 — `trip_reviews` INSERT requires completed booking** — no more fabricated reviews
+- ✅ **H6 — `messages` immutability trigger** — only `read_at` is mutable for recipients
+- ✅ **M1 — ClubOS helpers hardened** — `is_club_staff`/`is_club_member`/`is_club_admin`/`is_platform_admin` now `SET search_path = ''` with fully qualified table refs (schema-shadowing attack closed)
+- ✅ **M2 — `club_campaigns` INSERT pins `sender_user_id` to `auth.uid()`**
+- ✅ **M3 — `club_event_registrations` INSERT restricts member-path status** to `registered`/`waitlisted`
+- ✅ **M4 — `club_incidents` INSERT pins `reported_by` to `auth.uid()`** (harassment vector closed)
+- ✅ **M5 — `property_availability.reason` gated** via public view `property_availability_public` that excludes sensitive columns
+- ✅ **M6 — Dead `'manager'` role refs replaced** with canonical `is_club_staff()` / `is_club_admin()` helpers on `property_availability` + `club_created_properties`
+- ✅ **M7 — `corporate_invitations` blanket SELECT removed** — replaced with SECURITY DEFINER RPC `get_corporate_invitation_by_token(token)` for single-row lookup
+
+#### Corporate Conversion Funnel
+- ✅ **Site-wide Playwright crawler** — 56 pages mapped, route graph + 6 journey flows (Angler, Landowner, Club, Guide, Investor, Corporate) in `docs/anglerpass-flows.md` + D3 viz + JSON
+- ✅ **Dedicated corporate inquiry form** — replaced generic Contact modal on `/corporates` with qualified lead capture (company size, employee count, use case, regions, timeline, notes)
+- ✅ **Work-email validation** — schema rejects free-email providers (gmail/yahoo/etc), forcing corporate lead quality at the client layer
+- ✅ **New `/api/leads/corporate` route** — Turnstile + 3/min rate limit, writes to `leads` with `source: 'corporate-inquiry'`, sends submitter confirmation + structured notification to `partners@anglerpass.com`
+
 ---
 
 ## Phase 2: Landowner Property Management
