@@ -78,7 +78,10 @@ function LoginForm() {
         return;
       }
 
-      // Redirect to the user's primary (signup) role dashboard
+      // Redirect to the user's active role dashboard.
+      // The `role` column is authoritative — it's what the signup trigger
+      // stored and what all RLS policies check. The `roles` array is a
+      // multi-role convenience; never override the active role from it.
       const { getRoleHomePath } = await import("@/types/roles");
       const { data: profile } = await supabase
         .from("profiles")
@@ -86,17 +89,8 @@ function LoginForm() {
         .returns<{ role: string; roles: string[] | null }[]>()
         .maybeSingle();
 
-      const primaryRole = profile?.roles?.[0] ?? profile?.role ?? "angler";
-
-      // Reset active role to primary so dashboard/sidebar match
-      if (profile && profile.role !== primaryRole) {
-        await supabase
-          .from("profiles")
-          .update({ role: primaryRole })
-          .eq("id", (await supabase.auth.getUser()).data.user!.id);
-      }
-
-      const destination = getRoleHomePath(primaryRole);
+      const activeRole = profile?.role ?? "angler";
+      const destination = getRoleHomePath(activeRole);
       router.push(destination);
       router.refresh();
       // Keep spinner running until navigation completes
