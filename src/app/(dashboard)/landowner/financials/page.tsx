@@ -14,6 +14,9 @@ import {
   Loader2,
   Wallet,
   BarChart3,
+  AlertTriangle,
+  FileText,
+  Layers,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -63,6 +66,33 @@ interface QuarterlyEarnings {
   bookings: number;
 }
 
+interface LeasePayment {
+  id: string;
+  property_name: string;
+  club_name?: string;
+  amount: number;
+  platform_fee: number;
+  landowner_net: number;
+  period_start: string;
+  period_end: string;
+  paid_at: string | null;
+}
+
+interface PropertyPricing {
+  property_id: string;
+  name: string;
+  pricing_mode: string;
+  classification: string | null;
+  lease_paid_through: string | null;
+  lease_amount: number;
+}
+
+interface ClassificationBreakdown {
+  classification: string;
+  bookings: number;
+  landowner_payout: number;
+}
+
 interface Financials {
   total_earnings: number;
   period_earnings: number;
@@ -83,8 +113,21 @@ interface Financials {
   quarterly_earnings: QuarterlyEarnings[];
   earnings_by_property: PropertyEarnings[];
   monthly_earnings: { month: string; amount: number }[];
+  total_lease_income: number;
+  period_lease_income: number;
+  recent_lease_payments: LeasePayment[];
+  properties_pricing_overview: PropertyPricing[];
+  classification_breakdown: ClassificationBreakdown[];
   recent_transactions: Transaction[];
 }
+
+const CLASSIFICATION_LABEL: Record<string, string> = {
+  select: "Select (50/50)",
+  premier: "Premier (35/65)",
+  signature: "Signature (25/75)",
+  lease: "Upfront lease",
+  unclassified: "Unclassified",
+};
 
 export default function LandownerFinancialsPage() {
   const [data, setData] = useState<Financials | null>(null);
@@ -196,9 +239,9 @@ export default function LandownerFinancialsPage() {
       bg: "bg-river/10",
     },
     {
-      label: "Club Commissions",
+      label: "Club Rod-Fee Share",
       value: `$${(data?.total_commissions_paid ?? 0).toLocaleString()}`,
-      description: "$5/rod paid to clubs",
+      description: "Paid to clubs via rod-fee split",
       icon: Wallet,
       color: "text-bronze",
       bg: "bg-bronze/10",
@@ -228,6 +271,24 @@ export default function LandownerFinancialsPage() {
       <PayoutSetup type="landowner" />
       <StatCardGrid stats={stats} />
 
+      <LeaseAlertsBanner
+        properties={data?.properties_pricing_overview ?? []}
+      />
+
+      {(data && (data.total_lease_income > 0 ||
+        data.properties_pricing_overview.some((p) => p.pricing_mode === "upfront_lease"))) && (
+        <LeaseIncomeCard
+          totalLeaseIncome={data.total_lease_income}
+          periodLeaseIncome={data.period_lease_income}
+          days={days}
+          payments={data.recent_lease_payments}
+        />
+      )}
+
+      {(data?.classification_breakdown?.length ?? 0) > 0 && (
+        <ClassificationBreakdownCard items={data!.classification_breakdown} />
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
         <HeldFundsCard
           heldFundsTotal={data?.held_funds_total ?? 0}
@@ -254,7 +315,7 @@ export default function LandownerFinancialsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <PropertyBarList
           title="Earnings by Property"
-          description="Net payout after $5/rod club commission"
+          description="Net payout after rod-fee split"
           items={(data?.earnings_by_property ?? []).map((p) => ({
             name: p.name,
             value: p.landowner_payout,
@@ -262,7 +323,7 @@ export default function LandownerFinancialsPage() {
             subDetail: (
               <>
                 <span>
-                  ${p.base_rate.toLocaleString()} gross &middot; ${p.club_commission.toLocaleString()} commission
+                  ${p.base_rate.toLocaleString()} gross &middot; ${p.club_commission.toLocaleString()} club share
                 </span>
                 <span>
                   {p.bookings} booking{p.bookings !== 1 ? "s" : ""}
@@ -299,15 +360,177 @@ export default function LandownerFinancialsPage() {
       <LandownerTransactionHistory transactions={data?.recent_transactions ?? []} />
 
       <FeeExplanationCard label="How payouts work:">
-        Your listed rod fee is the gross amount. A $5/rod commission is paid
-        to the associated club on each booking. Your net payout is the gross
-        amount minus the club commission. The 15% platform fee shown to anglers
-        goes to AnglerPass and does not affect your payout. Guide fees are
-        charged separately to anglers and paid directly to guides. Payouts are
-        processed through Stripe and deposited directly to your connected bank
-        account. When a booking is cancelled, the refund comes from the held
-        payment &mdash; your net earnings reflect only completed transactions.
+        Your listed rod fee is the gross amount. Each property has a
+        classification that determines how the rod fee is split with your club
+        (Select 50/50, Premier 35/65, Signature 25/75 &mdash; landowner share
+        listed first). Your net payout is that share of the rod fee. The 15%
+        platform fee shown to anglers goes to AnglerPass and does not affect
+        your payout. Properties listed as upfront-lease receive an annual ACH
+        payment from the club (landowner keeps 100%; AnglerPass&apos;s 5%
+        facilitation fee is charged on top to the club) &mdash; with lease
+        mode, per-booking rod fees go entirely to the club. Guide fees are
+        charged separately. Payouts are processed through Stripe and deposited
+        directly to your connected bank account.
       </FeeExplanationCard>
     </div>
+  );
+}
+
+function daysUntil(dateStr: string | null): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return null;
+  const now = new Date();
+  return Math.floor((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function LeaseAlertsBanner({ properties }: { properties: PropertyPricing[] }) {
+  const leaseProps = properties.filter((p) => p.pricing_mode === "upfront_lease");
+  const pastDue = leaseProps.filter((p) => {
+    const d = daysUntil(p.lease_paid_through);
+    return d !== null && d < 0;
+  });
+  const expiringSoon = leaseProps.filter((p) => {
+    const d = daysUntil(p.lease_paid_through);
+    return d !== null && d >= 0 && d <= 30;
+  });
+
+  if (pastDue.length === 0 && expiringSoon.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      {pastDue.length > 0 && (
+        <Card className="border-red-500/40 bg-red-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base text-red-700">
+              <AlertTriangle className="size-4" />
+              Lease past due
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1 text-sm text-red-800">
+            {pastDue.map((p) => (
+              <div key={p.property_id} className="flex items-center justify-between">
+                <span>{p.name}</span>
+                <span>Paid through {formatDate(p.lease_paid_through)}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+      {expiringSoon.length > 0 && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base text-amber-800">
+              <AlertTriangle className="size-4" />
+              Lease expiring soon
+            </CardTitle>
+            <CardDescription className="text-amber-700">
+              Renewal needed within the next 30 days.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-1 text-sm text-amber-900">
+            {expiringSoon.map((p) => {
+              const d = daysUntil(p.lease_paid_through);
+              return (
+                <div key={p.property_id} className="flex items-center justify-between">
+                  <span>{p.name}</span>
+                  <span>
+                    {d} day{d === 1 ? "" : "s"} — through {formatDate(p.lease_paid_through)}
+                  </span>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function LeaseIncomeCard({
+  totalLeaseIncome,
+  periodLeaseIncome,
+  days,
+  payments,
+}: {
+  totalLeaseIncome: number;
+  periodLeaseIncome: number;
+  days: number;
+  payments: LeasePayment[];
+}) {
+  return (
+    <Card className="border-forest/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileText className="size-4 text-forest" />
+          Lease Income
+        </CardTitle>
+        <CardDescription>
+          ${totalLeaseIncome.toLocaleString()} total &middot; $
+          {periodLeaseIncome.toLocaleString()} last {days}d
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {payments.length === 0 ? (
+          <p className="py-3 text-sm text-text-light">No lease payments received yet.</p>
+        ) : (
+          <div className="divide-y divide-stone-light/20">
+            {payments.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between gap-4 py-2 text-sm"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-medium text-text-primary">{p.property_name}</div>
+                  <div className="text-xs text-text-secondary">
+                    {formatDate(p.period_start)} – {formatDate(p.period_end)}
+                    {p.paid_at ? ` · paid ${formatDate(p.paid_at)}` : ""}
+                  </div>
+                </div>
+                <div className="text-right font-medium text-forest">
+                  ${p.landowner_net.toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ClassificationBreakdownCard({ items }: { items: ClassificationBreakdown[] }) {
+  return (
+    <Card className="border-stone-light/20">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Layers className="size-4 text-forest" />
+          Classification Breakdown
+        </CardTitle>
+        <CardDescription>Bookings and landowner payout by property tier.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="divide-y divide-stone-light/20">
+          {items.map((c) => (
+            <div key={c.classification} className="flex items-center justify-between py-2 text-sm">
+              <span className="text-text-secondary">
+                {CLASSIFICATION_LABEL[c.classification] ?? c.classification}
+              </span>
+              <span className="font-medium text-text-primary">
+                {c.bookings} booking{c.bookings === 1 ? "" : "s"} &middot; $
+                {c.landowner_payout.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -14,6 +14,9 @@ import {
   Loader2,
   Users,
   CreditCard,
+  ArrowUpRight,
+  FileText,
+  Layers,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -70,9 +73,30 @@ interface MemberDuesHealth {
   lapsed: number;
 }
 
+interface LeasePayment {
+  id: string;
+  property_name: string;
+  amount: number;
+  platform_fee: number;
+  landowner_net: number;
+  period_start: string;
+  period_end: string;
+  paid_at: string | null;
+}
+
+interface ClassificationMixEntry {
+  classification: string;
+  bookings: number;
+  commission: number;
+}
+
 interface Financials {
   total_commission: number;
   period_commission: number;
+  managing_commission: number;
+  period_managing_commission: number;
+  referral_revenue: number;
+  period_referral_revenue: number;
   total_membership_revenue: number;
   period_membership_revenue: number;
   total_revenue: number;
@@ -86,12 +110,26 @@ interface Financials {
   period_cancellations: number;
   lost_commission_from_cancellations: number;
   cross_club_booking_count: number;
+  cross_club_inbound_count: number;
+  cross_club_outbound_count: number;
+  total_lease_outflows: number;
+  total_lease_platform_fees_paid: number;
+  recent_lease_payments: LeasePayment[];
+  classification_mix: ClassificationMixEntry[];
   monthly_membership: MonthlyData[];
   commission_by_property: PropertyCommission[];
   monthly_commission: MonthlyData[];
   recent_transactions: Transaction[];
   recent_membership_payments: MembershipPayment[];
 }
+
+const CLUB_CLASSIFICATION_LABEL: Record<string, string> = {
+  select: "Select (50% club)",
+  premier: "Premier (35% club)",
+  signature: "Signature (25% club)",
+  lease: "Upfront lease (100% club)",
+  unclassified: "Unclassified",
+};
 
 export default function ClubFinancialsPage() {
   const [data, setData] = useState<Financials | null>(null);
@@ -177,36 +215,44 @@ export default function ClubFinancialsPage() {
 
   const stats: StatCardItem[] = [
     {
-      label: "Total Revenue",
-      value: `$${(data?.total_revenue ?? 0).toLocaleString()}`,
-      description: "Commissions + memberships",
+      label: "Total Club Earnings",
+      value: `$${(data?.total_commission ?? 0).toLocaleString()}`,
+      description: "Managing rod-fee share + referrals",
       icon: DollarSign,
       color: "text-river",
       bg: "bg-river/10",
     },
     {
-      label: "Booking Commissions",
-      value: `$${(data?.total_commission ?? 0).toLocaleString()}`,
-      description: `$${(data?.period_commission ?? 0).toLocaleString()} last ${days}d`,
+      label: "Rod-Fee Share (Managing)",
+      value: `$${(data?.managing_commission ?? 0).toLocaleString()}`,
+      description: `$${(data?.period_managing_commission ?? 0).toLocaleString()} last ${days}d`,
       icon: TrendingUp,
       color: "text-forest",
       bg: "bg-forest/10",
+    },
+    {
+      label: "Cross-Club Referral Income",
+      value: `$${(data?.referral_revenue ?? 0).toLocaleString()}`,
+      description: "$10/rod/day from members booking elsewhere",
+      icon: ArrowUpRight,
+      color: "text-bronze",
+      bg: "bg-bronze/10",
     },
     {
       label: "Membership Revenue",
       value: `$${(data?.total_membership_revenue ?? 0).toLocaleString()}`,
       description: `$${(data?.period_membership_revenue ?? 0).toLocaleString()} last ${days}d`,
       icon: CreditCard,
-      color: "text-bronze",
-      bg: "bg-bronze/10",
+      color: "text-charcoal",
+      bg: "bg-charcoal/10",
     },
     {
       label: "Active Members",
       value: String(data?.active_members ?? 0),
       description: `${data?.period_bookings ?? 0} bookings last ${days}d`,
       icon: Users,
-      color: "text-charcoal",
-      bg: "bg-charcoal/10",
+      color: "text-river",
+      bg: "bg-river/10",
     },
   ];
 
@@ -254,8 +300,8 @@ export default function ClubFinancialsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <PropertyBarList
-          title="Commission by Property"
-          description="$5/rod earned per booking"
+          title="Rod-Fee Share by Property"
+          description="Managing share of rod fees"
           items={(data?.commission_by_property ?? []).map((p) => ({
             name: p.name,
             value: p.commission,
@@ -282,18 +328,127 @@ export default function ClubFinancialsPage() {
         </Card>
       </div>
 
+      {((data?.recent_lease_payments?.length ?? 0) > 0 ||
+        (data?.total_lease_outflows ?? 0) > 0) && (
+        <ClubLeasePaymentsCard
+          totalLeaseOutflows={data?.total_lease_outflows ?? 0}
+          totalLeasePlatformFeesPaid={data?.total_lease_platform_fees_paid ?? 0}
+          payments={data?.recent_lease_payments ?? []}
+        />
+      )}
+
+      {(data?.classification_mix?.length ?? 0) > 0 && (
+        <ClubClassificationMixCard items={data!.classification_mix} />
+      )}
+
       <ClubMembershipPaymentsTable payments={data?.recent_membership_payments ?? []} />
       <ClubTransactionHistory transactions={data?.recent_transactions ?? []} />
 
       <FeeExplanationCard label="How club revenue works:">
-        Your club earns a $5/rod commission on every booking made at your
-        associated properties. This commission comes from the
-        landowner&apos;s listed rate &mdash; it is not an additional charge to
-        the angler. Membership fees (initiation and annual dues) are set by you
-        and collected through AnglerPass. When members of other clubs book your
-        properties through the Cross-Club Network, your club still earns the
-        standard $5/rod commission. Payouts are processed via&nbsp;Stripe.
+        For rod-fee-split properties your club earns a share of each rod fee
+        based on the property&apos;s classification (Select 50%, Premier 35%,
+        Signature 25%). For upfront-lease properties your club pays the
+        landowner an agreed annual amount via ACH (AnglerPass adds a 5%
+        facilitation fee on top) and keeps 100% of rod-fee income. Membership
+        fees (initiation and annual dues) are set by you and collected through
+        AnglerPass. When one of your members books at another club&apos;s
+        property, your club earns a $10/rod/day referral. Payouts are processed
+        via&nbsp;Stripe.
       </FeeExplanationCard>
     </div>
+  );
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function ClubLeasePaymentsCard({
+  totalLeaseOutflows,
+  totalLeasePlatformFeesPaid,
+  payments,
+}: {
+  totalLeaseOutflows: number;
+  totalLeasePlatformFeesPaid: number;
+  payments: LeasePayment[];
+}) {
+  return (
+    <Card className="border-river/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileText className="size-4 text-river" />
+          Lease Payments Out
+        </CardTitle>
+        <CardDescription>
+          ${totalLeaseOutflows.toLocaleString()} total ACH charges &middot; $
+          {totalLeasePlatformFeesPaid.toLocaleString()} AnglerPass 5% fee
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {payments.length === 0 ? (
+          <p className="py-3 text-sm text-text-light">No lease payments yet.</p>
+        ) : (
+          <div className="divide-y divide-stone-light/20">
+            {payments.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between gap-4 py-2 text-sm"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-medium text-text-primary">{p.property_name}</div>
+                  <div className="text-xs text-text-secondary">
+                    {formatDate(p.period_start)} – {formatDate(p.period_end)}
+                    {p.paid_at ? ` · paid ${formatDate(p.paid_at)}` : ""}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-text-primary">
+                    ${p.amount.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-text-secondary">
+                    ${p.landowner_net.toLocaleString()} landowner &middot; $
+                    {p.platform_fee.toLocaleString()} AP
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ClubClassificationMixCard({ items }: { items: ClassificationMixEntry[] }) {
+  return (
+    <Card className="border-stone-light/20">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Layers className="size-4 text-river" />
+          Classification Mix
+        </CardTitle>
+        <CardDescription>
+          Rod-fee share earned by property tier (as managing club).
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="divide-y divide-stone-light/20">
+          {items.map((c) => (
+            <div key={c.classification} className="flex items-center justify-between py-2 text-sm">
+              <span className="text-text-secondary">
+                {CLUB_CLASSIFICATION_LABEL[c.classification] ?? c.classification}
+              </span>
+              <span className="font-medium text-text-primary">
+                {c.bookings} booking{c.bookings === 1 ? "" : "s"} &middot; $
+                {c.commission.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

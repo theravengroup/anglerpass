@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 async function getLandownerFinancials(admin: any, userId: string, since: string) {
   const { data: properties } = await admin
     .from("properties")
-    .select("id, name")
+    .select("id, name, pricing_mode, classification, lease_paid_through, lease_amount_cents")
     .eq("owner_id", userId);
 
   const propertyIds = (properties ?? []).map((p: { id: string }) => p.id);
@@ -84,7 +84,7 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
   const { data: allBookings } = await admin
     .from("bookings")
     .select(
-      "id, status, payment_status, booking_date, created_at, base_rate, platform_fee, club_commission, landowner_payout, cross_club_fee, total_amount, rod_count, property_id, booking_group_id, guide_id, guide_rate, guide_payout, guide_service_fee, refund_amount, refund_percentage, late_cancel_fee, properties(name), profiles!bookings_angler_id_fkey(display_name)"
+      "id, status, payment_status, booking_date, created_at, base_rate, platform_fee, club_commission, landowner_payout, cross_club_fee, total_amount, rod_count, property_id, booking_group_id, guide_id, guide_rate, guide_payout, guide_service_fee, refund_amount, refund_percentage, late_cancel_fee, property_classification, pricing_mode, properties(name), profiles!bookings_angler_id_fkey(display_name)"
     )
     .in("property_id", propertyIds)
     .order("created_at", { ascending: false });
@@ -172,6 +172,56 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
   // Monthly earnings (last 12 months)
   const monthly = aggregateMonthly(completed, "landowner_payout");
 
+  // Lease payments received (upfront_lease properties)
+  const { data: leasePaymentsRaw } = await admin
+    .from("property_lease_payments")
+    .select("id, property_id, amount_cents, platform_fee_cents, landowner_net_cents, status, period_start, period_end, paid_at, created_at, properties(name), clubs(name)")
+    .in("property_id", propertyIds)
+    .eq("status", "succeeded")
+    .order("paid_at", { ascending: false });
+
+  const leasePayments = leasePaymentsRaw ?? [];
+  const totalLeaseIncome = leasePayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.landowner_net_cents as number) ?? 0) / 100,
+    0
+  );
+  const periodLeasePayments = leasePayments.filter(
+    (p: Record<string, unknown>) => (p.created_at as string) >= since
+  );
+  const periodLeaseIncome = periodLeasePayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.landowner_net_cents as number) ?? 0) / 100,
+    0
+  );
+
+  // Properties pricing overview
+  const propertiesPricingOverview = (properties ?? []).map(
+    (p: { id: string; name: string; pricing_mode: string | null; classification: string | null; lease_paid_through: string | null; lease_amount_cents: number | null }) => ({
+      property_id: p.id,
+      name: p.name,
+      pricing_mode: p.pricing_mode ?? "rod_fee_split",
+      classification: p.classification,
+      lease_paid_through: p.lease_paid_through,
+      lease_amount: (p.lease_amount_cents ?? 0) / 100,
+    })
+  );
+
+  // Classification breakdown from completed bookings
+  const classMap: Record<string, { classification: string; bookings: number; landowner_payout: number }> = {};
+  for (const b of completed) {
+    const key = (b.pricing_mode === "upfront_lease")
+      ? "lease"
+      : (b.property_classification as string | null) ?? "unclassified";
+    if (!classMap[key]) {
+      classMap[key] = { classification: key, bookings: 0, landowner_payout: 0 };
+    }
+    classMap[key].bookings += 1;
+    classMap[key].landowner_payout += (b.landowner_payout as number) ?? 0;
+  }
+  const classificationBreakdown = Object.values(classMap).map((c) => ({
+    ...c,
+    landowner_payout: roundCurrency(c.landowner_payout),
+  }));
+
   return {
     total_earnings: totalEarnings,
     period_earnings: periodEarnings,
@@ -196,6 +246,22 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
     quarterly_earnings: quarters,
     earnings_by_property: Object.values(propMap).sort((a, b) => b.landowner_payout - a.landowner_payout),
     monthly_earnings: monthly,
+    // Lease income (upfront_lease properties)
+    total_lease_income: roundCurrency(totalLeaseIncome),
+    period_lease_income: roundCurrency(periodLeaseIncome),
+    recent_lease_payments: leasePayments.slice(0, 10).map((p: Record<string, unknown>) => ({
+      id: p.id,
+      property_name: (p.properties as { name: string } | null)?.name ?? "Unknown",
+      club_name: (p.clubs as { name: string } | null)?.name,
+      amount: roundCurrency(((p.amount_cents as number) ?? 0) / 100),
+      platform_fee: roundCurrency(((p.platform_fee_cents as number) ?? 0) / 100),
+      landowner_net: roundCurrency(((p.landowner_net_cents as number) ?? 0) / 100),
+      period_start: p.period_start,
+      period_end: p.period_end,
+      paid_at: p.paid_at,
+    })),
+    properties_pricing_overview: propertiesPricingOverview,
+    classification_breakdown: classificationBreakdown,
     recent_transactions: bookings.slice(0, 20).map((b: Record<string, unknown>) => ({
       id: b.id,
       status: b.status,
@@ -236,6 +302,11 @@ function emptyLandownerFinancials() {
     quarterly_earnings: [],
     earnings_by_property: [],
     monthly_earnings: [],
+    total_lease_income: 0,
+    period_lease_income: 0,
+    recent_lease_payments: [],
+    properties_pricing_overview: [],
+    classification_breakdown: [],
     recent_transactions: [],
   };
 }
@@ -286,7 +357,7 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     const { data: bookingData } = await admin
       .from("bookings")
       .select(
-        "id, status, booking_date, created_at, club_commission, base_rate, total_amount, rod_count, property_id, booking_group_id, refund_amount, refund_percentage, club_membership_id, properties(name), profiles!bookings_angler_id_fkey(display_name)"
+        "id, status, booking_date, created_at, club_commission, base_rate, total_amount, rod_count, property_id, booking_group_id, refund_amount, refund_percentage, club_membership_id, managing_club_id, referring_club_id, home_club_referral, property_classification, pricing_mode, properties(name), profiles!bookings_angler_id_fkey(display_name)"
       )
       .in("property_id", propertyIds)
       .order("created_at", { ascending: false });
@@ -302,8 +373,47 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     (b: Record<string, unknown>) => (b.created_at as string) >= since
   );
 
-  const totalCommission = sumField(bookings, "club_commission");
-  const periodCommission = sumField(periodBookings, "club_commission");
+  // Managing commission: club_commission where this club manages the booking
+  const managingBookings = bookings.filter(
+    (b: Record<string, unknown>) => (b.managing_club_id as string | null) === clubId
+  );
+  const periodManagingBookings = managingBookings.filter(
+    (b: Record<string, unknown>) => (b.created_at as string) >= since
+  );
+  const managingCommission = sumField(managingBookings, "club_commission");
+  const periodManagingCommission = sumField(periodManagingBookings, "club_commission");
+
+  // Cross-club inbound: bookings at this club's properties by members of other clubs
+  const crossClubInboundBookings = managingBookings.filter(
+    (b: Record<string, unknown>) => {
+      const ref = b.referring_club_id as string | null;
+      return ref && ref !== clubId;
+    }
+  );
+  const crossClubInboundCount = crossClubInboundBookings.length;
+
+  // Cross-club outbound (referral income): this club is the referring club, but not managing
+  const { data: referralBookingData } = await admin
+    .from("bookings")
+    .select(
+      "id, status, created_at, home_club_referral, managing_club_id, referring_club_id"
+    )
+    .eq("referring_club_id", clubId)
+    .in("status", ["confirmed", "completed"])
+    .order("created_at", { ascending: false });
+
+  const referralBookings = (referralBookingData ?? []).filter(
+    (b: Record<string, unknown>) => (b.managing_club_id as string | null) !== clubId
+  );
+  const periodReferralBookings = referralBookings.filter(
+    (b: Record<string, unknown>) => (b.created_at as string) >= since
+  );
+  const referralRevenue = sumField(referralBookings, "home_club_referral");
+  const periodReferralRevenue = sumField(periodReferralBookings, "home_club_referral");
+
+  // Back-compat totals
+  const totalCommission = managingCommission + referralRevenue;
+  const periodCommission = periodManagingCommission + periodReferralRevenue;
 
   // Refund impact on club revenue
   const cancelledBookings = allBookings.filter(
@@ -314,15 +424,23 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     (b: Record<string, unknown>) => (b.created_at as string) >= since
   );
 
-  // Cross-club referral revenue — bookings where members of OTHER clubs book this club's properties
-  const crossClubBookings = bookings.filter((b: Record<string, unknown>) => {
-    // If the booking has a club_membership_id that belongs to a different club, it's cross-club
-    return b.club_membership_id !== null;
-  });
-  // We track home club referral on the booking side — here we show bookings from external members
-  const crossClubReferralBookings = crossClubBookings.length;
-  // The $5/rod referral that the home club earns is separate. For the property club,
-  // the cross-club bookings still earn the normal $5/rod commission — so we highlight the volume.
+  // Lease payments OUT — this club paid for upfront_lease properties
+  const { data: leasePaymentsOutRaw } = await admin
+    .from("property_lease_payments")
+    .select("id, property_id, amount_cents, platform_fee_cents, landowner_net_cents, status, period_start, period_end, paid_at, created_at, properties(name)")
+    .eq("club_id", clubId)
+    .eq("status", "succeeded")
+    .order("paid_at", { ascending: false });
+
+  const leasePaymentsOut = leasePaymentsOutRaw ?? [];
+  const totalLeaseOutflows = leasePaymentsOut.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.amount_cents as number) ?? 0) / 100,
+    0
+  );
+  const totalLeasePlatformFeesPaid = leasePaymentsOut.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.platform_fee_cents as number) ?? 0) / 100,
+    0
+  );
 
   // Membership payments — with initiation vs dues breakdown
   const { data: membershipPayments } = await admin
@@ -383,9 +501,9 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
       ((p.club_payout as number) ?? (p.club_amount as number) ?? 0);
   }
 
-  // Commission by property
+  // Commission by property (from managing bookings only)
   const propMap: Record<string, { name: string; commission: number; bookings: number }> = {};
-  for (const b of bookings) {
+  for (const b of managingBookings) {
     const pid = b.property_id as string;
     const pname = (b.properties as { name: string } | null)?.name ?? "Unknown";
     if (!propMap[pid]) {
@@ -395,7 +513,24 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     propMap[pid].bookings += 1;
   }
 
-  const monthly = aggregateMonthly(bookings, "club_commission");
+  // Classification mix from managing bookings
+  const clsMap: Record<string, { classification: string; bookings: number; commission: number }> = {};
+  for (const b of managingBookings) {
+    const key = (b.pricing_mode === "upfront_lease")
+      ? "lease"
+      : (b.property_classification as string | null) ?? "unclassified";
+    if (!clsMap[key]) {
+      clsMap[key] = { classification: key, bookings: 0, commission: 0 };
+    }
+    clsMap[key].bookings += 1;
+    clsMap[key].commission += (b.club_commission as number) ?? 0;
+  }
+  const classificationMix = Object.values(clsMap).map((c) => ({
+    ...c,
+    commission: roundCurrency(c.commission),
+  }));
+
+  const monthly = aggregateMonthly(managingBookings, "club_commission");
 
   return {
     total_commission: totalCommission,
@@ -420,8 +555,29 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     total_cancellations: cancelledBookings.length,
     period_cancellations: periodCancelled.length,
     lost_commission_from_cancellations: lostCommissionFromCancellations,
-    // New: cross-club booking volume
-    cross_club_booking_count: crossClubReferralBookings,
+    // Rod-fee share split
+    managing_commission: roundCurrency(managingCommission),
+    period_managing_commission: roundCurrency(periodManagingCommission),
+    referral_revenue: roundCurrency(referralRevenue),
+    period_referral_revenue: roundCurrency(periodReferralRevenue),
+    // Cross-club booking volume
+    cross_club_booking_count: crossClubInboundCount,
+    cross_club_inbound_count: crossClubInboundCount,
+    cross_club_outbound_count: referralBookings.length,
+    // Lease outflows
+    total_lease_outflows: roundCurrency(totalLeaseOutflows),
+    total_lease_platform_fees_paid: roundCurrency(totalLeasePlatformFeesPaid),
+    recent_lease_payments: leasePaymentsOut.slice(0, 10).map((p: Record<string, unknown>) => ({
+      id: p.id,
+      property_name: (p.properties as { name: string } | null)?.name ?? "Unknown",
+      amount: roundCurrency(((p.amount_cents as number) ?? 0) / 100),
+      platform_fee: roundCurrency(((p.platform_fee_cents as number) ?? 0) / 100),
+      landowner_net: roundCurrency(((p.landowner_net_cents as number) ?? 0) / 100),
+      period_start: p.period_start,
+      period_end: p.period_end,
+      paid_at: p.paid_at,
+    })),
+    classification_mix: classificationMix,
     // New: monthly membership trend
     monthly_membership: Object.entries(monthlyMembership)
       .map(([month, amount]) => ({ month, amount: roundCurrency(amount) }))
@@ -467,7 +623,17 @@ function emptyClubFinancials() {
     total_cancellations: 0,
     period_cancellations: 0,
     lost_commission_from_cancellations: 0,
+    managing_commission: 0,
+    period_managing_commission: 0,
+    referral_revenue: 0,
+    period_referral_revenue: 0,
     cross_club_booking_count: 0,
+    cross_club_inbound_count: 0,
+    cross_club_outbound_count: 0,
+    total_lease_outflows: 0,
+    total_lease_platform_fees_paid: 0,
+    recent_lease_payments: [],
+    classification_mix: [],
     monthly_membership: [],
     commission_by_property: [],
     monthly_commission: [],
@@ -704,7 +870,7 @@ async function getAdminFinancials(admin: any, since: string) {
   const { data: allBookings } = await admin
     .from("bookings")
     .select(
-      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, guide_rate, guide_service_fee, guide_payout, club_commission, landowner_payout, total_amount, rod_count, property_id, properties(name, owner_id, profiles!properties_owner_id_fkey(display_name))"
+      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, guide_rate, guide_service_fee, guide_payout, club_commission, landowner_payout, total_amount, rod_count, property_id, property_classification, pricing_mode, properties(name, owner_id, profiles!properties_owner_id_fkey(display_name))"
     )
     .in("status", ["confirmed", "completed"])
     .order("created_at", { ascending: false });
@@ -735,11 +901,11 @@ async function getAdminFinancials(admin: any, since: string) {
   const guidePayoutsTotal = sumField(bookings, "guide_payout");
 
   // Revenue by month
-  const monthlyRevenue: Record<string, { month: string; platform_fee: number; cross_club_fee: number; guide_service_fee: number; total: number }> = {};
+  const monthlyRevenue: Record<string, { month: string; platform_fee: number; cross_club_fee: number; guide_service_fee: number; lease_facilitation_fee: number; total: number }> = {};
   for (const b of bookings) {
     const month = (b.created_at as string).slice(0, 7); // YYYY-MM
     if (!monthlyRevenue[month]) {
-      monthlyRevenue[month] = { month, platform_fee: 0, cross_club_fee: 0, guide_service_fee: 0, total: 0 };
+      monthlyRevenue[month] = { month, platform_fee: 0, cross_club_fee: 0, guide_service_fee: 0, lease_facilitation_fee: 0, total: 0 };
     }
     monthlyRevenue[month].platform_fee += (b.platform_fee as number) ?? 0;
     monthlyRevenue[month].cross_club_fee += (b.cross_club_fee as number) ?? 0;
@@ -749,6 +915,40 @@ async function getAdminFinancials(admin: any, since: string) {
       ((b.cross_club_fee as number) ?? 0) +
       ((b.guide_service_fee as number) ?? 0);
   }
+
+  // Classification mix & pricing-mode split from bookings
+  const clsMap: Record<string, { classification: string; bookings: number; gmv: number; platform_fee: number }> = {};
+  let rodFeeSplitBookings = 0;
+  let rodFeeSplitGmv = 0;
+  let leaseBookings = 0;
+  let leaseGmv = 0;
+  for (const b of bookings) {
+    const isLease = b.pricing_mode === "upfront_lease";
+    const key = isLease ? "lease" : ((b.property_classification as string | null) ?? "unclassified");
+    if (!clsMap[key]) {
+      clsMap[key] = { classification: key, bookings: 0, gmv: 0, platform_fee: 0 };
+    }
+    const gmv = (b.total_amount as number) ?? 0;
+    const fee =
+      ((b.platform_fee as number) ?? 0) +
+      ((b.cross_club_fee as number) ?? 0) +
+      ((b.guide_service_fee as number) ?? 0);
+    clsMap[key].bookings += 1;
+    clsMap[key].gmv += gmv;
+    clsMap[key].platform_fee += fee;
+    if (isLease) {
+      leaseBookings += 1;
+      leaseGmv += gmv;
+    } else {
+      rodFeeSplitBookings += 1;
+      rodFeeSplitGmv += gmv;
+    }
+  }
+  const classificationMix = Object.values(clsMap).map((c) => ({
+    ...c,
+    gmv: roundCurrency(c.gmv),
+    platform_fee: roundCurrency(c.platform_fee),
+  }));
 
   // Top revenue properties
   const propMap: Record<string, { name: string; gmv: number; platform_revenue: number; bookings: number }> = {};
@@ -779,9 +979,50 @@ async function getAdminFinancials(admin: any, since: string) {
     (sum: number, p: Record<string, unknown>) => sum + ((p.processing_fee as number) ?? 0), 0
   );
 
+  // Lease payments — platform facilitation revenue
+  const { data: allLeasePayments } = await admin
+    .from("property_lease_payments")
+    .select("id, property_id, club_id, amount_cents, platform_fee_cents, landowner_net_cents, status, period_start, period_end, paid_at, created_at, properties(name), clubs(name)")
+    .eq("status", "succeeded")
+    .order("paid_at", { ascending: false });
+
+  const leasePayments = allLeasePayments ?? [];
+  const leaseFacilitationFeeTotal = leasePayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.platform_fee_cents as number) ?? 0) / 100,
+    0
+  );
+  const leasePayoutsTotal = leasePayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.landowner_net_cents as number) ?? 0) / 100,
+    0
+  );
+  const periodLeasePayments = leasePayments.filter(
+    (p: Record<string, unknown>) => (p.created_at as string) >= since
+  );
+  const leaseFacilitationFeePeriod = periodLeasePayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.platform_fee_cents as number) ?? 0) / 100,
+    0
+  );
+
+  // Attribute lease facilitation fees to month buckets (by paid_at or created_at)
+  for (const p of leasePayments) {
+    const dateStr = (p.paid_at as string | null) ?? (p.created_at as string);
+    if (!dateStr) continue;
+    const month = dateStr.slice(0, 7);
+    if (!monthlyRevenue[month]) {
+      monthlyRevenue[month] = { month, platform_fee: 0, cross_club_fee: 0, guide_service_fee: 0, lease_facilitation_fee: 0, total: 0 };
+    }
+    const fee = ((p.platform_fee_cents as number) ?? 0) / 100;
+    monthlyRevenue[month].lease_facilitation_fee += fee;
+    monthlyRevenue[month].total += fee;
+  }
+
+  // Roll lease facilitation into headline platform revenue
+  const platformRevenueTotalWithLease = platformRevenueTotal + leaseFacilitationFeeTotal + membershipProcessingFees;
+  const platformRevenuePeriodWithLease = platformRevenuePeriod + leaseFacilitationFeePeriod;
+
   return {
-    platform_revenue_total: platformRevenueTotal,
-    platform_revenue_period: platformRevenuePeriod,
+    platform_revenue_total: roundCurrency(platformRevenueTotalWithLease),
+    platform_revenue_period: roundCurrency(platformRevenuePeriodWithLease),
     platform_fee_total: platformFeeTotal,
     cross_club_fee_total: crossClubFeeTotal,
     guide_service_fee_total: guideServiceFeeTotal,
@@ -793,7 +1034,27 @@ async function getAdminFinancials(admin: any, since: string) {
     total_bookings: bookings.length,
     period_bookings: periodBookings.length,
     membership_gmv: membershipGmv,
-    membership_processing_fees: membershipProcessingFees,
+    membership_processing_fees: roundCurrency(membershipProcessingFees),
+    lease_facilitation_fee_total: roundCurrency(leaseFacilitationFeeTotal),
+    lease_facilitation_fee_period: roundCurrency(leaseFacilitationFeePeriod),
+    lease_payouts_total: roundCurrency(leasePayoutsTotal),
+    lease_payment_count: leasePayments.length,
+    classification_mix: classificationMix,
+    pricing_mode_split: {
+      rod_fee_split: { bookings: rodFeeSplitBookings, gmv: roundCurrency(rodFeeSplitGmv) },
+      upfront_lease: { bookings: leaseBookings, gmv: roundCurrency(leaseGmv) },
+    },
+    recent_lease_payments: leasePayments.slice(0, 10).map((p: Record<string, unknown>) => ({
+      id: p.id,
+      property_name: (p.properties as { name: string } | null)?.name ?? "Unknown",
+      club_name: (p.clubs as { name: string } | null)?.name,
+      amount: roundCurrency(((p.amount_cents as number) ?? 0) / 100),
+      platform_fee: roundCurrency(((p.platform_fee_cents as number) ?? 0) / 100),
+      landowner_net: roundCurrency(((p.landowner_net_cents as number) ?? 0) / 100),
+      period_start: p.period_start,
+      period_end: p.period_end,
+      paid_at: p.paid_at,
+    })),
     revenue_by_month: Object.values(monthlyRevenue).sort((a, b) => a.month.localeCompare(b.month)),
     top_properties: Object.values(propMap)
       .sort((a, b) => b.platform_revenue - a.platform_revenue)
