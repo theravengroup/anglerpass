@@ -67,7 +67,7 @@ The split is snapshotted onto each booking at creation time (`club_split_pct`, `
 
 ### Upfront Lease (alternative property pricing mode)
 
-Instead of a per-booking split, the club pays the landowner an agreed annual amount via ACH. AnglerPass takes 5%; 95% flows to the landowner. On bookings at a leased property, the club keeps 100% of the rod fee (the landowner has already been paid). The lease lifecycle is:
+Instead of a per-booking split, the club pays the landowner an agreed annual amount via ACH. The landowner receives 100% of the agreed amount; AnglerPass's 5% facilitation fee is charged on top to the club (e.g. landowner asks $5,000 → landowner gets $5,000, club is charged $5,250, AnglerPass keeps $250). On bookings at a leased property, the club keeps 100% of the rod fee (the landowner has already been paid). The lease lifecycle is:
 
 ```
 proposed  →  under_negotiation  →  agreed  →  active  →  expired
@@ -82,7 +82,7 @@ Endpoints:
 | `POST /api/properties/:id/lease/respond` | Club admin | accept / counter / decline |
 | `POST /api/properties/:id/lease/pay`     | Club admin | Creates ACH PaymentIntent (us_bank_account only) |
 
-`payment_intent.succeeded` with `metadata.type = 'property_lease_payment'` flips `lease_status → active`, records the succeeded ledger row in `property_lease_payments`, and creates a Stripe Transfer to the landowner's Connected Account for the 95% net. A nightly cron (`/api/cron/lease-renewal`) sends reminders at T-30 and T-7 and flips past-due leases to `expired` + `status = draft`.
+`payment_intent.succeeded` with `metadata.type = 'property_lease_payment'` flips `lease_status → active`, records the succeeded ledger row in `property_lease_payments`, and creates a Stripe Transfer to the landowner's Connected Account for the full agreed amount (100%). A nightly cron (`/api/cron/lease-renewal`) sends reminders at T-30 and T-7 and flips past-due leases to `expired` + `status = draft`.
 
 ### Staff Discount
 
@@ -192,7 +192,7 @@ Stripe webhooks drive payment state updates:
 | `invoice.payment_failed`         | Warn member, grace period starts            |
 | `customer.subscription.deleted`  | Cancel club membership                      |
 | `account.updated`               | Update Connected Account status             |
-| `payment_intent.succeeded` (lease) | Activate lease, insert succeeded ledger row, transfer 95% to landowner |
+| `payment_intent.succeeded` (lease) | Activate lease, insert succeeded ledger row, transfer full agreed amount to landowner |
 | `payment_intent.payment_failed` (lease) | Mark ledger row failed, revert property to `agreed` for retry |
 
 Webhook handler: `src/app/api/webhooks/stripe/route.ts` (to be created in Layer 2).

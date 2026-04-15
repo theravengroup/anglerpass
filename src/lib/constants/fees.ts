@@ -15,7 +15,9 @@
  *       • Premier   — 35/65
  *       • Signature — 25/75
  *   (b) pricing_mode = 'upfront_lease' — club pays an annual lease to the
- *       landowner via ACH; on bookings the club keeps 100% of the rod fee.
+ *       landowner via ACH. The landowner receives 100% of the agreed
+ *       amount; AnglerPass's 5% facilitation fee is charged on top to the
+ *       club. On bookings the club then keeps 100% of the rod fee.
  *
  * AnglerPass always charges 15% on top of the rod fee at checkout.
  *
@@ -90,7 +92,11 @@ export const CLASSIFICATION_META: Record<
 export const PLATFORM_FEE_RATE = 0.15;
 
 // ─── Lease Platform Fee ──────────────────────────────────────────────
-/** 5% platform fee on annual upfront lease payments (club → landowner via ACH). */
+/**
+ * 5% facilitation fee on annual upfront lease payments. Charged ON TOP of
+ * the landowner's agreed amount to the club — the landowner always receives
+ * 100% of what they asked for. Club ACH charge = landowner_amount * 1.05.
+ */
 export const LEASE_PLATFORM_FEE_RATE = 0.05;
 
 /** Sensible guardrails for landowner-proposed lease amounts (USD). */
@@ -318,19 +324,31 @@ export function resolveSplits(
 
 /**
  * Calculate the lease payment breakdown for an ACH transfer from club to
- * landowner. AnglerPass collects a 5% platform fee.
+ * landowner.
+ *
+ * The landowner's agreed amount is what the landowner receives in full —
+ * AnglerPass's 5% facilitation fee is charged ON TOP to the club. In other
+ * words: landowner asks for $5,000 → landowner gets $5,000 → club is
+ * charged $5,250 via ACH → AnglerPass keeps $250.
  *
  * All amounts are in cents to match Stripe's PaymentIntent convention.
+ *
+ * @param landownerAmountCents The agreed landowner payout (what the
+ *   landowner receives). This is the figure stored in
+ *   properties.lease_amount_cents.
  */
-export function calculateLeaseBreakdown(amountCents: number): {
-  amountCents: number;
-  platformFeeCents: number;
+export function calculateLeaseBreakdown(landownerAmountCents: number): {
+  /** What the landowner receives (the agreed amount). */
   landownerNetCents: number;
+  /** 5% platform fee charged on top to the club. */
+  platformFeeCents: number;
+  /** Total charged to the club via ACH = landowner + platform fee. */
+  clubChargeCents: number;
 } {
-  const amount = Math.max(0, Math.floor(amountCents));
-  const platformFeeCents = Math.round(amount * LEASE_PLATFORM_FEE_RATE);
-  const landownerNetCents = amount - platformFeeCents;
-  return { amountCents: amount, platformFeeCents, landownerNetCents };
+  const landowner = Math.max(0, Math.floor(landownerAmountCents));
+  const platformFeeCents = Math.round(landowner * LEASE_PLATFORM_FEE_RATE);
+  const clubChargeCents = landowner + platformFeeCents;
+  return { landownerNetCents: landowner, platformFeeCents, clubChargeCents };
 }
 
 /** Round to 2 decimal places (currency precision). */

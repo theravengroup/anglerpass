@@ -84,9 +84,10 @@ export async function POST(
     );
 
     // ACH PaymentIntent — automatic capture, us_bank_account only.
+    // Club is charged landowner amount + 5% platform fee on top.
     try {
       const pi = await stripe.paymentIntents.create({
-        amount: breakdown.amountCents,
+        amount: breakdown.clubChargeCents,
         currency: "usd",
         customer: customerId,
         payment_method_types: ["us_bank_account"],
@@ -103,6 +104,7 @@ export async function POST(
       });
 
       // Pre-create pending ledger row so admins can see in-flight payments.
+      // amount_cents = total club charge (landowner + platform fee).
       const periodStart = new Date();
       const periodEnd = new Date(periodStart);
       periodEnd.setMonth(periodEnd.getMonth() + termMonths);
@@ -110,7 +112,7 @@ export async function POST(
       await admin.from("property_lease_payments").insert({
         property_id: id,
         club_id: parsed.data.club_id,
-        amount_cents: breakdown.amountCents,
+        amount_cents: breakdown.clubChargeCents,
         platform_fee_cents: breakdown.platformFeeCents,
         landowner_net_cents: breakdown.landownerNetCents,
         stripe_payment_intent_id: pi.id,
@@ -126,7 +128,8 @@ export async function POST(
         actor_id: auth.user.id,
         new_data: {
           payment_intent_id: pi.id,
-          amount_cents: breakdown.amountCents,
+          club_charge_cents: breakdown.clubChargeCents,
+          landowner_net_cents: breakdown.landownerNetCents,
           platform_fee_cents: breakdown.platformFeeCents,
         },
       });
@@ -134,7 +137,7 @@ export async function POST(
       return jsonOk({
         client_secret: pi.client_secret,
         payment_intent_id: pi.id,
-        amount_cents: breakdown.amountCents,
+        club_charge_cents: breakdown.clubChargeCents,
         platform_fee_cents: breakdown.platformFeeCents,
         landowner_net_cents: breakdown.landownerNetCents,
       });

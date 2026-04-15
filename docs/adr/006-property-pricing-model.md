@@ -34,7 +34,7 @@ The split applies to the base rod fee set by the landowner. AnglerPass charges a
 
 ### Mode B — Upfront lease
 
-The club pays the landowner an agreed annual amount via ACH. AnglerPass collects a 5% platform fee on the lease transfer. After the lease is active:
+The club pays the landowner an agreed annual amount via ACH. The landowner receives 100% of the agreed amount; AnglerPass's 5% facilitation fee is charged on top to the club (landowner asks $5,000 → landowner gets $5,000, club is charged $5,250). After the lease is active:
 
 - Rod fees on bookings at this property flow 100% to the managing club.
 - AnglerPass still charges the 15% angler platform fee.
@@ -44,7 +44,7 @@ Lease negotiation is a three-step flow:
 
 1. Landowner proposes an amount → `lease_status = 'proposed'`
 2. Club accepts, counters, or declines → `agreed` / `under_negotiation` / cleared
-3. Club funds via ACH PaymentIntent → webhook flips to `active`, transfers landowner net (95%) via Connect, opens the booking pipeline
+3. Club funds via ACH PaymentIntent (landowner amount + 5% fee) → webhook flips to `active`, transfers the full agreed amount via Connect to the landowner, opens the booking pipeline
 
 ### Cross-club rebalance
 
