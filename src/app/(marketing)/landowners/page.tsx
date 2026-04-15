@@ -321,6 +321,236 @@ export default function LandownersPage() {
         </div>
       </section>
 
+      {/* Pricing & Compensation */}
+      <section className="py-[100px] bg-offwhite">
+        <div className="max-w-[1000px] mx-auto px-8">
+          <div className="reveal text-center mb-14">
+            <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-forest">
+              How You Get Paid
+            </span>
+            <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-5 tracking-[-0.3px] text-balance">
+              Two ways to earn from your water
+            </h2>
+            <p className="text-[16.5px] leading-[1.7] text-text-secondary max-w-[600px] mx-auto">
+              Every property on AnglerPass uses one of two pricing models. You choose
+              the one that matches how you want to be compensated &mdash; per-booking
+              revenue share or a guaranteed annual&nbsp;lease.
+            </p>
+          </div>
+
+          {/* Mode A — Rod Fee Split */}
+          <div className="reveal mb-12">
+            <div className="bg-white border border-parchment rounded-[14px] overflow-hidden">
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-forest/8 text-forest">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-[22px] font-semibold text-forest mb-1">
+                      Option A: Rod Fee Split
+                    </h3>
+                    <p className="text-[14px] text-text-light">
+                      Default &mdash; earn a share of every booking
+                    </p>
+                  </div>
+                </div>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-5">
+                  You set a rod fee (the price per angler, per day) and receive a
+                  percentage of that fee each time someone books your water. The split
+                  depends on a classification assigned to your property based on its
+                  quality, exclusivity, and demand. You choose the classification
+                  during onboarding with your managing&nbsp;club.
+                </p>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-1">
+                  <strong className="text-text-primary">The 15% AnglerPass platform
+                  fee is charged on top of your rod fee and paid entirely by the
+                  angler.</strong> It does not reduce your share &mdash; your
+                  classification percentage is calculated from the full rod fee
+                  you&nbsp;set.
+                </p>
+              </div>
+
+              {/* Classification tiers */}
+              <div className="border-t border-parchment">
+                <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-parchment">
+                  {/* Select */}
+                  <div className="px-7 py-7">
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <span className="inline-flex items-center justify-center size-7 rounded-md bg-forest/10 text-forest font-heading text-[12px] font-bold">
+                        S
+                      </span>
+                      <h4 className="font-heading text-[18px] font-semibold text-forest">
+                        Select
+                      </h4>
+                    </div>
+                    <div className="flex items-baseline gap-1.5 mb-3">
+                      <span className="font-heading text-[32px] font-bold text-forest leading-none">
+                        50%
+                      </span>
+                      <span className="text-[13px] text-text-light">
+                        to you
+                      </span>
+                    </div>
+                    <p className="text-[13.5px] leading-[1.7] text-text-secondary mb-4">
+                      Shared opportunity. Your club earns 50% to cover their
+                      operations, member services, and booking&nbsp;management.
+                    </p>
+                    <div className="rounded-lg bg-parchment-light/60 px-4 py-3">
+                      <p className="text-[12.5px] text-text-secondary leading-[1.6] m-0">
+                        <strong className="text-text-primary">Example:</strong> You
+                        set a $200/rod fee. You receive $100, the club receives $100.
+                        The angler pays $230 total ($200 + 15%&nbsp;platform&nbsp;fee).
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Premier */}
+                  <div className="px-7 py-7">
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <span className="inline-flex items-center justify-center size-7 rounded-md bg-forest/10 text-forest font-heading text-[12px] font-bold">
+                        P
+                      </span>
+                      <h4 className="font-heading text-[18px] font-semibold text-forest">
+                        Premier
+                      </h4>
+                    </div>
+                    <div className="flex items-baseline gap-1.5 mb-3">
+                      <span className="font-heading text-[32px] font-bold text-forest leading-none">
+                        65%
+                      </span>
+                      <span className="text-[13px] text-text-light">
+                        to you
+                      </span>
+                    </div>
+                    <p className="text-[13.5px] leading-[1.7] text-text-secondary mb-4">
+                      Standout water. Higher demand, better habitat, or a more
+                      exclusive experience &mdash; you earn a larger&nbsp;share.
+                    </p>
+                    <div className="rounded-lg bg-parchment-light/60 px-4 py-3">
+                      <p className="text-[12.5px] text-text-secondary leading-[1.6] m-0">
+                        <strong className="text-text-primary">Example:</strong> You
+                        set a $300/rod fee. You receive $195, the club receives $105.
+                        The angler pays $345 total ($300 + 15%&nbsp;platform&nbsp;fee).
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Signature */}
+                  <div className="px-7 py-7">
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <span className="inline-flex items-center justify-center size-7 rounded-md bg-forest/10 text-forest font-heading text-[12px] font-bold">
+                        ★
+                      </span>
+                      <h4 className="font-heading text-[18px] font-semibold text-forest">
+                        Signature
+                      </h4>
+                    </div>
+                    <div className="flex items-baseline gap-1.5 mb-3">
+                      <span className="font-heading text-[32px] font-bold text-forest leading-none">
+                        75%
+                      </span>
+                      <span className="text-[13px] text-text-light">
+                        to you
+                      </span>
+                    </div>
+                    <p className="text-[13.5px] leading-[1.7] text-text-secondary mb-4">
+                      Exceptional water. Trophy fisheries, rare access, or
+                      truly one-of-a-kind experiences that command premium&nbsp;rates.
+                    </p>
+                    <div className="rounded-lg bg-parchment-light/60 px-4 py-3">
+                      <p className="text-[12.5px] text-text-secondary leading-[1.6] m-0">
+                        <strong className="text-text-primary">Example:</strong> You
+                        set a $500/rod fee. You receive $375, the club receives $125.
+                        The angler pays $575 total ($500 + 15%&nbsp;platform&nbsp;fee).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mode B — Upfront Lease */}
+          <div className="reveal">
+            <div className="bg-white border border-parchment rounded-[14px] px-8 py-8">
+              <div className="flex items-start gap-4 mb-5">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-forest/8 text-forest">
+                  <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-heading text-[22px] font-semibold text-forest mb-1">
+                    Option B: Upfront Annual Lease
+                  </h3>
+                  <p className="text-[14px] text-text-light">
+                    Guaranteed income &mdash; no per-booking&nbsp;variability
+                  </p>
+                </div>
+              </div>
+              <p className="text-[15px] leading-[1.8] text-text-secondary mb-5">
+                If you prefer certainty over per-booking revenue, you can propose
+                an annual lease amount to the managing club. If the club agrees,
+                they pay you once via ACH bank transfer and you receive the full
+                agreed amount &mdash; AnglerPass&rsquo;s 5% facilitation fee is
+                charged on top to the club, not deducted from your&nbsp;payment.
+              </p>
+              <p className="text-[15px] leading-[1.8] text-text-secondary mb-6">
+                After the lease is active, the club manages all bookings and keeps
+                100% of rod-fee income. You receive your guaranteed payment
+                regardless of how many bookings the club fills. The lease renews
+                annually &mdash; you can renegotiate the amount at each&nbsp;renewal.
+              </p>
+              <div className="rounded-lg bg-parchment-light/60 px-5 py-4 max-w-[620px]">
+                <p className="text-[13.5px] text-text-secondary leading-[1.7] m-0">
+                  <strong className="text-text-primary">Example:</strong> You propose
+                  a $20,000 annual lease. The club accepts and pays via ACH. You
+                  receive the full $20,000 in your bank account. The club is charged
+                  $21,000 ($20,000 + AnglerPass&rsquo;s 5% facilitation fee). You are
+                  done &mdash; guaranteed income, no per-booking&nbsp;tracking.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Payout details callout */}
+          <div className="reveal mt-8 flex flex-col lg:flex-row gap-5 lg:gap-6">
+            <div className="flex-1 rounded-xl border border-parchment bg-white px-6 py-5">
+              <h4 className="font-heading text-[16px] font-semibold text-forest mb-2">
+                Weekly payouts
+              </h4>
+              <p className="text-[13.5px] leading-[1.7] text-text-secondary m-0">
+                Rod-fee-split earnings are paid out weekly every Monday via Stripe
+                Connect after a 7-day post-trip hold. Deposits arrive in 1&ndash;2
+                business&nbsp;days.
+              </p>
+            </div>
+            <div className="flex-1 rounded-xl border border-parchment bg-white px-6 py-5">
+              <h4 className="font-heading text-[16px] font-semibold text-forest mb-2">
+                You set the price
+              </h4>
+              <p className="text-[13.5px] leading-[1.7] text-text-secondary m-0">
+                Your rod fee is entirely up to you. Price by season, water type, or
+                demand. AnglerPass never dictates what your water is&nbsp;worth.
+              </p>
+            </div>
+            <div className="flex-1 rounded-xl border border-parchment bg-white px-6 py-5">
+              <h4 className="font-heading text-[16px] font-semibold text-forest mb-2">
+                No listing fees
+              </h4>
+              <p className="text-[13.5px] leading-[1.7] text-text-secondary m-0">
+                Registering your property is free. You only earn money &mdash;
+                AnglerPass never charges landowners a subscription or
+                listing&nbsp;fee.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cross-club access */}
       <section className="py-[100px] bg-white">
         <div className="reveal max-w-[700px] mx-auto px-8 text-center">
@@ -362,7 +592,7 @@ export default function LandownersPage() {
               },
               {
                 q: 'What does it cost me as a landowner?',
-                a: 'There is no cost to list your property on AnglerPass. You set your own rod fees and receive 100% of those fees. A 15% platform fee is added on top and paid by the angler at checkout. Your rod fees are paid out weekly every Monday via Stripe Connect, after a 7-day post-trip hold period.',
+                a: 'Nothing upfront \u2014 listing your property is completely free. If you choose the rod-fee-split model, you receive a classification-based share of each booking\u2019s rod fee: 50% (Select), 65% (Premier), or 75% (Signature). The 15% AnglerPass platform fee is charged on top and paid entirely by the angler, so it never reduces your share. If you choose an upfront annual lease instead, you receive the full agreed amount from the club \u2014 AnglerPass\u2019s 5% facilitation fee is charged on top to the club, not deducted from your payment.',
               },
               {
                 q: 'How do I control who accesses my property?',
@@ -378,11 +608,11 @@ export default function LandownersPage() {
               },
               {
                 q: 'How are rod fees and pricing determined?',
-                a: 'You set your own rod fee per angler per day. You can price based on season, water type, or however you see fit. AnglerPass does not dictate pricing \u2014 you decide what your water is worth.',
+                a: 'You set your own rod fee per angler per day \u2014 AnglerPass never dictates what your water is worth. During onboarding, you and your managing club agree on a property classification (Select, Premier, or Signature) that determines the revenue split between you and the club. Higher classifications mean a larger share for you. You can price by season, water type, or demand, and adjust your rod fee at any time.',
               },
               {
                 q: 'When do I get paid?',
-                a: 'Payouts are processed weekly every Monday via Stripe Connect. After each trip, there is a 7-day hold period for dispute resolution. Once the hold clears, your rod fees are included in the next weekly payout and deposited directly to your bank account, typically arriving within 2 business days.',
+                a: 'It depends on your pricing model. Rod-fee-split earnings are paid out weekly every Monday via Stripe Connect. After each trip there is a 7-day hold period for dispute resolution; once it clears your share is included in the next weekly payout, typically arriving within 2 business days. If you choose the upfront annual lease, the club pays you once via ACH bank transfer when the lease is executed \u2014 no per-booking tracking required.',
               },
               {
                 q: 'What kind of properties work on AnglerPass?',
