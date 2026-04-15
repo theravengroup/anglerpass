@@ -10,7 +10,7 @@ export default function GuideAffiliationsPage() {
           Club Affiliations
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Manage your affiliations with fishing clubs. Affiliated guides can be
+          Manage your affiliations with fishing clubs. Affiliated independent guides can be
           assigned to trips on club waters.
         </p>
       </div>

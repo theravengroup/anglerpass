@@ -85,7 +85,7 @@ const ROLE_STEPS: Record<string, StepItem[]> = {
     { label: "Make your first booking", description: "Reserve a fishing day at a private property", href: "/angler/bookings", done: false },
   ],
   guide: [
-    { label: "Complete your guide profile", description: "Add your bio, techniques, species, and pricing", href: "/guide/profile", done: false },
+    { label: "Complete your independent guide profile", description: "Add your bio, techniques, species, and pricing", href: "/guide/profile", done: false },
     { label: "Upload credentials", description: "License, insurance, and First Aid certification", href: "/guide/profile", done: false },
     { label: "Set your pricing and availability", description: "Configure rates and block off unavailable dates", href: "/guide/availability", done: false },
     { label: "Request water approvals from clubs", description: "Ask clubs to approve you for their waters", href: "/guide/profile", done: false },

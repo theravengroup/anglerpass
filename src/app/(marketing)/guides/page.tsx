@@ -9,7 +9,7 @@ const features = [
   {
     title: 'Access Private Water',
     description:
-      'Get approved to guide on exclusive club waters and private stretches that most guides never see. Build relationships with landowners and clubs through a trusted platform.',
+      'Get approved to guide independently on exclusive club waters and private stretches that most independent guides never see. Build relationships with landowners and clubs through a trusted platform.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
@@ -19,7 +19,7 @@ const features = [
   {
     title: 'Instant Bookings',
     description:
-      'Anglers book you directly when they add a guide to their trip. No back-and-forth, no phone tag. Confirmed bookings land in your dashboard immediately.',
+      'Anglers book you directly when they add an independent guide to their trip. No back-and-forth, no phone tag. Confirmed bookings land in your dashboard immediately.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
@@ -39,7 +39,7 @@ const features = [
   {
     title: 'Build Your Reputation',
     description:
-      'Earn reviews from anglers you guide. Your rating, specialties, and credentials are showcased when anglers browse available guides for their trip.',
+      'Earn reviews from anglers you guide. Your rating, specialties, and credentials are showcased when anglers browse available independent guides for their trip.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
@@ -59,7 +59,7 @@ const features = [
   {
     title: 'Track Your Earnings',
     description:
-      'See your earnings in real time — this month, this year, all time. Clear breakdown of guide rates, service fees, and payouts.',
+      'See your earnings in real time — this month, this year, all time. Clear breakdown of your rates, service fees, and payouts.',
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
@@ -87,7 +87,7 @@ const howItWorks = [
   {
     step: '04',
     title: 'Get Booked',
-    description: 'When anglers book a trip on water you\'re approved for, they can add you as their guide. You get notified instantly and the trip appears in your dashboard.',
+    description: 'When anglers book a trip on water you\'re approved for, they can add you as their independent guide. You get notified instantly and the trip appears in your dashboard.',
   },
 ];
 
@@ -100,8 +100,8 @@ const requirements = [
 
 const faqs = [
   {
-    q: 'How much does it cost to join as a guide?',
-    a: 'There is a one-time $49 verification fee that covers your mandatory background check. After that, there are no subscription or listing fees. AnglerPass adds a 10% service fee on top of your guide rate, paid by the angler. You receive 100% of your stated rate.',
+    q: 'How much does it cost to join as an independent guide?',
+    a: 'There is a one-time $49 verification fee that covers your mandatory background check. After that, there are no subscription or listing fees. AnglerPass adds a 10% service fee on top of your rate, paid by the angler. You receive 100% of your stated rate.',
   },
   {
     q: 'How do I get approved for specific waters?',
@@ -113,31 +113,31 @@ const faqs = [
   },
   {
     q: 'How do I get paid?',
-    a: 'Payouts are processed through Stripe Connect directly to your bank account. Your guide rate is paid out 24\u201348 hours after the trip date, following a 7-day hold period for dispute resolution. For example, if you guide on Saturday, your payout initiates the following Saturday and typically arrives within 2 business days.',
+    a: 'Payouts are processed through Stripe Connect directly to your bank account. Your rate is paid out 24\u201348 hours after the trip date, following a 7-day hold period for dispute resolution. For example, if you guide on Saturday, your payout initiates the following Saturday and typically arrives within 2 business days.',
   },
   {
     q: 'What if an angler cancels?',
-    a: 'Our cancellation policy protects guides. Cancellations less than 24 hours before the trip or on the day of result in a full payout to the guide. Cancellations 24 hours to 3 days before pay 50% of your guide rate, and cancellations 3\u20137 days before pay 25%. A $15 late cancellation fee is assessed to the angler for any cancellation within 72 hours.',
+    a: 'Our cancellation policy protects independent guides. Cancellations less than 24 hours before the trip or on the day of result in a full payout to you. Cancellations 24 hours to 3 days before pay 50% of your rate, and cancellations 3\u20137 days before pay 25%. A $15 late cancellation fee is assessed to the angler for any cancellation within 72 hours.',
   },
   {
     q: 'Do I need to be affiliated with a club?',
-    a: 'No. Guides are independent providers on AnglerPass. You request water access from clubs, but you\'re not bound to any single club.',
+    a: 'No. Independent guides are independent providers on the platform. You request water access from clubs, but you\'re not bound to any single club.',
   },
   {
     q: 'How long does the verification process take?',
-    a: 'After uploading your credentials and paying the one-time $49 verification fee, your background check typically completes within 2\u20135 business days. Admin review follows shortly after. Most guides are live within a week of submitting all documents.',
+    a: 'After uploading your credentials and paying the one-time $49 verification fee, your background check typically completes within 2\u20135 business days. Admin review follows shortly after. Most independent guides are live within a week of submitting all documents.',
   },
   {
     q: 'Can I guide on multiple properties and for multiple clubs?',
-    a: 'Yes. There is no limit to how many properties or clubs you can be approved for. Many guides build a network of approved waters across multiple regions to maximize their bookings.',
+    a: 'Yes. There is no limit to how many properties or clubs you can be approved for. Many independent guides build a network of approved waters across multiple regions to maximize their bookings.',
   },
   {
     q: 'What happens if a property or club removes my access?',
     a: 'If a club or landowner revokes your access, any future bookings on that water are canceled and the angler is notified. Existing completed trips and reviews remain on your profile.',
   },
   {
-    q: 'Do anglers have to book a guide for their trip?',
-    a: 'No. Guides are entirely optional on AnglerPass. Anglers can book water on their own or choose to add a guide during the booking process. Your profile is shown to anglers who are looking for guided experiences.',
+    q: 'Do anglers have to book an independent guide for their trip?',
+    a: 'No. Independent guides are entirely optional on AnglerPass. Anglers can book water on their own or choose to add an independent guide during the booking process. Your profile is shown to anglers who are looking for guided experiences.',
   },
 ];
 
@@ -154,13 +154,13 @@ export default function GuidesPage() {
         <div className="absolute inset-0 bg-charcoal/70" />
         <div className="relative max-w-[800px] mx-auto px-8 text-center">
           <span className="inline-block mb-5 font-mono text-[11px] uppercase tracking-[0.2em] text-bronze-light">
-            For Guides
+            For Independent Guides
           </span>
           <h1 className="font-heading text-[clamp(38px,5vw,58px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
             Your Skills. Their Water.<br />More Clients.
           </h1>
           <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto mb-10">
-            AnglerPass connects professional guides with private water across the country.
+            AnglerPass connects professional independent guides with private water across the country.
             Get approved, set your rates, and let anglers book you directly when they
             reserve their trip. No cold calls, no middlemen.
           </p>
@@ -186,7 +186,7 @@ export default function GuidesPage() {
         <div className="max-w-[1200px] mx-auto px-8">
           <div className="reveal text-center mb-[72px]">
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
-              Guide Tools
+              Independent Guide Tools
             </span>
             <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px] text-balance">
               Everything you need to run your guiding business
@@ -264,7 +264,7 @@ export default function GuidesPage() {
               What we look for
             </h2>
             <p className="text-[16px] text-text-secondary max-w-[520px] mx-auto leading-[1.65]">
-              We vet every guide on the platform. Landowners and clubs need to trust
+              We vet every independent guide on the platform. Landowners and clubs need to trust
               that anyone guiding on their water meets professional standards.
             </p>
           </div>
@@ -385,7 +385,7 @@ export default function GuidesPage() {
             Ready to expand your range?
           </h2>
           <p className="text-[16px] leading-[1.7] text-parchment/55 max-w-[480px] mx-auto mb-10">
-            Join a growing network of professional guides accessing private water
+            Join a growing network of professional independent guides accessing private water
             across the country. Your next client is already looking.
           </p>
           <Link

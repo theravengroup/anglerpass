@@ -125,10 +125,10 @@ export default function ClubGuideAffiliations({
     <div className="space-y-6">
       <div>
         <h3 className="font-heading text-lg font-semibold text-text-primary">
-          Guide Affiliations
+          Independent Guide Affiliations
         </h3>
         <p className="text-sm text-text-secondary">
-          Manage guides affiliated with your club.
+          Manage independent guides affiliated with your club.
         </p>
       </div>
 
@@ -141,8 +141,8 @@ export default function ClubGuideAffiliations({
       {affiliations.length === 0 ? (
         <EmptyState
           icon={Handshake}
-          title="No guide affiliations"
-          description="Guides can request to affiliate with your club. Pending requests will appear here."
+          title="No independent guide affiliations"
+          description="Independent guides can request to affiliate with your club. Pending requests will appear here."
           iconColor="text-river"
         />
       ) : (
@@ -170,7 +170,7 @@ export default function ClubGuideAffiliations({
           {active.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-text-secondary">
-                Active Guides ({active.length})
+                Active Independent Guides ({active.length})
               </h4>
               {active.map((aff) => (
                 <AffiliationCard key={aff.id} affiliation={aff} />

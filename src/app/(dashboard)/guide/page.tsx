@@ -120,14 +120,14 @@ export default function GuideDashboardPage() {
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <h2 className="font-heading text-2xl font-semibold text-text-primary">
-            Guide Dashboard
+            Independent Guide Dashboard
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
             {onboarding.state === "no_profile"
-              ? "Set up your guide profile to start guiding on private waters."
+              ? "Set up your independent guide profile to start guiding on private waters."
               : onboarding.profile?.display_name
                 ? `Welcome back, ${onboarding.profile.display_name}`
-                : "Complete your guide setup to get started."}
+                : "Complete your independent guide setup to get started."}
           </p>
         </div>
         <GuideOnboardingCard
@@ -170,7 +170,7 @@ function ActiveGuideDashboard({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-heading text-2xl font-semibold text-text-primary">
-            Guide Dashboard
+            Independent Guide Dashboard
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
             Welcome back, {profile.display_name}

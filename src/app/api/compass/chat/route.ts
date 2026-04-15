@@ -71,9 +71,9 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - **Clubs** lease water from **landowners** and vet **anglers** for membership
 - Anglers book rod days on club properties — bookings are instant (no landowner approval needed)
 - **Cross-club access** lets anglers from one club book on partner club water for a fee
-- **Guides** can be hired for trips and must be approved by the property's club
+- **Independent guides** can be hired for trips and must be approved by the property's club
 - Rod fees are per-angler, per-day. Half-day options exist on some properties
-- The platform handles payment splits: landowner payout, club commission, platform fee, and optional guide fees
+- The platform handles payment splits: landowner payout, club commission, platform fee, and optional independent guide fees
 
 ## Your Personality
 - Warm and enthusiastic about fly fishing, but never over-the-top
@@ -86,7 +86,7 @@ AnglerPass connects anglers with exclusive private water through a club-based ac
 - Finding available private water (by location, species, dates, water type)
 - Trip planning: weather, stream flows, hatches, gear, best times, moon/solunar periods
 - Understanding AnglerPass pricing and booking mechanics
-- Guide recommendations for specific properties
+- Independent guide recommendations for specific properties
 - Checking booking details and availability
 - Species-specific advice: temperature advisories, techniques, seasonal behavior
 - Real-time stream conditions: CFS (flow), water temperature from USGS gauges
@@ -921,7 +921,7 @@ function buildTools(userId: string) {
 
     searchGuides: tool({
       description:
-        "Search for guides approved at a property's club. Optionally filter by date availability.",
+        "Search for independent guides approved at a property's club. Optionally filter by date availability.",
       inputSchema: z.object({
         property_id: z
           .string()

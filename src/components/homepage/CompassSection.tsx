@@ -121,7 +121,7 @@ const RESULTS = [
     location: 'Tarryall Valley, CO',
     drive: '2h 25m',
     match: 88,
-    badge: 'Guide Available',
+    badge: 'Independent Guide Available',
     badgeClass: 'compass-badge-guide',
     cfs: 260,
     temp: 51,
@@ -356,7 +356,7 @@ export default function CompassSection() {
 
                 {/* Suggestion chips */}
                 <div className="concierge-suggestions">
-                  <span>Do I need a guide?</span>
+                  <span>Do I need an independent guide?</span>
                   <span>Best time of day?</span>
                   <span>Good for beginners?</span>
                 </div>

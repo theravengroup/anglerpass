@@ -121,10 +121,10 @@ export default function GuideBrowsePage() {
       {/* Header */}
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Find a Guide
+          Find an Independent Guide
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Browse experienced fly fishing guides available for your next trip.
+          Browse experienced independent fly fishing guides available for your next trip.
         </p>
       </div>
 
@@ -134,7 +134,7 @@ export default function GuideBrowsePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-light" />
             <Input
-              placeholder="Search guides by name, bio, or location..."
+              placeholder="Search independent guides by name, bio, or location..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               className="border-stone-light/30 pl-9"
@@ -197,11 +197,11 @@ export default function GuideBrowsePage() {
       {!loading && !error && guides.length === 0 && (
         <EmptyState
           icon={Users}
-          title="No guides found"
+          title="No independent guides found"
           description={
             hasFilters
-              ? "Try adjusting your search or filters to find more guides."
-              : "No approved guides are available yet. Check back soon."
+              ? "Try adjusting your search or filters to find more independent guides."
+              : "No approved independent guides are available yet. Check back soon."
           }
           iconColor="text-charcoal"
         />
@@ -210,7 +210,7 @@ export default function GuideBrowsePage() {
       {!loading && guides.length > 0 && (
         <>
           <p className="text-xs text-text-light">
-            {total} guide{total !== 1 ? "s" : ""} found
+            {total} independent guide{total !== 1 ? "s" : ""} found
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {guides.map((g) => (

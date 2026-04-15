@@ -26,7 +26,7 @@ export default function GuideDashboardPreview() {
       <div className="flex justify-between items-center mb-5">
         <div>
           <div className="text-base font-semibold text-text-primary font-heading">Welcome back, Tom</div>
-          <div className="text-xs text-text-light">Licensed Guide &middot; Montana #4821</div>
+          <div className="text-xs text-text-light">Licensed Independent Guide &middot; Montana #4821</div>
         </div>
         <div className="py-1 px-3 rounded-md bg-charcoal/[0.07] text-[11px] font-semibold text-charcoal">Approved</div>
       </div>

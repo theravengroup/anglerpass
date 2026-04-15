@@ -12,7 +12,7 @@ export function FinancialSummaryCard() {
               <li>
                 $25/rod cross-club access fee ($20 AP + $5 home club referral)
               </li>
-              <li>10% guide service fee (paid by angler)</li>
+              <li>10% independent guide service fee (paid by angler)</li>
               <li>
                 5% platform fee on membership payments
               </li>
@@ -28,7 +28,7 @@ export function FinancialSummaryCard() {
                 Clubs receive $5/rod commission + membership fees + $5/rod
                 referral when members fish cross-club
               </li>
-              <li>Guides receive 100% of their listed day rate</li>
+              <li>Independent guides receive 100% of their listed day rate</li>
               <li>All payouts processed via Stripe Connect</li>
             </ul>
           </div>

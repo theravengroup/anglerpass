@@ -18,7 +18,7 @@ export default function BookingSuccessCard({ guideName }: BookingSuccessCardProp
         <p className="mt-1 text-center text-sm text-text-secondary">
           Your booking is confirmed. Access details are available in your bookings.
           {guideName && (
-            <> Your guide {guideName} will be in touch before your trip.</>
+            <> Your independent guide {guideName} will be in touch before your trip.</>
           )}
         </p>
         <div className="mt-4 flex gap-2">

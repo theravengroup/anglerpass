@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy — AnglerPass',
   description:
-    'How AnglerPass collects, uses, and protects your personal information. Privacy policy for landowners, clubs, anglers, and guides.',
+    'How AnglerPass collects, uses, and protects your personal information. Privacy policy for landowners, clubs, anglers, and independent guides.',
   openGraph: {
     title: 'Privacy Policy — AnglerPass',
     description:
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             <p className={textClass}>
               <strong>Account information.</strong>{' '}When you create an account,
               we collect your name, email address, password, and role (angler,
-              landowner, club manager, or guide). You may also provide a display
+              landowner, club manager, or independent guide). You may also provide a display
               name, bio, location, fishing experience level, and favorite species.
             </p>
 
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Guide verification data.</strong>{' '}Guides who apply for
+              <strong>Independent guide verification data.</strong>{' '}Independent guides who apply for
               verification provide professional credentials including state guide
               licenses, liability insurance certificates, first aid
               certifications, and USCG licenses where applicable. As part of the
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
               payouts are handled entirely by Stripe. When you pay a verification
               fee, booking fee, club dues, or any other charge, your payment
               details are collected directly by Stripe. Landowners, clubs, and
-              guides who receive payouts connect a bank account through Stripe
+              independent guides who receive payouts connect a bank account through Stripe
               Connect. AnglerPass does not store credit card numbers or bank
               account details on our servers.
             </p>
@@ -92,7 +92,7 @@ export default function PrivacyPage() {
             <p className={textClass}>
               <strong>Booking and trip data.</strong>{' '}We collect information about
               bookings you make or receive, including dates, locations,
-              participants, rod fees, and guide rates. After a trip, anglers may
+              participants, rod fees, and independent guide rates. After a trip, anglers may
               submit reviews that are stored and displayed on the platform.
             </p>
 
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
             <p className={textClass}>
               We use your information to operate the AnglerPass platform,
               including: authenticating your identity, displaying your profile to
-              other users, processing bookings and payments, verifying guide
+              other users, processing bookings and payments, verifying independent guide
               credentials, sending transactional emails and SMS messages (booking
               confirmations, trip reminders, credential expiry warnings, payout
               notifications), and enforcing platform policies. We do not sell,
@@ -137,11 +137,11 @@ export default function PrivacyPage() {
           <div className={sectionClass}>
             <h2 className={headingClass}>Automated processing</h2>
             <p className={textClass}>
-              AnglerPass uses automated systems to monitor guide credential
+              AnglerPass uses automated systems to monitor independent guide credential
               expiration dates. When a credential approaches expiry, we send
               reminder notifications at 60, 30, and 7 days. If a credential
-              expires, the guide&rsquo;s profile is automatically suspended until
-              renewed credentials are uploaded. Guides whose credentials are
+              expires, the independent guide&rsquo;s profile is automatically suspended until
+              renewed credentials are uploaded. Independent guides whose credentials are
               renewed are automatically reinstated. These automated actions are
               logged and can be reviewed by our team.
             </p>
@@ -153,10 +153,10 @@ export default function PrivacyPage() {
               Background checks &amp; FCRA compliance
             </h2>
             <p className={textClass}>
-              Guide background checks are conducted by Checkr, Inc. in compliance
+              Independent guide background checks are conducted by Checkr, Inc. in compliance
               with the Fair Credit Reporting Act (FCRA). Checkr&rsquo;s hosted
               flow handles all required disclosures, consent collection, and
-              adverse action procedures. Guides have the right to dispute
+              adverse action procedures. Independent guides have the right to dispute
               background check results directly with Checkr. AnglerPass receives
               only summary results, not the underlying report details. For more
               information, see{' '}
@@ -265,7 +265,7 @@ export default function PrivacyPage() {
                 Stripe Connect
               </li>
               <li className={listItemClass}>
-                <strong>Checkr</strong> &mdash; background checks for guide
+                <strong>Checkr</strong> &mdash; background checks for independent guide
                 verification
               </li>
               <li className={listItemClass}>
@@ -285,7 +285,7 @@ export default function PrivacyPage() {
               Account data is retained for as long as your account is active.
               Booking records, reviews, and financial transaction logs are
               retained for 7 years for legal and tax compliance. Background check
-              results are retained for the duration of a guide&rsquo;s active
+              results are retained for the duration of an independent guide&rsquo;s active
               status plus 1 year. Uploaded credentials and photos are deleted when
               you remove them or delete your account, subject to any legal
               retention requirements.

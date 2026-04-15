@@ -36,7 +36,7 @@ const WELCOME_CONTENT: Record<WelcomeRole, [WelcomeEmailContent, WelcomeEmailCon
     },
     {
       subject: "Complete Your Angler Profile",
-      body: "A complete profile helps clubs evaluate your membership application and helps guides tailor trips to your skill level.\n\nAdd your experience level, the species you target, your home water region, and a short bio. It only takes a minute and makes a real difference.",
+      body: "A complete profile helps clubs evaluate your membership application and helps independent guides tailor trips to your skill level.\n\nAdd your experience level, the species you target, your home water region, and a short bio. It only takes a minute and makes a real difference.",
       ctaLabel: "Complete Your Profile",
       ctaUrl: "/angler",
       ctaColor: "#8b6914",
@@ -52,13 +52,13 @@ const WELCOME_CONTENT: Record<WelcomeRole, [WelcomeEmailContent, WelcomeEmailCon
   guide: [
     {
       subject: "Welcome to AnglerPass",
-      body: "AnglerPass helps professional guides connect with quality anglers on private water. To start receiving bookings, you will need to complete our verification process.\n\nVerification includes a background check, identity confirmation, and credential review. Once approved, you will appear in our guide directory and can be added to bookings.",
+      body: "AnglerPass helps professional independent guides connect with quality anglers on private water. To start receiving bookings, you will need to complete our verification process.\n\nVerification includes a background check, identity confirmation, and credential review. Once approved, you will appear in our independent guide directory and can be added to bookings.",
       ctaLabel: "Start Verification",
       ctaUrl: "/guide",
       ctaColor: "#1e1e1a",
     },
     {
-      subject: "Complete Your Guide Profile",
+      subject: "Complete Your Independent Guide Profile",
       body: "A strong profile is how anglers find and choose you. Add your daily rate, the species and water types you specialize in, your years of experience, and a bio that reflects your guiding style.\n\nUpload your credentials \u2014 fishing license, CPR certification, and insurance \u2014 to move through verification quickly.",
       ctaLabel: "Build Your Profile",
       ctaUrl: "/guide/profile",

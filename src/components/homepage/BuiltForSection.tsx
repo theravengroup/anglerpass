@@ -44,13 +44,13 @@ export default function BuiltForSection() {
           </div>
           <div className="built-for-row reveal">
             <div className="built-for-img">
-              <img src="/images/womananglerwithguide.webp" alt="Fly fishing guide helping an angler on a private river" />
+              <img src="/images/womananglerwithguide.webp" alt="Fly fishing independent guide helping an angler on a private river" />
             </div>
             <div className="built-for-text">
-              <span className="built-for-label">For Guides</span>
-              <h3>Professional Guides</h3>
-              <p>Your skills deserve private water. AnglerPass lets verified guides request access to club and landowner properties, set their own rates, and get booked directly by anglers. No cold calls, no middlemen — just more days on the water doing what you do best.</p>
-              <a href="/guides" className="btn btn-charcoal">Join as a Guide</a>
+              <span className="built-for-label">For Independent Guides</span>
+              <h3>Professional Independent Guides</h3>
+              <p>Your skills deserve private water. AnglerPass lets verified independent guides request access to club and landowner properties, set their own rates, and get booked directly by anglers. No cold calls, no middlemen — just more days on the water doing what you do best.</p>
+              <a href="/guides" className="btn btn-charcoal">Join as an Independent Guide</a>
             </div>
           </div>
         </div>

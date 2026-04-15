@@ -7,7 +7,7 @@ import { buildMetadata, buildJsonLd, SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Press | AnglerPass — Private Water Fly Fishing Marketplace",
   description:
-    "Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and guides.",
+    "Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and independent guides.",
   path: "/press",
   keywords: [
     "anglerpass press",
@@ -119,7 +119,7 @@ export default function PressPage() {
 
             <p className="mb-8 text-[15px] font-medium leading-[1.7] text-text-secondary">
               New platform connects anglers, fly fishing clubs, private water
-              landowners, and guides in one marketplace &mdash; launching May 15,
+              landowners, and independent guides in one marketplace &mdash; launching May 15,
               2026
             </p>
 
@@ -138,7 +138,7 @@ export default function PressPage() {
               <p>
                 AnglerPass (anglerpass.com) launches May 15 as the first platform
                 connecting all four participants in the private water ecosystem
-                &mdash; anglers, clubs, landowners, and guides &mdash; in a
+                &mdash; anglers, clubs, landowners, and independent guides &mdash; in a
                 single marketplace.
               </p>
 
@@ -146,7 +146,7 @@ export default function PressPage() {
                 Private water access today runs on handshakes, spreadsheets, and
                 knowing the right people. Clubs manage rosters in Excel.
                 Landowners can&rsquo;t vet who&rsquo;s on their property. Anglers
-                without connections can&rsquo;t find bookable water. Guides
+                without connections can&rsquo;t find bookable water. Independent guides
                 operate with no standardized verification. AnglerPass brings all
                 of it onto one platform without stripping away the trust and
                 stewardship that make private water worth protecting.
@@ -155,7 +155,7 @@ export default function PressPage() {
               <p>
                 &ldquo;I built this because I got tired of watching great water
                 sit empty while good anglers couldn&rsquo;t find access,&rdquo;
-                said founder Dan Jahn. &ldquo;Clubs, landowners, and guides are
+                said founder Dan Jahn. &ldquo;Clubs, landowners, and independent guides are
                 already doing the hard work. We give them better tools and connect
                 them to each other.&rdquo;
               </p>
@@ -176,9 +176,9 @@ export default function PressPage() {
 
               <p>
                 The platform also introduces the industry&rsquo;s most rigorous
-                guide verification &mdash; background checks through Checkr,
+                independent guide verification &mdash; background checks through Checkr,
                 credential monitoring, and automatic suspension when licenses or
-                insurance lapse. Every guide on AnglerPass is verified before they
+                insurance lapse. Every independent guide on AnglerPass is verified before they
                 meet a client.
               </p>
 
@@ -196,7 +196,7 @@ export default function PressPage() {
                 >
                   anglerpass.com
                 </Link>
-                . Anglers, club managers, landowners, and guides each select their
+                . Anglers, club managers, landowners, and independent guides each select their
                 role for tailored onboarding at launch. Early members receive
                 priority access.
               </p>
@@ -209,11 +209,11 @@ export default function PressPage() {
               </h4>
               <p className="text-[15px] leading-[1.75] text-text-secondary">
                 AnglerPass is a private water fly fishing marketplace connecting
-                anglers, clubs, landowners, and guides on one platform. By keeping
+                anglers, clubs, landowners, and independent guides on one platform. By keeping
                 clubs at the center of every transaction, AnglerPass preserves the
                 trust that defines private water access while giving every
                 participant modern tools for memberships, bookings, listings, and
-                guide services. Headquartered in Denver, Colorado. Learn more at{" "}
+                independent guide services. Headquartered in Denver, Colorado. Learn more at{" "}
                 <Link
                   href="/"
                   className="font-medium text-forest underline decoration-forest/30 underline-offset-2 transition-colors hover:text-forest-deep"
@@ -277,7 +277,7 @@ export default function PressPage() {
                 <p className="text-[17px] font-medium leading-[1.6] text-forest italic">
                   &ldquo;The best trout water in America doesn&rsquo;t need more
                   technology. It needs a better handshake &mdash; one where clubs,
-                  landowners, guides, and anglers can all trust each other before
+                  landowners, independent guides, and anglers can all trust each other before
                   anyone opens a gate.&rdquo;
                 </p>
                 <cite className="mt-3 block font-mono text-[11px] not-italic uppercase tracking-[0.15em] text-text-light">

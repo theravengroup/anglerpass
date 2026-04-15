@@ -27,7 +27,7 @@ export default function GuideCredentials({
       <CardHeader>
         <CardTitle className="text-base">Credentials</CardTitle>
         <CardDescription>
-          Upload your certifications for verification. Guide license and
+          Upload your certifications for verification. Independent guide license and
           insurance are required.
         </CardDescription>
       </CardHeader>
@@ -35,7 +35,7 @@ export default function GuideCredentials({
         {[
           {
             type: "license",
-            label: "Guide/Outfitter License",
+            label: "Independent Guide/Outfitter License",
             urlKey: "license_url",
             expiryField: "license_expiry" as const,
             required: true,

@@ -116,10 +116,10 @@ export default function AdminGuidesPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Guide Management
+          Independent Guide Management
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Review and manage guide profiles.
+          Review and manage independent guide profiles.
         </p>
       </div>
 
@@ -149,7 +149,7 @@ export default function AdminGuidesPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Compass className="size-8 text-text-light" />
             <p className="mt-3 text-sm text-text-secondary">
-              No guides in this category
+              No independent guides in this category
             </p>
           </CardContent>
         </Card>

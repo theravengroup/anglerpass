@@ -178,7 +178,7 @@ export default function GuideEarningsPage() {
               Earnings
             </h2>
             <p className="mt-1 text-sm text-text-secondary">
-              Track your guide earnings and manage payouts.
+              Track your independent guide earnings and manage payouts.
             </p>
           </div>
         </div>
@@ -291,7 +291,7 @@ export default function GuideEarningsPage() {
         <Card className="border-stone-light/20">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Monthly Earnings</CardTitle>
-            <CardDescription>Your guide income over time</CardDescription>
+            <CardDescription>Your independent guide income over time</CardDescription>
           </CardHeader>
           <CardContent>
             <MonthlyBarChart data={data!.monthly_earnings} />
@@ -384,9 +384,9 @@ export default function GuideEarningsPage() {
         <CardContent className="py-5">
           <p className="text-xs leading-relaxed text-text-light">
             <strong className="text-text-secondary">
-              How guide payouts work:
+              How independent guide payouts work:
             </strong>{" "}
-            You set your own day rates and keep 100% of your guide fee. The
+            You set your own day rates and keep 100% of your independent guide fee. The
             angler pays a 10% service fee on top of your rate — this goes to
             AnglerPass and does not reduce your payout. Earnings are deposited
             directly to your connected Stripe account.

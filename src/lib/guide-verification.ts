@@ -36,12 +36,12 @@ export async function evaluateVerification(
     .maybeSingle();
 
   if (error || !guide) {
-    return { ready: false, status: "not_found", missing: ["Guide profile not found"] };
+    return { ready: false, status: "not_found", missing: ["Independent guide profile not found"] };
   }
 
   // Only evaluate guides in pending status
   if (guide.status !== "pending") {
-    return { ready: false, status: guide.status, missing: [`Guide is in ${guide.status} status, not pending`] };
+    return { ready: false, status: guide.status, missing: [`Independent guide is in ${guide.status} status, not pending`] };
   }
 
   const missing: string[] = [];
@@ -59,7 +59,7 @@ export async function evaluateVerification(
 
   // 3. Required credentials
   if (!guide.license_url) {
-    missing.push("Guide/outfitter license not uploaded");
+    missing.push("Independent guide/outfitter license not uploaded");
   }
   if (!guide.insurance_url) {
     missing.push("Liability insurance not uploaded");
@@ -67,7 +67,7 @@ export async function evaluateVerification(
 
   // 4. Credential expiry checks
   if (guide.license_expiry && new Date(guide.license_expiry) <= now) {
-    missing.push("Guide license has expired");
+    missing.push("Independent guide license has expired");
   }
   if (guide.insurance_expiry && new Date(guide.insurance_expiry) <= now) {
     missing.push("Insurance has expired");
@@ -131,11 +131,11 @@ export async function checkCredentialExpiry(
   const expiringSoon: { credential: string; daysLeft: number }[] = [];
 
   const credentials: { key: string; label: string }[] = [
-    { key: "license_expiry", label: "Guide/outfitter license" },
+    { key: "license_expiry", label: "Independent guide/outfitter license" },
     { key: "insurance_expiry", label: "Liability insurance" },
     { key: "first_aid_expiry", label: "First aid certification" },
     { key: "uscg_license_expiry", label: "USCG license" },
-    { key: "guide_license_expiry", label: "Guide license" },
+    { key: "guide_license_expiry", label: "Independent guide license" },
   ];
 
   for (const cred of credentials) {

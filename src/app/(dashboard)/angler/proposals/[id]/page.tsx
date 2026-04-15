@@ -260,7 +260,7 @@ export default function ProposalDetailPage() {
         <Card className="border-stone-light/20">
           <CardContent className="py-4">
             <h3 className="text-xs font-medium uppercase tracking-wide text-text-light">
-              Notes from Guide
+              Notes from Independent Guide
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-text-secondary">
               {proposal.guide_notes}

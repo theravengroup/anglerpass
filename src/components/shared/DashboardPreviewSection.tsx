@@ -43,7 +43,7 @@ const CONFIG: Record<Role, { url: string; accentColor: string; description: stri
   guide: {
     url: 'app.anglerpass.com/guide',
     accentColor: 'charcoal',
-    description: 'View your upcoming schedule, track earnings, manage your rates, and see which waters you\u2019re approved to guide.',
+    description: 'View your upcoming schedule, track earnings, manage your rates, and see which waters you\u2019re approved to guide on.',
     Component: GuideDashboardPreview,
   },
 };

@@ -22,7 +22,7 @@ const TOC_ITEMS = [
   { href: '#payments', label: 'Payment Processing' },
   { href: '#bookings', label: 'Booking Cancellations & Refunds' },
   { href: '#payouts', label: 'Payout Schedules' },
-  { href: '#guide-services', label: 'Guide Services' },
+  { href: '#guide-services', label: 'Independent Guide Services' },
   { href: '#guest-policy', label: 'Guest Policy' },
   { href: '#club-subscriptions', label: 'Club Subscriptions' },
   { href: '#sms-terms', label: 'SMS Terms & Conditions' },

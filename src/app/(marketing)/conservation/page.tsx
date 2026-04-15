@@ -301,7 +301,7 @@ export default function ConservationPage() {
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">
                     <span className="mt-[5px] size-[7px] bg-forest/50 shrink-0 [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" />
-                    Guides on the platform are verified professionals who model
+                    Independent guides on the platform are verified professionals who model
                     responsible practices
                   </li>
                   <li className="flex items-start gap-3 text-[14px] text-text-secondary leading-[1.7]">

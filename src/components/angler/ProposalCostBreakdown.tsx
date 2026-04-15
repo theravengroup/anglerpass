@@ -50,11 +50,11 @@ export default function ProposalCostBreakdown({
         {fees.guideRate > 0 && (
           <>
             <div className="flex justify-between text-text-secondary">
-              <span>Guide fee</span>
+              <span>Independent guide fee</span>
               <span>${fees.guideRate.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-text-light">
-              <span>Guide service fee (10%)</span>
+              <span>Independent guide service fee (10%)</span>
               <span>${fees.guideServiceFee.toFixed(2)}</span>
             </div>
           </>

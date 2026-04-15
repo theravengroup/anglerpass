@@ -118,8 +118,8 @@ export default function AnglerFinancialsPage() {
       ["Category", "Amount"],
       ["Rod Fees", data.total_rod_fees.toFixed(2)],
       ["Platform Fees (15%)", data.total_platform_fees.toFixed(2)],
-      ["Guide Rates", data.total_guide_rates.toFixed(2)],
-      ["Guide Service Fees (10%)", data.total_guide_service_fees.toFixed(2)],
+      ["Independent Guide Rates", data.total_guide_rates.toFixed(2)],
+      ["Independent Guide Service Fees (10%)", data.total_guide_service_fees.toFixed(2)],
       ["Cross-Club Fees", data.total_cross_club_fees.toFixed(2)],
       ["Total Spent on Bookings", data.total_spent.toFixed(2)],
       [],
@@ -146,7 +146,7 @@ export default function AnglerFinancialsPage() {
         String(p.bookings),
       ]),
       [],
-      ["Date", "Property", "Rod Fee", "Platform Fee", "Guide", "Cross-Club", "Total", "Refund", "Late Fee", "Status"],
+      ["Date", "Property", "Rod Fee", "Platform Fee", "Ind. Guide", "Cross-Club", "Total", "Refund", "Late Fee", "Status"],
       ...data.recent_transactions.map((t) => [
         t.booking_date,
         t.property_name ?? "",
@@ -217,8 +217,8 @@ export default function AnglerFinancialsPage() {
   const feeBreakdownItems = [
     { label: "Rod Fees", amount: data?.total_rod_fees ?? 0, color: "bg-forest" },
     { label: "Platform Fees", amount: data?.total_platform_fees ?? 0, color: "bg-river" },
-    { label: "Guide Rates", amount: data?.total_guide_rates ?? 0, color: "bg-charcoal" },
-    { label: "Guide Service Fees", amount: data?.total_guide_service_fees ?? 0, color: "bg-charcoal/60" },
+    { label: "Independent Guide Rates", amount: data?.total_guide_rates ?? 0, color: "bg-charcoal" },
+    { label: "Independent Guide Service Fees", amount: data?.total_guide_service_fees ?? 0, color: "bg-charcoal/60" },
     { label: "Cross-Club Fees", amount: data?.total_cross_club_fees ?? 0, color: "bg-bronze" },
   ];
 
@@ -287,7 +287,7 @@ export default function AnglerFinancialsPage() {
         cover payment processing and platform operation. If you book through
         the Cross-Club Network (a property outside your home club), a $25/rod
         cross-club access fee applies ($20 to AnglerPass, $5 to your home
-        club). Guide fees include the guide&apos;s rate plus a 10% service fee.
+        club). Independent guide fees include the independent guide&apos;s rate plus a 10% service fee.
         Club membership dues include initiation fees (one-time) and annual
         dues, plus a 5% platform fee. Cancellation refunds follow a
         graduated policy: 100% if 7+ days out, 75% if 3&ndash;7 days, 50% if

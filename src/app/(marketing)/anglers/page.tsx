@@ -377,8 +377,8 @@ export default function AnglersPage() {
                 a: 'Private rivers, spring creeks, ponds, and lakes that are not accessible to the general public. Properties range from intimate spring creeks to multi-mile stretches of premium trout water on working ranches. All water on the platform is fly fishing only.',
               },
               {
-                q: 'Can I book a guide for my trip?',
-                a: 'Yes, but it is entirely optional. When booking a fishing day, you can choose to add a verified guide to your trip. Guides set their own rates, and a 10% service fee is added on top, paid by you. Many anglers fish without a guide.',
+                q: 'Can I book an independent guide for my trip?',
+                a: 'Yes, but it is entirely optional. When booking a fishing day, you can choose to add a verified independent guide to your trip. Independent guides set their own rates, and a 10% service fee is added on top, paid by you. Many anglers fish without an independent guide.',
               },
               {
                 q: 'Can I book multi-day trips?',
@@ -390,7 +390,7 @@ export default function AnglersPage() {
               },
               {
                 q: 'What is the cancellation policy?',
-                a: 'Cancellation terms vary by property and are shown before you confirm your booking. Generally, cancellations made well in advance receive a full refund, while last-minute cancellations may be subject to partial or no refund to protect landowners and guides.',
+                a: 'Cancellation terms vary by property and are shown before you confirm your booking. Generally, cancellations made well in advance receive a full refund, while last-minute cancellations may be subject to partial or no refund to protect landowners and independent guides.',
               },
               {
                 q: 'What does my employer\u2019s corporate membership get me?',

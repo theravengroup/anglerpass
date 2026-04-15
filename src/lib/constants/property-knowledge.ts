@@ -250,7 +250,7 @@ export const FLOAT_DIFFICULTY_LABELS: Record<FloatDifficulty, string> = {
   easy: "Easy — calm water, no hazards",
   intermediate: "Intermediate — some rapids, rocks",
   advanced: "Advanced — significant rapids, maneuvering",
-  expert: "Expert — dangerous conditions, guide required",
+  expert: "Expert — dangerous conditions, independent guide required",
 };
 
 export const BOAT_TYPES_ALLOWED = [
@@ -426,7 +426,7 @@ export const NEARBY_SERVICES = [
   { key: "restaurant", label: "Restaurant / Cafe" },
   { key: "hospital", label: "Hospital / Urgent Care" },
   { key: "lodging_nearby", label: "Lodging Nearby" },
-  { key: "guide_service", label: "Guide Service" },
+  { key: "guide_service", label: "Independent Guide Service" },
   { key: "gear_rental", label: "Gear Rental" },
 ] as const;
 

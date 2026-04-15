@@ -217,11 +217,11 @@ const SUBJECT_MAP: Partial<Record<NotificationType, string>> = {
   property_access_granted: "Property Access Granted",
   guide_booking_created: "You've Been Added to a Booking",
   guide_booking_cancelled: "A Booking Has Been Cancelled",
-  guide_water_approval_requested: "New Guide Approval Request",
+  guide_water_approval_requested: "New Independent Guide Approval Request",
   guide_water_approved: "Water Approval Granted",
   guide_water_declined: "Water Approval Update",
-  guide_profile_approved: "Your Guide Profile is Approved!",
-  guide_profile_rejected: "Guide Profile Update",
+  guide_profile_approved: "Your Independent Guide Profile is Approved!",
+  guide_profile_rejected: "Independent Guide Profile Update",
   guide_review_received: "You Have a New Review",
   guide_credential_expiring: "Credential Expiring Soon",
   guide_message_received: "New Message",
@@ -738,8 +738,8 @@ export async function notifyGuideProfileApproved(
   await notify(admin, {
     userId: opts.guideUserId,
     type: "guide_profile_approved",
-    title: "Your guide profile is approved!",
-    body: "Congratulations! Your guide profile has been reviewed and approved. You can now be added to bookings on waters you're approved for.",
+    title: "Your independent guide profile is approved!",
+    body: "Congratulations! Your independent guide profile has been reviewed and approved. You can now be added to bookings on waters you're approved for.",
     link: "/guide/profile",
   });
 }
@@ -752,8 +752,8 @@ export async function notifyGuideProfileRejected(
   await notify(admin, {
     userId: opts.guideUserId,
     type: "guide_profile_rejected",
-    title: "Guide profile update needed",
-    body: `Your guide profile was not approved. Reason: \u201C${opts.reason}\u201D. Please update your profile and resubmit.`,
+    title: "Independent guide profile update needed",
+    body: `Your independent guide profile was not approved. Reason: \u201C${opts.reason}\u201D. Please update your profile and resubmit.`,
     link: "/guide/profile",
   });
 }
@@ -770,7 +770,7 @@ export async function notifyGuideWaterApprovalRequested(
   await notify(admin, {
     userId: opts.clubAdminId,
     type: "guide_water_approval_requested",
-    title: `Guide approval request for ${opts.propertyName}`,
+    title: `Independent guide approval request for ${opts.propertyName}`,
     body: `${opts.guideName} has requested approval to guide on ${opts.propertyName}.`,
     link: "/club/guide-approvals",
   });
@@ -832,7 +832,7 @@ export async function notifyGuideCredentialExpiring(
     userId: opts.guideUserId,
     type: "guide_credential_expiring",
     title: `${opts.credential} expiring in ${opts.daysLeft} days`,
-    body: `Your ${opts.credential} expires in ${opts.daysLeft} days. Please update it to keep your guide profile active.`,
+    body: `Your ${opts.credential} expires in ${opts.daysLeft} days. Please update it to keep your independent guide profile active.`,
     link: "/guide/profile",
   });
 }
@@ -866,8 +866,8 @@ export async function notifyGuideAutoSuspended(
   await notify(admin, {
     userId: opts.guideUserId,
     type: "guide_credential_expiring",
-    title: "Guide profile suspended \u2014 expired credentials",
-    body: `Your guide profile has been suspended because the following credentials have expired: ${credList}. Upload renewed documents to be automatically reinstated.`,
+    title: "Independent guide profile suspended \u2014 expired credentials",
+    body: `Your independent guide profile has been suspended because the following credentials have expired: ${credList}. Upload renewed documents to be automatically reinstated.`,
     link: "/guide/profile",
   });
 }
@@ -882,8 +882,8 @@ export async function notifyGuideAutoReinstated(
   await notify(admin, {
     userId: opts.guideUserId,
     type: "guide_profile_approved",
-    title: "Guide profile reinstated!",
-    body: "Your credentials have been renewed and your guide profile is live again. You can now accept bookings.",
+    title: "Independent guide profile reinstated!",
+    body: "Your credentials have been renewed and your independent guide profile is live again. You can now accept bookings.",
     link: "/guide",
   });
 }
@@ -1037,7 +1037,7 @@ export async function notifyGuideAffiliationRequested(
   await notify(admin, {
     userId: opts.clubOwnerId,
     type: "guide_affiliation_requested",
-    title: `Guide affiliation request`,
+    title: `Independent guide affiliation request`,
     body: `${opts.guideName} has requested to affiliate with ${opts.clubName}.`,
     link: "/club/guides",
   });
@@ -1055,7 +1055,7 @@ export async function notifyGuideAffiliationApproved(
     userId: opts.guideUserId,
     type: "guide_affiliation_approved",
     title: `Affiliation approved`,
-    body: `${opts.clubName} has approved your guide affiliation request. You can now be assigned to trips on their waters.`,
+    body: `${opts.clubName} has approved your independent guide affiliation request. You can now be assigned to trips on their waters.`,
     link: "/guide/affiliations",
   });
 }
@@ -1072,7 +1072,7 @@ export async function notifyGuideAffiliationRejected(
     userId: opts.guideUserId,
     type: "guide_affiliation_rejected",
     title: `Affiliation not approved`,
-    body: `${opts.clubName} did not approve your guide affiliation request at this time.`,
+    body: `${opts.clubName} did not approve your independent guide affiliation request at this time.`,
     link: "/guide/affiliations",
   });
 }

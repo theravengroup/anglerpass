@@ -77,7 +77,7 @@ export const TRIGGER_EVENT_LABELS: Record<CrmTriggerEvent, string> = {
   booking_completed: "Booking Completed",
   trip_review_submitted: "Trip Review Submitted",
   membership_joined: "Club Membership Joined",
-  guide_verified: "Guide Verified",
+  guide_verified: "Independent Guide Verified",
   property_claimed: "Property Claimed",
   inactivity_30d: "30-Day Inactivity",
   inactivity_60d: "60-Day Inactivity",

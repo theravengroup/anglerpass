@@ -28,7 +28,7 @@ function formatUsd(amount: number): string {
 const STREAM_CONFIG = [
   { key: "platform_fees", label: "Platform Fees (15%)", color: "bg-forest" },
   { key: "cross_club_fees", label: "Cross-Club Fees", color: "bg-river" },
-  { key: "guide_service_fees", label: "Guide Service Fees", color: "bg-bronze" },
+  { key: "guide_service_fees", label: "Ind. Guide Service Fees", color: "bg-bronze" },
   { key: "membership_fees", label: "Membership Fees", color: "bg-charcoal" },
   { key: "compass_credit_revenue", label: "Compass AI Credits", color: "bg-purple-500" },
 ] as const;

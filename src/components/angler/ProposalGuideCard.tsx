@@ -26,7 +26,7 @@ export default function ProposalGuideCard({
     <Card className="border-stone-light/20">
       <CardContent className="py-4">
         <h3 className="text-xs font-medium uppercase tracking-wide text-text-light">
-          Your Guide
+          Your Independent Guide
         </h3>
         <div className="mt-3 flex items-start gap-3">
           {profilePhotoUrl ? (

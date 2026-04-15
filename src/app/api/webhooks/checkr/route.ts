@@ -133,7 +133,7 @@ async function handleReportCompleted(
           userId: adminUser.id,
           type: "guide_water_approval_requested",
           title: "Background check needs review",
-          body: `A guide's background check returned "consider" status and requires manual review.`,
+          body: `An independent guide's background check returned "consider" status and requires manual review.`,
           link: "/admin/guides",
         });
       }

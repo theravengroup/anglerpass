@@ -96,16 +96,16 @@ export default function GuideVerificationPage() {
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-            Guide Verification
+            Independent Guide Verification
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
-            Create your guide profile first before starting verification.
+            Create your independent guide profile first before starting verification.
           </p>
         </div>
         <Card className="border-bronze/20 bg-bronze/5">
           <CardContent className="py-8 text-center">
             <p className="text-sm text-text-secondary">
-              You need a guide profile before you can begin verification.
+              You need an independent guide profile before you can begin verification.
             </p>
             <Link
               href="/guide/profile"
@@ -124,7 +124,7 @@ export default function GuideVerificationPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Guide Verification
+          Independent Guide Verification
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
           Complete verification to go live on AnglerPass.
@@ -229,7 +229,7 @@ export default function GuideVerificationPage() {
               <>
                 <p className="text-sm text-text-secondary">
                   Before starting verification, make sure your profile is
-                  complete and you&apos;ve uploaded your guide license and
+                  complete and you&apos;ve uploaded your independent guide license and
                   insurance documents.
                 </p>
                 <Link href="/guide/profile">

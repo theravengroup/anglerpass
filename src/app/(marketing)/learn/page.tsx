@@ -7,12 +7,12 @@ import LearnPostGrid from '@/components/shared/LearnPostGrid';
 export const revalidate = 3600;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Fly Fishing Guides & Resources | AnglerPass Learn',
+  title: 'Fly Fishing Independent Guides & Resources | AnglerPass Learn',
   description:
-    'Expert guides on private water fly fishing, club management, and access rights. Learn everything about fly fishing on private land.',
+    'Expert independent guides on private water fly fishing, club management, and access rights. Learn everything about fly fishing on private land.',
   path: '/learn',
   keywords: [
-    'fly fishing guides',
+    'fly fishing independent guides',
     'private water fly fishing',
     'fly fishing club resources',
     'private water access guide',
@@ -32,10 +32,10 @@ export default function LearnPage() {
             Learn
           </span>
           <h1 className="font-heading text-[clamp(38px,5vw,52px)] font-medium leading-[1.1] text-parchment tracking-[-0.5px] mb-6">
-            Fly Fishing Guides &amp; Resources
+            Fly Fishing Independent Guides &amp; Resources
           </h1>
           <p className="text-[17px] leading-[1.7] text-parchment/60 max-w-[560px] mx-auto">
-            Expert guides on private water access, club management, and getting
+            Expert independent guides on private water access, club management, and getting
             the most out of your fly fishing experience.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function LearnPage() {
               href="/guides"
               className="inline-flex items-center justify-center px-5 py-3.5 rounded-md text-sm font-medium tracking-[0.3px] no-underline bg-charcoal text-white transition-all duration-300 hover:opacity-90"
             >
-              Guides
+              Independent Guides
             </Link>
           </div>
         </div>

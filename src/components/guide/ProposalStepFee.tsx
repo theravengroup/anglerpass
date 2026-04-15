@@ -20,7 +20,7 @@ export function ProposalStepFee({
   return (
     <div className="space-y-5">
       <p className="text-sm text-text-secondary">
-        Set your guide fee per angler. AnglerPass charges a{" "}
+        Set your independent guide fee per angler. AnglerPass charges a{" "}
         {GUIDE_SERVICE_FEE_RATE * 100}% service fee.
       </p>
 
@@ -29,7 +29,7 @@ export function ProposalStepFee({
           htmlFor="guide_fee_per_angler"
           className="text-sm text-text-primary"
         >
-          Guide Fee Per Angler ($)
+          Independent Guide Fee Per Angler ($)
         </Label>
         <Input
           id="guide_fee_per_angler"
@@ -52,7 +52,7 @@ export function ProposalStepFee({
           <div className="mt-3 space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-text-secondary">
-                Guide fee per angler
+                Independent guide fee per angler
               </span>
               <span className="font-medium text-text-primary">
                 ${feePerAngler.toFixed(2)}
@@ -76,7 +76,7 @@ export function ProposalStepFee({
             {maxAnglers > 1 && (
               <div className="flex justify-between text-text-light">
                 <span>
-                  Total guide fee ({maxAnglers} anglers)
+                  Total independent guide fee ({maxAnglers} anglers)
                 </span>
                 <span>${totalGuideFee.toFixed(2)}</span>
               </div>

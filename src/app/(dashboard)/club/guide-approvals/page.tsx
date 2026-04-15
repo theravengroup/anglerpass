@@ -115,10 +115,10 @@ export default function ClubGuideApprovalsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Guide Approvals
+          Independent Guide Approvals
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Manage guide access requests for your club&apos;s waters.
+          Manage independent guide access requests for your club&apos;s waters.
         </p>
       </div>
 
@@ -153,7 +153,7 @@ export default function ClubGuideApprovalsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Compass className="size-8 text-text-light" />
             <p className="mt-3 text-sm text-text-secondary">
-              No guide approval requests
+              No independent guide approval requests
             </p>
           </CardContent>
         </Card>
@@ -173,7 +173,7 @@ export default function ClubGuideApprovalsPage() {
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-text-primary">
-                          {guide?.display_name ?? "Unknown Guide"}
+                          {guide?.display_name ?? "Unknown Independent Guide"}
                         </h3>
                         <p className="text-xs text-text-secondary">
                           Requesting access to{" "}

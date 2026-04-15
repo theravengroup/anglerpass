@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service — AnglerPass',
   description:
-    'Terms of Service for AnglerPass: accounts, guide verification, payments, payouts, cancellations, liability, and governing law.',
+    'Terms of Service for AnglerPass: accounts, independent guide verification, payments, payouts, cancellations, liability, and governing law.',
   openGraph: {
     title: 'Terms of Service — AnglerPass',
     description:
@@ -47,8 +47,8 @@ export default function TermsPage() {
             <p className={textClass}>
               AnglerPass is a platform operated by Angler Pass, LLC that
               connects private water landowners, fishing clubs, professional
-              guides, and anglers. We provide tools for managing property access,
-              club memberships, guide verification, bookings, and payments on
+              independent guides, and anglers. We provide tools for managing property access,
+              club memberships, independent guide verification, bookings, and payments on
               private fly fishing waters.
             </p>
           </div>
@@ -73,7 +73,7 @@ export default function TermsPage() {
               <strong>landowners</strong> who list properties,{' '}
               <strong>clubs</strong> that manage memberships and property access,{' '}
               <strong>anglers</strong> who book fishing days, and{' '}
-              <strong>guides</strong> who offer professional guiding services.
+              <strong>independent guides</strong> who offer professional guiding services.
               Users may hold multiple roles. Each role has specific
               responsibilities outlined in these terms.
             </p>
@@ -81,11 +81,11 @@ export default function TermsPage() {
 
           {/* 4. Guide verification */}
           <div className={sectionClass}>
-            <h2 className={headingClass}>4. Guide verification</h2>
+            <h2 className={headingClass}>4. Independent guide verification</h2>
             <p className={textClass}>
-              Guides must complete a mandatory verification process before their
+              Independent guides must complete a mandatory verification process before their
               profile becomes visible to anglers. Verification includes: (a)
-              completing a guide profile with required credentials, (b) paying a
+              completing an independent guide profile with required credentials, (b) paying a
               one-time $49 verification fee, (c) passing a background check
               conducted by Checkr, and (d) receiving final approval from
               AnglerPass administrators. The verification fee is non-refundable,
@@ -93,14 +93,14 @@ export default function TermsPage() {
               if the application is rejected.
             </p>
             <p className={textClass}>
-              Verified guides must maintain valid credentials at all times.
+              Verified independent guides must maintain valid credentials at all times.
               Required credentials include a state guide license and liability
               insurance; first aid certification, USCG license, and other
               credentials may be required based on services offered. AnglerPass
               monitors credential expiration dates and will send reminders at 60,
               30, and 7 days before expiry. If a credential expires, the
-              guide&rsquo;s profile will be automatically suspended until renewed
-              documentation is uploaded. Guides are solely responsible for
+              independent guide&rsquo;s profile will be automatically suspended until renewed
+              documentation is uploaded. Independent guides are solely responsible for
               maintaining current credentials and legal compliance in their
               operating jurisdictions.
             </p>
@@ -112,10 +112,10 @@ export default function TermsPage() {
             <p className={textClass}>
               Property owners and clubs are responsible for the accuracy of their
               listings, including descriptions, photos, availability, water
-              conditions, and pricing. Guides are responsible for the accuracy of
+              conditions, and pricing. Independent guides are responsible for the accuracy of
               their profile information, qualifications, and rates. AnglerPass
               acts as a platform and does not guarantee the quality, safety, or
-              legality of any listed property, fishing experience, or guide
+              legality of any listed property, fishing experience, or independent guide
               service.
             </p>
             <p className={textClass}>
@@ -225,15 +225,15 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Guide services.</strong>{' '}Guide rates are set by the
-              guide. When an angler adds a guide to their booking, a 10%
+              <strong>Independent guide services.</strong>{' '}Independent guide rates are set by the
+              independent guide. When an angler adds an independent guide to their booking, a 10%
               service fee is added to the angler&rsquo;s checkout total.
-              Guides receive 100% of their stated rate &mdash; the service
-              fee is never deducted from the guide&rsquo;s payout.
+              Independent guides receive 100% of their stated rate &mdash; the service
+              fee is never deducted from the independent guide&rsquo;s payout.
             </p>
 
             <p className={textClass}>
-              <strong>Guide verification.</strong>{' '}Guides pay a one-time $49
+              <strong>Independent guide verification.</strong>{' '}Independent guides pay a one-time $49
               verification fee to complete the mandatory background check and
               profile review process. This fee is non-refundable, including
               if the background check returns an unfavorable result or the
@@ -251,7 +251,7 @@ export default function TermsPage() {
             </p>
             <ul className={listClass}>
               <li className={listItemClass}>
-                <strong>Guides:</strong>{' '}
+                <strong>Independent guides:</strong>{' '}
                 24&ndash;48 hours after the 7-day hold clears
               </li>
               <li className={listItemClass}>
@@ -298,7 +298,7 @@ export default function TermsPage() {
             <h2 className={headingClass}>11. Reviews</h2>
             <p className={textClass}>
               After a completed trip, anglers may submit reviews of properties and
-              guides. Reviews are subject to a moderation period before
+              independent guides. Reviews are subject to a moderation period before
               publication. Our{' '}
               <a
                 href="/policies#review-moderation"
@@ -316,7 +316,7 @@ export default function TermsPage() {
             <h2 className={headingClass}>12. Acceptable use</h2>
             <p className={textClass}>
               You agree to use AnglerPass only for its intended purpose. You may
-              not: misrepresent property access or guide qualifications; create
+              not: misrepresent property access or independent guide qualifications; create
               fraudulent listings or bookings; harass, discriminate against, or
               threaten other users; circumvent the platform to arrange
               off-platform payments; upload malicious content; or violate any
@@ -329,10 +329,10 @@ export default function TermsPage() {
             <h2 className={headingClass}>13. Suspension &amp; termination</h2>
             <p className={textClass}>
               We reserve the right to suspend or terminate accounts that violate
-              these terms. Guide profiles may be suspended automatically for
+              these terms. Independent guide profiles may be suspended automatically for
               expired credentials or by administrators for policy violations.
-              Suspended guides cannot accept new bookings; existing bookings for
-              suspended guides will be cancelled with full refunds to anglers. You
+              Suspended independent guides cannot accept new bookings; existing bookings for
+              suspended independent guides will be cancelled with full refunds to anglers. You
               may delete your account at any time by contacting us at{' '}
               <a
                 href="mailto:support@anglerpass.com"

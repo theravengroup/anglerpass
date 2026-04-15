@@ -39,7 +39,7 @@ export default function ClubGuidesPage() {
     return (
       <div className="mx-auto max-w-5xl py-24 text-center">
         <p className="text-sm text-text-secondary">
-          Set up your club first to manage guide affiliations.
+          Set up your club first to manage independent guide affiliations.
         </p>
       </div>
     );
@@ -49,10 +49,10 @@ export default function ClubGuidesPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h2 className="font-heading text-2xl font-semibold text-text-primary">
-          Guide Affiliations
+          Independent Guide Affiliations
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Review and manage guide affiliation requests for your club.
+          Review and manage independent guide affiliation requests for your club.
         </p>
       </div>
       <ClubGuideAffiliations clubId={clubId} />

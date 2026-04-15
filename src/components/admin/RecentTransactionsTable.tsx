@@ -44,11 +44,11 @@ export function RecentTransactionsTable({
                     <span className="text-river">Cross-Club</span>
                   </th>
                   <th className="pb-2 pr-3 text-right">
-                    <span className="text-charcoal">Guide Fee</span>
+                    <span className="text-charcoal">Ind. Guide Fee</span>
                   </th>
                   <th className="pb-2 pr-3 text-right">Landowner</th>
                   <th className="pb-2 pr-3 text-right">Club</th>
-                  <th className="pb-2 text-right">Guide</th>
+                  <th className="pb-2 text-right">Ind. Guide</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-light/10">

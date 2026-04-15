@@ -161,12 +161,12 @@ export default function GuideProfilePage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h2 className="font-[family-name:var(--font-heading)] text-2xl font-semibold text-text-primary">
-          Guide Profile
+          Independent Guide Profile
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
           {profile
-            ? "Update your guide profile information."
-            : "Set up your guide profile to start guiding on AnglerPass."}
+            ? "Update your independent guide profile information."
+            : "Set up your independent guide profile to start guiding on AnglerPass."}
         </p>
       </div>
 

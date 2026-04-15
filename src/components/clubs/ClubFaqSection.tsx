@@ -55,8 +55,8 @@ const faqs = [
   },
   {
     value: "guides",
-    q: "How do guides work with our club?",
-    a: "Guides on AnglerPass are independent professionals who request access to specific properties. You can approve or deny guide access to any water your club manages. When your members book a trip, they can optionally add an approved guide. Guides set their own rates and are paid directly \u2014 the club is not involved in guide compensation.",
+    q: "How do independent guides work with our club?",
+    a: "Independent guides on AnglerPass are professionals who request access to specific properties. You can approve or deny independent guide access to any water your club manages. When your members book a trip, they can optionally add an approved independent guide. Independent guides set their own rates and are paid directly \u2014 the club is not involved in independent guide compensation.",
   },
   {
     value: "getting-started",

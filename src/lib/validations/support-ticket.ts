@@ -5,7 +5,7 @@ export const SUPPORT_CATEGORIES = [
   "Account",
   "Technical Bug",
   "Billing",
-  "Guide",
+  "Independent Guide",
   "Other",
 ] as const;
 

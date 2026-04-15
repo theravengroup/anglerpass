@@ -35,7 +35,7 @@ const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
   club_admin: "Club / Outfitter",
   angler: "Angler",
-  guide: "Fishing Guide",
+  guide: "Independent Fishing Guide",
   corporate: "Corporate Sponsor",
 };
 

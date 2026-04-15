@@ -311,7 +311,7 @@ export default function PricingPage() {
                   { label: 'Rod fee', detail: 'Per rod, per day, set by the property' },
                   { label: 'Platform fee', detail: '15% of rod fees' },
                   { label: 'Cross-club access fee', detail: '$25/rod (only when fishing outside your home club)' },
-                  { label: 'Guide service fee', detail: '10% of guide rate (only when adding a guide)' },
+                  { label: 'Independent guide service fee', detail: '10% of guide rate (only when adding an independent guide)' },
                 ].map((item) => (
                   <li key={item.label} className="py-2 border-b border-parchment">
                     <span className="text-[14px] font-medium text-forest">{item.label}</span>
@@ -407,10 +407,10 @@ export default function PricingPage() {
         <div className="max-w-[900px] mx-auto px-8">
           <div className="reveal mb-12">
             <span className="inline-block mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-charcoal">
-              For Guides
+              For Independent Guides
             </span>
             <h2 className="font-heading text-[clamp(28px,3.5vw,40px)] font-medium leading-[1.15] text-forest mb-4 tracking-[-0.3px]">
-              What guides receive
+              What independent guides receive
             </h2>
             <p className="text-[16px] text-text-secondary leading-[1.65] max-w-[680px]">
               No subscription. No listing fee. You set your rates and keep 100% of them.
@@ -443,7 +443,7 @@ export default function PricingPage() {
               ))}
             </div>
             <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
-              Guide add-on is optional for anglers. When an angler selects you for their trip,
+              Independent guide add-on is optional for anglers. When an angler selects you for their trip,
               the service fee is added to their checkout total. You also set a half-day rate
               separately. Payouts are processed via{' '}
               <Link href="/guides" className="text-charcoal underline">

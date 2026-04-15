@@ -154,7 +154,7 @@ export default function WaitlistForm() {
               <option value="landowner">Landowner</option>
               <option value="angler">Individual Angler</option>
               <option value="club">Club or Association</option>
-              <option value="guide">Guide</option>
+              <option value="guide">Independent Guide</option>
               <option value="corporate">Corporate Member</option>
               <option value="partner">Partner</option>
             </select>

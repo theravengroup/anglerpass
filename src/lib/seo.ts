@@ -148,7 +148,7 @@ export const PAGES_SEO = {
   pricing: buildMetadata({
     title: 'Pricing — AnglerPass',
     description:
-      'Transparent pricing for clubs, landowners, anglers, and guides. See exactly what you pay and what you receive on AnglerPass.',
+      'Transparent pricing for clubs, landowners, anglers, and independent guides. See exactly what you pay and what you receive on AnglerPass.',
     path: '/pricing',
     image: `${SITE_URL}/pricing/opengraph-image`,
     keywords: [
@@ -173,7 +173,7 @@ export const PAGES_SEO = {
   press: buildMetadata({
     title: 'Press | AnglerPass — Private Water Fly Fishing Marketplace',
     description:
-      'Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and guides.',
+      'Press resources, media kit, and company information for AnglerPass — the first marketplace connecting anglers, fly fishing clubs, private water landowners, and independent guides.',
     path: '/press',
     image: `${SITE_URL}/press/opengraph-image`,
     keywords: [
@@ -184,16 +184,16 @@ export const PAGES_SEO = {
     ],
   }),
   guides: buildMetadata({
-    title: 'For Guides — AnglerPass',
+    title: 'For Independent Guides — AnglerPass',
     description:
-      'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass — the platform for professional fly fishing guides.',
+      'Guide on private water. Build your client base, manage availability, and earn more with AnglerPass — the platform for professional independent fly fishing guides.',
     path: '/guides',
     image: `${SITE_URL}/guides/opengraph-image`,
     keywords: [
-      'fly fishing guide platform',
-      'private water guide',
-      'fly fishing guide bookings',
-      'fishing guide management',
+      'independent fly fishing guide platform',
+      'private water independent guide',
+      'fly fishing independent guide bookings',
+      'independent fishing guide management',
     ],
   }),
   corporates: buildMetadata({

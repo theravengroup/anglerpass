@@ -14,16 +14,16 @@ export default function ServicePolicies() {
     <>
       {/* Guide Services */}
       <div id="guide-services" className={sectionClass}>
-        <h2 className={headingClass}>Guide Services</h2>
+        <h2 className={headingClass}>Independent Guide Services</h2>
         <p className={textClass}>
-          Professional fly fishing guides can apply to join the AnglerPass platform
-          as independent service providers. Guides are not employees of AnglerPass
+          Professional fly fishing independent guides can apply to join the AnglerPass platform
+          as independent service providers. Independent guides are not employees of AnglerPass
           or any club on the platform.
         </p>
 
-        <h3 className={subHeadingClass}>Guide requirements</h3>
+        <h3 className={subHeadingClass}>Independent guide requirements</h3>
         <p className={textClass}>
-          All guides must submit credentials for verification before being approved
+          All independent guides must submit credentials for verification before being approved
           to offer services on the platform. Required credentials include a valid
           state guide license, professional liability insurance, and current first
           aid certification. AnglerPass reviews all applications and may request
@@ -32,32 +32,32 @@ export default function ServicePolicies() {
 
         <h3 className={subHeadingClass}>Water access approvals</h3>
         <p className={textClass}>
-          Approved guides may request access to guide on specific properties. Each
+          Approved independent guides may request access to guide on specific properties. Each
           request is reviewed by the club or landowner managing that water. Approval
           is at the sole discretion of the managing entity and may be revoked at any
           time.
         </p>
 
-        <h3 className={subHeadingClass}>Guide fees &amp; payouts</h3>
+        <h3 className={subHeadingClass}>Independent guide fees &amp; payouts</h3>
         <p className={textClass}>
-          There is no subscription or listing fee for guides. Guides set their own
+          There is no subscription or listing fee for independent guides. Independent guides set their own
           full-day and half-day rates. A 10% service fee is added on top of the
-          guide&rsquo;s rate at checkout, paid by the angler. The guide receives 100%
+          independent guide&rsquo;s rate at checkout, paid by the angler. The independent guide receives 100%
           of their stated rate for each completed trip. Payouts are processed through
           Stripe Connect.
         </p>
 
-        <h3 className={subHeadingClass}>Cancellation &amp; guide payouts</h3>
+        <h3 className={subHeadingClass}>Cancellation &amp; independent guide payouts</h3>
         <p className={textClass}>
-          When an angler cancels a booking that includes a guide, the guide payout
+          When an angler cancels a booking that includes an independent guide, the independent guide payout
           follows the same tiered refund schedule as the booking itself. Cancellations
-          within 48 hours of the trip date result in a full guide payout. The guide&rsquo;s
+          within 48 hours of the trip date result in a full independent guide payout. The independent guide&rsquo;s
           availability is automatically released upon cancellation.
         </p>
 
         <h3 className={subHeadingClass}>Reviews</h3>
         <p className={textClass}>
-          After a guided trip, both the angler and guide may submit reviews within
+          After a guided trip, both the angler and independent guide may submit reviews within
           14 days. Reviews are revealed simultaneously once both parties have submitted,
           or after the 14-day window closes &mdash; whichever comes first. This mutual
           reveal system ensures honest, unbiased feedback.

@@ -55,13 +55,13 @@ export default function FeeBreakdown({
         <>
           <div className="flex justify-between text-text-secondary">
             <span>
-              Guide — {selectedGuideName} ({duration === "half_day" ? "half" : "full"} day)
+              Independent Guide — {selectedGuideName} ({duration === "half_day" ? "half" : "full"} day)
               {isMultiDay ? ` x ${numberOfDays} days` : ""}
             </span>
             <span>${fees.guideRate.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-text-light">
-            <span>Guide service fee (10%)</span>
+            <span>Independent guide service fee (10%)</span>
             <span>${fees.guideServiceFee.toFixed(2)}</span>
           </div>
         </>

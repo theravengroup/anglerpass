@@ -34,7 +34,7 @@ interface MessagesViewProps {
 
 export function MessagesView({
   accentColor = "forest",
-  subtitle = "Communicate with landowners, club managers, and guides.",
+  subtitle = "Communicate with landowners, club managers, and independent guides.",
   emptyDescription = "Your conversations will appear here.",
 }: MessagesViewProps) {
   const [threads, setThreads] = useState<Thread[]>([]);

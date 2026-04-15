@@ -1,7 +1,7 @@
 const STEPS = [
   "Property",
   "Trip Details",
-  "Guide Fee",
+  "Independent Guide Fee",
   "Invite Anglers",
   "Review",
 ];

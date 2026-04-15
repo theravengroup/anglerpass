@@ -24,7 +24,7 @@ export default function GuideProfileForm({ form, isEditable }: GuideProfileFormP
       <Card className="border-stone-light/20">
         <CardHeader>
           <CardTitle className="text-base">Basic Information</CardTitle>
-          <CardDescription>Your public-facing guide profile</CardDescription>
+          <CardDescription>Your public-facing independent guide profile</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -57,7 +57,7 @@ export default function GuideProfileForm({ form, isEditable }: GuideProfileFormP
       <Card className="border-stone-light/20">
         <CardHeader>
           <CardTitle className="text-base">Services</CardTitle>
-          <CardDescription>What you offer as a guide</CardDescription>
+          <CardDescription>What you offer as an independent guide</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

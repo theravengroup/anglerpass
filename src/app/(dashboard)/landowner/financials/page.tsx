@@ -160,7 +160,7 @@ export default function LandownerFinancialsPage() {
       ["YTD Earnings", data.ytd_earnings.toFixed(2)],
       ["Held Funds", data.held_funds_total.toFixed(2)],
       ["Total Refunds Issued", data.total_refunds.toFixed(2)],
-      ["Guide Revenue (from guided bookings)", data.total_guide_rate.toFixed(2)],
+      ["Independent Guide Revenue (from guided bookings)", data.total_guide_rate.toFixed(2)],
       [],
       ["Quarterly Breakdown", "Earnings", "Gross", "Commissions", "Bookings"],
       ...data.quarterly_earnings.map((q) => [
@@ -180,7 +180,7 @@ export default function LandownerFinancialsPage() {
         String(p.bookings),
       ]),
       [],
-      ["Transaction ID", "Date", "Property", "Angler", "Gross", "Commission", "Net Payout", "Guide Rate", "Refund", "Status"],
+      ["Transaction ID", "Date", "Property", "Angler", "Gross", "Commission", "Net Payout", "Ind. Guide Rate", "Refund", "Status"],
       ...data.recent_transactions.map((t) => [
         t.id,
         t.booking_date,
@@ -360,7 +360,7 @@ export default function LandownerFinancialsPage() {
         your payout. Properties listed as upfront-lease receive an annual ACH
         payment from the club (landowner keeps 100%; AnglerPass&apos;s 5%
         facilitation fee is charged on top to the club) &mdash; with lease
-        mode, per-booking rod fees go entirely to the club. Guide fees are
+        mode, per-booking rod fees go entirely to the club. Independent guide fees are
         charged separately. Payouts are processed through Stripe and deposited
         directly to your connected bank account.
       </FeeExplanationCard>

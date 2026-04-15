@@ -49,7 +49,7 @@ export const STATE_SEO_DATA: StateSeoData[] = [
           "Montana's prime fly fishing season runs from late June through September, with excellent dry fly hatches including salmonflies in June, PMDs through summer, and hoppers in August. Spring creeks fish well year-round, and fall offers outstanding brown trout fishing with fewer crowds.",
       },
       {
-        question: "Do I need a guide to fish private water in Montana?",
+        question: "Do I need an independent guide to fish private water in Montana?",
         answer:
           "Not necessarily. Many AnglerPass properties offer walk-and-wade access with detailed maps and hatch charts. Some landowners do require guided trips, which can be arranged through the platform. Private spring creeks often fish best with local knowledge of the specific water.",
       },

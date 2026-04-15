@@ -41,7 +41,7 @@ const ROLE_CONFIG: Record<
     home: "/club",
   },
   guide: {
-    label: "Guide",
+    label: "Independent Guide",
     icon: Compass,
     color: "text-charcoal",
     bg: "bg-charcoal/10",
@@ -74,7 +74,7 @@ const ADDABLE_ROLES = [
   },
   {
     value: "guide",
-    label: "Become a Guide",
+    label: "Become an Independent Guide",
     description: "Offer guided fishing trips on AnglerPass",
   },
 ];

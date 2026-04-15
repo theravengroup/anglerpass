@@ -52,7 +52,7 @@ export default function AnglerTransactionHistory({
                   <th className="pb-2 pr-4">Property</th>
                   <th className="pb-2 pr-4 text-right">Rod Fee</th>
                   <th className="pb-2 pr-4 text-right">Platform</th>
-                  <th className="pb-2 pr-4 text-right">Guide</th>
+                  <th className="pb-2 pr-4 text-right">Ind. Guide</th>
                   <th className="pb-2 pr-4 text-right">Total</th>
                   <th className="pb-2 text-right">Status</th>
                 </tr>

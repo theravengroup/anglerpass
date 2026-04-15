@@ -40,7 +40,7 @@ export function MonthlyRevenueTable({
                 <th className="pb-2 pr-4">Month</th>
                 <th className="pb-2 pr-4 text-right">Platform Fee</th>
                 <th className="pb-2 pr-4 text-right">Cross-Club</th>
-                <th className="pb-2 pr-4 text-right">Guide Service</th>
+                <th className="pb-2 pr-4 text-right">Ind. Guide Service</th>
                 <th className="pb-2 text-right">Total</th>
               </tr>
             </thead>

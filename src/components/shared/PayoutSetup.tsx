@@ -31,7 +31,7 @@ interface PayoutSetupProps {
 const TYPE_CONFIG = {
   guide: {
     color: "charcoal",
-    label: "Guide",
+    label: "Independent Guide",
     description:
       "Connect your bank account to receive earnings from guided trips. This is required before you can accept bookings.",
   },

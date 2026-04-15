@@ -31,7 +31,7 @@ export default function GuideProfileSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <DollarSign className="size-4 text-charcoal" />
-            Guide Rates
+            Independent Guide Rates
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -99,12 +99,12 @@ export default function GuideProfileSidebar({
       {/* CTA */}
       <Link href="/angler/discover">
         <Button className="w-full bg-charcoal text-white hover:bg-charcoal/90">
-          Book This Guide
+          Book This Independent Guide
           <ArrowRight className="ml-1 size-4" />
         </Button>
       </Link>
       <p className="text-center text-[10px] text-text-light">
-        Guides are booked through property pages when scheduling a trip.
+        Independent guides are booked through property pages when scheduling a trip.
       </p>
     </div>
   );

@@ -60,7 +60,7 @@ export default function GuideCard({ guide }: GuideCardProps) {
                     {guide.rating_avg!.toFixed(1)} ({guide.rating_count})
                   </span>
                 ) : (
-                  <span className="text-xs text-text-light">New Guide</span>
+                  <span className="text-xs text-text-light">New Independent Guide</span>
                 )}
               </div>
             </div>

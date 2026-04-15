@@ -33,17 +33,17 @@ export default function GuidesSection({
     <div className="space-y-2">
       <Label className="flex items-center gap-1.5">
         <Compass className="size-3.5 text-charcoal" />
-        Add a Guide
+        Add an Independent Guide
       </Label>
 
       {loadingGuides ? (
         <div className="flex items-center gap-2 rounded-lg border border-stone-light/15 px-3 py-2 text-xs text-text-light">
           <Loader2 className="size-3 animate-spin" />
-          Finding available guides...
+          Finding available independent guides...
         </div>
       ) : availableGuides.length === 0 ? (
         <p className="text-xs text-text-light">
-          No guides available for this date
+          No independent guides available for this date
         </p>
       ) : (
         <div className="space-y-2">
@@ -57,7 +57,7 @@ export default function GuidesSection({
                 : "border-stone-light/20 hover:border-stone-light/40"
             }`}
           >
-            No guide needed
+            No independent guide needed
           </button>
 
           {availableGuides.slice(0, 5).map((guide, idx) => (

@@ -39,7 +39,7 @@ function buildExportRows(data: Financials): string[][] {
     ["  Platform Fees (15%)", data.platform_fee_total.toFixed(2)],
     ["  Cross-Club Fees (AP share $15/rod)", data.cross_club_fee_total.toFixed(2)],
     ["  Cross-Club Referring Club Referral ($10/rod)", data.cross_club_referral_total.toFixed(2)],
-    ["  Guide Service Fees (10%)", data.guide_service_fee_total.toFixed(2)],
+    ["  Independent Guide Service Fees (10%)", data.guide_service_fee_total.toFixed(2)],
     ["  Lease Facilitation Fees (5%)", data.lease_facilitation_fee_total.toFixed(2)],
     ["  Membership Processing Fees", data.membership_processing_fees.toFixed(2)],
     [],
@@ -50,7 +50,7 @@ function buildExportRows(data: Financials): string[][] {
     ["═══ PAYOUT OBLIGATIONS ═══"],
     ["Landowner Payouts", data.landowner_payouts_total.toFixed(2)],
     ["Club Commissions", data.club_payouts_total.toFixed(2)],
-    ["Guide Payouts", data.guide_payouts_total.toFixed(2)],
+    ["Independent Guide Payouts", data.guide_payouts_total.toFixed(2)],
     [
       "Total Payouts",
       (
@@ -61,7 +61,7 @@ function buildExportRows(data: Financials): string[][] {
     ],
     [],
     ["═══ MONTHLY REVENUE ═══"],
-    ["Month", "Platform Fee", "Cross-Club Fee", "Guide Service Fee", "Lease Facilitation Fee", "Total"],
+    ["Month", "Platform Fee", "Cross-Club Fee", "Ind. Guide Service Fee", "Lease Facilitation Fee", "Total"],
     ...data.revenue_by_month.map((m) => [
       m.month,
       m.platform_fee.toFixed(2),
@@ -87,10 +87,10 @@ function buildExportRows(data: Financials): string[][] {
       "Total",
       "Platform Fee",
       "Cross-Club",
-      "Guide Fee",
+      "Ind. Guide Fee",
       "Landowner",
       "Club",
-      "Guide",
+      "Ind. Guide",
     ],
     ...data.recent_transactions.map((t) => [
       t.booking_date,
@@ -181,7 +181,7 @@ export default function AdminFinancialsPage() {
     {
       label: "Total Payouts",
       value: `$${totalPayouts.toLocaleString()}`,
-      description: "Landowners + clubs + guides",
+      description: "Landowners + clubs + independent guides",
       icon: Wallet,
       color: "text-bronze",
       bg: "bg-bronze/10",
@@ -199,7 +199,7 @@ export default function AdminFinancialsPage() {
   const revenueStreams: StreamItem[] = [
     { label: "Platform Fees (15%)", amount: data?.platform_fee_total ?? 0, color: "bg-forest" },
     { label: "Cross-Club Fees (AP $15/rod)", amount: data?.cross_club_fee_total ?? 0, color: "bg-river" },
-    { label: "Guide Service Fees (10%)", amount: data?.guide_service_fee_total ?? 0, color: "bg-charcoal" },
+    { label: "Independent Guide Service Fees (10%)", amount: data?.guide_service_fee_total ?? 0, color: "bg-charcoal" },
     { label: "Lease Facilitation Fee (5%)", amount: data?.lease_facilitation_fee_total ?? 0, color: "bg-bronze" },
     { label: "Membership Processing Fees", amount: data?.membership_processing_fees ?? 0, color: "bg-river-light" },
   ].filter((s) => s.amount > 0);
@@ -210,7 +210,7 @@ export default function AdminFinancialsPage() {
     { label: "Landowner Payouts", amount: data?.landowner_payouts_total ?? 0, color: "bg-forest" },
     { label: "Club Rod-Fee Share", amount: data?.club_payouts_total ?? 0, color: "bg-river" },
     { label: "Cross-Club Referral Payouts", amount: data?.cross_club_referral_total ?? 0, color: "bg-river-light" },
-    { label: "Guide Payouts", amount: data?.guide_payouts_total ?? 0, color: "bg-charcoal" },
+    { label: "Independent Guide Payouts", amount: data?.guide_payouts_total ?? 0, color: "bg-charcoal" },
   ].filter((s) => s.amount > 0);
 
   function exportCSV() {

@@ -129,7 +129,7 @@ async function exportRevenue() {
   const data = await res.json();
 
   const rows: string[][] = [
-    ["Date", "Platform Fees", "Cross-Club Fees", "Guide Service Fees", "Membership Fees", "Compass Credits"],
+    ["Date", "Platform Fees", "Cross-Club Fees", "Independent Guide Service Fees", "Membership Fees", "Compass Credits"],
   ];
 
   for (const day of data.daily ?? []) {

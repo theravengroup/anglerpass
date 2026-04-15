@@ -55,7 +55,7 @@ const ALL_ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <Building2 />,
   },
   {
-    label: "Guides",
+    label: "Independent Guides",
     href: "/admin/guides",
     icon: <Compass />,
   },

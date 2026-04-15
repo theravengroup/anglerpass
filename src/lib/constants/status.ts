@@ -356,7 +356,7 @@ export const ROLE_LABELS: Record<string, string> = {
   landowner: "Landowner",
   club_admin: "Club Admin",
   admin: "Admin",
-  guide: "Guide",
+  guide: "Independent Guide",
 };
 
 export const ROLE_BADGE_COLORS: Record<string, string> = {

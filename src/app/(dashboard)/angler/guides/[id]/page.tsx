@@ -77,7 +77,7 @@ export default function GuideProfilePage() {
       try {
         const res = await fetch(`/api/guides/${id}`);
         if (!res.ok) {
-          setError(res.status === 404 ? "Guide not found." : "Failed to load guide profile.");
+          setError(res.status === 404 ? "Independent guide not found." : "Failed to load independent guide profile.");
           return;
         }
         const data = await res.json();
@@ -85,7 +85,7 @@ export default function GuideProfilePage() {
         setReviews(data.reviews ?? []);
         setWaters(data.waters ?? []);
       } catch {
-        setError("Failed to load guide profile.");
+        setError("Failed to load independent guide profile.");
       } finally {
         setLoading(false);
       }
@@ -107,11 +107,11 @@ export default function GuideProfilePage() {
         <Link href="/angler/guides">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-1 size-4" />
-            Back to Guides
+            Back to Independent Guides
           </Button>
         </Link>
         <div role="alert" aria-live="polite" className="py-12 text-center text-sm text-red-600">
-          {error ?? "Guide not found."}
+          {error ?? "Independent guide not found."}
         </div>
       </div>
     );

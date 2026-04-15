@@ -28,7 +28,7 @@ export default function GuidedBookingsCard({
           Guided Bookings
         </CardTitle>
         <CardDescription>
-          Revenue split on bookings with guides
+          Revenue split on bookings with independent guides
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -43,18 +43,18 @@ export default function GuidedBookingsCard({
             <p className="text-xl font-semibold text-text-primary">
               ${totalGuideRate.toLocaleString()}
             </p>
-            <p className="text-xs text-text-secondary">Total Guide Revenue</p>
+            <p className="text-xs text-text-secondary">Total Independent Guide Revenue</p>
           </div>
           <div className="rounded-lg border border-charcoal/20 bg-charcoal/5 p-3">
             <p className="text-xl font-semibold text-charcoal">
               ${totalGuidePayout.toLocaleString()}
             </p>
-            <p className="text-xs text-text-secondary">Paid to Guides</p>
+            <p className="text-xs text-text-secondary">Paid to Independent Guides</p>
           </div>
         </div>
         <p className="mt-3 text-xs text-text-light">
-          Guide rates are charged to anglers in addition to your rod fee. You
-          receive your full net payout regardless of guide involvement.
+          Independent guide rates are charged to anglers in addition to your rod fee. You
+          receive your full net payout regardless of independent guide involvement.
         </p>
       </CardContent>
     </Card>

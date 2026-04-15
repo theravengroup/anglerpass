@@ -1,7 +1,7 @@
 import { getLogoDataUri, getOgBackgroundDataUri } from '@/lib/og-logo';
 import { jpegOgImage } from '@/lib/og-jpeg';
 
-export const alt = 'For Guides — AnglerPass';
+export const alt = 'For Independent Guides — AnglerPass';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/jpeg';
 
@@ -111,7 +111,7 @@ export default async function Image() {
               textShadow: '0 2px 16px rgba(0,0,0,0.5)',
             }}
           >
-            For Guides
+            For Independent Guides
           </div>
 
           {/* Gold divider */}

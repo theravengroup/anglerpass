@@ -49,7 +49,7 @@ function getTemplates(clubName: string): CopyTemplate[] {
       id: "modern",
       label: "Modern Club Management",
       headline: `${clubName} + AnglerPass`,
-      body: `We\u2019re using AnglerPass to run our club\u00a0\u2014\u00a0online bookings, verified guides, and a network of private water that goes well beyond our own properties. Join us and see what modern club membership\u00a0looks\u00a0like.`,
+      body: `We\u2019re using AnglerPass to run our club\u00a0\u2014\u00a0online bookings, verified independent guides, and a network of private water that goes well beyond our own properties. Join us and see what modern club membership\u00a0looks\u00a0like.`,
       cta: `Join ${clubName} on AnglerPass`,
     },
   ];

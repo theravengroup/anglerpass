@@ -39,8 +39,8 @@ export default function PaymentPolicies() {
           Fishing access bookings have a separate fee structure: a 15% platform fee on
           rod fees, plus a $25/rod/day cross-club access fee when booking outside your
           home club ($15 to AnglerPass, $10 referral to your home club).
-          When a guide is added to a booking, a 10% service fee is applied to the guide&rsquo;s
-          rate, paid by the angler. The guide receives 100% of their stated rate.
+          When an independent guide is added to a booking, a 10% service fee is applied to the independent guide&rsquo;s
+          rate, paid by the angler. The independent guide receives 100% of their stated rate.
           See our{' '}
           <Link href="/pricing" className="text-river underline">
             pricing page
@@ -146,13 +146,13 @@ export default function PaymentPolicies() {
             <tbody>
               <tr className="border-t border-parchment">
                 <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
-                  Guides
+                  Independent Guides
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
                   24&ndash;48 hours after trip date + 7-day hold
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
-                  100% of your stated guide rate
+                  100% of your stated independent guide rate
                 </td>
               </tr>
               <tr className="border-t border-parchment">
@@ -200,10 +200,10 @@ export default function PaymentPolicies() {
           7-day window, funds are released to the next scheduled payout.
         </p>
 
-        <h3 className={subHeadingClass}>Guide payouts</h3>
+        <h3 className={subHeadingClass}>Independent guide payouts</h3>
         <p className={textClass}>
-          Guides receive the fastest payouts on the platform. After the 7-day
-          hold clears, your guide rate is paid out within 24&ndash;48 hours.
+          Independent guides receive the fastest payouts on the platform. After the 7-day
+          hold clears, your independent guide rate is paid out within 24&ndash;48 hours.
           For example, if you guide a trip on Saturday April 5, the 7-day hold
           clears on Saturday April 12, and your payout initiates by Monday April
           14 &mdash; typically arriving in your bank account within 2 business days.

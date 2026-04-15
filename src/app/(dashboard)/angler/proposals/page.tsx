@@ -61,7 +61,7 @@ export default function AnglerProposalsPage() {
           Trip Proposals
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
-          Proposals from guides for upcoming fishing trips.
+          Proposals from independent guides for upcoming fishing trips.
         </p>
       </div>
 
@@ -75,7 +75,7 @@ export default function AnglerProposalsPage() {
               No proposals yet
             </h3>
             <p className="mt-1 max-w-sm text-center text-sm text-text-secondary">
-              When a guide sends you a trip proposal, it will appear here for
+              When an independent guide sends you a trip proposal, it will appear here for
               you to review and accept.
             </p>
           </CardContent>

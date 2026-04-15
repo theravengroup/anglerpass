@@ -356,7 +356,7 @@ export default function CorporateMembershipsPage() {
               },
               {
                 q: 'What can corporate employees do on the platform?',
-                a: 'Everything a regular club member can do. They can browse private water properties, book fishing days, access cross-club water, add optional guides to trips, and manage their own angler profile.',
+                a: 'Everything a regular club member can do. They can browse private water properties, book fishing days, access cross-club water, add optional independent guides to trips, and manage their own angler profile.',
               },
               {
                 q: 'Is there a limit on how many employees we can invite?',

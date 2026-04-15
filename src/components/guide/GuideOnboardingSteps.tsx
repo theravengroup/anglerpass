@@ -44,10 +44,10 @@ export function NoProfileStep() {
             <UserCircle className="size-8 text-charcoal" />
           </div>
           <h3 className="mt-4 text-lg font-medium text-text-primary">
-            Create Your Guide Profile
+            Create Your Independent Guide Profile
           </h3>
           <p className="mt-2 max-w-md text-sm text-text-secondary">
-            Get started by setting up your guide profile. You&rsquo;ll add
+            Get started by setting up your independent guide profile. You&rsquo;ll add
             your bio, techniques, pricing, and credentials — then go through a
             quick verification process.
           </p>
@@ -101,7 +101,7 @@ export function ProfileIncompleteStep({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <FileText className="size-5 text-charcoal" />
-          Complete Your Guide Setup
+          Complete Your Independent Guide Setup
         </CardTitle>
         <CardDescription>
           {completedCount} of {steps.length} steps complete
@@ -274,7 +274,7 @@ export function PayoutNeededStep() {
               You&rsquo;re approved!
             </p>
             <p className="text-sm text-text-secondary">
-              Your guide profile is live. Connect your bank account below to
+              Your independent guide profile is live. Connect your bank account below to
               start accepting bookings and receiving payouts.
             </p>
           </div>
@@ -294,7 +294,7 @@ export function RejectedStep({ profile }: { profile?: StepProfile }) {
           Verification Not Approved
         </CardTitle>
         <CardDescription>
-          Unfortunately, your guide verification was not approved.
+          Unfortunately, your independent guide verification was not approved.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -326,7 +326,7 @@ export function SuspendedStep({ profile }: { profile?: StepProfile }) {
           Profile Suspended
         </CardTitle>
         <CardDescription>
-          Your guide profile has been suspended.
+          Your independent guide profile has been suspended.
         </CardDescription>
       </CardHeader>
       <CardContent>

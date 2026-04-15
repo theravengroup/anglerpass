@@ -415,8 +415,8 @@ function ActiveClubDashboard({
             bg: "bg-river/10",
           },
           {
-            label: "Guide Affiliations",
-            description: "Manage affiliated guides for your waters",
+            label: "Independent Guide Affiliations",
+            description: "Manage affiliated independent guides for your waters",
             href: "/club/guides",
             icon: Handshake,
             color: "text-charcoal",
