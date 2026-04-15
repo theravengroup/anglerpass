@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     const { data: property, error: propError } = await admin
       .from("properties")
       .select(
-        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id, location_description"
+        "id, name, status, half_day_allowed, rate_adult_full_day, rate_adult_half_day, max_rods, max_guests, owner_id, location_description, classification, pricing_mode, lease_status"
       )
       .eq("id", property_id)
       .maybeSingle();
@@ -297,13 +297,64 @@ export async function POST(request: Request) {
       guideName = guideProfile.display_name;
     }
 
+    // ── Resolve pricing model ─────────────────────────────────────
+    // Pre-launch safety: properties must have pricing configured before
+    // they're published. Belt-and-suspenders check at booking time too.
+    const pricingMode = (property.pricing_mode ?? "rod_fee_split") as
+      | "rod_fee_split"
+      | "upfront_lease";
+    const classification = property.classification as
+      | "select"
+      | "premier"
+      | "signature"
+      | null;
+
+    if (pricingMode === "rod_fee_split" && !classification) {
+      return jsonError(
+        "This property has not finished pricing setup — please contact the owner",
+        400,
+      );
+    }
+    if (pricingMode === "upfront_lease" && property.lease_status !== "active") {
+      return jsonError(
+        "This property's lease is not active — please contact the owner",
+        400,
+      );
+    }
+
+    // ── Routing: determine referring vs managing club ─────────────
+    //   referring_club_id = the angler's club (from their membership)
+    //   managing_club_id  = the club that holds the property relationship
+    // For home-club bookings these are the same. For cross-club they differ
+    // and the referring club receives a $10/rod/day referral.
+    const referringClubId = membership.club_id;
+    const managingClubId = routing.accessClubId;
+
+    // Staff discount applies only when the angler is staff of the MANAGING
+    // club (owns the landowner relationship, absorbs the discount).
+    const { data: managingClub } = await admin
+      .from("clubs")
+      .select("id, owner_id")
+      .eq("id", managingClubId)
+      .maybeSingle();
+    const isManagingClubStaff = managingClub?.owner_id === user.id;
+
     // Calculate full fee breakdown
     const ratePerRod =
       duration === "full_day"
         ? (property.rate_adult_full_day ?? 0)
         : (property.rate_adult_half_day ?? 0);
 
-    const fees = calculateFeeBreakdown(ratePerRod, party_size, isCrossClub, guideRate, numberOfDays);
+    const fees = calculateFeeBreakdown({
+      ratePerRod,
+      rodCount: party_size,
+      numberOfDays,
+      classification,
+      pricingMode,
+      isCrossClub,
+      isManagingClubStaff,
+      guideRate,
+    });
 
     // ── Create booking record(s) ──────────────────────────────────
     const bookingGroupId = isMultiDay ? crypto.randomUUID() : null;
@@ -344,10 +395,18 @@ export async function POST(request: Request) {
       base_rate: idx === 0 ? fees.baseRate : 0,
       platform_fee: idx === 0 ? fees.platformFee : 0,
       cross_club_fee: idx === 0 ? fees.crossClubFee : 0,
-      home_club_referral: idx === 0 ? fees.homeClubReferral : 0,
-      club_commission: idx === 0 ? fees.clubCommission : 0,
+      home_club_referral: idx === 0 ? fees.crossClubReferral : 0,
+      club_commission: idx === 0 ? fees.clubPayout : 0,
       landowner_payout: idx === 0 ? fees.landownerPayout : 0,
       total_amount: idx === 0 ? fees.totalAmount : 0,
+      // Snapshot pricing model at booking time so future classification
+      // changes don't retroactively rewrite this booking's payout math.
+      property_classification: fees.classification,
+      pricing_mode: fees.pricingMode,
+      club_split_pct: fees.clubSplitPct,
+      landowner_split_pct: fees.landownerSplitPct,
+      referring_club_id: referringClubId,
+      managing_club_id: managingClubId,
     }));
 
     const { data: bookings, error: insertError } = await admin

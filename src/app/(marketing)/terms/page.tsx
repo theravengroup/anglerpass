@@ -185,22 +185,42 @@ export default function TermsPage() {
             </p>
 
             <p className={textClass}>
-              <strong>Property bookings.</strong>{' '}Anglers pay the
-              landowner&rsquo;s rod fee plus a 15% platform fee on each
-              booking. A $5 per rod per day commission is deducted from the
-              rod fee and paid to the managing club. Landowners receive 100%
-              of their stated rod fee minus the $5/rod club commission. The
-              15% platform fee is paid by the angler and does not reduce the
-              landowner&rsquo;s payout.
+              <strong>Property bookings &mdash; rod fee split.</strong>{' '}Anglers
+              pay the landowner&rsquo;s rod fee plus a 15% platform fee on each
+              booking. The rod fee is split between the managing club and the
+              landowner per the property&rsquo;s classification: Select
+              (50% club / 50% landowner), Premier (35% / 65%), or Signature
+              (25% / 75%). The 15% platform fee is paid by the angler and does
+              not reduce the landowner&rsquo;s or club&rsquo;s payout.
+            </p>
+
+            <p className={textClass}>
+              <strong>Property bookings &mdash; upfront lease.</strong>{' '}A
+              landowner may alternatively opt for an upfront annual lease. In
+              this model the managing club pays the landowner a negotiated
+              lease amount via ACH at lease acceptance; AnglerPass retains a
+              5% platform fee on the lease payment. For bookings on lease
+              properties, the managing club keeps 100% of the rod fee; the
+              landowner receives no per-booking payout since they were paid
+              upfront.
             </p>
 
             <p className={textClass}>
               <strong>Cross-club access.</strong>{' '}When an angler books water
-              managed by a club other than their home club, a $25 per rod
-              cross-club access fee applies. Of this fee, $20 goes to
-              AnglerPass and $5 goes to the angler&rsquo;s home club as a
-              referral commission. The hosting club still receives its
-              standard $5/rod commission from the rod fee.
+              managed by a club other than their home club, a $25 per rod per
+              day cross-club access fee applies. Of this fee, $15 goes to
+              AnglerPass and $10 goes to the angler&rsquo;s home club as a
+              referral. The hosting (managing) club still receives its full
+              rod-fee share per the property&rsquo;s classification.
+            </p>
+
+            <p className={textClass}>
+              <strong>Staff discount.</strong>{' '}Staff of the managing club
+              booking at their own club&rsquo;s properties receive the
+              club&rsquo;s share of the rod fee as a discount (absorbed by the
+              club). The landowner still receives their full classification
+              share of the gross rod fee. Cross-club bookings by staff do not
+              receive this discount and all cross-club fees still apply.
             </p>
 
             <p className={textClass}>

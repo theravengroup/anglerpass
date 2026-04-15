@@ -29,7 +29,8 @@ export async function GET(
         *,
         properties(
           id, name, rate_adult_full_day, rate_adult_half_day,
-          location_description, water_type, photos
+          location_description, water_type, photos,
+          classification, pricing_mode, lease_status
         ),
         guide_profiles(
           user_id, display_name, bio, profile_photo_url,
@@ -97,12 +98,26 @@ export async function GET(
       }
     }
 
-    const fees = calculateFeeBreakdown(
+    // Preview breakdown — tolerate properties that haven't finished pricing
+    // setup yet (fall back to defaults so the UI can still render).
+    const pricingMode = (proposal.properties?.pricing_mode ?? "rod_fee_split") as
+      | "rod_fee_split"
+      | "upfront_lease";
+    const classification = (proposal.properties?.classification ?? "select") as
+      | "select"
+      | "premier"
+      | "signature";
+
+    const fees = calculateFeeBreakdown({
       ratePerRod,
       rodCount,
+      numberOfDays: 1,
+      classification: pricingMode === "rod_fee_split" ? classification : null,
+      pricingMode,
       isCrossClub,
-      totalGuideRate
-    );
+      isManagingClubStaff: false,
+      guideRate: totalGuideRate,
+    });
 
     return jsonOk({
       proposal: {

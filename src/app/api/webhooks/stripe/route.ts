@@ -113,6 +113,164 @@ async function handleCompassCreditPurchase(
 
 }
 
+async function handleLeasePaymentSucceeded(
+  paymentIntent: Record<string, unknown>
+) {
+  const admin = createAdminClient();
+  const metadata = paymentIntent.metadata as Record<string, string>;
+  const propertyId = metadata.property_id;
+  const clubId = metadata.club_id;
+  const landownerId = metadata.landowner_id;
+  const paymentIntentId = paymentIntent.id as string;
+
+  if (!propertyId || !clubId) {
+    console.error("[stripe-webhook] lease payment missing metadata", {
+      payment_intent_id: paymentIntentId,
+    });
+    return;
+  }
+
+  // Idempotent: skip if already succeeded
+  const { data: existing } = await admin
+    .from("property_lease_payments")
+    .select("id, status, period_end")
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .maybeSingle();
+
+  if (existing?.status === "succeeded") return;
+
+  const nowIso = new Date().toISOString();
+
+  // Mark payment succeeded
+  const { data: updated, error: updateErr } = await admin
+    .from("property_lease_payments")
+    .update({
+      status: "succeeded",
+      paid_at: nowIso,
+    })
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .select("id, period_end, landowner_net_cents")
+    .maybeSingle();
+
+  if (updateErr || !updated) {
+    console.error("[stripe-webhook] lease payment update failed", updateErr);
+    throw updateErr ?? new Error("Lease ledger row missing");
+  }
+
+  // Activate the lease on the property
+  await admin
+    .from("properties")
+    .update({
+      lease_status: "active",
+      lease_paid_through: updated.period_end,
+      lease_last_payment_at: nowIso,
+      updated_at: nowIso,
+    })
+    .eq("id", propertyId);
+
+  // Transfer landowner net to their Stripe Connect account.
+  if (landownerId) {
+    const { data: landowner } = await admin
+      .from("profiles")
+      .select("stripe_connect_account_id")
+      .eq("id", landownerId)
+      .maybeSingle();
+
+    const destination = landowner?.stripe_connect_account_id;
+    if (destination && updated.landowner_net_cents > 0) {
+      try {
+        const { createTransfer } = await import("@/lib/stripe/server");
+        const transfer = await createTransfer(
+          {
+            amountCents: updated.landowner_net_cents,
+            destinationAccountId: destination,
+            metadata: {
+              type: "property_lease_payment",
+              property_id: propertyId,
+              payment_intent_id: paymentIntentId,
+            },
+          },
+          { idempotencyKey: `lease-${paymentIntentId}` }
+        );
+
+        await admin
+          .from("property_lease_payments")
+          .update({ stripe_transfer_id: transfer.id })
+          .eq("id", updated.id);
+      } catch (err) {
+        console.error("[stripe-webhook] lease transfer failed", err);
+      }
+    } else {
+      console.warn(
+        "[stripe-webhook] lease paid but landowner has no Stripe Connect account",
+        { propertyId, landownerId }
+      );
+    }
+  }
+
+  // Notify landowner
+  try {
+    const { notify } = await import("@/lib/notifications");
+    if (landownerId) {
+      await notify(admin, {
+        userId: landownerId,
+        type: "lease_activated",
+        title: "Lease payment received",
+        body: "Your upfront lease payment has cleared and the funds are on their way to your bank account.",
+        link: `/landowner/properties/${propertyId}`,
+      });
+    }
+  } catch (err) {
+    console.error("[stripe-webhook] lease notification failed", err);
+  }
+
+  await admin.from("audit_log").insert({
+    action: "lease.payment_succeeded",
+    entity_type: "property",
+    entity_id: propertyId,
+    new_data: {
+      payment_intent_id: paymentIntentId,
+      amount_cents: paymentIntent.amount as number,
+    },
+  });
+}
+
+async function handleLeasePaymentFailed(
+  paymentIntent: Record<string, unknown>
+) {
+  const admin = createAdminClient();
+  const metadata = paymentIntent.metadata as Record<string, string>;
+  const propertyId = metadata.property_id;
+  const paymentIntentId = paymentIntent.id as string;
+  const failureMessage =
+    ((paymentIntent.last_payment_error as Record<string, unknown>)?.message as
+      | string
+      | undefined) ?? null;
+
+  await admin
+    .from("property_lease_payments")
+    .update({
+      status: "failed",
+      failure_reason: failureMessage,
+    })
+    .eq("stripe_payment_intent_id", paymentIntentId);
+
+  if (propertyId) {
+    // Revert to agreed so the club can retry
+    await admin
+      .from("properties")
+      .update({ lease_status: "agreed", updated_at: new Date().toISOString() })
+      .eq("id", propertyId);
+  }
+
+  await admin.from("audit_log").insert({
+    action: "lease.payment_failed",
+    entity_type: "property",
+    entity_id: propertyId ?? paymentIntentId,
+    new_data: { payment_intent_id: paymentIntentId, reason: failureMessage },
+  });
+}
+
 async function handlePaymentIntentSucceeded(
   paymentIntent: Record<string, unknown>
 ) {
@@ -122,6 +280,10 @@ async function handlePaymentIntentSucceeded(
   // Route to compass credit handler if applicable
   if (metadata?.type === "compass_credit_purchase") {
     return handleCompassCreditPurchase(paymentIntent);
+  }
+
+  if (metadata?.type === "property_lease_payment") {
+    return handleLeasePaymentSucceeded(paymentIntent);
   }
 
   const bookingId = metadata?.booking_id;
@@ -165,8 +327,11 @@ async function handlePaymentIntentFailed(
   paymentIntent: Record<string, unknown>
 ) {
   const admin = createAdminClient();
-  const bookingId = (paymentIntent.metadata as Record<string, string>)
-    ?.booking_id;
+  const metadata = paymentIntent.metadata as Record<string, string>;
+  if (metadata?.type === "property_lease_payment") {
+    return handleLeasePaymentFailed(paymentIntent);
+  }
+  const bookingId = metadata?.booking_id;
 
   if (!bookingId) return;
 

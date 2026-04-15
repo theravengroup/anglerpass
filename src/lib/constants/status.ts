@@ -370,10 +370,6 @@ export const ROLE_BADGE_COLORS: Record<string, string> = {
 export { type UserRole } from "@/types/roles";
 export const VALID_ROLES = ["landowner", "club_admin", "angler", "admin", "guide"] as const;
 
-// ─── Staff Discount Rates ────────────────────────────────────────────
-// Re-exported for backward compatibility. Canonical source: @/lib/constants/fees
-export { STAFF_DISCOUNT_OWN_CLUB, STAFF_DISCOUNT_CROSS_CLUB } from "@/lib/constants/fees";
-
 // ─── Trip Review Status ──────────────────────────────────────────────
 
 export const TRIP_REVIEW_STATUS: Record<string, StatusConfig> = {

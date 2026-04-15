@@ -79,7 +79,7 @@ const landownerFaqJsonLd = buildJsonLd({
       name: 'How do landowners make money with AnglerPass?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Landowners partner with a member fly fishing club that lists and manages their property on AnglerPass. Anglers pay a booking fee for access, and the landowner receives a trespass fee negotiated directly with the managing club.',
+        text: 'Landowners choose one of two payment models during onboarding. Rod fee split pays you a classification-based share (50%, 65%, or 75%) of every booking&apos;s rod fee. Upfront annual lease pays you a single ACH payment from the managing club, who then keeps 100% of rod fees. Either way the club handles all booking logistics.',
       },
     },
     {

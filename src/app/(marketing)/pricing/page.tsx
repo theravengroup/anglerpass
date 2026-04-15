@@ -159,6 +159,44 @@ export default function PricingPage() {
             </div>
           </div>
 
+          {/* Rod Fee Splits */}
+          <div className="reveal mt-8 bg-white border border-parchment rounded-[14px] py-8 px-7">
+            <h3 className="font-heading text-[22px] font-semibold text-forest mb-4 tracking-[-0.2px]">
+              Rod fee split by classification
+            </h3>
+            <p className="text-[14px] text-text-secondary leading-[1.65] mb-5">
+              Every booking&rsquo;s rod fee is split between the managing club and the landowner
+              based on the property&rsquo;s classification. Higher tiers mean a bigger landowner
+              share and a smaller club share &mdash; the landowner decides during onboarding.
+            </p>
+            <div className="marketing-features-grid grid grid-cols-3 gap-4 mb-6">
+              {[
+                { label: 'Select', club: 50, landowner: 50, tagline: 'Baseline water.' },
+                { label: 'Premier', club: 35, landowner: 65, tagline: 'Standout water.' },
+                { label: 'Signature', club: 25, landowner: 75, tagline: 'Exceptional water.' },
+              ].map((tier) => (
+                <div key={tier.label} className="bg-offwhite rounded-[10px] border border-parchment p-5">
+                  <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-river m-0 mb-1">
+                    {tier.label}
+                  </p>
+                  <p className="text-[28px] font-heading font-semibold text-forest m-0">
+                    {tier.club}%
+                  </p>
+                  <p className="text-[12px] text-text-light m-0 mb-2">club share</p>
+                  <p className="text-[11px] text-text-secondary m-0">
+                    Landowner keeps {tier.landowner}% &middot; {tier.tagline}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[13px] text-text-light leading-[1.6]">
+              Prefer a predictable annual payment? Landowners can instead choose{' '}
+              <strong className="text-forest">upfront lease</strong>: the managing club pays a
+              fixed annual lease via ACH, and then keeps 100% of rod fees. AnglerPass takes a
+              5% facilitation fee on the lease payment.
+            </p>
+          </div>
+
           {/* Cross-Club Network Revenue */}
           <div className="reveal mt-8 bg-white border border-parchment rounded-[14px] py-8 px-7">
             <h3 className="font-heading text-[22px] font-semibold text-forest mb-4 tracking-[-0.2px]">
@@ -166,8 +204,9 @@ export default function PricingPage() {
             </h3>
             <p className="text-[14px] text-text-secondary leading-[1.65] mb-3">
               When your members fish at another club&rsquo;s properties, the angler pays
-              a <strong className="text-forest">$25/rod cross-club access fee</strong>. Your club
-              earns a $5 referral on every rod &mdash; passive revenue just for being in the network.
+              a <strong className="text-forest">$25/rod/day cross-club access fee</strong> on top
+              of the usual rod fee. Your club earns a $10/rod/day referral &mdash; passive
+              revenue just for being in the network.
             </p>
             <p className="text-[13px] text-text-light leading-[1.6] mb-5">
               All tiers include cross-club access: Starter clubs can hold up to 2 partner
@@ -177,22 +216,23 @@ export default function PricingPage() {
             {/* Fee split visual */}
             <div className="mb-6">
               <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-text-light mb-3">
-                How the $25 cross-club fee is split
+                How the $25/rod/day cross-club fee is split
               </p>
               <div className="flex rounded-[10px] overflow-hidden border border-parchment">
-                <div className="flex-[4] bg-forest/5 px-5 py-4 border-r border-parchment">
-                  <p className="text-[22px] font-heading font-semibold text-forest mb-0.5">$20</p>
+                <div className="flex-[3] bg-forest/5 px-5 py-4 border-r border-parchment">
+                  <p className="text-[22px] font-heading font-semibold text-forest mb-0.5">$15</p>
                   <p className="text-[12px] text-text-secondary m-0">to AnglerPass</p>
                   <p className="text-[11px] text-text-light m-0 mt-0.5">Platform &amp; network operations</p>
                 </div>
-                <div className="flex-[1] bg-river/5 px-5 py-4">
-                  <p className="text-[22px] font-heading font-semibold text-river mb-0.5">$5</p>
-                  <p className="text-[12px] text-text-secondary m-0">to home club</p>
+                <div className="flex-[2] bg-river/5 px-5 py-4">
+                  <p className="text-[22px] font-heading font-semibold text-river mb-0.5">$10</p>
+                  <p className="text-[12px] text-text-secondary m-0">to referring club</p>
                   <p className="text-[11px] text-text-light m-0 mt-0.5">Member referral</p>
                 </div>
               </div>
               <p className="text-[13px] text-text-secondary mt-2">
-                The hosting club still receives its standard $5/rod commission from the rod fee &mdash; same as any booking.
+                The hosting club still receives its full rod-fee share per the property&rsquo;s
+                classification &mdash; same as any booking.
               </p>
             </div>
 
@@ -203,16 +243,16 @@ export default function PricingPage() {
               </p>
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between text-[13px] pb-2 border-b border-parchment">
-                  <span className="text-text-secondary">Cross-club fee: $25/rod &times; 2 rods &times; 3 days</span>
+                  <span className="text-text-secondary">Cross-club fee: $25/rod/day &times; 2 rods &times; 3 days</span>
                   <span className="font-medium text-forest">$150</span>
                 </div>
                 <div className="flex justify-between text-[13px] mt-2">
-                  <span className="text-forest">AnglerPass receives ($20 &times; 6)</span>
-                  <span className="text-text-secondary">$120</span>
+                  <span className="text-forest">AnglerPass receives ($15 &times; 6)</span>
+                  <span className="text-text-secondary">$90</span>
                 </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-river font-medium">Your club receives ($5 &times; 6)</span>
-                  <span className="font-semibold text-river">$30</span>
+                  <span className="text-river font-medium">Your club receives ($10 &times; 6)</span>
+                  <span className="font-semibold text-river">$60</span>
                 </div>
               </div>
             </div>
@@ -280,9 +320,9 @@ export default function PricingPage() {
               </ul>
               <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
                 Non-fishing guests are free. Only anglers with rods pay the rod fee.
-                The $25 cross-club fee is split $20 to AnglerPass and $5 to your
-                home club. The hosting club receives its standard $5/rod commission
-                from the rod fee.
+                The $25/rod/day cross-club fee is split $15 to AnglerPass and $10 to
+                your home club as a referral. The hosting club keeps its rod-fee
+                share per the property&rsquo;s classification.
               </p>
             </div>
           </div>
@@ -307,30 +347,54 @@ export default function PricingPage() {
 
           <div className="reveal bg-white border border-parchment rounded-[14px] py-8 px-7">
             <h3 className="font-heading text-[20px] font-semibold text-forest mb-5">
-              Per-booking payout breakdown
+              Two ways to get paid
             </h3>
-            <div className="flex flex-col">
-              {[
-                { label: 'Rod rate (set by you)', example: 'e.g. $75/rod/day', color: 'text-forest' },
-                { label: 'Club commission', example: '$5/rod (goes to the managing club)', color: 'text-text-secondary' },
-                { label: 'Your payout', example: 'Rod rate minus $5/rod club commission', color: 'text-forest', bold: true },
-              ].map((row) => (
-                <div
-                  key={row.label}
-                  className="flex justify-between items-center py-[14px] border-b border-parchment"
-                >
-                  <span className={`text-[14px] ${row.bold ? 'font-semibold' : 'font-normal'} ${row.color}`}>
-                    {row.label}
-                  </span>
-                  <span className="text-[13px] text-text-light">
-                    {row.example}
-                  </span>
-                </div>
-              ))}
+            <div className="marketing-features-grid grid grid-cols-2 gap-6 mb-6">
+              <div>
+                <h4 className="text-[15px] font-semibold text-forest mb-2">
+                  Option 1 &mdash; Per-trip rod fee split
+                </h4>
+                <p className="text-[13px] text-text-secondary leading-[1.6] mb-3">
+                  Choose a classification during onboarding. Each booking&rsquo;s rod fee is
+                  split with the managing club per your tier:
+                </p>
+                <ul className="list-none m-0 p-0">
+                  {[
+                    { label: 'Select', detail: 'You keep 50% of every rod fee' },
+                    { label: 'Premier', detail: 'You keep 65% of every rod fee' },
+                    { label: 'Signature', detail: 'You keep 75% of every rod fee' },
+                  ].map((row) => (
+                    <li key={row.label} className="py-[5px] text-[13px] text-text-secondary">
+                      <strong className="text-forest">{row.label}:</strong> {row.detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-[15px] font-semibold text-forest mb-2">
+                  Option 2 &mdash; Upfront annual lease
+                </h4>
+                <p className="text-[13px] text-text-secondary leading-[1.6] mb-3">
+                  Prefer a predictable annual payment? Propose a lease amount; once your
+                  club accepts, you&rsquo;re paid the full amount via ACH.
+                </p>
+                <ul className="list-none m-0 p-0">
+                  {[
+                    'You set the annual amount ($1,000 - $1,000,000)',
+                    'Paid upfront via ACH, not credit card',
+                    'AnglerPass takes 5% on the lease',
+                    'Club keeps 100% of rod fees thereafter',
+                  ].map((detail) => (
+                    <li key={detail} className="py-[5px] text-[13px] text-text-secondary">
+                      &middot; {detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <p className="text-[13px] text-text-light mt-4 leading-[1.6]">
-              Platform fees and cross-club access fees are paid by the angler and do not
-              reduce your payout. The $5/rod club commission is the only deduction from your rate.
+            <p className="text-[13px] text-text-light leading-[1.6]">
+              Either way: platform fees and cross-club access fees are paid by the angler
+              and do not reduce your payout.
             </p>
           </div>
         </div>

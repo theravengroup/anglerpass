@@ -509,7 +509,7 @@ export default function ClubsPage() {
                 {
                   step: '4',
                   title: 'Everyone Benefits',
-                  description: 'Your club earns a $5 referral credit on every cross-club rod your members book. Partner clubs earn the same from theirs.',
+                  description: 'Your club earns a $10/rod/day referral credit on every cross-club rod your members book. Partner clubs earn the same from theirs.',
                 },
               ].map((item, i) => (
                 <div
@@ -593,28 +593,29 @@ export default function ClubsPage() {
                 <div className="flex items-start gap-3">
                   <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-bronze/20 text-bronze text-[11px] font-semibold mt-0.5">$</span>
                   <div>
-                    <p className="text-[14px] font-medium text-parchment m-0">$25 per rod cross-club access fee</p>
+                    <p className="text-[14px] font-medium text-parchment m-0">$25 per rod / day cross-club access fee</p>
                     <p className="text-[13px] text-parchment/40 m-0 mt-0.5">Paid by the angler, added at checkout</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-river/20 text-river-light text-[11px] font-semibold mt-0.5">$5</span>
+                  <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-river/20 text-river-light text-[11px] font-semibold mt-0.5">$10</span>
                   <div>
-                    <p className="text-[14px] font-medium text-parchment m-0">$5 referral credit to the home club</p>
+                    <p className="text-[14px] font-medium text-parchment m-0">$10 referral to the referring club</p>
                     <p className="text-[13px] text-parchment/40 m-0 mt-0.5">Earned every time your member books cross-club water</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-forest/30 text-parchment/70 text-[11px] font-semibold mt-0.5">$20</span>
+                  <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-forest/30 text-parchment/70 text-[11px] font-semibold mt-0.5">$15</span>
                   <div>
-                    <p className="text-[14px] font-medium text-parchment m-0">$20 to AnglerPass</p>
+                    <p className="text-[14px] font-medium text-parchment m-0">$15 to AnglerPass</p>
                     <p className="text-[13px] text-parchment/40 m-0 mt-0.5">Covers network operations, vetting infrastructure, and support</p>
                   </div>
                 </div>
               </div>
               <p className="text-[13px] text-parchment/40 mt-4 m-0">
-                The hosting club still receives its standard $5/rod commission from the
-                rod fee &mdash; same as any booking. Cross-club fees are additional, not a replacement.
+                The hosting club still receives its full rod-fee share per the
+                property&rsquo;s classification &mdash; same as any booking. Cross-club
+                fees are additional, not a replacement.
               </p>
 
               {/* Concrete example */}
@@ -624,17 +625,17 @@ export default function ClubsPage() {
                 </p>
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[13px]">
-                    <span className="text-parchment/50">Cross-club fee: $25/rod &times; 2 rods &times; 3 days</span>
+                    <span className="text-parchment/50">Cross-club fee: $25/rod/day &times; 2 rods &times; 3 days</span>
                     <span className="text-parchment font-medium">$150</span>
                   </div>
                   <div className="border-t border-parchment/10 my-1" />
                   <div className="flex justify-between text-[13px]">
-                    <span className="text-parchment/50">AnglerPass receives ($20 &times; 6)</span>
-                    <span className="text-parchment/60">$120</span>
+                    <span className="text-parchment/50">AnglerPass receives ($15 &times; 6)</span>
+                    <span className="text-parchment/60">$90</span>
                   </div>
                   <div className="flex justify-between text-[13px]">
-                    <span className="text-river-light">Your club receives ($5 &times; 6)</span>
-                    <span className="text-river-light font-semibold">$30</span>
+                    <span className="text-river-light">Your club receives ($10 &times; 6)</span>
+                    <span className="text-river-light font-semibold">$60</span>
                   </div>
                 </div>
               </div>

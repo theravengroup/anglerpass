@@ -7,6 +7,8 @@ import { Loader2, CalendarDays, Send } from "lucide-react";
 import {
   calculateFeeBreakdown,
   ROD_NOMENCLATURE,
+  type PropertyClassification,
+  type PricingMode,
 } from "@/lib/constants/fees";
 import { toDateString } from "@/lib/utils";
 import GuidesSection from "./GuidesSection";
@@ -38,6 +40,9 @@ interface BookingFormProps {
     max_rods: number | null;
     max_guests: number | null;
     is_cross_club?: boolean;
+    classification?: PropertyClassification | null;
+    pricing_mode?: PricingMode;
+    is_managing_club_staff?: boolean;
     accessible_through: {
       membership_id: string;
       club_id: string;
@@ -114,7 +119,19 @@ export default function BookingForm({ property, initialMembership }: BookingForm
       ? (property.rate_adult_full_day ?? 0)
       : (property.rate_adult_half_day ?? 0);
   const perDayGuideRate = guideRate;
-  const fees = calculateFeeBreakdown(ratePerRod, partySize, isCrossClub, guideRate, numberOfDays);
+  const pricingMode: PricingMode = property.pricing_mode ?? "rod_fee_split";
+  const classification: PropertyClassification | null =
+    property.classification ?? null;
+  const fees = calculateFeeBreakdown({
+    ratePerRod,
+    rodCount: partySize,
+    numberOfDays,
+    classification,
+    pricingMode,
+    isCrossClub,
+    isManagingClubStaff: property.is_managing_club_staff ?? false,
+    guideRate,
+  });
 
   async function handleBooking() {
     if (!selectedMembership || !startDate) return;

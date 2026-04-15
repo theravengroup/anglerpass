@@ -43,13 +43,50 @@ Landowner/club receives payout to their bank
 
 ## Fee Structure
 
-| Transaction Type     | Platform Fee | Notes                                          |
-|----------------------|-------------|-------------------------------------------------|
-| Booking (all)        | 15%         | Added on top of rod fee, paid by angler          |
-| Cross-club access fee| $25/rod     | $20 to AnglerPass + $5 home club referral            |
-| Club membership      | 5%          | Platform fee on initiation fees and annual dues   |
+| Transaction Type      | Platform Fee        | Notes                                                        |
+|-----------------------|---------------------|--------------------------------------------------------------|
+| Booking platform fee  | 15%                 | On top of rod fee, paid by angler                            |
+| Cross-club access fee | $25/rod/day         | $15 AnglerPass + $10 referring club                          |
+| Guide service fee     | 10%                 | On guide rate, paid by angler. Guide keeps 100% of their rate. |
+| Club membership       | 5%                  | On initiation fees + annual dues, paid by member              |
+| Upfront lease         | 5%                  | On club → landowner ACH payment                              |
 
-The platform fee is a markup on the landowner's rod fee — it does not reduce the landowner or club's share. Rod fees flow through to the existing landowner/club split ($5/rod to club, remainder to landowner).
+The 15% booking platform fee is a markup on the rod fee — it does not reduce the rod-fee split below. Rod fees flow through to the landowner/club via one of two models (see below). Fee math is in `src/lib/constants/fees.ts` and is the single source of truth.
+
+### Rod Fee Split (default property pricing mode)
+
+Each property has a classification that determines how the base rod fee is split between the managing club and the landowner:
+
+| Classification | Club share | Landowner share |
+|---|---|---|
+| Select    | 50% | 50% |
+| Premier   | 35% | 65% |
+| Signature | 25% | 75% |
+
+The split is snapshotted onto each booking at creation time (`club_split_pct`, `landowner_split_pct`) so reclassifying a property later never rewrites history.
+
+### Upfront Lease (alternative property pricing mode)
+
+Instead of a per-booking split, the club pays the landowner an agreed annual amount via ACH. AnglerPass takes 5%; 95% flows to the landowner. On bookings at a leased property, the club keeps 100% of the rod fee (the landowner has already been paid). The lease lifecycle is:
+
+```
+proposed  →  under_negotiation  →  agreed  →  active  →  expired
+(landowner)  (counter/reply)     (ACH init) (webhook)  (past due / cron)
+```
+
+Endpoints:
+
+| Endpoint | Actor | Effect |
+|---|---|---|
+| `POST /api/properties/:id/lease/propose` | Landowner | Sets `lease_status = 'proposed'`, records proposed amount |
+| `POST /api/properties/:id/lease/respond` | Club admin | accept / counter / decline |
+| `POST /api/properties/:id/lease/pay`     | Club admin | Creates ACH PaymentIntent (us_bank_account only) |
+
+`payment_intent.succeeded` with `metadata.type = 'property_lease_payment'` flips `lease_status → active`, records the succeeded ledger row in `property_lease_payments`, and creates a Stripe Transfer to the landowner's Connected Account for the 95% net. A nightly cron (`/api/cron/lease-renewal`) sends reminders at T-30 and T-7 and flips past-due leases to `expired` + `status = draft`.
+
+### Staff Discount
+
+Staff of the managing club booking at their own club get the club's share of the rod fee as their discount (Select 50%, Premier 35%, Signature 25%; in lease mode 100%). The discount is absorbed entirely by the club — the landowner still receives their full classification share of the gross rod fee. Staff of *other* clubs (cross-club bookings) do not get the discount.
 
 ---
 
@@ -155,6 +192,8 @@ Stripe webhooks drive payment state updates:
 | `invoice.payment_failed`         | Warn member, grace period starts            |
 | `customer.subscription.deleted`  | Cancel club membership                      |
 | `account.updated`               | Update Connected Account status             |
+| `payment_intent.succeeded` (lease) | Activate lease, insert succeeded ledger row, transfer 95% to landowner |
+| `payment_intent.payment_failed` (lease) | Mark ledger row failed, revert property to `agreed` for retry |
 
 Webhook handler: `src/app/api/webhooks/stripe/route.ts` (to be created in Layer 2).
 

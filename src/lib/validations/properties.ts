@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+  PROPERTY_CLASSIFICATIONS,
+  PRICING_MODES,
+  LEASE_MIN_USD,
+  LEASE_MAX_USD,
+} from "@/lib/constants/fees";
 
 export const WATER_TYPES = [
   "river",
@@ -120,6 +126,33 @@ export const propertySchema = z
     access_notes: z.string().max(2000).optional().or(z.literal("")),
     gate_code_required: z.boolean().default(false),
     gate_code: z.string().max(100).optional().or(z.literal("")),
+
+    // ── Pricing model ────────────────────────────────────────────
+    //
+    // Every property is one of:
+    //   • rod_fee_split + classification  — club & landowner share rod fees
+    //     per classification ratio (Select 50/50, Premier 35/65, Signature
+    //     25/75). Default model at onboarding.
+    //   • upfront_lease — club pays the landowner an annual lease via ACH;
+    //     rod-fee revenue goes 100% to the club thereafter.
+    //
+    // Lease fields are optional at draft time; the publish gate (enforced at
+    // the DB trigger layer) requires a classification OR an active lease.
+    pricing_mode: z.enum(PRICING_MODES).default("rod_fee_split"),
+    classification: z.enum(PROPERTY_CLASSIFICATIONS).optional().nullable(),
+    lease_amount_usd: z
+      .number()
+      .min(LEASE_MIN_USD, `Lease must be at least $${LEASE_MIN_USD.toLocaleString()}`)
+      .max(LEASE_MAX_USD, `Lease must not exceed $${LEASE_MAX_USD.toLocaleString()}`)
+      .optional()
+      .nullable(),
+    lease_term_months: z
+      .number()
+      .int()
+      .min(1, "Lease term must be at least 1 month")
+      .max(60, "Lease term cannot exceed 60 months")
+      .optional()
+      .nullable(),
   })
   .refine(
     (data) => {
@@ -149,7 +182,21 @@ export const propertySchema = z
       path: ["max_rods"],
     }
   )
-;
+  .refine(
+    (data) => {
+      // Lease mode needs both amount and term for publish; draft can skip.
+      if (data.pricing_mode === "upfront_lease") {
+        if (data.lease_amount_usd != null && data.lease_term_months == null) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message: "Lease term is required when a lease amount is set",
+      path: ["lease_term_months"],
+    }
+  );
 
 export type PropertyFormData = z.input<typeof propertySchema>;
 
@@ -179,6 +226,59 @@ export const bulkAvailabilitySchema = z.object({
 });
 
 export type BulkAvailabilityInput = z.infer<typeof bulkAvailabilitySchema>;
+
+// ─── Pricing Model Selection ─────────────────────────────────────
+//
+// Used by the landowner pricing panel on the property form and by the
+// pricing API. One of:
+//   { pricing_mode: "rod_fee_split", classification: "select"|"premier"|"signature" }
+//   { pricing_mode: "upfront_lease", lease_amount_usd, lease_term_months }
+
+export const propertyPricingSchema = z
+  .object({
+    pricing_mode: z.enum(PRICING_MODES),
+    classification: z.enum(PROPERTY_CLASSIFICATIONS).optional().nullable(),
+    lease_amount_usd: z
+      .number()
+      .min(LEASE_MIN_USD)
+      .max(LEASE_MAX_USD)
+      .optional()
+      .nullable(),
+    lease_term_months: z.number().int().min(1).max(60).optional().nullable(),
+  })
+  .refine(
+    (data) =>
+      data.pricing_mode !== "rod_fee_split" || !!data.classification,
+    {
+      message: "Select a classification (Select / Premier / Signature)",
+      path: ["classification"],
+    },
+  )
+  .refine(
+    (data) =>
+      data.pricing_mode !== "upfront_lease" ||
+      (data.lease_amount_usd != null && data.lease_term_months != null),
+    {
+      message: "Lease amount and term are required for upfront lease pricing",
+      path: ["lease_amount_usd"],
+    },
+  );
+
+export type PropertyPricingInput = z.infer<typeof propertyPricingSchema>;
+
+// ─── Lease Proposal (landowner ↔ club negotiation) ───────────────
+
+export const leaseProposalSchema = z.object({
+  property_id: z.string().uuid(),
+  amount_usd: z
+    .number()
+    .min(LEASE_MIN_USD, `Lease must be at least $${LEASE_MIN_USD.toLocaleString()}`)
+    .max(LEASE_MAX_USD, `Lease must not exceed $${LEASE_MAX_USD.toLocaleString()}`),
+  term_months: z.number().int().min(1).max(60),
+  note: z.string().max(2000).optional(),
+});
+
+export type LeaseProposalInput = z.infer<typeof leaseProposalSchema>;
 
 // ─── Invite Landowner ─────────────────────────────────────────────
 

@@ -61,7 +61,8 @@ export async function POST(
         `
         *,
         properties(
-          id, name, rate_adult_full_day, owner_id, max_rods, max_guests
+          id, name, rate_adult_full_day, owner_id, max_rods, max_guests,
+          classification, pricing_mode, lease_status
         ),
         guide_profiles(id, user_id, display_name, rate_full_day)
       `
@@ -134,12 +135,13 @@ export async function POST(
 
       // Find the angler's active club membership for this property's club
       let clubMembershipId: string | null = null;
+      let referringClubId: string | null = null;
       let isCrossClub = false;
 
       if (proposal.club_id) {
         const { data: membership } = await admin
           .from("club_memberships")
-          .select("id")
+          .select("id, club_id")
           .eq("user_id", user.id)
           .eq("club_id", proposal.club_id)
           .eq("status", "active")
@@ -147,11 +149,12 @@ export async function POST(
 
         if (membership) {
           clubMembershipId = membership.id;
+          referringClubId = membership.club_id;
         } else {
           // Cross-club: find any active membership for this angler
           const { data: anyMembership } = await admin
             .from("club_memberships")
-            .select("id")
+            .select("id, club_id")
             .eq("user_id", user.id)
             .eq("status", "active")
             .limit(1)
@@ -159,6 +162,7 @@ export async function POST(
 
           if (anyMembership) {
             clubMembershipId = anyMembership.id;
+            referringClubId = anyMembership.club_id;
             isCrossClub = true;
           }
         }
@@ -171,18 +175,58 @@ export async function POST(
         );
       }
 
+      // ── Resolve pricing model ──
+      const pricingMode = (property.pricing_mode ?? "rod_fee_split") as
+        | "rod_fee_split"
+        | "upfront_lease";
+      const classification = property.classification as
+        | "select"
+        | "premier"
+        | "signature"
+        | null;
+
+      if (pricingMode === "rod_fee_split" && !classification) {
+        return jsonError(
+          "This property has not finished pricing setup",
+          400,
+        );
+      }
+      if (pricingMode === "upfront_lease" && property.lease_status !== "active") {
+        return jsonError(
+          "This property's lease is not active",
+          400,
+        );
+      }
+
+      const managingClubId = proposal.club_id ?? referringClubId;
+
+      // Staff discount check — is the angler staff of the managing club?
+      let isManagingClubStaff = false;
+      if (managingClubId) {
+        const { data: mgmtClub } = await admin
+          .from("clubs")
+          .select("id, owner_id")
+          .eq("id", managingClubId)
+          .maybeSingle();
+        isManagingClubStaff = mgmtClub?.owner_id === user.id;
+      }
+
       // Calculate fees
       const ratePerRod = property.rate_adult_full_day ?? 0;
       const rodCount = proposal.max_anglers ?? 1;
       const totalGuideRate =
         (proposal.guide_fee_per_angler ?? 0) * rodCount;
 
-      const fees = calculateFeeBreakdown(
+      const fees = calculateFeeBreakdown({
         ratePerRod,
         rodCount,
+        numberOfDays: 1,
+        classification,
+        pricingMode,
         isCrossClub,
-        totalGuideRate
-      );
+        isManagingClubStaff,
+        guideRate: totalGuideRate,
+      });
 
       // Insert booking (matching existing booking creation pattern)
       const confirmedAt = new Date().toISOString();
@@ -214,10 +258,16 @@ export async function POST(
           base_rate: fees.baseRate,
           platform_fee: fees.platformFee,
           cross_club_fee: fees.crossClubFee,
-          home_club_referral: fees.homeClubReferral,
-          club_commission: fees.clubCommission,
+          home_club_referral: fees.crossClubReferral,
+          club_commission: fees.clubPayout,
           landowner_payout: fees.landownerPayout,
           total_amount: fees.totalAmount,
+          property_classification: fees.classification,
+          pricing_mode: fees.pricingMode,
+          club_split_pct: fees.clubSplitPct,
+          landowner_split_pct: fees.landownerSplitPct,
+          referring_club_id: referringClubId,
+          managing_club_id: managingClubId,
         })
         .select()
         .single();
