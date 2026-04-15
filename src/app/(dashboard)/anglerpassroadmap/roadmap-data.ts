@@ -193,6 +193,8 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-mkt-corp-inquiry", label: "Dedicated corporate inquiry form (company size, use case, regions, timeline — routes to partners@ with structured lead data)", done: true },
           { id: "c-sec-hardening", label: "Pre-launch security hardening (migration 00088: role-escalation trigger, stripe webhook RLS, club-logos ACL, bookings financial guard, messages immutability, ClubOS search_path lockdown, corporate invitation token RPC — 17 findings fixed)", done: true },
           { id: "c-mkt-conservation", label: "Conservation page (habitat preservation, catch-and-release values)", done: true },
+          { id: "c-mkt-conservation-update", label: "Conservation page update (Stripe Climate raised to 1%, EarthNow partnership + live widget embed)", done: true },
+          { id: "c-mkt-landowner-pricing", label: "Landowner pricing education (Select/Premier/Signature tiers, rod-fee-split examples, upfront lease explainer, updated FAQs)", done: true },
           { id: "c-mkt-ai", label: "AnglerPass Compass AI section (trip matching, planning, on-water guidance)", done: true },
           { id: "c-mkt-explore", label: "Public Explore Waters page (search properties without login)", done: true },
           { id: "c-mkt-press-kit", label: "Press kit (logos in 6 formats, dashboard screenshots, founder headshot, brand kit PDF)", done: true },
@@ -305,6 +307,7 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-efin-club", label: "Club financials (dues health tracking, cancellation impact, cross-club activity, membership revenue breakdown)", done: true },
           { id: "c-efin-landowner", label: "Landowner financials (held funds pipeline, tax summary with quarterly breakdown, guide splits, refund tracking)", done: true },
           { id: "c-efin-angler", label: "Angler financials (cost-per-trip metrics, late-cancel fees, refund tracking, discount savings, fee breakdown)", done: true },
+          { id: "c-efin-rod-split", label: "Rod-fee-split model in all dashboards (classification-based splits, lease payments, cross-club fee attribution fix, pricing mode breakdowns)", done: true },
         ],
       },
       {
@@ -431,6 +434,12 @@ export const PHASES: RoadmapPhase[] = [
             label: "Conservation statement",
             detail: "Platform values on conservation, catch-and-release, habitat preservation.",
             done: true,
+          },
+          {
+            id: "p1-earthnow",
+            label: "EarthNow monthly donation",
+            detail: "Recurring monthly donation to EarthNow via their donation form (Mercury debit card). Complements Stripe Climate 1% commitment.",
+            done: false,
           },
           {
             id: "p1-liability",
