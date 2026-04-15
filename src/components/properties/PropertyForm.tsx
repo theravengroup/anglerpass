@@ -114,6 +114,8 @@ export default function PropertyForm({ initialData, mode, clubId }: PropertyForm
   const species = watch("species");
   const waterType = watch("water_type");
   const halfDayAllowed = watch("half_day_allowed");
+  const pricingMode = watch("pricing_mode");
+  const classification = watch("classification");
   const gateCodeRequired = watch("gate_code_required");
   const photos = watch("photos");
 
@@ -169,6 +171,9 @@ export default function PropertyForm({ initialData, mode, clubId }: PropertyForm
         errors={errors}
         disabled={isDisabled}
         halfDayAllowed={halfDayAllowed ?? false}
+        pricingMode={pricingMode ?? "rod_fee_split"}
+        classification={classification}
+        setValue={setValue}
       />
 
       <AccessInfoSection

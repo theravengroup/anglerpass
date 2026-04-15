@@ -53,7 +53,10 @@ export type NotificationType =
   | "booking_abuse_flagged"
   | "booking_late_cancel_fee"
   | "club_deactivated"
-  | "property_deactivated";
+  | "property_deactivated"
+  | "lease_activated"
+  | "lease_renewal_reminder"
+  | "lease_expired";
 
 interface EmailAttachment {
   filename: string;

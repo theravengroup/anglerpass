@@ -37,8 +37,8 @@ export default function PaymentPolicies() {
         <h3 className={subHeadingClass}>Booking fees</h3>
         <p className={textClass}>
           Fishing access bookings have a separate fee structure: a 15% platform fee on
-          rod fees, plus a $25/rod cross-club access fee when booking outside your home club
-          ($20 to AnglerPass, $5 to your home club).
+          rod fees, plus a $25/rod/day cross-club access fee when booking outside your
+          home club ($15 to AnglerPass, $10 referral to your home club).
           When a guide is added to a booking, a 10% service fee is applied to the guide&rsquo;s
           rate, paid by the angler. The guide receives 100% of their stated rate.
           See our{' '}
@@ -46,6 +46,19 @@ export default function PaymentPolicies() {
             pricing page
           </Link>{' '}
           for full details.
+        </p>
+
+        <h3 className={subHeadingClass}>Rod fee splits</h3>
+        <p className={textClass}>
+          Each rod fee is split between the managing club and the landowner per the
+          property&rsquo;s classification, set by the landowner during onboarding:
+          <strong> Select</strong> (50% club / 50% landowner),
+          <strong> Premier</strong> (35% / 65%), or
+          <strong> Signature</strong> (25% / 75%).
+          Alternatively, a landowner can opt into <strong>upfront lease</strong>: the
+          club pays the landowner a fixed annual amount via ACH, and the club then
+          keeps 100% of rod fees. AnglerPass takes a 5% facilitation fee on the
+          lease payment.
         </p>
 
         <h3 className={subHeadingClass}>Payouts</h3>
@@ -144,13 +157,24 @@ export default function PaymentPolicies() {
               </tr>
               <tr className="border-t border-parchment">
                 <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
-                  Landowners
+                  Landowners (rod fee split)
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
                   Weekly (every Monday) after 7-day hold
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
-                  100% of rod fees, minus $5/rod club commission
+                  50% / 65% / 75% of rod fees depending on classification
+                </td>
+              </tr>
+              <tr className="border-t border-parchment">
+                <td className="p-3 px-5 text-[14px] text-text-secondary font-medium">
+                  Landowners (upfront lease)
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  Single ACH payment at lease acceptance
+                </td>
+                <td className="p-3 px-5 text-[14px] text-text-secondary">
+                  95% of lease amount (5% platform fee)
                 </td>
               </tr>
               <tr className="border-t border-parchment">
@@ -161,7 +185,7 @@ export default function PaymentPolicies() {
                   Monthly (1st of each month) after 7-day hold
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
-                  $5/rod booking commission
+                  Club&rsquo;s classification share + $10/rod/day cross-club referrals
                 </td>
               </tr>
             </tbody>
@@ -187,19 +211,25 @@ export default function PaymentPolicies() {
 
         <h3 className={subHeadingClass}>Landowner payouts</h3>
         <p className={textClass}>
-          Landowner rod fees are aggregated into a single weekly payout every
-          Monday. This batching reduces transaction overhead and simplifies
-          accounting. Once the 7-day hold clears for each booking, the rod fees
-          are included in the next Monday payout.
+          Landowners on the <strong>rod fee split</strong> model are paid their
+          classification share of each booking&rsquo;s rod fee, aggregated into a
+          weekly payout every Monday. Once the 7-day hold clears for each booking,
+          the landowner share is included in the next Monday payout.
+        </p>
+        <p className={textClass}>
+          Landowners on the <strong>upfront lease</strong> model receive a single
+          ACH payment at lease acceptance (95% of the agreed amount; AnglerPass
+          keeps a 5% platform fee). Rod-fee revenue after the lease is paid flows
+          100% to the managing club.
         </p>
 
         <h3 className={subHeadingClass}>Club payouts</h3>
         <p className={textClass}>
-          Club commissions ($5 per rod per booking) are paid out monthly on the
-          1st of each month. Monthly batching aligns with how most clubs handle
-          their accounting and reduces noise from small individual commission
-          amounts. Membership dues and initiation fees are transferred separately
-          as they are collected.
+          Clubs receive their classification share of rod fees plus any cross-club
+          referrals ($10/rod/day when a member fishes at a partner club&rsquo;s
+          water), batched into a monthly payout on the 1st of each month. Monthly
+          batching aligns with how most clubs handle their accounting. Membership
+          dues and initiation fees are transferred separately as they are collected.
         </p>
 
         <h3 className={subHeadingClass}>Stripe Connect setup</h3>

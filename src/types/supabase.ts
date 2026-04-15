@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       affiliate_brands: {
@@ -574,6 +549,7 @@ export type Database = {
           cancelled_at: string | null
           club_commission: number
           club_membership_id: string
+          club_split_pct: number
           confirmed_at: string | null
           created_at: string
           created_by_user_id: string | null
@@ -590,6 +566,7 @@ export type Database = {
           is_cross_club: boolean
           landowner_notes: string | null
           landowner_payout: number
+          landowner_split_pct: number
           late_cancel_fee: number | null
           lodging_checkin_date: string | null
           lodging_checkout_date: string | null
@@ -598,6 +575,7 @@ export type Database = {
           lodging_platform_fee: number | null
           lodging_source: string | null
           lodging_subtotal: number | null
+          managing_club_id: string | null
           message: string | null
           non_fishing_guests: number
           on_behalf_of: boolean
@@ -607,7 +585,10 @@ export type Database = {
           payout_distributed_at: string | null
           platform_fee: number
           platform_fee_cents: number | null
+          pricing_mode: string
+          property_classification: string | null
           property_id: string
+          referring_club_id: string | null
           refund_amount: number | null
           refund_percentage: number | null
           refunded_at: string | null
@@ -630,6 +611,7 @@ export type Database = {
           cancelled_at?: string | null
           club_commission?: number
           club_membership_id: string
+          club_split_pct?: number
           confirmed_at?: string | null
           created_at?: string
           created_by_user_id?: string | null
@@ -646,6 +628,7 @@ export type Database = {
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          landowner_split_pct?: number
           late_cancel_fee?: number | null
           lodging_checkin_date?: string | null
           lodging_checkout_date?: string | null
@@ -654,6 +637,7 @@ export type Database = {
           lodging_platform_fee?: number | null
           lodging_source?: string | null
           lodging_subtotal?: number | null
+          managing_club_id?: string | null
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
@@ -663,7 +647,10 @@ export type Database = {
           payout_distributed_at?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
+          pricing_mode?: string
+          property_classification?: string | null
           property_id: string
+          referring_club_id?: string | null
           refund_amount?: number | null
           refund_percentage?: number | null
           refunded_at?: string | null
@@ -686,6 +673,7 @@ export type Database = {
           cancelled_at?: string | null
           club_commission?: number
           club_membership_id?: string
+          club_split_pct?: number
           confirmed_at?: string | null
           created_at?: string
           created_by_user_id?: string | null
@@ -702,6 +690,7 @@ export type Database = {
           is_cross_club?: boolean
           landowner_notes?: string | null
           landowner_payout?: number
+          landowner_split_pct?: number
           late_cancel_fee?: number | null
           lodging_checkin_date?: string | null
           lodging_checkout_date?: string | null
@@ -710,6 +699,7 @@ export type Database = {
           lodging_platform_fee?: number | null
           lodging_source?: string | null
           lodging_subtotal?: number | null
+          managing_club_id?: string | null
           message?: string | null
           non_fishing_guests?: number
           on_behalf_of?: boolean
@@ -719,7 +709,10 @@ export type Database = {
           payout_distributed_at?: string | null
           platform_fee?: number
           platform_fee_cents?: number | null
+          pricing_mode?: string
+          property_classification?: string | null
           property_id?: string
+          referring_club_id?: string | null
           refund_amount?: number | null
           refund_percentage?: number | null
           refunded_at?: string | null
@@ -758,10 +751,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bookings_managing_club_id_fkey"
+            columns: ["managing_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_referring_club_id_fkey"
+            columns: ["referring_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -5245,6 +5252,7 @@ export type Database = {
         Row: {
           access_notes: string | null
           advance_booking_days: number | null
+          classification: string | null
           coordinates: string | null
           created_at: string | null
           created_by_club_id: string | null
@@ -5255,6 +5263,12 @@ export type Database = {
           id: string
           knowledge_completeness: number | null
           latitude: number | null
+          lease_amount_cents: number | null
+          lease_last_payment_at: string | null
+          lease_negotiation_note: string | null
+          lease_paid_through: string | null
+          lease_proposed_amount_cents: number | null
+          lease_status: string | null
           location_description: string | null
           lodging_available: boolean
           lodging_url: string | null
@@ -5265,6 +5279,7 @@ export type Database = {
           name: string
           owner_id: string | null
           photos: string[] | null
+          pricing_mode: string
           rate_adult_full_day: number | null
           rate_adult_half_day: number | null
           rate_child_full_day: number | null
@@ -5282,6 +5297,7 @@ export type Database = {
         Insert: {
           access_notes?: string | null
           advance_booking_days?: number | null
+          classification?: string | null
           coordinates?: string | null
           created_at?: string | null
           created_by_club_id?: string | null
@@ -5292,6 +5308,12 @@ export type Database = {
           id?: string
           knowledge_completeness?: number | null
           latitude?: number | null
+          lease_amount_cents?: number | null
+          lease_last_payment_at?: string | null
+          lease_negotiation_note?: string | null
+          lease_paid_through?: string | null
+          lease_proposed_amount_cents?: number | null
+          lease_status?: string | null
           location_description?: string | null
           lodging_available?: boolean
           lodging_url?: string | null
@@ -5302,6 +5324,7 @@ export type Database = {
           name: string
           owner_id?: string | null
           photos?: string[] | null
+          pricing_mode?: string
           rate_adult_full_day?: number | null
           rate_adult_half_day?: number | null
           rate_child_full_day?: number | null
@@ -5319,6 +5342,7 @@ export type Database = {
         Update: {
           access_notes?: string | null
           advance_booking_days?: number | null
+          classification?: string | null
           coordinates?: string | null
           created_at?: string | null
           created_by_club_id?: string | null
@@ -5329,6 +5353,12 @@ export type Database = {
           id?: string
           knowledge_completeness?: number | null
           latitude?: number | null
+          lease_amount_cents?: number | null
+          lease_last_payment_at?: string | null
+          lease_negotiation_note?: string | null
+          lease_paid_through?: string | null
+          lease_proposed_amount_cents?: number | null
+          lease_status?: string | null
           location_description?: string | null
           lodging_available?: boolean
           lodging_url?: string | null
@@ -5339,6 +5369,7 @@ export type Database = {
           name?: string
           owner_id?: string | null
           photos?: string[] | null
+          pricing_mode?: string
           rate_adult_full_day?: number | null
           rate_adult_half_day?: number | null
           rate_child_full_day?: number | null
@@ -5548,6 +5579,75 @@ export type Database = {
             foreignKeyName: "property_knowledge_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_lease_payments: {
+        Row: {
+          amount_cents: number
+          club_id: string
+          created_at: string
+          failure_reason: string | null
+          id: string
+          landowner_net_cents: number
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          platform_fee_cents: number
+          property_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_transfer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          club_id: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          landowner_net_cents: number
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          platform_fee_cents?: number
+          property_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          club_id?: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          landowner_net_cents?: number
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          platform_fee_cents?: number
+          property_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_lease_payments_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_lease_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
@@ -6569,9 +6669,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
