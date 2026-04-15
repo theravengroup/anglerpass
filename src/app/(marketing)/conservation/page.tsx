@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Script from 'next/script';
 import { PAGES_SEO } from '@/lib/seo';
 
 export const metadata = PAGES_SEO.conservation;
@@ -11,6 +12,7 @@ const TOC_ITEMS = [
   { href: '#landowners', label: 'Supporting Landowners' },
   { href: '#community', label: 'Community Standards' },
   { href: '#climate', label: 'Climate Action' },
+  { href: '#earthnow', label: 'EarthNow Partnership' },
   { href: '#future', label: 'Looking Ahead' },
 ];
 
@@ -328,7 +330,7 @@ export default function ConservationPage() {
                   action on a larger scale.
                 </p>
                 <p className="text-[15px] leading-[1.8] text-text-secondary mb-6">
-                  That is why AnglerPass contributes 0.5% of revenue to carbon
+                  That is why AnglerPass contributes 1% of revenue to carbon
                   removal through{' '}
                   <a
                     href="https://stripe.com/climate"
@@ -381,6 +383,56 @@ export default function ConservationPage() {
                   have a responsibility to protect it &mdash; not just at the
                   streambank, but at the atmospheric level. Every booking on
                   AnglerPass contributes to both.
+                </p>
+              </section>
+
+              {/* EarthNow Partnership */}
+              <section id="earthnow" className="mb-14 scroll-mt-24">
+                <h2 className="font-heading text-[28px] font-semibold text-forest mb-4">
+                  EarthNow Partnership
+                </h2>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-4">
+                  Conservation starts with awareness. That is why AnglerPass has
+                  partnered with{' '}
+                  <a
+                    href="https://earthnow.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-river underline"
+                  >
+                    EarthNow
+                  </a>
+                  , a real-time planetary health monitoring platform that makes
+                  Earth&apos;s vital signs visible and&nbsp;accessible.
+                </p>
+                <p className="text-[15px] leading-[1.8] text-text-secondary mb-6">
+                  EarthNow tracks the environmental metrics that matter most to
+                  the waters we fish &mdash; from atmospheric CO&#8322; levels
+                  and tree cover to water quality and soil health. By surfacing
+                  this data directly on our platform, we help our community see
+                  the patterns, measure the impact, and stay connected to the
+                  larger environmental picture that shapes every&nbsp;fishery.
+                </p>
+                <div className="rounded-xl border border-parchment bg-white p-6 mb-6">
+                  <h3 className="font-heading text-[18px] font-semibold text-forest mb-4">
+                    Earth&apos;s Vital Signs &mdash; Live
+                  </h3>
+                  {/* @ts-expect-error — earth-now is a web component, not a React intrinsic */}
+                  <earth-now
+                    stats="co2,trees,plastic,icelost,water,soillost"
+                    theme="light"
+                    layout="horizontal"
+                  />
+                  <Script
+                    src="https://earthnow.app/widget.js"
+                    strategy="lazyOnload"
+                  />
+                </div>
+                <p className="text-[15px] leading-[1.8] text-text-secondary">
+                  The health of a trout stream is inseparable from the health of
+                  the planet. EarthNow gives our community a window into that
+                  connection &mdash; real data, updated in real time, right where
+                  it&nbsp;matters.
                 </p>
               </section>
 
