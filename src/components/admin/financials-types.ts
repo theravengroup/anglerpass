@@ -61,6 +61,10 @@ export interface Financials {
   platform_revenue_period: number;
   platform_fee_total: number;
   cross_club_fee_total: number;
+  /** Full cross-club fee ($25/rod/day) including referring-club referral */
+  cross_club_fee_gross: number;
+  /** Referring-club referral payout ($10/rod/day) — not AP revenue */
+  cross_club_referral_total: number;
   guide_service_fee_total: number;
   gmv_total: number;
   gmv_period: number;

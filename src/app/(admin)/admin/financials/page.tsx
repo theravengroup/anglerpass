@@ -11,18 +11,7 @@ import {
   Download,
   Wallet,
   BarChart3,
-  FileText,
-  Layers,
-  SplitSquareHorizontal,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import type { ClassificationMixEntry, PricingModeSplit, RecentLeasePayment } from "@/components/admin/financials-types";
 import { PERIOD_OPTIONS } from "@/lib/constants/status";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -36,6 +25,9 @@ import { TopPropertiesCard } from "@/components/admin/TopPropertiesCard";
 import { RecentTransactionsTable } from "@/components/admin/RecentTransactionsTable";
 import { FinancialSummaryCard } from "@/components/admin/FinancialSummaryCard";
 import AdminPageGuard from "@/components/admin/AdminPageGuard";
+import { PricingModeSplitCard } from "@/components/admin/PricingModeSplitCard";
+import { AdminClassificationMixCard } from "@/components/admin/AdminClassificationMixCard";
+import { AdminRecentLeasePaymentsCard } from "@/components/admin/AdminRecentLeasePaymentsCard";
 
 function buildExportRows(data: Financials): string[][] {
   return [
@@ -45,7 +37,8 @@ function buildExportRows(data: Financials): string[][] {
     ["═══ REVENUE SUMMARY ═══"],
     ["Platform Revenue (Total)", data.platform_revenue_total.toFixed(2)],
     ["  Platform Fees (15%)", data.platform_fee_total.toFixed(2)],
-    ["  Cross-Club Fees ($25/rod)", data.cross_club_fee_total.toFixed(2)],
+    ["  Cross-Club Fees (AP share $15/rod)", data.cross_club_fee_total.toFixed(2)],
+    ["  Cross-Club Referring Club Referral ($10/rod)", data.cross_club_referral_total.toFixed(2)],
     ["  Guide Service Fees (10%)", data.guide_service_fee_total.toFixed(2)],
     ["  Lease Facilitation Fees (5%)", data.lease_facilitation_fee_total.toFixed(2)],
     ["  Membership Processing Fees", data.membership_processing_fees.toFixed(2)],
@@ -165,6 +158,7 @@ export default function AdminFinancialsPage() {
   const totalPayouts =
     (data?.landowner_payouts_total ?? 0) +
     (data?.club_payouts_total ?? 0) +
+    (data?.cross_club_referral_total ?? 0) +
     (data?.guide_payouts_total ?? 0);
 
   const stats: StatItem[] = [
@@ -204,7 +198,7 @@ export default function AdminFinancialsPage() {
 
   const revenueStreams: StreamItem[] = [
     { label: "Platform Fees (15%)", amount: data?.platform_fee_total ?? 0, color: "bg-forest" },
-    { label: "Cross-Club Fees ($25/rod)", amount: data?.cross_club_fee_total ?? 0, color: "bg-river" },
+    { label: "Cross-Club Fees (AP $15/rod)", amount: data?.cross_club_fee_total ?? 0, color: "bg-river" },
     { label: "Guide Service Fees (10%)", amount: data?.guide_service_fee_total ?? 0, color: "bg-charcoal" },
     { label: "Lease Facilitation Fee (5%)", amount: data?.lease_facilitation_fee_total ?? 0, color: "bg-bronze" },
     { label: "Membership Processing Fees", amount: data?.membership_processing_fees ?? 0, color: "bg-river-light" },
@@ -214,7 +208,8 @@ export default function AdminFinancialsPage() {
 
   const payoutStreams: StreamItem[] = [
     { label: "Landowner Payouts", amount: data?.landowner_payouts_total ?? 0, color: "bg-forest" },
-    { label: "Club Commissions", amount: data?.club_payouts_total ?? 0, color: "bg-river" },
+    { label: "Club Rod-Fee Share", amount: data?.club_payouts_total ?? 0, color: "bg-river" },
+    { label: "Cross-Club Referral Payouts", amount: data?.cross_club_referral_total ?? 0, color: "bg-river-light" },
     { label: "Guide Payouts", amount: data?.guide_payouts_total ?? 0, color: "bg-charcoal" },
   ].filter((s) => s.amount > 0);
 
@@ -303,11 +298,11 @@ export default function AdminFinancialsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <PricingModeSplitCard split={data?.pricing_mode_split} />
-        <ClassificationMixCard items={data?.classification_mix ?? []} />
+        <AdminClassificationMixCard items={data?.classification_mix ?? []} />
       </div>
 
       {(data?.recent_lease_payments?.length ?? 0) > 0 && (
-        <RecentLeasePaymentsCard
+        <AdminRecentLeasePaymentsCard
           payments={data?.recent_lease_payments ?? []}
           total={data?.lease_facilitation_fee_total ?? 0}
           count={data?.lease_payment_count ?? 0}
@@ -326,140 +321,3 @@ export default function AdminFinancialsPage() {
   );
 }
 
-const ADMIN_CLASSIFICATION_LABEL: Record<string, string> = {
-  select: "Select (50/50)",
-  premier: "Premier (35/65)",
-  signature: "Signature (25/75)",
-  lease: "Upfront lease",
-  unclassified: "Unclassified",
-};
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-}
-
-function PricingModeSplitCard({ split }: { split: PricingModeSplit | undefined }) {
-  const rod = split?.rod_fee_split ?? { bookings: 0, gmv: 0 };
-  const lease = split?.upfront_lease ?? { bookings: 0, gmv: 0 };
-  return (
-    <Card className="border-stone-light/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <SplitSquareHorizontal className="size-4 text-forest" />
-          Pricing Mode Split
-        </CardTitle>
-        <CardDescription>Booking volume and GMV by property pricing mode.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-text-secondary">Rod-fee split</span>
-          <span className="font-medium text-text-primary">
-            {rod.bookings} booking{rod.bookings === 1 ? "" : "s"} &middot; $
-            {rod.gmv.toLocaleString()} GMV
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-text-secondary">Upfront lease</span>
-          <span className="font-medium text-text-primary">
-            {lease.bookings} booking{lease.bookings === 1 ? "" : "s"} &middot; $
-            {lease.gmv.toLocaleString()} GMV
-          </span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ClassificationMixCard({ items }: { items: ClassificationMixEntry[] }) {
-  return (
-    <Card className="border-stone-light/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Layers className="size-4 text-river" />
-          Classification Mix
-        </CardTitle>
-        <CardDescription>Bookings, GMV and platform fees by tier.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {items.length === 0 ? (
-          <p className="py-3 text-sm text-text-light">No classification data yet.</p>
-        ) : (
-          <div className="divide-y divide-stone-light/20">
-            {items.map((c) => (
-              <div key={c.classification} className="flex items-center justify-between py-2 text-sm">
-                <span className="text-text-secondary">
-                  {ADMIN_CLASSIFICATION_LABEL[c.classification] ?? c.classification}
-                </span>
-                <span className="text-right font-medium text-text-primary">
-                  <span className="block">
-                    {c.bookings} &middot; ${c.gmv.toLocaleString()} GMV
-                  </span>
-                  <span className="block text-xs text-text-secondary">
-                    ${c.platform_fee.toLocaleString()} platform fees
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecentLeasePaymentsCard({
-  payments,
-  total,
-  count,
-}: {
-  payments: RecentLeasePayment[];
-  total: number;
-  count: number;
-}) {
-  return (
-    <Card className="border-stone-light/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <FileText className="size-4 text-bronze" />
-          Recent Lease Payments
-        </CardTitle>
-        <CardDescription>
-          {count} payment{count === 1 ? "" : "s"} &middot; ${total.toLocaleString()} facilitation fees collected
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="divide-y divide-stone-light/20">
-          {payments.map((p) => (
-            <div
-              key={p.id}
-              className="grid grid-cols-12 items-center gap-2 py-2 text-sm"
-            >
-              <div className="col-span-4 min-w-0">
-                <div className="truncate font-medium text-text-primary">{p.property_name}</div>
-                {p.club_name && (
-                  <div className="truncate text-xs text-text-secondary">{p.club_name}</div>
-                )}
-              </div>
-              <div className="col-span-4 text-xs text-text-secondary">
-                {formatDate(p.period_start)} – {formatDate(p.period_end)}
-                {p.paid_at ? ` · paid ${formatDate(p.paid_at)}` : ""}
-              </div>
-              <div className="col-span-4 text-right">
-                <div className="font-medium text-text-primary">
-                  ${p.amount.toLocaleString()}
-                </div>
-                <div className="text-xs text-text-secondary">
-                  ${p.landowner_net.toLocaleString()} landowner &middot; $
-                  {p.platform_fee.toLocaleString()} AP
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

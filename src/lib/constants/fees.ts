@@ -87,6 +87,30 @@ export const CLASSIFICATION_META: Record<
   },
 };
 
+/**
+ * Human-readable classification labels for dashboards.
+ * Includes "lease" and "unclassified" for bookings that don't fit the
+ * three standard tiers.
+ */
+export const CLASSIFICATION_LABELS: Record<string, string> = {
+  select: "Select (50/50)",
+  premier: "Premier (35/65)",
+  signature: "Signature (25/75)",
+  lease: "Upfront lease",
+  unclassified: "Unclassified",
+};
+
+/**
+ * Club-perspective classification labels (shows club's share %).
+ */
+export const CLASSIFICATION_LABELS_CLUB: Record<string, string> = {
+  select: "Select (50% club)",
+  premier: "Premier (35% club)",
+  signature: "Signature (25% club)",
+  lease: "Upfront lease (100% club)",
+  unclassified: "Unclassified",
+};
+
 // ─── Platform Fee ────────────────────────────────────────────────────
 /** 15% markup on the base rod fee, paid by the angler to AnglerPass. */
 export const PLATFORM_FEE_RATE = 0.15;

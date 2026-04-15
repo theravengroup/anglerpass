@@ -14,9 +14,6 @@ import {
   Loader2,
   Wallet,
   BarChart3,
-  AlertTriangle,
-  FileText,
-  Layers,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -32,6 +29,9 @@ import HeldFundsCard from "@/components/properties/HeldFundsCard";
 import GuidedBookingsCard from "@/components/properties/GuidedBookingsCard";
 import TaxSummaryCard from "@/components/properties/TaxSummaryCard";
 import LandownerTransactionHistory from "@/components/properties/LandownerTransactionHistory";
+import { LeaseAlertsBanner } from "@/components/properties/LeaseAlertsBanner";
+import { LeaseIncomeCard } from "@/components/properties/LeaseIncomeCard";
+import { ClassificationBreakdownCard } from "@/components/shared/ClassificationBreakdownCard";
 
 interface Transaction {
   id: string;
@@ -120,14 +120,6 @@ interface Financials {
   classification_breakdown: ClassificationBreakdown[];
   recent_transactions: Transaction[];
 }
-
-const CLASSIFICATION_LABEL: Record<string, string> = {
-  select: "Select (50/50)",
-  premier: "Premier (35/65)",
-  signature: "Signature (25/75)",
-  lease: "Upfront lease",
-  unclassified: "Unclassified",
-};
 
 export default function LandownerFinancialsPage() {
   const [data, setData] = useState<Financials | null>(null);
@@ -376,161 +368,3 @@ export default function LandownerFinancialsPage() {
   );
 }
 
-function daysUntil(dateStr: string | null): number | null {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return null;
-  const now = new Date();
-  return Math.floor((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-}
-
-function LeaseAlertsBanner({ properties }: { properties: PropertyPricing[] }) {
-  const leaseProps = properties.filter((p) => p.pricing_mode === "upfront_lease");
-  const pastDue = leaseProps.filter((p) => {
-    const d = daysUntil(p.lease_paid_through);
-    return d !== null && d < 0;
-  });
-  const expiringSoon = leaseProps.filter((p) => {
-    const d = daysUntil(p.lease_paid_through);
-    return d !== null && d >= 0 && d <= 30;
-  });
-
-  if (pastDue.length === 0 && expiringSoon.length === 0) return null;
-
-  return (
-    <div className="space-y-3">
-      {pastDue.length > 0 && (
-        <Card className="border-red-500/40 bg-red-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base text-red-700">
-              <AlertTriangle className="size-4" />
-              Lease past due
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm text-red-800">
-            {pastDue.map((p) => (
-              <div key={p.property_id} className="flex items-center justify-between">
-                <span>{p.name}</span>
-                <span>Paid through {formatDate(p.lease_paid_through)}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-      {expiringSoon.length > 0 && (
-        <Card className="border-amber-500/40 bg-amber-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base text-amber-800">
-              <AlertTriangle className="size-4" />
-              Lease expiring soon
-            </CardTitle>
-            <CardDescription className="text-amber-700">
-              Renewal needed within the next 30 days.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm text-amber-900">
-            {expiringSoon.map((p) => {
-              const d = daysUntil(p.lease_paid_through);
-              return (
-                <div key={p.property_id} className="flex items-center justify-between">
-                  <span>{p.name}</span>
-                  <span>
-                    {d} day{d === 1 ? "" : "s"} — through {formatDate(p.lease_paid_through)}
-                  </span>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-function LeaseIncomeCard({
-  totalLeaseIncome,
-  periodLeaseIncome,
-  days,
-  payments,
-}: {
-  totalLeaseIncome: number;
-  periodLeaseIncome: number;
-  days: number;
-  payments: LeasePayment[];
-}) {
-  return (
-    <Card className="border-forest/30">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <FileText className="size-4 text-forest" />
-          Lease Income
-        </CardTitle>
-        <CardDescription>
-          ${totalLeaseIncome.toLocaleString()} total &middot; $
-          {periodLeaseIncome.toLocaleString()} last {days}d
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {payments.length === 0 ? (
-          <p className="py-3 text-sm text-text-light">No lease payments received yet.</p>
-        ) : (
-          <div className="divide-y divide-stone-light/20">
-            {payments.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center justify-between gap-4 py-2 text-sm"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-text-primary">{p.property_name}</div>
-                  <div className="text-xs text-text-secondary">
-                    {formatDate(p.period_start)} – {formatDate(p.period_end)}
-                    {p.paid_at ? ` · paid ${formatDate(p.paid_at)}` : ""}
-                  </div>
-                </div>
-                <div className="text-right font-medium text-forest">
-                  ${p.landowner_net.toLocaleString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ClassificationBreakdownCard({ items }: { items: ClassificationBreakdown[] }) {
-  return (
-    <Card className="border-stone-light/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Layers className="size-4 text-forest" />
-          Classification Breakdown
-        </CardTitle>
-        <CardDescription>Bookings and landowner payout by property tier.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="divide-y divide-stone-light/20">
-          {items.map((c) => (
-            <div key={c.classification} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-text-secondary">
-                {CLASSIFICATION_LABEL[c.classification] ?? c.classification}
-              </span>
-              <span className="font-medium text-text-primary">
-                {c.bookings} booking{c.bookings === 1 ? "" : "s"} &middot; $
-                {c.landowner_payout.toLocaleString()}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

@@ -223,10 +223,10 @@ async function getLandownerFinancials(admin: any, userId: string, since: string)
   }));
 
   return {
-    total_earnings: totalEarnings,
-    period_earnings: periodEarnings,
-    total_base_rate: totalBaseRate,
-    total_commissions_paid: totalCommissionsPaid,
+    total_earnings: roundCurrency(totalEarnings),
+    period_earnings: roundCurrency(periodEarnings),
+    total_base_rate: roundCurrency(totalBaseRate),
+    total_commissions_paid: roundCurrency(totalCommissionsPaid),
     total_bookings: completed.length,
     period_bookings: periodCompleted.length,
     // New: held funds
@@ -533,17 +533,17 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
   const monthly = aggregateMonthly(managingBookings, "club_commission");
 
   return {
-    total_commission: totalCommission,
-    period_commission: periodCommission,
-    total_membership_revenue: totalMembershipRevenue,
-    period_membership_revenue: periodMembershipRevenue,
-    total_revenue: totalCommission + totalMembershipRevenue,
+    total_commission: roundCurrency(totalCommission),
+    period_commission: roundCurrency(periodCommission),
+    total_membership_revenue: roundCurrency(totalMembershipRevenue),
+    period_membership_revenue: roundCurrency(periodMembershipRevenue),
+    total_revenue: roundCurrency(totalCommission + totalMembershipRevenue),
     active_members: activeMembersCount ?? 0,
     total_bookings: bookings.length,
     period_bookings: periodBookings.length,
     // New: initiation vs dues breakdown
-    total_initiation_revenue: totalInitiationRevenue,
-    total_dues_revenue: totalDuesRevenue,
+    total_initiation_revenue: roundCurrency(totalInitiationRevenue),
+    total_dues_revenue: roundCurrency(totalDuesRevenue),
     // New: member dues health
     member_dues_health: {
       active: activeMembersCount ?? 0,
@@ -554,7 +554,7 @@ async function getClubFinancials(admin: any, userId: string, since: string) {
     // New: refund impact
     total_cancellations: cancelledBookings.length,
     period_cancellations: periodCancelled.length,
-    lost_commission_from_cancellations: lostCommissionFromCancellations,
+    lost_commission_from_cancellations: roundCurrency(lostCommissionFromCancellations),
     // Rod-fee share split
     managing_commission: roundCurrency(managingCommission),
     period_managing_commission: roundCurrency(periodManagingCommission),
@@ -870,7 +870,7 @@ async function getAdminFinancials(admin: any, since: string) {
   const { data: allBookings } = await admin
     .from("bookings")
     .select(
-      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, guide_rate, guide_service_fee, guide_payout, club_commission, landowner_payout, total_amount, rod_count, property_id, property_classification, pricing_mode, properties(name, owner_id, profiles!properties_owner_id_fkey(display_name))"
+      "id, status, booking_date, created_at, base_rate, platform_fee, cross_club_fee, home_club_referral, guide_rate, guide_service_fee, guide_payout, club_commission, landowner_payout, total_amount, rod_count, property_id, property_classification, pricing_mode, properties(name, owner_id, profiles!properties_owner_id_fkey(display_name))"
     )
     .in("status", ["confirmed", "completed"])
     .order("created_at", { ascending: false });
@@ -881,15 +881,23 @@ async function getAdminFinancials(admin: any, since: string) {
   );
 
   // Platform revenue streams
+  //
+  // IMPORTANT: cross_club_fee is the full $25/rod/day charged to the angler,
+  // but $10 of that is the referring-club referral (home_club_referral). AP
+  // only keeps $15. For AP revenue we must subtract the referral payout.
   const platformFeeTotal = sumField(bookings, "platform_fee");
   const crossClubFeeTotal = sumField(bookings, "cross_club_fee");
+  const crossClubReferralTotal = sumField(bookings, "home_club_referral");
+  const crossClubApShareTotal = roundCurrency(crossClubFeeTotal - crossClubReferralTotal);
   const guideServiceFeeTotal = sumField(bookings, "guide_service_fee");
-  const platformRevenueTotal = platformFeeTotal + crossClubFeeTotal + guideServiceFeeTotal;
+  const platformRevenueTotal = platformFeeTotal + crossClubApShareTotal + guideServiceFeeTotal;
 
   const platformFeePeriod = sumField(periodBookings, "platform_fee");
   const crossClubFeePeriod = sumField(periodBookings, "cross_club_fee");
+  const crossClubReferralPeriod = sumField(periodBookings, "home_club_referral");
+  const crossClubApSharePeriod = roundCurrency(crossClubFeePeriod - crossClubReferralPeriod);
   const guideServiceFeePeriod = sumField(periodBookings, "guide_service_fee");
-  const platformRevenuePeriod = platformFeePeriod + crossClubFeePeriod + guideServiceFeePeriod;
+  const platformRevenuePeriod = platformFeePeriod + crossClubApSharePeriod + guideServiceFeePeriod;
 
   // GMV
   const gmvTotal = sumField(bookings, "total_amount");
@@ -908,11 +916,14 @@ async function getAdminFinancials(admin: any, since: string) {
       monthlyRevenue[month] = { month, platform_fee: 0, cross_club_fee: 0, guide_service_fee: 0, lease_facilitation_fee: 0, total: 0 };
     }
     monthlyRevenue[month].platform_fee += (b.platform_fee as number) ?? 0;
-    monthlyRevenue[month].cross_club_fee += (b.cross_club_fee as number) ?? 0;
+    const ccFee = (b.cross_club_fee as number) ?? 0;
+    const ccReferral = (b.home_club_referral as number) ?? 0;
+    const ccApShare = ccFee - ccReferral;
+    monthlyRevenue[month].cross_club_fee += ccApShare;
     monthlyRevenue[month].guide_service_fee += (b.guide_service_fee as number) ?? 0;
     monthlyRevenue[month].total +=
       ((b.platform_fee as number) ?? 0) +
-      ((b.cross_club_fee as number) ?? 0) +
+      ccApShare +
       ((b.guide_service_fee as number) ?? 0);
   }
 
@@ -929,9 +940,11 @@ async function getAdminFinancials(admin: any, since: string) {
       clsMap[key] = { classification: key, bookings: 0, gmv: 0, platform_fee: 0 };
     }
     const gmv = (b.total_amount as number) ?? 0;
+    const bCcFee = (b.cross_club_fee as number) ?? 0;
+    const bCcRef = (b.home_club_referral as number) ?? 0;
     const fee =
       ((b.platform_fee as number) ?? 0) +
-      ((b.cross_club_fee as number) ?? 0) +
+      (bCcFee - bCcRef) +
       ((b.guide_service_fee as number) ?? 0);
     clsMap[key].bookings += 1;
     clsMap[key].gmv += gmv;
@@ -958,9 +971,11 @@ async function getAdminFinancials(admin: any, since: string) {
       propMap[pname] = { name: pname, gmv: 0, platform_revenue: 0, bookings: 0 };
     }
     propMap[pname].gmv += (b.total_amount as number) ?? 0;
+    const pCcFee = (b.cross_club_fee as number) ?? 0;
+    const pCcRef = (b.home_club_referral as number) ?? 0;
     propMap[pname].platform_revenue +=
       ((b.platform_fee as number) ?? 0) +
-      ((b.cross_club_fee as number) ?? 0) +
+      (pCcFee - pCcRef) +
       ((b.guide_service_fee as number) ?? 0);
     propMap[pname].bookings += 1;
   }
@@ -1016,21 +1031,31 @@ async function getAdminFinancials(admin: any, since: string) {
     monthlyRevenue[month].total += fee;
   }
 
-  // Roll lease facilitation into headline platform revenue
+  // Membership processing fees for the period
+  const periodMemberPayments = memberPayments.filter(
+    (p: Record<string, unknown>) => (p.created_at as string) >= since
+  );
+  const membershipProcessingFeesPeriod = periodMemberPayments.reduce(
+    (sum: number, p: Record<string, unknown>) => sum + ((p.processing_fee as number) ?? 0), 0
+  );
+
+  // Roll lease facilitation + membership processing into headline platform revenue
   const platformRevenueTotalWithLease = platformRevenueTotal + leaseFacilitationFeeTotal + membershipProcessingFees;
-  const platformRevenuePeriodWithLease = platformRevenuePeriod + leaseFacilitationFeePeriod;
+  const platformRevenuePeriodWithLease = platformRevenuePeriod + leaseFacilitationFeePeriod + membershipProcessingFeesPeriod;
 
   return {
     platform_revenue_total: roundCurrency(platformRevenueTotalWithLease),
     platform_revenue_period: roundCurrency(platformRevenuePeriodWithLease),
-    platform_fee_total: platformFeeTotal,
-    cross_club_fee_total: crossClubFeeTotal,
-    guide_service_fee_total: guideServiceFeeTotal,
-    gmv_total: gmvTotal,
-    gmv_period: gmvPeriod,
-    landowner_payouts_total: landownerPayoutsTotal,
-    club_payouts_total: clubPayoutsTotal,
-    guide_payouts_total: guidePayoutsTotal,
+    platform_fee_total: roundCurrency(platformFeeTotal),
+    cross_club_fee_total: roundCurrency(crossClubApShareTotal),
+    cross_club_fee_gross: roundCurrency(crossClubFeeTotal),
+    cross_club_referral_total: roundCurrency(crossClubReferralTotal),
+    guide_service_fee_total: roundCurrency(guideServiceFeeTotal),
+    gmv_total: roundCurrency(gmvTotal),
+    gmv_period: roundCurrency(gmvPeriod),
+    landowner_payouts_total: roundCurrency(landownerPayoutsTotal),
+    club_payouts_total: roundCurrency(clubPayoutsTotal),
+    guide_payouts_total: roundCurrency(guidePayoutsTotal),
     total_bookings: bookings.length,
     period_bookings: periodBookings.length,
     membership_gmv: membershipGmv,

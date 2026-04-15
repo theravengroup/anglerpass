@@ -15,8 +15,6 @@ import {
   Users,
   CreditCard,
   ArrowUpRight,
-  FileText,
-  Layers,
 } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
 import { FetchError } from "@/components/shared/FetchError";
@@ -33,6 +31,8 @@ import MembershipRevenueBreakdown from "@/components/clubs/MembershipRevenueBrea
 import CrossClubNetworkCard from "@/components/clubs/CrossClubNetworkCard";
 import ClubMembershipPaymentsTable from "@/components/clubs/ClubMembershipPaymentsTable";
 import ClubTransactionHistory from "@/components/clubs/ClubTransactionHistory";
+import { ClubLeasePaymentsCard } from "@/components/clubs/ClubLeasePaymentsCard";
+import { ClubClassificationMixCard } from "@/components/clubs/ClubClassificationMixCard";
 
 interface PropertyCommission {
   name: string;
@@ -122,14 +122,6 @@ interface Financials {
   recent_transactions: Transaction[];
   recent_membership_payments: MembershipPayment[];
 }
-
-const CLUB_CLASSIFICATION_LABEL: Record<string, string> = {
-  select: "Select (50% club)",
-  premier: "Premier (35% club)",
-  signature: "Signature (25% club)",
-  lease: "Upfront lease (100% club)",
-  unclassified: "Unclassified",
-};
 
 export default function ClubFinancialsPage() {
   const [data, setData] = useState<Financials | null>(null);
@@ -359,96 +351,3 @@ export default function ClubFinancialsPage() {
   );
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-}
-
-function ClubLeasePaymentsCard({
-  totalLeaseOutflows,
-  totalLeasePlatformFeesPaid,
-  payments,
-}: {
-  totalLeaseOutflows: number;
-  totalLeasePlatformFeesPaid: number;
-  payments: LeasePayment[];
-}) {
-  return (
-    <Card className="border-river/30">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <FileText className="size-4 text-river" />
-          Lease Payments Out
-        </CardTitle>
-        <CardDescription>
-          ${totalLeaseOutflows.toLocaleString()} total ACH charges &middot; $
-          {totalLeasePlatformFeesPaid.toLocaleString()} AnglerPass 5% fee
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {payments.length === 0 ? (
-          <p className="py-3 text-sm text-text-light">No lease payments yet.</p>
-        ) : (
-          <div className="divide-y divide-stone-light/20">
-            {payments.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center justify-between gap-4 py-2 text-sm"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-text-primary">{p.property_name}</div>
-                  <div className="text-xs text-text-secondary">
-                    {formatDate(p.period_start)} – {formatDate(p.period_end)}
-                    {p.paid_at ? ` · paid ${formatDate(p.paid_at)}` : ""}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium text-text-primary">
-                    ${p.amount.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-text-secondary">
-                    ${p.landowner_net.toLocaleString()} landowner &middot; $
-                    {p.platform_fee.toLocaleString()} AP
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ClubClassificationMixCard({ items }: { items: ClassificationMixEntry[] }) {
-  return (
-    <Card className="border-stone-light/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Layers className="size-4 text-river" />
-          Classification Mix
-        </CardTitle>
-        <CardDescription>
-          Rod-fee share earned by property tier (as managing club).
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="divide-y divide-stone-light/20">
-          {items.map((c) => (
-            <div key={c.classification} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-text-secondary">
-                {CLUB_CLASSIFICATION_LABEL[c.classification] ?? c.classification}
-              </span>
-              <span className="font-medium text-text-primary">
-                {c.bookings} booking{c.bookings === 1 ? "" : "s"} &middot; $
-                {c.commission.toLocaleString()}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
