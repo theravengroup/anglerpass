@@ -130,7 +130,9 @@ export default function PricingSection({
           <div className="space-y-4 border-t border-stone-light/20 pt-4">
             <p className="text-xs text-text-secondary">
               Your club will receive a lease proposal. You&apos;ll be paid via
-              ACH after the club accepts; AnglerPass takes a 5% platform fee.
+              ACH after the club accepts &mdash; you receive the full amount you
+              propose. AnglerPass&apos;s 5% facilitation fee is charged on top
+              to the club.
             </p>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">

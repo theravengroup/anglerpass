@@ -192,8 +192,9 @@ export default function PricingPage() {
             <p className="text-[13px] text-text-light leading-[1.6]">
               Prefer a predictable annual payment? Landowners can instead choose{' '}
               <strong className="text-forest">upfront lease</strong>: the managing club pays a
-              fixed annual lease via ACH, and then keeps 100% of rod fees. AnglerPass takes a
-              5% facilitation fee on the lease payment.
+              fixed annual lease via ACH, and then keeps 100% of rod fees. The landowner
+              receives the full agreed amount; AnglerPass adds a 5% facilitation fee on top
+              to the club&rsquo;s charge.
             </p>
           </div>
 
@@ -376,13 +377,14 @@ export default function PricingPage() {
                 </h4>
                 <p className="text-[13px] text-text-secondary leading-[1.6] mb-3">
                   Prefer a predictable annual payment? Propose a lease amount; once your
-                  club accepts, you&rsquo;re paid the full amount via ACH.
+                  club accepts, you receive 100% of that amount via ACH.
                 </p>
                 <ul className="list-none m-0 p-0">
                   {[
                     'You set the annual amount ($1,000 - $1,000,000)',
                     'Paid upfront via ACH, not credit card',
-                    'AnglerPass takes 5% on the lease',
+                    'You receive 100% of the agreed amount',
+                    'AnglerPass adds a 5% facilitation fee on top, paid by the club',
                     'Club keeps 100% of rod fees thereafter',
                   ].map((detail) => (
                     <li key={detail} className="py-[5px] text-[13px] text-text-secondary">

@@ -57,8 +57,8 @@ export default function PaymentPolicies() {
           <strong> Signature</strong> (25% / 75%).
           Alternatively, a landowner can opt into <strong>upfront lease</strong>: the
           club pays the landowner a fixed annual amount via ACH, and the club then
-          keeps 100% of rod fees. AnglerPass takes a 5% facilitation fee on the
-          lease payment.
+          keeps 100% of rod fees. The landowner receives the full agreed amount;
+          AnglerPass adds a 5% facilitation fee on top, charged to the club.
         </p>
 
         <h3 className={subHeadingClass}>Payouts</h3>
@@ -174,7 +174,7 @@ export default function PaymentPolicies() {
                   Single ACH payment at lease acceptance
                 </td>
                 <td className="p-3 px-5 text-[14px] text-text-secondary">
-                  95% of lease amount (5% platform fee)
+                  100% of the agreed amount (5% fee added to club&rsquo;s charge)
                 </td>
               </tr>
               <tr className="border-t border-parchment">
@@ -218,9 +218,10 @@ export default function PaymentPolicies() {
         </p>
         <p className={textClass}>
           Landowners on the <strong>upfront lease</strong> model receive a single
-          ACH payment at lease acceptance (95% of the agreed amount; AnglerPass
-          keeps a 5% platform fee). Rod-fee revenue after the lease is paid flows
-          100% to the managing club.
+          ACH payment at lease acceptance for <strong>100% of the agreed amount</strong>.
+          AnglerPass&rsquo;s 5% facilitation fee is charged on top to the club &mdash;
+          it does not come out of the landowner&rsquo;s payout. Rod-fee revenue after
+          the lease is paid flows 100% to the managing club.
         </p>
 
         <h3 className={subHeadingClass}>Club payouts</h3>

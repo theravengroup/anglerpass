@@ -197,12 +197,13 @@ export default function TermsPage() {
             <p className={textClass}>
               <strong>Property bookings &mdash; upfront lease.</strong>{' '}A
               landowner may alternatively opt for an upfront annual lease. In
-              this model the managing club pays the landowner a negotiated
-              lease amount via ACH at lease acceptance; AnglerPass retains a
-              5% platform fee on the lease payment. For bookings on lease
-              properties, the managing club keeps 100% of the rod fee; the
-              landowner receives no per-booking payout since they were paid
-              upfront.
+              this model the landowner receives 100% of the agreed lease
+              amount via ACH at lease acceptance. AnglerPass charges a 5%
+              facilitation fee on top of that amount to the managing club, so
+              the club&rsquo;s total ACH charge equals the landowner&rsquo;s
+              agreed amount plus 5%. For bookings on lease properties, the
+              managing club keeps 100% of the rod fee; the landowner receives
+              no per-booking payout since they were paid upfront.
             </p>
 
             <p className={textClass}>

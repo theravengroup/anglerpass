@@ -557,30 +557,31 @@ describe("calculateFeeBreakdown — edge cases", () => {
 // ─── Lease breakdown ─────────────────────────────────────────────────
 
 describe("calculateLeaseBreakdown", () => {
-  it("5% platform fee, landowner gets 95%", () => {
-    const r = calculateLeaseBreakdown(20_000_00); // $20,000 in cents
-    expect(r.amountCents).toBe(2_000_000);
-    expect(r.platformFeeCents).toBe(100_000); // 5%
-    expect(r.landownerNetCents).toBe(1_900_000);
+  it("landowner receives full agreed amount; club charged 5% on top", () => {
+    // Landowner asked for $20,000
+    const r = calculateLeaseBreakdown(20_000_00);
+    expect(r.landownerNetCents).toBe(2_000_000); // landowner gets $20,000
+    expect(r.platformFeeCents).toBe(100_000);    // AP takes $1,000 (5%)
+    expect(r.clubChargeCents).toBe(2_100_000);   // club pays $21,000 total
   });
 
-  it("handles rounding on odd cents", () => {
-    const r = calculateLeaseBreakdown(10_001); // $100.01
+  it("club charge = landowner net + platform fee", () => {
+    const r = calculateLeaseBreakdown(10_001); // $100.01 to landowner
     expect(r.platformFeeCents).toBe(500); // round(10001 * 0.05) = 500
-    expect(r.amountCents).toBe(r.platformFeeCents + r.landownerNetCents);
+    expect(r.clubChargeCents).toBe(r.landownerNetCents + r.platformFeeCents);
   });
 
   it("zero amount", () => {
     const r = calculateLeaseBreakdown(0);
-    expect(r.amountCents).toBe(0);
-    expect(r.platformFeeCents).toBe(0);
     expect(r.landownerNetCents).toBe(0);
+    expect(r.platformFeeCents).toBe(0);
+    expect(r.clubChargeCents).toBe(0);
   });
 
   it("floors negative to zero", () => {
     const r = calculateLeaseBreakdown(-500);
-    expect(r.amountCents).toBe(0);
     expect(r.landownerNetCents).toBe(0);
+    expect(r.clubChargeCents).toBe(0);
   });
 });
 
