@@ -195,6 +195,7 @@ export const PHASES: RoadmapPhase[] = [
           { id: "c-mkt-conservation", label: "Conservation page (habitat preservation, catch-and-release values)", done: true },
           { id: "c-mkt-conservation-update", label: "Conservation page update (Stripe Climate raised to 1%, EarthNow partnership + live widget embed)", done: true },
           { id: "c-mkt-landowner-pricing", label: "Landowner pricing education (Select/Premier/Signature tiers, rod-fee-split examples, upfront lease explainer, updated FAQs)", done: true },
+          { id: "c-mkt-guide-rename", label: "Renamed Guide role to Independent Guide across all user-facing text (80 files, marketing, dashboard, notifications, emails, SEO, policies, roadmap)", done: true },
           { id: "c-mkt-ai", label: "AnglerPass Compass AI section (trip matching, planning, on-water guidance)", done: true },
           { id: "c-mkt-explore", label: "Public Explore Waters page (search properties without login)", done: true },
           { id: "c-mkt-press-kit", label: "Press kit (logos in 6 formats, dashboard screenshots, founder headshot, brand kit PDF)", done: true },
@@ -669,8 +670,22 @@ export const PHASES: RoadmapPhase[] = [
         ],
       },
       {
+        id: "p2-outfitters",
+        title: "2F: Outfitter Role",
+        description: "New user role for commercial outfitting operations — distinct from independent guides.",
+        items: [
+          { id: "p2-outfitter-role", label: "Outfitter role definition (DB, types, middleware, route protection)", done: false },
+          { id: "p2-outfitter-profile", label: "Outfitter profile and business registration (company, staff, fleet)", done: false },
+          { id: "p2-outfitter-marketing", label: "Outfitter marketing page and audience-specific messaging", done: false },
+          { id: "p2-outfitter-dashboard", label: "Outfitter dashboard shell (bookings, staff, properties, earnings)", done: false },
+          { id: "p2-outfitter-booking", label: "Outfitter booking flow (multi-guide trips, group coordination)", done: false },
+          { id: "p2-outfitter-pricing", label: "Outfitter pricing page section and fee structure", done: false },
+          { id: "p2-outfitter-verification", label: "Outfitter verification (business license, insurance, Checkr)", done: false },
+        ],
+      },
+      {
         id: "p2-infra",
-        title: "2F: Testing & Infrastructure",
+        title: "2G: Testing & Infrastructure",
         description: "Operational maturity for a platform handling financial transactions.",
         items: [
           { id: "p2-tests", label: "Test framework (Vitest unit + Playwright E2E)", done: true },
@@ -681,7 +696,7 @@ export const PHASES: RoadmapPhase[] = [
       },
       {
         id: "p2-corporate",
-        title: "2G: Corporate & Enterprise",
+        title: "2H: Corporate & Enterprise",
         items: [
           { id: "p2-corp-dashboard", label: "Corporate admin dashboard (utilization, spending, engagement)", done: true },
           { id: "p2-corp-billing", label: "Corporate billing (invoices, PO numbers, net-30 terms)", done: true },
