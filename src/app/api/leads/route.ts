@@ -102,13 +102,13 @@ async function sendInvestorEmails(data: {
   const typeLabel =
     INVESTOR_TYPE_LABELS[data.investorType ?? ""] ?? data.investorType ?? "—";
 
-  // Fetch the Investor Snapshot PDF for attachment
+  // Fetch the Investor Snapshot PNG for attachment
   let attachments: { filename: string; content: Buffer }[] = [];
   try {
-    const snapshotRes = await fetch("https://anglerpass.com/images/anglerpass-investor-snapshot.pdf");
+    const snapshotRes = await fetch("https://anglerpass.com/images/anglerpass-investor-snapshot.png");
     if (snapshotRes.ok) {
       const arrayBuffer = await snapshotRes.arrayBuffer();
-      attachments = [{ filename: "AnglerPass-Investor-Snapshot.pdf", content: Buffer.from(arrayBuffer) }];
+      attachments = [{ filename: "AnglerPass-Investor-Snapshot.png", content: Buffer.from(arrayBuffer) }];
     }
   } catch {
     console.error("[leads] Failed to fetch investor snapshot for attachment");
